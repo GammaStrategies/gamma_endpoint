@@ -222,6 +222,37 @@ class thegraph_scraper_helper:
     def _url_constructor(self, network, query_name: str = ""):
         return self._URLS[network]
 
+    def _get_last_block(self, network: str, query_name: str) -> int:
+        """get last block number from this subgraph
+
+        Returns:
+            int: last block number
+        """
+        try:
+            _url = self._url_constructor(network, query_name)
+            _query = """{ _meta {
+                            block {
+                            number
+                            }
+                        }  } """
+
+            _data = net_utilities.post_request(
+                url=_url,
+                query=_query,
+                retry=0,
+                max_retry=1,
+                wait_secs=2,
+                timeout_secs=self.timeout_secs,
+            )
+
+            return _data["data"].get("_meta", {}).get("block", {}).get("number", 0)
+
+        except Exception as err:
+            logging.getLogger(__name__).exception(
+                f"Unexpected error while retrieving last block number from thegraph   .error: {sys.exc_info()[0]}"
+            )
+        return 0
+
 
 ## SPECIFIC ##
 class gamma_scraper(thegraph_scraper_helper):
@@ -1474,7 +1505,7 @@ class arrakis_scraper(thegraph_scraper_helper):
                     }}
                     }}
             """.format(
-                _filter, _skip
+                filter, skip
             )
         elif name == "univ3_gelato":
             return """{{

@@ -8,6 +8,7 @@ from endpoint.routers.template import (
 )
 from sources.common.general.enums import Dex, Chain
 from sources.mongo.bins.apps import hypervisor
+from sources.mongo.bins.apps import user
 
 
 def build_routers() -> list:
@@ -196,7 +197,7 @@ class mongo_router_builder(router_builder_generalTemplate):
         timestamp: int | None = None,
         block: int | None = None,
     ):
-        return hypervisor.get_uncollected_fees(
+        return await hypervisor.hypervisor_uncollected_fees(
             network=self.chain,
             hypervisor_address=hypervisor_address,
             timestamp=timestamp,
@@ -212,7 +213,7 @@ class mongo_router_builder(router_builder_generalTemplate):
         start_block: int | None = None,
         end_block: int | None = None,
     ):
-        return hypervisor.get_collected_fees(
+        return await hypervisor.hypervisor_collected_fees(
             network=self.chain,
             hypervisor_address=hypervisor_address,
             start_timestamp=start_timestamp,
@@ -247,7 +248,7 @@ class mongo_router_builder(router_builder_generalTemplate):
 
     async def hypervisors_list(self, response: Response):
         """Returns a list of low case hypervisor addresses found in registry"""
-        return hypervisor.get_list(network=self.chain, dex=self.dex)
+        return await hypervisor.hypervisors_list(network=self.chain, dex=self.dex)
 
     async def hypervisors_aggregate_stats(self, response: Response):
         return "Not implemented yet"
@@ -268,7 +269,7 @@ class mongo_router_builder(router_builder_generalTemplate):
         self,
         response: Response,
     ):
-        return "Not implemented yet"
+        return await hypervisor.hypervisors_uncollected_fees(network=self.chain)
 
     async def hypervisors_collected_fees(
         self,
@@ -278,7 +279,13 @@ class mongo_router_builder(router_builder_generalTemplate):
         start_block: int | None = None,
         end_block: int | None = None,
     ):
-        return "Not implemented yet"
+        return await hypervisor.hypervisors_collected_fees(
+            network=self.chain,
+            start_timestamp=start_timestamp,
+            end_timestamp=end_timestamp,
+            start_block=start_block,
+            end_block=end_block,
+        )
 
     async def hypervisors_feeReturns_daily(self, response: Response):
         return "Not implemented yet"
@@ -312,10 +319,10 @@ class mongo_router_builder(router_builder_generalTemplate):
         return "Not implemented yet"
 
     async def user_data(self, address: str, response: Response):
-        return "Not implemented yet"
+        return await user.get_user_historic_info(chain=self.chain, address=address)
 
     async def user_analytics(self, address: str, response: Response):
-        return "Not implemented yet"
+        return await user.get_user_analytic_data(chain=self.chain, address=address)
 
     async def vault_data(self, address: str, response: Response):
         return "Not implemented yet"

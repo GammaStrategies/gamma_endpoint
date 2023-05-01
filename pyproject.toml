@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "uniswap-v3-performance"
+version = "0.1.0"
+description = "Data API for Gamma Strategies"
+authors = ["loc <l0c4t0r@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "uniswap_v3_performance"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+uvicorn = {extras = ["standard"], version = "^0.20.0"}
+fastapi = "^0.92.0"
+httpx = "^0.23.3"
+web3 = "^6.0.0b11"
+fastapi-cache2 = "^0.2.1"
+numpy = "^1.24.2"
+pandas = "^1.5.3"
+gql = "^3.4.0"
+pymongo = "^4.3.3"
+gunicorn = "^20.1.0"
+pyyaml = "^6.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+flake8 = "^6.0.0"
+pylint = "^2.17.1"
+isort = "^5.12.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+
+[tool.pylint]
+max-line-length = 88
+
+[tool.pylint.MASTER]
+extension-pkg-whitelist = "pydantic"
+
+[tool.poe.tasks]
+run = "uvicorn app:app --reload"

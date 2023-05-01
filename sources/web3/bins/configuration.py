@@ -5,7 +5,7 @@ from sources.web3.bins.general.general_utilities import (
 
 
 # load configuration file
-CONFIGURATION = {}  # load_configuration()
+CONFIGURATION = {"cache": {"save_path": "data/cache"}}  # load_configuration()
 
 
 # check configuration
@@ -113,12 +113,12 @@ RPC_URLS = {
         "https://ethereum.publicnode.com",
     ],
     "polygon": [
-        "https://polygon-rpc.com/",
+        # "https://polygon-rpc.com/",
         "https://rpc-mainnet.matic.network",
         "https://matic-mainnet.chainstacklabs.com",
         "https://rpc-mainnet.maticvigil.com",
         "https://rpc-mainnet.matic.quiknode.pro",
-        "https://matic-mainnet-full-rpc.bwarelabs.com",
+        # "https://matic-mainnet-full-rpc.bwarelabs.com",
         "https://polygon-bor.publicnode.com",
     ],
     "optimism": ["https://mainnet.optimism.io/"],

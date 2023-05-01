@@ -77,7 +77,9 @@ class price_scraper:
 
         if _price in [None, 0]:
             # get a list of thegraph_connectors
-            thegraph_connectors = self._get_connector_candidates(network=network)
+            thegraph_connectors = self._get_connector_candidates(
+                network=network, block=block
+            )
 
             for dex, connector in thegraph_connectors.items():
                 logging.getLogger(LOG_NAME).debug(
@@ -288,7 +290,7 @@ class price_scraper:
         except Exception:
             return 0
 
-    def _get_connector_candidates(self, network: str) -> dict:
+    def _get_connector_candidates(self, network: str, block: int | None = None) -> dict:
         """get thegraph connectors with data for the specified network
 
         Args:
@@ -297,8 +299,20 @@ class price_scraper:
         Returns:
             dict: { <connector name> : <connector>}
         """
-        return {
-            name: connector
-            for name, connector in self.thegraph_connectors.items()
-            if network in connector.networks
-        }
+        result = {}
+        for name, connector in self.thegraph_connectors.items():
+            if network in connector.networks:
+                if block:
+                    latest_block = connector._get_last_block(
+                        network=network, query_name="tokens"
+                    )
+                    if latest_block >= block:
+                        result[name] = connector
+                else:
+                    result[name] = connector
+        return result
+        # return {
+        #     name: connector
+        #     for name, connector in self.thegraph_connectors.items()
+        #     if network in connector.networks and (not block or connector._get_last_block(network=network, query_name="tokens") > block)
+        # }

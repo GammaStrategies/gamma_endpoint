@@ -2,9 +2,13 @@ import logging
 import math
 import datetime as dt
 
-from web3 import Web3, exceptions
+from web3 import Web3, exceptions, AsyncWeb3, AsyncHTTPProvider
+from web3.eth import AsyncEth
+from web3.net import AsyncNet
 from web3.contract import Contract
-from web3.middleware import geth_poa_middleware, simple_cache_middleware
+from web3.middleware import async_geth_poa_middleware, async_simple_cache_middleware
+
+import asyncio
 
 from sources.web3.bins.configuration import CONFIGURATION
 from sources.web3.bins.general import file_utilities
@@ -19,6 +23,7 @@ class web3wrap:
         abi_filename: str = "",
         abi_path: str = "",
         block: int = 0,
+        timestamp: int = 0,
         custom_web3: Web3 | None = None,
         custom_web3Url: str | None = None,
     ):
@@ -39,8 +44,17 @@ class web3wrap:
         # setup contract to query
         self.setup_contract(contract_address=self._address, contract_abi=self._abi)
 
-        # set block
-        self._block = self._w3.eth.get_block("latest").number if block == 0 else block
+        self._timestamp = timestamp
+        self._block = block
+        self._block_data = None
+
+    # initializers
+    async def init_block(self) -> tuple[int, int]:
+        self._block_data = await self._w3.eth.get_block(self._block or "latest")
+        self.block = self._block_data.number
+        self.timestamp = self._block_data.timestamp
+
+        return self._block, self._timestamp
 
     def setup_abi(self, abi_filename: str, abi_path: str):
         # set optionals
@@ -54,19 +68,21 @@ class web3wrap:
         )
 
     def setup_w3(self, network: str, web3Url: str | None = None) -> Web3:
-        # create Web3 helper
-        result = Web3(
-            Web3.HTTPProvider(
+        # setup web3
+        result = AsyncWeb3(
+            AsyncHTTPProvider(
                 web3Url or CONFIGURATION["sources"]["web3Providers"][network],
-                request_kwargs={"timeout": 60},
-            )
+                request_kwargs={"timeout": 120},
+            ),
+            modules={"eth": AsyncEth, "net": AsyncNet},
         )
+
         # add simple cache module
-        result.middleware_onion.add(simple_cache_middleware)
+        result.middleware_onion.add(async_simple_cache_middleware)
 
         # add middleware as needed
         if network != "ethereum":
-            result.middleware_onion.inject(geth_poa_middleware, layer=0)
+            result.middleware_onion.inject(async_geth_poa_middleware, layer=0)
 
         return result
 
@@ -90,16 +106,30 @@ class web3wrap:
         return self._contract
 
     @property
-    def block(self) -> int:
+    async def block(self) -> int:
         """ """
+        if not self._block:
+            await self.init_block()
+
         return self._block
 
     @block.setter
     def block(self, value: int):
         self._block = value
 
+    @property
+    async def timestamp(self) -> int:
+        """ """
+        if not self._timestamp:
+            await self.init_block()
+        return self._timestamp
+
+    @timestamp.setter
+    def timestamp(self, value: int):
+        self._timestamp = value
+
     # HELPERS
-    def average_blockTime(self, blocksaway: int = 500) -> dt.datetime.timestamp:
+    async def average_blockTime(self, blocksaway: int = 500) -> dt.datetime.timestamp:
         """Average time of block creation
 
         Args:
@@ -113,12 +143,14 @@ class web3wrap:
         blocksaway: int = math.floor(blocksaway)
         #
         if blocksaway > 0:
-            block_current: int = self._w3.eth.get_block("latest")
-            block_past: int = self._w3.eth.get_block(block_current.number - blocksaway)
+            block_current, block_past = await asyncio.gather(
+                self._w3.eth.get_block("latest"),
+                self._w3.eth.get_block(block_current.number - blocksaway),
+            )
             result: int = (block_current.timestamp - block_past.timestamp) / blocksaway
         return result
 
-    def blockNumberFromTimestamp(
+    async def blockNumberFromTimestamp(
         self,
         timestamp: dt.datetime.timestamp,
         inexact_mode="before",
@@ -140,21 +172,21 @@ class web3wrap:
             raise ValueError("Timestamp cannot be zero!")
 
         # check min timestamp
-        min_block = self._w3.eth.get_block(1)
+        min_block = await self._w3.eth.get_block(1)
         if min_block.timestamp > timestamp:
             return 1
 
         queries_cost = 0
         found_exact = False
 
-        block_curr = self._w3.eth.get_block("latest")
+        block_curr = await self._w3.eth.get_block("latest")
         first_step = math.ceil(block_curr.number * 0.85)
 
         # make sure we have positive block result
         while (block_curr.number + first_step) <= 0:
             first_step -= 1
         # calc blocks to go up/down closer to goal
-        block_past = self._w3.eth.get_block(block_curr.number - (first_step))
+        block_past = await self._w3.eth.get_block(block_curr.number - (first_step))
         blocks_x_timestamp = (
             abs(block_curr.timestamp - block_past.timestamp) / first_step
         )
@@ -176,7 +208,7 @@ class web3wrap:
                 block_step /= 2
             # go to block
             try:
-                block_curr = self._w3.eth.get_block(
+                block_curr = await self._w3.eth.get_block(
                     math.floor(block_curr.number + (block_step * block_step_sign))
                 )
             except exceptions.BlockNotFound:
@@ -217,11 +249,11 @@ class web3wrap:
                 if inexact_mode == "before":
                     # select block smaller than objective
                     while block_curr.timestamp > timestamp:
-                        block_curr = self._w3.eth.get_block(block_curr.number - 1)
+                        block_curr = await self._w3.eth.get_block(block_curr.number - 1)
                 elif inexact_mode == "after":
                     # select block greater than objective
                     while block_curr.timestamp < timestamp:
-                        block_curr = self._w3.eth.get_block(block_curr.number + 1)
+                        block_curr = await self._w3.eth.get_block(block_curr.number + 1)
                 else:
                     raise ValueError(
                         f" Inexact method chosen is not valid:->  {inexact_mode}"
@@ -233,7 +265,9 @@ class web3wrap:
         result = block_curr.number
 
         # get blocks with same timestamp
-        sametimestampBlocks = self.get_sameTimestampBlocks(block_curr, queries_cost)
+        sametimestampBlocks = await self.get_sameTimestampBlocks(
+            block_curr, queries_cost
+        )
         if len(sametimestampBlocks) > 0:
             if eq_timestamp_position == "first":
                 result = sametimestampBlocks[0]
@@ -254,31 +288,31 @@ class web3wrap:
         # return closest block found
         return result
 
-    def timestampFromBlockNumber(self, block: int) -> int:
+    async def timestampFromBlockNumber(self, block: int) -> int:
         block_obj = None
         if block < 1:
-            block_obj = self._w3.eth.get_block("latest")
+            block_obj = await self._w3.eth.get_block("latest")
         else:
-            block_obj = self._w3.eth.get_block(block)
+            block_obj = await self._w3.eth.get_block(block)
 
         # return closest block found
         return block_obj.timestamp
 
-    def get_sameTimestampBlocks(self, block, queries_cost: int):
+    async def get_sameTimestampBlocks(self, block, queries_cost: int):
         result = []
         # try go backwards till different timestamp is found
         curr_block = block
         while curr_block.timestamp == block.timestamp:
             if curr_block.number != block.number:
                 result.append(curr_block.number)
-            curr_block = self._w3.eth.get_block(curr_block.number - 1)
+            curr_block = await self._w3.eth.get_block(curr_block.number - 1)
             queries_cost += 1
         # try go forward till different timestamp is found
         curr_block = block
         while curr_block.timestamp == block.timestamp:
             if curr_block.number != block.number:
                 result.append(curr_block.number)
-            curr_block = self._w3.eth.get_block(curr_block.number + 1)
+            curr_block = await self._w3.eth.get_block(curr_block.number + 1)
             queries_cost += 1
 
         return sorted(result)
@@ -326,12 +360,13 @@ class web3wrap:
         # return result
         return result
 
-    def get_chunked_events(self, eventfilter, max_blocks=2000):
+    async def get_chunked_events(self, eventfilter, max_blocks=2000):
+        result = []
         # get a list of filters with different block chunks
-        for _filter in self.create_eventFilter_chunks(
+        for _filter in await self.create_eventFilter_chunks(
             eventfilter=eventfilter, max_blocks=max_blocks
         ):
-            entries = self._w3.eth.filter(_filter).get_all_entries()
+            entries = await self._w3.eth.filter(_filter).get_all_entries()
 
             # progress if no data found
             if self._progress_callback and len(entries) == 0:
@@ -340,9 +375,10 @@ class web3wrap:
                     remaining=eventfilter["toBlock"] - _filter["toBlock"],
                     total=eventfilter["toBlock"] - eventfilter["fromBlock"],
                 )
+            result.append(entries)
 
             # filter blockchain data
-            yield from entries
+        return result
 
     def identify_dex_name(self) -> str:
         """Return dex name using the calling object's type
@@ -392,12 +428,13 @@ class web3wrap:
                 f" Dex name cannot be identified using object type {type(self)}"
             )
 
-    def as_dict(self, convert_bint=False) -> dict:
-        result = {
-            "block": self.block,
-            "timestamp": self.timestampFromBlockNumber(block=self.block),
-        }
+    async def as_dict(self, convert_bint=False) -> dict:
+        # it will only fill when block is not set
 
+        result = {}
+        result["block"], result["timestamp"] = await asyncio.gather(
+            self.block, self.timestamp
+        )
         # lower case address to be able to be directly compared
         result["address"] = self.address.lower()
         return result
@@ -412,6 +449,7 @@ class erc20(web3wrap):
         abi_filename: str = "",
         abi_path: str = "",
         block: int = 0,
+        timestamp: int = 0,
         custom_web3: Web3 | None = None,
         custom_web3Url: str | None = None,
     ):
@@ -424,37 +462,61 @@ class erc20(web3wrap):
             abi_filename=self._abi_filename,
             abi_path=self._abi_path,
             block=block,
+            timestamp=timestamp,
             custom_web3=custom_web3,
             custom_web3Url=custom_web3Url,
         )
 
+        self._decimals = None
+        self._totalSupply = None
+        self._symbol = None
+
+    async def init_decimals(self):
+        self._decimals = await self._contract.functions.decimals().call()
+
+    async def init_totalSupply(self):
+        self._totalSupply = await self._contract.functions.totalSupply().call(
+            block_identifier=await self.block
+        )
+
+    async def init_symbol(self):
+        self._symbol = (
+            "MKR"
+            if self.address == "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2"
+            else await self._contract.functions.symbol().call()
+        )
+
     # PROPERTIES
-    @property
-    def decimals(self) -> int:
-        return self._contract.functions.decimals().call()
 
-    def balanceOf(self, address: str) -> int:
-        return self._contract.functions.balanceOf(
+    @property
+    async def decimals(self) -> int:
+        if not self._decimals:
+            await self.init_decimals()
+        return self._decimals
+
+    @property
+    async def totalSupply(self) -> int:
+        if not self._totalSupply:
+            await self.init_totalSupply()
+        return self._totalSupply
+
+    @property
+    async def symbol(self) -> str:
+        if not self._symbol:
+            await self.init_symbol()
+        return self._symbol
+
+    async def balanceOf(self, address: str) -> int:
+        return await self._contract.functions.balanceOf(
             Web3.to_checksum_address(address)
-        ).call(block_identifier=self.block)
+        ).call(block_identifier=await self.block)
 
-    @property
-    def totalSupply(self) -> int:
-        return self._contract.functions.totalSupply().call(block_identifier=self.block)
-
-    @property
-    def symbol(self) -> str:
-        # MKR special: ( has a too large for python int )
-        if self.address == "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2":
-            return "MKR"
-        return self._contract.functions.symbol().call()
-
-    def allowance(self, owner: str, spender: str) -> int:
-        return self._contract.functions.allowance(
+    async def allowance(self, owner: str, spender: str) -> int:
+        return await self._contract.functions.allowance(
             Web3.to_checksum_address(owner), Web3.to_checksum_address(spender)
-        ).call(block_identifier=self.block)
+        ).call(block_identifier=await self.block)
 
-    def as_dict(self, convert_bint=False) -> dict:
+    async def as_dict(self, convert_bint=False) -> dict:
         """as_dict _summary_
 
         Args:
@@ -463,13 +525,12 @@ class erc20(web3wrap):
         Returns:
             dict: decimals, totalSupply(bint) and symbol dict
         """
-        result = super().as_dict(convert_bint=convert_bint)
+        result = await super().as_dict(convert_bint=convert_bint)
 
-        result["decimals"] = self.decimals
-        result["totalSupply"] = (
-            str(self.totalSupply) if convert_bint else self.totalSupply
-        )
-
-        result["symbol"] = self.symbol
+        (
+            result["decimals"],
+            result["totalSupply"],
+            result["symbol"],
+        ) = await asyncio.gather(self.decimals, self.totalSupply, self.symbol)
 
         return result

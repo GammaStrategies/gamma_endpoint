@@ -439,6 +439,87 @@ class database_local(db_collections_common):
             collection_name="status", find=find, sort=sort
         )
 
+    async def get_user_operations_status(
+        self, user_address: str, timestamp_ini: int | None, timestamp_end: int | None
+    ) -> list:
+        """retrieve all user operations and their status, grouped by hypervisor
+
+        Args:
+            user_address (str):
+            timestamp_ini (int | None):
+            timestamp_end (int | None):
+
+        Returns:
+            list: of hypervisors with their operations and status
+        """
+
+        _match = {
+            "$or": [
+                {"sender": user_address.lower()},
+                {"to": user_address.lower()},
+                {"src": user_address.lower()},
+                {"dst": user_address.lower()},
+            ]
+        }
+
+        if timestamp_ini and timestamp_end:
+            _match["$and"] = [
+                {"timestamp": {"$lte": timestamp_end}},
+                {"timestamp": {"$gte": timestamp_ini}},
+            ]
+        elif timestamp_ini:
+            _match["timestamp"] = {"$gte": timestamp_ini}
+        elif timestamp_end:
+            _match["timestamp"] = {"$lte": timestamp_end}
+
+        query = [
+            {"$match": _match},
+            {
+                "$lookup": {
+                    "from": "status",
+                    "let": {
+                        "operation_hype_address": "$address",
+                        "operation_block": "$blockNumber",
+                    },
+                    "pipeline": [
+                        {
+                            "$match": {
+                                "$expr": {
+                                    "$and": [
+                                        {
+                                            "$eq": [
+                                                "$address",
+                                                "$$operation_hype_address",
+                                            ]
+                                        },
+                                        {"$eq": ["$block", "$$operation_block"]},
+                                    ],
+                                }
+                            }
+                        },
+                        {"$unset": ["_id"]},
+                    ],
+                    "as": "status",
+                }
+            },
+            {"$unset": ["_id"]},
+            {"$unwind": "$status"},
+            {"$sort": {"block": 1}},
+            {
+                "$group": {
+                    "_id": "$address",
+                    "hypervisor_address": {"$first": "$address"},
+                    "operations": {"$push": "$$ROOT"},
+                }
+            },
+            {"$unset": ["_id"]},
+        ]
+
+        debug_query = f"{query}"
+        return await self.query_items_from_database(
+            collection_name="operations", query=query
+        )
+
     # status
 
     async def set_status(self, data: dict):
@@ -1140,6 +1221,7 @@ class database_local(db_collections_common):
             else:
                 query.insert(0, {"$match": {"address": hypervisor_address}})
 
+        # debug_query = f"{query}"
         return query
 
     @staticmethod
@@ -1188,7 +1270,7 @@ class database_local(db_collections_common):
 
     @staticmethod
     def query_operations_summary(
-        hypervisor_address: str,
+        hypervisor_address: str | None = None,
         timestamp_ini: int | None = None,
         timestamp_end: int | None = None,
         block_ini: int | None = None,
@@ -1364,17 +1446,28 @@ class database_local(db_collections_common):
             },
             {"$unset": ["_id"]},
         ]
-        if block_ini and block_end:
-            query.insert(0, {"$match": {"$gte": block_ini, "$lte": block_end}})
-        elif block_ini:
-            query.insert(0, {"$match": {"$gte": block_ini}})
-        elif block_end:
-            query.insert(0, {"$match": {"$lte": block_end}})
-        elif timestamp_ini and timestamp_end:
-            query.insert(0, {"$match": {"$gte": timestamp_ini, "$lte": timestamp_end}})
-        elif timestamp_ini:
-            query.insert(0, {"$match": {"$gte": timestamp_ini}})
-        elif timestamp_end:
-            query.insert(0, {"$match": {"$lte": timestamp_end}})
 
+        # build match
+        _and = []
+        _match = {}
+
+        # add block or timestamp in query
+        if block_ini:
+            _and.append({"blockNumber": {"$gte": block_ini}})
+        elif timestamp_ini:
+            _and.append({"timestamp": {"$gte": timestamp_ini}})
+        if block_end:
+            _and.append({"blockNumber": {"$lte": block_end}})
+        elif timestamp_end:
+            _and.append({"timestamp": {"$lte": timestamp_end}})
+
+        # add hype address
+        if hypervisor_address:
+            _and.append({"address": {"$lte": hypervisor_address}})
+
+        # add to query
+        if _and:
+            _match["$and"] = _and
+            query.insert(0, {"$match": _match})
+        # debug_query = f"{query}"
         return query

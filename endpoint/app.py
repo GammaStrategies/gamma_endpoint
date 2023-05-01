@@ -1,4 +1,6 @@
 import logging
+import time
+from fastapi import Request
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -44,3 +46,15 @@ app.mount(
     app=create_web3_endpoint(title="Gamma API - web3 calls", version="0.0.1"),
     name="web3",
 )
+
+
+#  Add globals
+
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    response.headers["X-responseTime"] = f"{ time.time() - start_time} sec"
+
+    return response

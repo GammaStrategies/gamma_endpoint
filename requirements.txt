@@ -65,8 +65,9 @@ uvicorn==0.20.0 ; python_version >= "3.10" and python_version < "4.0"
 uvicorn[standard]==0.20.0 ; python_version >= "3.10" and python_version < "4.0"
 uvloop==0.17.0 ; sys_platform != "win32" and sys_platform != "cygwin" and platform_python_implementation != "PyPy" and python_version >= "3.10" and python_version < "4.0"
 watchfiles==0.18.1 ; python_version >= "3.10" and python_version < "4.0"
-web3==6.0.0b11 ; python_version >= "3.10" and python_version < "4.0"
 websockets==10.4 ; python_version >= "3.10" and python_version < "4.0"
 yarl==1.8.2 ; python_version >= "3.10" and python_version < "4.0"
 aiocron
 croniter
+web3
+pycoingecko

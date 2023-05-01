@@ -8,7 +8,7 @@ from endpoint.routers.template import (
 )
 from sources.common.general.enums import Dex, Chain
 
-from sources.web3.bins.apps import hypervisors
+from sources.web3.bins.apps import hypervisors, rewards
 
 # Route builders
 
@@ -109,6 +109,22 @@ def build_routers() -> list:
 class web3_router_builder(router_builder_generalTemplate):
     # ROUTEs BUILD FUNCTIONS
 
+    def _create_routes_hypervisor(
+        self, router: APIRouter, dex: str, chain: str
+    ) -> APIRouter:
+        """Create /hypervisor routes for the given chain and dex combination."""
+
+        router = super()._create_routes_hypervisor(router=router, dex=dex, chain=chain)
+
+        router.add_api_route(
+            path=f"{self.prefix}{'/hypervisor/{hypervisor_address}/rewards'}",
+            endpoint=self.hypervisor_rewards,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
+        return router
+
     def _create_routes_hypervisors(
         self, router: APIRouter, dex: str, chain: str
     ) -> APIRouter:
@@ -153,10 +169,22 @@ class web3_router_builder(router_builder_generalTemplate):
     ):
         return "Not implemented yet"
 
-    async def hypervisor_uncollected_fees(
+    async def hypervisor_collected_fees(
         self, hypervisor_address: str, response: Response
     ):
         return "Not implemented yet"
+
+    async def hypervisor_uncollected_fees(
+        self, hypervisor_address: str, response: Response
+    ):
+        return await hypervisors.hypervisor_uncollected_fees(
+            network=self.chain, dex=self.dex, hypervisor_address=hypervisor_address
+        )
+
+    async def hypervisor_rewards(self, hypervisor_address: str, response: Response):
+        return await rewards.get_rewards(
+            dex=self.dex, hypervisor_address=hypervisor_address, network=self.chain
+        )
 
     #    hypervisor analytics
 
@@ -184,7 +212,7 @@ class web3_router_builder(router_builder_generalTemplate):
 
     async def hypervisors_list(self, response: Response):
         """Returns a list of low case hypervisor addresses found in registry"""
-        return hypervisors.hypervisors_list(network=self.chain, dex=self.dex)
+        return await hypervisors.hypervisors_list(network=self.chain, dex=self.dex)
 
     async def hypervisors_aggregate_stats(self, response: Response):
         return "Not implemented yet"
@@ -256,3 +284,18 @@ class web3_router_builder(router_builder_generalTemplate):
 
     async def vault_data(self, address: str, response: Response):
         return "Not implemented yet"
+
+
+# class web3_special_builder(router_builder_baseTemplate):
+
+
+#     # ROUTEs BUILD FUNCTIONS
+#     def router(self) -> APIRouter:
+#         router = APIRouter(prefix=self.prefix)
+
+#         #
+#         router.add_api_route(
+#             path="/hypervisors/aggregateStats",
+#             endpoint=self.aggregate_stats,
+#             methods=["GET"],
+#         )

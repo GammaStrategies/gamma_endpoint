@@ -148,9 +148,9 @@ class MongoDbManager:
                                                    "$gte": <date>
                                                      }
                                        }
+                                   projection={'_id': False}
                                    batch_size=100
                                    sort=[(<field_01>,1), (<field_02>,-1) ]
-                                   limit=10
 
                                    --AGGREGATE-------------------
                                    aggregate=[{  "$match": {
@@ -166,61 +166,113 @@ class MongoDbManager:
                                    allowDiskUse=<bool>
         """
 
+        # when no argunments, return all
+        if len(kwargs.keys()) == 0:
+            kwargs["find"] = {}
+
         # build FIND result
         if "find" in kwargs:
             if "batch_size" in kwargs:
                 if "sort" in kwargs:
-                    if "limit" in kwargs:
+                    if "projection" in kwargs:
                         return (
-                            self.database[coll_name]
-                            .find(kwargs["find"], batch_size=kwargs["batch_size"])
-                            .sort(kwargs["sort"])
-                            .limit(kwargs["limit"])
+                            (
+                                self.database[coll_name]
+                                .find(
+                                    kwargs["find"],
+                                    projection=kwargs["projection"],
+                                    batch_size=kwargs["batch_size"],
+                                )
+                                .sort(kwargs["sort"])
+                                .limit(kwargs["limit"])
+                            )
+                            if "limit" in kwargs
+                            else (
+                                self.database[coll_name]
+                                .find(
+                                    kwargs["find"],
+                                    projection=kwargs["projection"],
+                                    batch_size=kwargs["batch_size"],
+                                )
+                                .sort(kwargs["sort"])
+                            )
                         )
                     else:
-                        if "limit" in kwargs:
-                            return (
+                        return (
+                            (
                                 self.database[coll_name]
                                 .find(kwargs["find"], batch_size=kwargs["batch_size"])
                                 .sort(kwargs["sort"])
                                 .limit(kwargs["limit"])
                             )
-                        else:
-                            return (
+                            if "limit" in kwargs
+                            else (
                                 self.database[coll_name]
                                 .find(kwargs["find"], batch_size=kwargs["batch_size"])
                                 .sort(kwargs["sort"])
                             )
-                else:
-                    return self.database[coll_name].find(
-                        kwargs["find"], batch_size=kwargs["batch_size"]
-                    )
-            else:
-                if "sort" in kwargs:
-                    if "limit" in kwargs:
-                        return (
-                            self.database[coll_name]
-                            .find(kwargs["find"])
-                            .sort(kwargs["sort"])
-                            .limit(kwargs["limit"])
                         )
-                    else:
-                        return (
-                            self.database[coll_name]
-                            .find(kwargs["find"])
-                            .sort(kwargs["sort"])
-                        )
-                else:
-                    if "limit" in kwargs:
-                        return (
-                            self.database[coll_name]
-                            .find(kwargs["find"])
-                            .limit(kwargs["limit"])
-                        )
-                    else:
-                        return self.database[coll_name].find(kwargs["find"])
 
-        # build AGGREGATE result
+                else:
+                    return (
+                        self.database[coll_name].find(
+                            kwargs["find"],
+                            projection=kwargs["projection"],
+                            batch_size=kwargs["batch_size"],
+                        )
+                        if "projection" in kwargs
+                        else self.database[coll_name].find(
+                            kwargs["find"], batch_size=kwargs["batch_size"]
+                        )
+                    )
+            elif "sort" in kwargs:
+                if "limit" in kwargs:
+                    return (
+                        (
+                            self.database[coll_name]
+                            .find(kwargs["find"], projection=kwargs["projection"])
+                            .sort(kwargs["sort"])
+                            .limit(kwargs["limit"])
+                        )
+                        if "projection" in kwargs
+                        else (
+                            self.database[coll_name]
+                            .find(kwargs["find"])
+                            .sort(kwargs["sort"])
+                            .limit(kwargs["limit"])
+                        )
+                    )
+                else:
+                    return (
+                        (
+                            self.database[coll_name]
+                            .find(kwargs["find"], projection=kwargs["projection"])
+                            .sort(kwargs["sort"])
+                        )
+                        if "projection" in kwargs
+                        else (
+                            self.database[coll_name]
+                            .find(kwargs["find"])
+                            .sort(kwargs["sort"])
+                        )
+                    )
+            elif "limit" in kwargs:
+                return (
+                    self.database[coll_name]
+                    .find(kwargs["find"], projection=kwargs["projection"])
+                    .limit(kwargs["limit"])
+                    if "projection" in kwargs
+                    else self.database[coll_name]
+                    .find(kwargs["find"])
+                    .limit(kwargs["limit"])
+                )
+            elif "projection" in kwargs:
+                return self.database[coll_name].find(
+                    kwargs["find"], projection=kwargs["projection"]
+                )
+            else:
+                return self.database[coll_name].find(kwargs["find"])
+
         elif "aggregate" in kwargs:
             if "allowDiskUse" in kwargs:
                 return self.database[coll_name].aggregate(
