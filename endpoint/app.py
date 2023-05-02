@@ -28,7 +28,7 @@ app.add_middleware(
 app.mount(
     path="/subgraph",
     app=create_subgraph_endpoint(
-        title="Gamma API", backwards_compatible=False, version="0.0.1"
+        title="Gamma API - Subgraph data", backwards_compatible=False, version="0.0.1"
     ),
     name="subgraph",
 )
