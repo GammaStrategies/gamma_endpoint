@@ -120,12 +120,14 @@ async def get_hypervisor_data(
             hypervisor_decimals,
             token0,
             token1,
+            symbol,
         ) = await asyncio.gather(
             hypervisor.totalSupply,
             hypervisor.getTotalAmounts,
             hypervisor.decimals,
             hypervisor.token0,
             hypervisor.token1,
+            hypervisor.symbol,
         )
 
         (
@@ -143,6 +145,7 @@ async def get_hypervisor_data(
         return {
             "block": block,
             "timestamp": timestamp,
+            "symbol": symbol,
             "address": hypervisor_address,
             "token0_address": token0_address,
             "token1_address": token1_address,

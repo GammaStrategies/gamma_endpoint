@@ -160,6 +160,7 @@ async def get_rewards(dex: Dex, hypervisor_address: str, network: Chain):
             )
             result.append(
                 {
+                    "symbol": hypervisor_data["symbol"],
                     **rewards,
                     "apr": apr,
                     "token0_price_usd": hypervisor_data["token0_price_usd"],
