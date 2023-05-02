@@ -24,15 +24,14 @@ class FeesYield:
         """Calculate APR and APY for fees
 
         Args:
-            apr_type (str, optional): users:  use Liquiditiy Provider fees to calculate feeApr,
-                                     gamma:  use Gamma's fees to calculate feeApr,
-                                     all:    use totalFees ( lp's+gammas) to calculate feeApr
+            apr_type (str, optional): net:  use Liquiditiy Provider fees to calculate feeApr,
+                                      gross: use totalFees ( lp's+gammas) to calculate feeApr
 
         Returns:
             FeeYield:
         """
         # default apr typeis Liquidity Providers feeApr (users)
-        apr_type = apr_type or "users"
+        apr_type = apr_type or "net"
 
         snapshots = [self.get_fees(entry) for entry in self.data]
         df_snapshots = DataFrame(snapshots, dtype=np.float64)
@@ -59,13 +58,13 @@ class FeesYield:
         df_snapshots["elapsed_time"] = df_snapshots.timestamp.diff()
 
         # Choose fee growth based on aprType
-        if apr_type == "users":
+        if apr_type == "net":
             df_snapshots["fee0_growth"] = df_snapshots.lp_fee_0.diff().clip(lower=0)
             df_snapshots["fee1_growth"] = df_snapshots.lp_fee_1.diff().clip(lower=0)
-        elif apr_type == "gamma":
-            df_snapshots["fee0_growth"] = df_snapshots.gamma_fee_0.diff().clip(lower=0)
-            df_snapshots["fee1_growth"] = df_snapshots.gamma_fee_1.diff().clip(lower=0)
-        elif apr_type == "all":
+        # elif apr_type == "gamma":
+        #     df_snapshots["fee0_growth"] = df_snapshots.gamma_fee_0.diff().clip(lower=0)
+        #     df_snapshots["fee1_growth"] = df_snapshots.gamma_fee_1.diff().clip(lower=0)
+        elif apr_type == "gross":
             df_snapshots["fee0_growth"] = df_snapshots.total_fees_0.diff().clip(lower=0)
             df_snapshots["fee1_growth"] = df_snapshots.total_fees_1.diff().clip(lower=0)
 
