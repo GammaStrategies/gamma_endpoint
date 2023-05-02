@@ -321,22 +321,22 @@ async def collected_fees(
     end_grossFeesClaimedUSD = 0
     period_grossFeesClaimedUSD = 0
     for k, x in collected_fees.items():
-        initial_grossFeesClaimedUSD += x["initialGrossFeesClaimedUsd"]
-        end_grossFeesClaimedUSD += x["endGrossFeesClaimedUsd"]
-        period_grossFeesClaimedUSD += x["periodGrossFeesClaimedUsd"]
+        initial_grossFeesClaimedUSD += x["initial_grossFeesClaimedUSD"]
+        end_grossFeesClaimedUSD += x["end_grossFeesClaimedUSD"]
+        period_grossFeesClaimedUSD += x["period_grossFeesClaimedUSD"]
 
     return {
-        "initialBlock": collected_fees[first_key]["initialBlock"],
-        "initialTimestamp": collected_fees[first_key]["initialTimestamp"],
-        "initialDatetime": datetime.fromtimestamp(
-            collected_fees[first_key]["initialTimestamp"]
+        "initial_block": collected_fees[first_key]["initial_block"],
+        "initial_timestamp": collected_fees[first_key]["initial_timestamp"],
+        "initial_datetime": datetime.fromtimestamp(
+            collected_fees[first_key]["initial_timestamp"]
         ),
-        "endBlock": collected_fees[first_key]["endBlock"],
-        "endTimestamp": collected_fees[first_key]["endTimestamp"],
-        "endDatetime": datetime.fromtimestamp(
-            collected_fees[first_key]["endTimestamp"]
+        "end_block": collected_fees[first_key]["end_block"],
+        "end_timestamp": collected_fees[first_key]["end_timestamp"],
+        "end_datetime": datetime.fromtimestamp(
+            collected_fees[first_key]["end_timestamp"]
         ),
-        "initialGrossFeesClaimedUSD": initial_grossFeesClaimedUSD,
-        "endGrossFeesClaimedUSD": end_grossFeesClaimedUSD,
-        "periodGrossFeesClaimedUSD": period_grossFeesClaimedUSD,
+        "initial_grossFeesClaimedUSD": initial_grossFeesClaimedUSD,
+        "end_grossFeesClaimedUSD": end_grossFeesClaimedUSD,
+        "period_grossFeesClaimedUSD": period_grossFeesClaimedUSD,
     }
