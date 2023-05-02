@@ -1,5 +1,6 @@
 import random
 from sources.common.general.enums import Chain, Dex, ChainId
+from sources.mongo.bins.enums import enumsConverter
 
 from sources.web3.bins.w3.objects.protocols import (
     gamma_hypervisor,
@@ -7,6 +8,8 @@ from sources.web3.bins.w3.objects.protocols import (
     gamma_hypervisor_quickswap,
     gamma_hypervisor_thena,
     gamma_hypervisor_registry,
+    thena_gauge_V2,
+    thena_voter_v3,
     zyberswap_masterchef_v1,
 )
 
@@ -62,10 +65,10 @@ def build_hypervisor_registry(
 ) -> gamma_hypervisor_registry:
     # get the list of registry addresses
 
+    netval = enumsConverter.convert_general_to_local(chain=network).value
+
     if registry_address := (
-        STATIC_REGISTRY_ADDRESSES.get(network.value, {})
-        .get("hypervisors", {})
-        .get(dex.value)
+        STATIC_REGISTRY_ADDRESSES.get(netval, {}).get("hypervisors", {}).get(dex.value)
     ):
         # build hype
         registry = gamma_hypervisor_registry(
@@ -190,12 +193,74 @@ async def build_zyberchef_anyRpc(
             )
             if test:
                 # test its working
-                # await result.poolLength
-                pass
+                await result.poolLength
             # return hype
             break
         except:
             # not working hype
+            pass
+
+    return result
+
+
+async def build_thena_voter_anyRpc(
+    network: Chain, block: int, rpcUrls: list[str], test: bool = False
+) -> thena_voter_v3:
+    result = None
+    netval = enumsConverter.convert_general_to_local(chain=network).value
+    if voter_url := STATIC_REGISTRY_ADDRESSES.get(netval, {}).get("thena_voter", None):
+        # shuffle the rpc urls
+        random.shuffle(rpcUrls)
+        # loop over the rpc urls
+
+        for rpcUrl in rpcUrls:
+            try:
+                # construct hype
+                result = thena_voter_v3(
+                    address=voter_url,
+                    network=netval,
+                    block=block,
+                    custom_web3Url=rpcUrl,
+                )
+                if test:
+                    # test its working
+                    await result.factoryLength
+                # return hype
+                break
+            except Exception as e:
+                # not working hype
+                print(f" error creating hype: {e} -> rpc: {rpcUrl}")
+                pass
+
+    return result
+
+
+async def build_thena_gauge_anyRpc(
+    address: str, network: Chain, block: int, rpcUrls: list[str], test: bool = False
+) -> thena_gauge_V2:
+    result = None
+    netval = enumsConverter.convert_general_to_local(chain=network).value
+    # shuffle the rpc urls
+    random.shuffle(rpcUrls)
+    # loop over the rpc urls
+
+    for rpcUrl in rpcUrls:
+        try:
+            # construct hype
+            result = thena_gauge_V2(
+                address=address,
+                network=netval,
+                block=block,
+                custom_web3Url=rpcUrl,
+            )
+            if test:
+                # test its working
+                await result.lastUpdateTime
+            # return hype
+            break
+        except Exception as e:
+            # not working hype
+            print(f" error creating hype: {e} -> rpc: {rpcUrl}")
             pass
 
     return result

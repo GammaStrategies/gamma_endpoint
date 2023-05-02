@@ -1,5 +1,6 @@
 from sources.common.general.enums import Chain, Dex, ChainId
 import asyncio
+from sources.mongo.bins.enums import enumsConverter
 
 from sources.web3.bins.w3.helpers import (
     build_hypervisor,
@@ -16,9 +17,11 @@ from sources.web3.bins.mixed.price_utilities import price_scraper
 
 
 async def hypervisors_list(network: Chain, dex: Dex):
+    netval = enumsConverter.convert_general_to_local(chain=network).value
+
     # get network registry address
     registry = await build_hypervisor_registry_anyRpc(
-        network=network, dex=dex, block=0, rpcUrls=RPC_URLS[network.value], test=True
+        network=network, dex=dex, block=0, rpcUrls=RPC_URLS[netval], test=True
     )
 
     return await registry.get_hypervisors_addresses()
@@ -27,12 +30,13 @@ async def hypervisors_list(network: Chain, dex: Dex):
 async def hypervisor_uncollected_fees(
     network: Chain, dex: Dex, hypervisor_address: str, block: int = None
 ):
+    netval = enumsConverter.convert_general_to_local(chain=network).value
     hypervisor = await build_hypervisor_anyRpc(
         network=network,
         dex=dex,
         hypervisor_address=hypervisor_address,
         block=block if block else 0,
-        rpcUrls=RPC_URLS[network.value],
+        rpcUrls=RPC_URLS[netval],
         test=True,
     )
 
@@ -105,12 +109,13 @@ async def hypervisor_uncollected_fees(
 async def get_hypervisor_data(
     network: Chain, dex: Dex, hypervisor_address: str, convert_to_decimal: bool = False
 ):
+    netval = enumsConverter.convert_general_to_local(chain=network).value
     if hypervisor := await build_hypervisor_anyRpc(
         network=network,
         dex=dex,
         block=0,
         hypervisor_address=hypervisor_address,
-        rpcUrls=RPC_URLS[network.value],
+        rpcUrls=RPC_URLS[netval],
         test=True,
     ):
         block, timestamp = await hypervisor.init_block()

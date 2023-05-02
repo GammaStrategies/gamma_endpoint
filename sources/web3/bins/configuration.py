@@ -101,6 +101,7 @@ STATIC_REGISTRY_ADDRESSES = {
             "thena": "0xd4bcFC023736Db5617E5638748E127581d5929bd",
         },
         "MasterChefV2Registry": {},
+        "thena_voter": "0x3a1d0952809f4948d15ebce8d345962a282c4fcb",
     },
 }
 

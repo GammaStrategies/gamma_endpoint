@@ -2379,9 +2379,9 @@ class thena_voter_v3(web3wrap):
 
         self._max_vote_delay: int | None = None
         self._vote_delay: int | None = None
-        self._epochTimestamp: int | None = None
-        self._factories: list[str] | None = None
-        self._ve: str | None = None
+        self.__epochTimestamp: int | None = None
+        self.__factories: list[str] | None = None
+        self.__ve: str | None = None
         self._bribefactory: str | None = None
         self._factory: str | None = None
         self._factoryLength: int | None = None
@@ -2427,13 +2427,13 @@ class thena_voter_v3(web3wrap):
         Returns:
             int: uint256
         """
-        if not self._epochTimestamp:
-            self._epochTimestamp = (
+        if not self.__epochTimestamp:
+            self.__epochTimestamp = (
                 await self._contract.functions._epochTimestamp().call(
                     block_identifier=await self.block
                 )
             )
-        return self._epochTimestamp
+        return self.__epochTimestamp
 
     @property
     async def _factories(self) -> list[str]:
@@ -2442,11 +2442,11 @@ class thena_voter_v3(web3wrap):
         Returns:
             list[str]: address[]
         """
-        if not self._factories:
-            self._factories = await self._contract.functions._factories().call(
+        if not self.__factories:
+            self.__factories = await self._contract.functions._factories().call(
                 block_identifier=await self.block
             )
-        return self._factories
+        return self.__factories
 
     @property
     async def _ve(self) -> str:
@@ -2455,11 +2455,11 @@ class thena_voter_v3(web3wrap):
         Returns:
             str: address
         """
-        if not self._ve:
-            self._ve = await self._contract.functions._ve().call(
+        if not self.__ve:
+            self.__ve = await self._contract.functions._ve().call(
                 block_identifier=await self.block
             )
-        return self._ve
+        return self.__ve
 
     @property
     async def bribefactory(self) -> str:
@@ -2915,11 +2915,12 @@ class thena_gauge_V2(web3wrap):
         self._distribution: str | None = None
         self._duration: int | None = None
         self._token: str | None = None
-        self._ve: str | None = None
+        self.__ve: str | None = None
         self.__periodFinish: int | None = None
-        self.__totalSupply: int | None = None
+        # self._periodFinish: int | None = None
+        # self.__totalSupply: int | None = None
         self._emergency: bool | None = None
-        self.external_bribe: str | None = None
+        self._external_bribe: str | None = None
         self._feeVault: str | None = None
         self._fees0: int | None = None
         self._fees1: int | None = None
@@ -2928,7 +2929,6 @@ class thena_gauge_V2(web3wrap):
         self._lastTimeRewardApplicable: int | None = None
         self._lastUpdateTime: int | None = None
         self._owner: str | None = None
-        self._periodFinish: int | None = None
         self._rewardPerDuration: int | None = None
         self._rewardPerToken: int | None = None
         self._rewardPerTokenStored: int | None = None
@@ -2983,11 +2983,11 @@ class thena_gauge_V2(web3wrap):
         Returns:
             str: address
         """
-        if not self._ve:
-            self._ve = await self._contract.functions._ve().call(
+        if not self.__ve:
+            self.__ve = await self._contract.functions._ve().call(
                 block_identifier=await self.block
             )
-        return self._ve
+        return self.__ve
 
     async def _balances(self, address: str) -> int:
         """_summary_
@@ -3015,18 +3015,18 @@ class thena_gauge_V2(web3wrap):
             )
         return self.__periodFinish
 
-    @property
-    async def _totalSupply(self) -> int:
-        """_summary_
+    # @property
+    # async def _totalSupply(self) -> int:
+    #     """_summary_
 
-        Returns:
-            int: uint256
-        """
-        if not self.__totalSupply:
-            self.__totalSupply = await self._contract.functions._totalSupply().call(
-                block_identifier=await self.block
-            )
-        return self.__totalSupply
+    #     Returns:
+    #         int: uint256
+    #     """
+    #     if not self.__totalSupply:
+    #         self.__totalSupply = await self._contract.functions._totalSupply().call(
+    #             block_identifier=await self.block
+    #         )
+    #     return self.__totalSupply
 
     async def balanceOf(self, address: str) -> int:
         """_summary_
@@ -3186,18 +3186,18 @@ class thena_gauge_V2(web3wrap):
             )
         return self._owner
 
-    @property
-    async def periodFinish(self) -> int:
-        """_summary_
+    # @property
+    # async def periodFinish(self) -> int:
+    #     """_summary_
 
-        Returns:
-            int: uint256
-        """
-        if not self._periodFinish:
-            self._periodFinish = await self._contract.functions.periodFinish().call(
-                block_identifier=await self.block
-            )
-        return self._periodFinish
+    #     Returns:
+    #         int: uint256
+    #     """
+    #     if not self._periodFinish:
+    #         self._periodFinish = await self._contract.functions.periodFinish().call(
+    #             block_identifier=await self.block
+    #         )
+    #     return self._periodFinish
 
     @property
     async def rewardPerDuration(self) -> int:
