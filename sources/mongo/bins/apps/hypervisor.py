@@ -207,3 +207,39 @@ async def add_prices_to_hypervisor(hypervisor: dict, network: str) -> dict:
         pass
 
     return hypervisor
+
+
+async def get_hypervisor_prices(
+    hypervisor_address: str, network: Chain, dex=Dex
+) -> dict:
+    hype_last_status = await get_hypervisor_last_status(
+        network=network, dex=Dex, address=hypervisor_address
+    )
+
+    price_token0, price_token1 = await asyncio.gather(
+        create_global_database().get_price_usd(
+            network=network.value,
+            block=0,
+            address=hype_last_status["pool"]["token0"]["address"],
+        ),
+        create_global_database().get_price_usd(
+            network=network.value,
+            block=0,
+            address=hype_last_status["pool"]["token1"]["address"],
+        ),
+    )
+
+    return {
+        "address": hype_last_status["address"],
+        "symbol": hype_last_status["symbol"],
+        "token0": {
+            "address": hype_last_status["pool"]["token0"]["address"],
+            "symbol": hype_last_status["pool"]["token0"]["symbol"],
+            "price_usd": price_token0[0],
+        },
+        "token1": {
+            "address": hype_last_status["pool"]["token1"]["address"],
+            "symbol": hype_last_status["pool"]["token1"]["symbol"],
+            "price_usd": price_token1[0],
+        },
+    }

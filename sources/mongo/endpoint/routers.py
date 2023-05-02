@@ -144,6 +144,13 @@ class mongo_router_builder(router_builder_generalTemplate):
             generate_unique_id_function=self.generate_unique_id,
         )
 
+        router.add_api_route(
+            path=f"{self.prefix}{'/hypervisor/{hypervisor_address}/prices'}",
+            endpoint=self.hypervisor_prices,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
         return router
 
     def _create_routes_hypervisors(
@@ -220,6 +227,16 @@ class mongo_router_builder(router_builder_generalTemplate):
             end_timestamp=end_timestamp,
             start_block=start_block,
             end_block=end_block,
+        )
+
+    async def hypervisor_prices(
+        self,
+        hypervisor_address: str,
+        response: Response,
+    ):
+        """ """
+        return await hypervisor.get_hypervisor_prices(
+            network=self.chain, dex=self.dex, hypervisor_address=hypervisor_address
         )
 
     #    hypervisor analytics
