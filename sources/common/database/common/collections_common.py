@@ -138,7 +138,7 @@ class db_collections_common:
 
     @staticmethod
     def convert_decimal_to_d128(item: dict) -> dict | None:
-        """Converts a dictionary decimal values to BSON.decimal128, recursivelly.
+        """Converts a dictionary decimal values to BSON.decimal128, recursively.
             The function iterates a dict looking for types of Decimal and converts them to Decimal128.
             Embedded dictionaries and lists are called recursively.
 
@@ -172,7 +172,7 @@ class db_collections_common:
 
     @staticmethod
     def convert_d128_to_decimal(item: dict) -> dict | None:
-        """Converts a dictionary decimal128 values to decimal, recursivelly.
+        """Converts a dictionary decimal128 values to decimal, recursively.
             The function iterates a dict looking for types of Decimal128 and converts them to Decimal.
             Embedded dictionaries and lists are called recursively.
 
@@ -204,7 +204,7 @@ class db_collections_common:
 
     @staticmethod
     def convert_decimal_to_float(item: dict) -> dict | None:
-        """Converts a dictionary decimal values to float, recursivelly.
+        """Converts a dictionary decimal values to float, recursively.
             The function iterates a dict looking for types of Decimal and converts them to float.
             Embedded dictionaries and lists are called recursively.
 
