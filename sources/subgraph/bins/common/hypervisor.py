@@ -285,6 +285,7 @@ async def collected_fees(
     end_timestamp: int | None = None,
     start_block: int | None = None,
     end_block: int | None = None,
+    usd_total_only: bool = False,
 ):
     if (not start_timestamp and not start_block) or (
         not end_timestamp and not end_block
@@ -304,9 +305,38 @@ async def collected_fees(
         end_timestamp = int(end_date.timestamp())
 
     hype = HypervisorData(protocol=protocol, chain=chain)
-    return await hype._get_collected_fees(
+    collected_fees = await hype._get_collected_fees(
         start_timestamp=start_timestamp,
         end_timestamp=end_timestamp,
         start_block=start_block,
         end_block=end_block,
     )
+    # Choose what to return
+    if not usd_total_only or not collected_fees:
+        return collected_fees
+
+    # return the sum of all fees
+    first_key = next(iter(collected_fees))
+    initial_grossFeesClaimedUSD = 0
+    end_grossFeesClaimedUSD = 0
+    period_grossFeesClaimedUSD = 0
+    for k, x in collected_fees.items():
+        initial_grossFeesClaimedUSD += x["initialGrossFeesClaimedUsd"]
+        end_grossFeesClaimedUSD += x["endGrossFeesClaimedUsd"]
+        period_grossFeesClaimedUSD += x["periodGrossFeesClaimedUsd"]
+
+    return {
+        "initialBlock": collected_fees[first_key]["initialBlock"],
+        "initialTimestamp": collected_fees[first_key]["initialTimestamp"],
+        "initialDatetime": datetime.fromtimestamp(
+            collected_fees[first_key]["initialTimestamp"]
+        ),
+        "endBlock": collected_fees[first_key]["endBlock"],
+        "endTimestamp": collected_fees[first_key]["endTimestamp"],
+        "endDatetime": datetime.fromtimestamp(
+            collected_fees[first_key]["endTimestamp"]
+        ),
+        "initialGrossFeesClaimedUSD": initial_grossFeesClaimedUSD,
+        "endGrossFeesClaimedUSD": end_grossFeesClaimedUSD,
+        "periodGrossFeesClaimedUSD": period_grossFeesClaimedUSD,
+    }
