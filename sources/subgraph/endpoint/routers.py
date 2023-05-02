@@ -369,7 +369,11 @@ class subgraph_router_builder(router_builder_generalTemplate):
         end_timestamp: int | None = None,
         start_block: int | None = None,
         end_block: int | None = None,
+        usd_total_only: bool = False,
     ):
+        """Retrieve collected fees for all hypervisors
+        When default values are used, the function will return the last month's fees collected
+        """
         return await hypervisor.collected_fees(
             protocol=self.dex,
             chain=self.chain,
@@ -377,6 +381,7 @@ class subgraph_router_builder(router_builder_generalTemplate):
             end_timestamp=end_timestamp,
             start_block=start_block,
             end_block=end_block,
+            usd_total_only=usd_total_only,
         )
 
     @cache(expire=APY_CACHE_TIMEOUT)
