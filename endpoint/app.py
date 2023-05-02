@@ -4,7 +4,7 @@ from fastapi import Request
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from sources.subgraph.enpoint.app import create_app as create_subgraph_endpoint
+from sources.subgraph.endpoint.app import create_app as create_subgraph_endpoint
 from sources.web3.endpoint.app import create_app as create_web3_endpoint
 from sources.mongo.endpoint.app import create_app as create_mongo_endpoint
 
