@@ -8,6 +8,8 @@ class Chain(str, Enum):
     OPTIMISM = "optimism"
     POLYGON = "polygon"
     BSC = "bsc"
+    POLYGON_ZKEVM = "polygon_zkevm"
+    AVALANCHE = "avalanche"
 
 
 class Dex(str, Enum):
@@ -15,6 +17,8 @@ class Dex(str, Enum):
     UNISWAP = "uniswap"
     ZYBERSWAP = "zyberswap"
     THENA = "thena"
+    GLACIER = "glacier"
+    CAMELOT = "camelot"
 
 
 @unique
@@ -25,3 +29,5 @@ class ChainId(int, Enum):
     OPTIMISM = 10
     POLYGON = 137
     BSC = 56
+    POLYGON_ZKEVM = 1101
+    AVALANCHE = 43114
