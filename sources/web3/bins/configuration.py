@@ -1,11 +1,10 @@
-from sources.web3.bins.general.general_utilities import (
-    load_configuration,
-    check_configuration_file,
-)
+from sources.common.general.config import get_config
 
 
 # load configuration file
 CONFIGURATION = {"cache": {"save_path": "data/cache"}}  # load_configuration()
+# load rpc providers
+CONFIGURATION["WEB3_PROVIDER_URLS"] = get_config("WEB3_PROVIDER_URLS")
 
 
 # check configuration
