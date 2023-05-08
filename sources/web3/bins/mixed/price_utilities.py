@@ -119,6 +119,16 @@ class price_scraper:
 
         # SAVE CACHE
         if _price not in [None, 0]:
+            if type(_price) == dict:
+                _price_tmp = _price.get(token_id, {}).get("usd", 0)
+                if _price_tmp == 0:
+                    logging.getLogger(LOG_NAME).error(
+                        f" Can't format price given by coingecko -> {_price}   ->{network}'s token {token_id} price at block {block} not found"
+                    )
+                    return
+                else:
+                    _price = _price_tmp
+
             logging.getLogger(LOG_NAME).debug(
                 f" {network}'s token {token_id} price at block {block} was found: {_price}"
             )
