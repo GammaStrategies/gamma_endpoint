@@ -52,44 +52,32 @@ class univ3_pool(web3wrap):
         self._token1: erc20 = None
 
     async def init_factory(self):
-        self._factory = await self._contract.functions.factory().call(
-            block_identifier=await self.block
-        )
+        self._factory = await self.call_function_autoRpc(function_name="factory")
 
     async def init_fee(self):
-        self._fee = await self._contract.functions.fee().call(
-            block_identifier=await self.block
-        )
+        self._fee = await self.call_function_autoRpc(function_name="fee")
 
     async def init_feeGrowthGlobal0X128(self):
-        self._feeGrowthGlobal0X128 = (
-            await self._contract.functions.feeGrowthGlobal0X128().call(
-                block_identifier=await self.block
-            )
+        self._feeGrowthGlobal0X128 = await self.call_function_autoRpc(
+            function_name="feeGrowthGlobal0X128"
         )
 
     async def init_feeGrowthGlobal1X128(self):
-        self._feeGrowthGlobal1X128 = (
-            await self._contract.functions.feeGrowthGlobal1X128().call(
-                block_identifier=await self.block
-            )
+        self._feeGrowthGlobal1X128 = self.call_function_autoRpc(
+            function_name="feeGrowthGlobal1X128"
         )
 
     async def init_liquidity(self):
-        self._liquidity = await self._contract.functions.liquidity().call(
-            block_identifier=await self.block
-        )
+        self._liquidity = await self.call_function_autoRpc(function_name="liquidity")
 
     async def init_maxLiquidityPerTick(self):
-        self._maxLiquidityPerTick = (
-            await self._contract.functions.maxLiquidityPerTick().call(
-                block_identifier=await self.block
-            )
+        self._maxLiquidityPerTick = self.call_function_autoRpc(
+            function_name="maxLiquidityPerTick"
         )
 
     async def init_protocolFees(self):
-        self._protocolFees = await self._contract.functions.protocolFees().call(
-            block_identifier=await self.block
+        self._protocolFees = await self.call_function_autoRpc(
+            function_name="protocolFees"
         )
 
     async def init_slot0(self):
@@ -104,9 +92,7 @@ class univ3_pool(web3wrap):
                    feeProtocol   uint8 :  0
                    unlocked   bool :  true
         """
-        tmp = await self._contract.functions.slot0().call(
-            block_identifier=await self.block
-        )
+        tmp = await self.call_function_autoRpc(function_name="slot0")
         self._slot0 = {
             "sqrtPriceX96": tmp[0],
             "tick": tmp[1],
@@ -118,14 +104,12 @@ class univ3_pool(web3wrap):
         }
 
     async def init_tickSpacing(self):
-        self._tickSpacing = await self._contract.functions.tickSpacing().call(
-            block_identifier=await self.block
+        self._tickSpacing = await self.call_function_autoRpc(
+            function_name="tickSpacing"
         )
 
     async def init_token0(self):
-        self._token0_address = await self._contract.functions.token0().call(
-            block_identifier=await self.block
-        )
+        self._token0_address = await self.call_function_autoRpc(function_name="token0")
         self._token0 = erc20(
             address=self._token0_address,
             network=self._network,
@@ -135,9 +119,7 @@ class univ3_pool(web3wrap):
         )
 
     async def init_token1(self):
-        self._token1_address = await self._contract.functions.token1().call(
-            block_identifier=await self.block
-        )
+        self._token1_address = await self.call_function_autoRpc(function_name="token1")
         self._token1 = erc20(
             address=self._token1_address,
             network=self._network,
@@ -215,9 +197,7 @@ class univ3_pool(web3wrap):
         return self._token1
 
     async def observations(self, input: int):
-        return await self._contract.functions.observations(input).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("observations", None, input)
 
     async def observe(self, secondsAgo: int):
         """observe _summary_
@@ -230,9 +210,7 @@ class univ3_pool(web3wrap):
                    secondsPerLiquidityCumulativeX128s   uint160[] :  242821134689165142944235398318169
 
         """
-        return await self._contract.functions.observe(secondsAgo).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("observe", None, secondsAgo)
 
     async def positions(self, position_key: str) -> dict:
         """
@@ -248,9 +226,10 @@ class univ3_pool(web3wrap):
                    tokensOwed0   uint128 :  0
                    tokensOwed1   uint128 :  0
         """
-        result = await self._contract.functions.positions(position_key).call(
-            block_identifier=await self.block
+        position_key = (
+            HexBytes(position_key) if type(position_key) == str else position_key
         )
+        result = await self.call_function_autoRpc("positions", None, position_key)
         return {
             "liquidity": result[0],
             "feeGrowthInside0LastX128": result[1],
@@ -260,14 +239,12 @@ class univ3_pool(web3wrap):
         }
 
     async def snapshotCumulativeInside(self, tickLower: int, tickUpper: int):
-        return await self._contract.functions.snapshotCumulativeInside(
-            tickLower, tickUpper
-        ).call(block_identifier=await self.block)
+        return await self.call_function_autoRpc(
+            "snapshotCumulativeInside", None, tickLower, tickUpper
+        )
 
     async def tickBitmap(self, input: int) -> int:
-        return await self._contract.functions.tickBitmap(input).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("tickBitmap", None, input)
 
     async def ticks(self, tick: int) -> dict:
         """
@@ -285,9 +262,7 @@ class univ3_pool(web3wrap):
                        secondsOutside   uint32 :  0
                        initialized   bool :  false
         """
-        result = await self._contract.functions.ticks(tick).call(
-            block_identifier=await self.block
-        )
+        result = await self.call_function_autoRpc("ticks", None, tick)
         return {
             "liquidityGross": result[0],
             "liquidityNet": result[1],
@@ -298,14 +273,6 @@ class univ3_pool(web3wrap):
             "secondsOutside": result[6],
             "initialized": result[7],
         }
-
-    # write function without state change ( not wrkin)
-    async def collect(
-        self, recipient, tickLower, tickUpper, amount0Requested, amount1Requested, owner
-    ):
-        return await self._contract.functions.collect(
-            recipient, tickLower, tickUpper, amount0Requested, amount1Requested
-        ).call({"from": owner})
 
     # CUSTOM PROPERTIES
     @property
@@ -624,14 +591,10 @@ class algebrav3_dataStorageOperator(web3wrap):
     # TODO: Implement contract functs calculateVolumePerLiquidity, getAverages, getFee, getSingleTimepoint, getTimepoints and timepoints
 
     async def init_feeConfig(self):
-        self._feeConfig = await self._contract.functions.feeConfig().call(
-            block_identifier=await self.block
-        )
+        self._feeConfig = await self.call_function_autoRpc("feeConfig")
 
     async def init_window(self):
-        self._window = await self._contract.functions.window().call(
-            block_identifier=await self.block
-        )
+        self._window = await self.call_function_autoRpc("window")
 
     @property
     async def feeConfig(self):
@@ -673,7 +636,6 @@ class algebrav3_pool(web3wrap):
             custom_web3Url=custom_web3Url,
         )
 
-
         self._activeIncentive = None
         self._dataStorageOperator = None
         self._factory = None
@@ -688,15 +650,11 @@ class algebrav3_pool(web3wrap):
         self._feeGrowthGlobal1X128 = None
 
     async def init_activeIncentive(self):
-        self._activeIncentive = self._contract.functions.activeIncentive().call(
-            block_identifier=await self.block
-        )
+        self._activeIncentive = await self.call_function_autoRpc("activeIncentive")
 
     async def init_dataStorageOperator(self):
-        self._dataStorageOperator_address = (
-            await self._contract.functions.dataStorageOperator().call(
-                block_identifier=await self.block
-            )
+        self._dataStorageOperator_address = await self.call_function_autoRpc(
+            "dataStorageOperator"
         )
         self._dataStorageOperator = algebrav3_dataStorageOperator(
             address=self._dataStorageOperator_address,
@@ -707,9 +665,7 @@ class algebrav3_pool(web3wrap):
         )
 
     async def init_factory(self):
-        self._factory = self._contract.functions.factory().call(
-            block_identifier=await self.block
-        )
+        self._factory = await self.call_function_autoRpc("factory")
 
     async def init_globalState(self):
         """
@@ -723,9 +679,7 @@ class algebrav3_pool(web3wrap):
                    communityFeeToken1   uint8 :  0
                    unlocked   bool :  true
         """
-        tmp = await self._contract.functions.globalState().call(
-            block_identifier=await self.block
-        )
+        tmp = await self.call_function_autoRpc("globalState")
         self._globalState = {
             "sqrtPriceX96": tmp[0],
             "tick": tmp[1],
@@ -737,29 +691,21 @@ class algebrav3_pool(web3wrap):
         }
 
     async def init_liquidity(self):
-        self._liquidity = self._contract.functions.liquidity().call(
-            block_identifier=await self.block
-        )
+        self._liquidity = await self.call_function_autoRpc("liquidity")
 
     async def init_liquidityCooldown(self):
-        self._liquidityCooldown = self._contract.functions.liquidityCooldown().call(
-            block_identifier=await self.block
-        )
+        self._liquidityCooldown = await self.call_function_autoRpc("liquidityCooldown")
 
     async def init_maxLiquidityPerTick(self):
-        self._maxLiquidityPerTick = self._contract.functions.maxLiquidityPerTick().call(
-            block_identifier=await self.block
+        self._maxLiquidityPerTick = await self.call_function_autoRpc(
+            "maxLiquidityPerTick"
         )
 
     async def init_tickSpacing(self):
-        self._tickSpacing = self._contract.functions.tickSpacing().call(
-            block_identifier=await self.block
-        )
+        self._tickSpacing = await self.call_function_autoRpc("tickSpacing")
 
     async def init_token0(self):
-        self._token0_address = await self._contract.functions.token0().call(
-            block_identifier=await self.block
-        )
+        self._token0_address = await self.call_function_autoRpc("token0")
         self._token0 = erc20(
             address=self._token0_address,
             network=self._network,
@@ -769,9 +715,7 @@ class algebrav3_pool(web3wrap):
         )
 
     async def init_token1(self):
-        self._token1_address = await self._contract.functions.token1().call(
-            block_identifier=await self.block
-        )
+        self._token1_address = await self.call_function_autoRpc("token1")
         self._token1 = erc20(
             address=self._token1_address,
             network=self._network,
@@ -781,17 +725,13 @@ class algebrav3_pool(web3wrap):
         )
 
     async def init_feeGrowthGlobal0X128(self):
-        self._feeGrowthGlobal0X128 = (
-            await self._contract.functions.totalFeeGrowth0Token().call(
-                block_identifier=await self.block
-            )
+        self._feeGrowthGlobal0X128 = await self.call_function_autoRpc(
+            "totalFeeGrowth0Token"
         )
 
     async def init_feeGrowthGlobal1X128(self):
-        self._feeGrowthGlobal1X128 = (
-            await self._contract.functions.totalFeeGrowth1Token().call(
-                block_identifier=await self.block
-            )
+        self._feeGrowthGlobal1X128 = await self.call_function_autoRpc(
+            "totalFeeGrowth1Token"
         )
 
     # Properties
@@ -894,10 +834,10 @@ class algebrav3_pool(web3wrap):
                    fees0   uint128 :  0  (tokensOwed0)
                    fees1   uint128 :  0  ( tokensOwed1)
         """
-
-        result = await self._contract.functions.positions(HexBytes(position_key)).call(
-            block_identifier=await self.block
+        position_key = (
+            HexBytes(position_key) if type(position_key) == str else position_key
         )
+        result = await self.call_function_autoRpc("positions", None, position_key)
         return {
             "liquidity": result[0],
             "lastLiquidityAddTimestamp": result[1],
@@ -908,9 +848,7 @@ class algebrav3_pool(web3wrap):
         }
 
     async def tickTable(self, value: int) -> int:
-        return await self._contract.functions.tickTable(value).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("tickTable", None, value)
 
     async def ticks(self, tick: int) -> dict:
         """
@@ -928,9 +866,7 @@ class algebrav3_pool(web3wrap):
                        secondsOutside   uint32 :  0         outerSecondsSpent
                        initialized   bool :  false          initialized
         """
-        result = await self._contract.functions.ticks(tick).call(
-            block_identifier=await self.block
-        )
+        result = await self.call_function_autoRpc("ticks", None, tick)
         return {
             "liquidityGross": result[0],
             "liquidityNet": result[1],
@@ -944,9 +880,7 @@ class algebrav3_pool(web3wrap):
 
     async def timepoints(self, index: int) -> dict:
         #   initialized bool, blockTimestamp uint32, tickCumulative int56, secondsPerLiquidityCumulative uint160, volatilityCumulative uint88, averageTick int24, volumePerLiquidityCumulative uint144
-        return await self._contract.functions.timepoints(index).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("timepoints", None, index)
 
     # CUSTOM PROPERTIES
     @property

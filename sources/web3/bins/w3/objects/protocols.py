@@ -72,9 +72,7 @@ class gamma_hypervisor(erc20):
         Returns:
             _type_: 0 int24
         """
-        self._baseUpper = await self._contract.functions.baseUpper().call(
-            block_identifier=await self.block
-        )
+        self._baseUpper = await self.call_function_autoRpc("baseUpper")
 
     async def init_baseLower(self):
         """baseLower _summary_
@@ -82,9 +80,7 @@ class gamma_hypervisor(erc20):
         Returns:
             _type_: 0 int24
         """
-        self._baseLower = await self._contract.functions.baseLower().call(
-            block_identifier=await self.block
-        )
+        self._baseLower = await self.call_function_autoRpc("baseLower")
 
     async def init_currentTick(self):
         """currentTick _summary_
@@ -92,9 +88,7 @@ class gamma_hypervisor(erc20):
         Returns:
             int: -78627 int24
         """
-        self._currentTick = await self._contract.functions.currentTick().call(
-            block_identifier=await self.block
-        )
+        self._currentTick = await self.call_function_autoRpc("currentTick")
 
     async def init_deposit0Max(self):
         """deposit0Max _summary_
@@ -102,9 +96,7 @@ class gamma_hypervisor(erc20):
         Returns:
             float: 1157920892373161954234007913129639935 uint256
         """
-        self._deposit0Max = await self._contract.functions.deposit0Max().call(
-            block_identifier=await self.block
-        )
+        self._deposit0Max = await self.call_function_autoRpc("deposit0Max")
 
     async def init_deposit1Max(self):
         """deposit1Max _summary_
@@ -112,9 +104,7 @@ class gamma_hypervisor(erc20):
         Returns:
             int: 115792089237 uint256
         """
-        self._deposit1Max = await self._contract.functions.deposit1Max().call(
-            block_identifier=await self.block
-        )
+        self._deposit1Max = await self.call_function_autoRpc("deposit1Max")
 
     async def init_directDeposit(self):
         """v1 contracts have no directDeposit function
@@ -122,9 +112,7 @@ class gamma_hypervisor(erc20):
         Returns:
             bool:
         """
-        self._directDeposit = await self._contract.functions.directDeposit().call(
-            block_identifier=await self.block
-        )
+        self._directDeposit = await self.call_function_autoRpc("directDeposit")
 
     async def init_fee(self):
         """fee _summary_
@@ -132,9 +120,7 @@ class gamma_hypervisor(erc20):
         Returns:
             int: 10 uint8
         """
-        self._fee = await self._contract.functions.fee().call(
-            block_identifier=await self.block
-        )
+        self._fee = await self.call_function_autoRpc("fee")
 
     async def init_feeRecipient(self):
         """v1 contracts have no feeRecipient function
@@ -143,9 +129,7 @@ class gamma_hypervisor(erc20):
             str: address
         """
         try:
-            self._feeRecipient = await self._contract.functions.feeRecipient().call(
-                block_identifier=await self.block
-            )
+            self._feeRecipient = await self.call_function_autoRpc("feeRecipient")
         except Exception:
             # v1 contracts have no feeRecipient function
             self._feeRecipient = None
@@ -159,9 +143,7 @@ class gamma_hypervisor(erc20):
                amount1     565062023318300677907  uint256
                }
         """
-        tmp = await self._contract.functions.getBasePosition().call(
-            block_identifier=await self.block
-        )
+        tmp = await self.call_function_autoRpc("getBasePosition")
         self._getBasePosition = {
             "liquidity": tmp[0],
             "amount0": tmp[1],
@@ -177,9 +159,7 @@ class gamma_hypervisor(erc20):
                amount1     565062023318300677907 uint256
                }
         """
-        tmp = await self._contract.functions.getLimitPosition().call(
-            block_identifier=await self.block
-        )
+        tmp = await self.call_function_autoRpc("getLimitPosition")
         self._getLimitPosition = {
             "liquidity": tmp[0],
             "amount0": tmp[1],
@@ -193,9 +173,7 @@ class gamma_hypervisor(erc20):
            _type_: total0   2902086313 uint256
                    total1  565062023318300678136 uint256
         """
-        tmp = await self._contract.functions.getTotalAmounts().call(
-            block_identifier=await self.block
-        )
+        tmp = await self.call_function_autoRpc("getTotalAmounts")
         self._getTotalAmounts = {
             "total0": tmp[0],
             "total1": tmp[1],
@@ -207,9 +185,7 @@ class gamma_hypervisor(erc20):
         Returns:
             int: 0 int24
         """
-        self._limitLower = await self._contract.functions.limitLower().call(
-            block_identifier=await self.block
-        )
+        self._limitLower = await self.call_function_autoRpc("limitLower")
 
     async def init_limitUpper(self):
         """limitUpper _summary_
@@ -217,9 +193,7 @@ class gamma_hypervisor(erc20):
         Returns:
             int: 0 int24
         """
-        self._limitUpper = await self._contract.functions.limitUpper().call(
-            block_identifier=await self.block
-        )
+        self._limitUpper = await self.call_function_autoRpc("limitUpper")
 
     async def init_maxTotalSupply(self):
         """maxTotalSupply _summary_
@@ -227,24 +201,16 @@ class gamma_hypervisor(erc20):
         Returns:
             int: 0 uint256
         """
-        self._maxTotalSupply = await self._contract.functions.maxTotalSupply().call(
-            block_identifier=await self.block
-        )
+        self._maxTotalSupply = await self.call_function_autoRpc("maxTotalSupply")
 
     async def init_name(self):
-        self._name = await self._contract.functions.name().call(
-            block_identifier=await self.block
-        )
+        self._name = await self.call_function_autoRpc("name")
 
     async def init_owner(self):
-        self._owner = await self._contract.functions.owner().call(
-            block_identifier=await self.block
-        )
+        self._owner = await self.call_function_autoRpc("owner")
 
     async def init_pool(self):
-        self._pool_address = await self._contract.functions.pool().call(
-            block_identifier=await self.block
-        )
+        self._pool_address = await self.call_function_autoRpc("pool")
         self._pool = univ3_pool(
             address=self._pool_address,
             network=self._network,
@@ -259,14 +225,10 @@ class gamma_hypervisor(erc20):
         Returns:
             int: 60 int24
         """
-        self._tickSpacing = await self._contract.functions.tickSpacing().call(
-            block_identifier=await self.block
-        )
+        self._tickSpacing = await self.call_function_autoRpc("tickSpacing")
 
     async def init_token0(self):
-        self._token0_address = await self._contract.functions.token0().call(
-            block_identifier=await self.block
-        )
+        self._token0_address = await self.call_function_autoRpc("token0")
         self._token0 = erc20(
             address=self._token0_address,
             network=self._network,
@@ -276,9 +238,7 @@ class gamma_hypervisor(erc20):
         )
 
     async def init_token1(self):
-        self._token1_address = await self._contract.functions.token1().call(
-            block_identifier=await self.block
-        )
+        self._token1_address = await self.call_function_autoRpc("token1")
         self._token1 = erc20(
             address=self._token1_address,
             network=self._network,
@@ -493,9 +453,9 @@ class gamma_hypervisor(erc20):
         return self._token1
 
     async def nonces(self, owner: str):
-        return await self._contract.functions.nonces()(
-            Web3.to_checksum_address(owner)
-        ).call(block_identifier=await self.block)
+        return await self.call_function_autoRpc(
+            "nonces", None, Web3.to_checksum_address(owner)
+        )
 
     @property
     async def block(self) -> int:
@@ -784,9 +744,7 @@ class gamma_hypervisor_algebra(gamma_hypervisor):
 
     # initializers
     async def init_pool(self):
-        self._pool_address = await self._contract.functions.pool().call(
-            block_identifier=await self.block
-        )
+        self._pool_address = await self.call_function_autoRpc("pool")
         self._pool = algebrav3_pool(
             address=self._pool_address,
             network=self._network,
@@ -878,9 +836,7 @@ class gamma_hypervisor_thena(gamma_hypervisor_algebra):
 
     # initializers
     async def init_pool(self):
-        self._pool_address = await self._contract.functions.pool().call(
-            block_identifier=await self.block
-        )
+        self._pool_address = await self.call_function_autoRpc("pool")
         self._pool = algebrav3_pool(
             address=self._pool_address,
             network=self._network,
@@ -891,9 +847,6 @@ class gamma_hypervisor_thena(gamma_hypervisor_algebra):
         )
 
 
-#####################
-#### TODO :   ###############
-#################3
 # registries
 
 
@@ -948,9 +901,7 @@ class gamma_hypervisor_registry(web3wrap):
             int: positions of hypervisors in registry
         """
         if not self._counter:
-            self._counter = await self._contract.functions.counter().call(
-                block_identifier=await self.block
-            )
+            self._counter = await self.call_function_autoRpc("counter")
         return self._counter
 
     async def hypeByIndex(self, index: int) -> tuple[str, int]:
@@ -963,27 +914,21 @@ class gamma_hypervisor_registry(web3wrap):
         Returns:
             tuple[str, int]: hype address and index
         """
-        return await self._contract.functions.hypeByIndex(index).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("hypeByIndex", None, index)
 
     @property
     async def owner(self) -> str:
         if not self._owner:
-            self._owner = await self._contract.functions.owner().call(
-                block_identifier=await self.block
-            )
+            self._owner = await self.call_function_autoRpc("owner")
         return self._owner
 
     async def registry(self, index: int) -> str:
-        return await self._contract.functions.registry(index).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("registry", None, index)
 
     async def registryMap(self, address: str) -> int:
-        return await self._contract.functions.registryMap(
-            Web3.to_checksum_address(address)
-        ).call(block_identifier=await self.block)
+        return await self.call_function_autoRpc(
+            "registryMap", None, Web3.to_checksum_address(address)
+        )
 
     # CUSTOM FUNCTIONS
     async def get_hypervisors(self) -> list[gamma_hypervisor]:

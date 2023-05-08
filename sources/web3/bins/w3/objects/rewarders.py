@@ -44,60 +44,45 @@ class gamma_masterchef_rewarder(web3wrap):
     @property
     async def acc_token_precision(self) -> int:
         if not self._acc_token_precision:
-            self._acc_token_precision = (
-                await self._contract.functions.ACC_TOKEN_PRECISION().call(
-                    block_identifier=await self.block
-                )
+            self._acc_token_precision = await self.call_function_autoRpc(
+                "ACC_TOKEN_PRECISION"
             )
+
         return self._acc_token_precision
 
     @property
     async def masterchef_v2(self) -> str:
         if not self._masterchef_v2:
-            self._masterchef_v2 = await self._contract.functions.MASTERCHEF_V2().call(
-                block_identifier=await self.block
-            )
+            self._masterchef_v2 = await self.call_function_autoRpc("MASTERCHEF_V2")
         return self._masterchef_v2
 
     @property
     async def funder(self) -> str:
         if not self._funder:
-            self._funder = await self._contract.functions.funder().call(
-                block_identifier=await self.block
-            )
+            self._funder = await self.call_function_autoRpc("funder")
         return self._funder
 
     @property
     async def owner(self) -> str:
         if not self._owner:
-            self._owner = await self._contract.functions.owner().call(
-                block_identifier=await self.block
-            )
+            self._owner = await self.call_function_autoRpc("owner")
         return self._owner
 
     @property
     async def pendingOwner(self) -> str:
         if not self._pendingOwner:
-            self._pendingOwner = await self._contract.functions.pendingOwner().call(
-                block_identifier=await self.block
-            )
+            self._pendingOwner = await self.call_function_autoRpc("pendingOwner")
         return self._pendingOwner
 
     async def pendingToken(self, pid: int, user: str) -> int:
-        return await self._contract.functions.pendingToken(pid, user).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("pendingToken", None, pid, user)
 
     async def pendingTokens(self, pid: int, user: str, input: int) -> tuple[list, list]:
         # rewardTokens address[], rewardAmounts uint256[]
-        return await self._contract.functions.pendingTokens(pid, user, input).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("pendingToken", None, pid, user, input)
 
     async def poolIds(self, input: int) -> int:
-        return await self._contract.functions.poolIds(input).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("poolIds", None, input)
 
     async def poolInfo(self, input: int) -> tuple[int, int, int]:
         """_summary_
@@ -111,34 +96,24 @@ class gamma_masterchef_rewarder(web3wrap):
                 lastRewardBlock — number of block, when the reward in the pool was the last time calculated
                 allocPoint — allocation points assigned to the pool. SUSHI to distribute per block per pool = SUSHI per block * pool.allocPoint / totalAllocPoint
         """
-        return await self._contract.functions.poolInfo(input).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("poolInfo", None, input)
 
     @property
     async def poolLength(self) -> int:
         if not self._poolLength:
-            self._poolLength = await self._contract.functions.poolLength().call(
-                block_identifier=await self.block
-            )
+            self._poolLength = await self.call_function_autoRpc("poolLength")
         return self._poolLength
 
     @property
     async def rewardPerSecond(self) -> int:
         if not self._rewardPerSecond:
-            self._rewardPerSecond = (
-                await self._contract.functions.rewardPerSecond().call(
-                    block_identifier=await self.block
-                )
-            )
+            self._rewardPerSecond = await self.call_function_autoRpc("rewardPerSecond")
         return self._rewardPerSecond
 
     @property
     async def rewardToken(self) -> str:
         if not self._rewardToken:
-            self._rewardToken = await self._contract.functions.rewardToken().call(
-                block_identifier=await self.block
-            )
+            self._rewardToken = await self.call_function_autoRpc("rewardToken")
         return self._rewardToken
 
     @property
@@ -149,11 +124,7 @@ class gamma_masterchef_rewarder(web3wrap):
             int: totalAllocPoint
         """
         if not self._totalAllocPoint:
-            self._totalAllocPoint = (
-                await self._contract.functions.totalAllocPoint().call(
-                    block_identifier=await self.block
-                )
-            )
+            self._totalAllocPoint = await self.call_function_autoRpc("totalAllocPoint")
         return self._totalAllocPoint
 
     async def userInfo(self, pid: int, user: str) -> tuple[int, int]:
@@ -169,9 +140,7 @@ class gamma_masterchef_rewarder(web3wrap):
                     rewardDebt — the amount of SUSHI entitled to the user
 
         """
-        return await self._contract.functions.userInfo(pid, user).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("userInfo", None, pid, user)
 
     # CUSTOM
     async def as_dict(self, convert_bint=False, static_mode: bool = False) -> dict:
@@ -254,9 +223,7 @@ class gamma_masterchef_v1(web3wrap):
             str: token address
         """
         if not self._sushi:
-            self._sushi = await self._contract.functions.SUSHI().call(
-                block_identifier=await self.block
-            )
+            self._sushi = await self.call_function_autoRpc("SUSHI")
         return self._sushi
 
     async def getRewarder(self, pid: int, rid: int) -> str:
@@ -269,9 +236,7 @@ class gamma_masterchef_v1(web3wrap):
         Returns:
             str: address
         """
-        return await self._contract.functions.getRewarder(pid, rid).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("getRewarder", None, pid, rid)
 
     async def lpToken(self, pid: int) -> str:
         """Retrieve lp token address (hypervisor) from masterchef
@@ -282,27 +247,20 @@ class gamma_masterchef_v1(web3wrap):
         Returns:
             str:  hypervisor address ( LP token)
         """
-        return await self._contract.functions.lpToken(pid).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("lpToken", None, pid)
 
     @property
     async def owner(self) -> str:
         if not self._owner:
-            self._owner = await self._contract.functions.owner().call(
-                block_identifier=await self.block
-            )
+            self._owner = await self.call_function_autoRpc("owner")
         return self._owner
 
     @property
     async def pendingOwner(self) -> str:
         if not self._pendingOwner:
-            self._pendingOwner = await self._contract.functions.pendingOwner().call(
-                block_identifier=await self.block
-            )
+            self._pendingOwner = await self.call_function_autoRpc("pendingOwner")
         return self._pendingOwner
 
-    @property
     async def pendingSushi(self, pid: int, user: str) -> int:
         """pending SUSHI reward for a given user
 
@@ -313,9 +271,7 @@ class gamma_masterchef_v1(web3wrap):
         Returns:
             int: _description_
         """
-        return await self._contract.functions.pendingSushi(pid, user).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("pendingSushi", None, pid, user)
 
     async def poolInfo(self, pid: int) -> tuple[int, int, int]:
         """_summary_
@@ -323,9 +279,7 @@ class gamma_masterchef_v1(web3wrap):
         Returns:
             tuple[int,int,int]:  accSushiPerShare uint128, lastRewardTime uint64, allocPoint uint64
         """
-        return await self._contract.functions.poolInfo(pid).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("poolInfo", None, pid)
 
     @property
     async def poolLength(self) -> int:
@@ -334,9 +288,7 @@ class gamma_masterchef_v1(web3wrap):
             int:
         """
         if not self._poolLength:
-            self._poolLength = await self._contract.functions.poolLength().call(
-                block_identifier=await self.block
-            )
+            self._poolLength = await self.call_function_autoRpc("poolLength")
         return self._poolLength
 
 
@@ -388,9 +340,7 @@ class gamma_masterchef_v2(web3wrap):
         Returns:
             int: _description_
         """
-        return await self._contract.functions.deposited(pid, user).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("deposited", None, pid, user)
 
     @property
     async def endTimestamp(self) -> int:
@@ -400,9 +350,7 @@ class gamma_masterchef_v2(web3wrap):
             int: _description_
         """
         if not self._endTimestamp:
-            self._endTimestamp = await self._contract.functions.endTimestamp().call(
-                block_identifier=await self.block
-            )
+            self._endTimestamp = await self.call_function_autoRpc("endTimestamp")
         return self._endTimestamp
 
     @property
@@ -413,9 +361,7 @@ class gamma_masterchef_v2(web3wrap):
             str: address
         """
         if not self._erc20:
-            self._erc20 = await self._contract.functions.erc20().call(
-                block_identifier=await self.block
-            )
+            self._erc20 = await self.call_function_autoRpc("erc20")
         return self._erc20
 
     @property
@@ -426,9 +372,7 @@ class gamma_masterchef_v2(web3wrap):
             str: address
         """
         if not self._feeAddress:
-            self._feeAddress = await self._contract.functions.feeAddress().call(
-                block_identifier=await self.block
-            )
+            self._feeAddress = await self.call_function_autoRpc("feeAddress")
         return self._feeAddress
 
     @property
@@ -439,9 +383,7 @@ class gamma_masterchef_v2(web3wrap):
             str: address
         """
         if not self._owner:
-            self._owner = await self._contract.functions.owner().call(
-                block_identifier=await self.block
-            )
+            self._owner = await self.call_function_autoRpc("owner")
         return self._owner
 
     @property
@@ -452,9 +394,7 @@ class gamma_masterchef_v2(web3wrap):
             int: _description_
         """
         if not self._paidOut:
-            self._paidOut = await self._contract.functions.paidOut().call(
-                block_identifier=await self.block
-            )
+            self._paidOut = await self.call_function_autoRpc("paidOut")
         return self._paidOut
 
     async def pending(self, pid: int, user: str) -> int:
@@ -467,9 +407,7 @@ class gamma_masterchef_v2(web3wrap):
         Returns:
             int: _description_
         """
-        return await self._contract.functions.pending(pid, user).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("pending", None, pid, user)
 
     async def poolInfo(self, pid: int) -> tuple[str, int, int, int, int]:
         """_summary_
@@ -485,9 +423,7 @@ class gamma_masterchef_v2(web3wrap):
                 accERC20PerShare uint256,
                 depositFeeBP uint16
         """
-        return await self._contract.functions.poolInfo(pid).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("poolInfo", None, pid)
 
     @property
     async def poolLength(self) -> int:
@@ -497,9 +433,7 @@ class gamma_masterchef_v2(web3wrap):
             int: uint256
         """
         if not self._poolLength:
-            self._poolLength = await self._contract.functions.poolLength().call(
-                block_identifier=await self.block
-            )
+            self._poolLength = await self.call_function_autoRpc("poolLength")
         return self._poolLength
 
     @property
@@ -510,11 +444,7 @@ class gamma_masterchef_v2(web3wrap):
             int: uint256
         """
         if not self._rewardPerSecond:
-            self._rewardPerSecond = (
-                await self._contract.functions.rewardPerSecond().call(
-                    block_identifier=await self.block
-                )
-            )
+            self._rewardPerSecond = await self.call_function_autoRpc("rewardPerSecond")
         return self._rewardPerSecond
 
     @property
@@ -525,9 +455,7 @@ class gamma_masterchef_v2(web3wrap):
             int: uint256
         """
         if not self._startTimestamp:
-            self._startTimestamp = await self._contract.functions.startTimestamp().call(
-                block_identifier=await self.block
-            )
+            self._startTimestamp = await self.call_function_autoRpc("startTimestamp")
         return self._startTimestamp
 
     @property
@@ -538,11 +466,7 @@ class gamma_masterchef_v2(web3wrap):
             int: uint256
         """
         if not self._totalAllocPoint:
-            self._totalAllocPoint = (
-                await self._contract.functions.totalAllocPoint().call(
-                    block_identifier=await self.block
-                )
-            )
+            self._totalAllocPoint = await self.call_function_autoRpc("totalAllocPoint")
         return self._totalAllocPoint
 
     async def userInfo(self, pid: int, user: str) -> tuple[int, int]:
@@ -557,9 +481,7 @@ class gamma_masterchef_v2(web3wrap):
                 amount uint256,
                 rewardDebt uint256
         """
-        return await self._contract.functions.userInfo(pid, user).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("userInfo", None, pid, user)
 
 
 # Gamma masterchef registry ( registry of the "rewarders registry")
@@ -604,9 +526,7 @@ class gamma_masterchef_registry(web3wrap):
             int: positions of hypervisors in registry
         """
         if not self._counter:
-            counter = await self._contract.functions.counter().call(
-                block_identifier=await self.block
-            )
+            counter = await self.call_function_autoRpc("counter")
         return self._counter
 
     async def hypeByIndex(self, index: int) -> tuple[str, int]:
@@ -619,27 +539,21 @@ class gamma_masterchef_registry(web3wrap):
         Returns:
             tuple[str, int]: hype address and index
         """
-        return await self._contract.functions.hypeByIndex(index).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("hypeByIndex", None, index)
 
     @property
     async def owner(self) -> str:
         if not self._owner:
-            self._owner = await self._contract.functions.owner().call(
-                block_identifier=await self.block
-            )
+            self._owner = await self.call_function_autoRpc("owner")
         return self._owner
 
     async def registry(self, index: int) -> str:
-        return await self._contract.functions.registry(index).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("registry")
 
     async def registryMap(self, address: str) -> int:
-        return await self._contract.functions.registryMap(
-            Web3.to_checksum_address(address)
-        ).call(block_identifier=await self.block)
+        return await self.call_function_autoRpc(
+            "registryMap", None, Web3.to_checksum_address(address)
+        )
 
     # CUSTOM FUNCTIONS
 
@@ -742,48 +656,36 @@ class zyberswap_masterchef_rewarder(web3wrap):
         self._totalAllocPoint: int | None = None
 
     async def _getTimeElapsed(self, _from: int, _to: int, _endTimestamp: int) -> int:
-        return await self._contract.functions._getTimeElapsed(
-            _from, _to, _endTimestamp
-        ).call(block_identifier=await self.block)
+        return await self.call_function_autoRpc(
+            "_getTimeElapsed", None, _from, _to, _endTimestamp
+        )
 
     async def currentTimestamp(self, pid: int) -> int:
-        return await self._contract.functions._getTimeElapsed(pid).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("currentTimestamp", None, pid)
 
     @property
     async def distributorV2(self) -> str:
         if not self._distributorV2:
-            self._distributorV2 = await self._contract.functions.distributorV2().call(
-                block_identifier=await self.block
-            )
+            self._distributorV2 = await self.call_function_autoRpc("distributorV2")
         return self._distributorV2
 
     @property
     async def isNative(self) -> bool:
         if not self._isNative:
-            self._isNative = await self._contract.functions.isNative().call(
-                block_identifier=await self.block
-            )
+            self._isNative = await self.call_function_autoRpc("isNative")
         return self._isNative
 
     @property
     async def owner(self) -> str:
         if not self._owner:
-            self._owner = await self._contract.functions.owner().call(
-                block_identifier=await self.block
-            )
+            self._owner = await self.call_function_autoRpc("owner")
         return self._owner
 
     async def pendingTokens(self, pid: int, user: str) -> int:
-        return await self._contract.functions.pendingTokens(pid, user).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("pendingTokens", None, pid, user)
 
     async def poolIds(self, input: int) -> int:
-        return await self._contract.functions.poolIds(input).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("poolIds", None, input)
 
     async def poolInfo(self, pid: int) -> tuple[int, int, int, int, int]:
         """
@@ -799,9 +701,7 @@ class zyberswap_masterchef_rewarder(web3wrap):
                 allocPoint uint256 — allocation points assigned to the pool.
                 totalRewards uint256 — total rewards for the pool
         """
-        return await self._contract.functions.poolInfo(pid).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("poolInfo", None, pid)
 
     async def poolRewardInfo(self, input1: int, input2: int) -> tuple[int, int, int]:
         """_summary_
@@ -813,31 +713,21 @@ class zyberswap_masterchef_rewarder(web3wrap):
         Returns:
             tuple[int,int,int]:  startTimestamp uint256, endTimestamp uint256, rewardPerSec uint256
         """
-        return await self._contract.functions.poolRewardInfo(input1, input2).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("poolRewardInfo", None, input1, input2)
 
     async def poolRewardsPerSec(self, pid: int) -> int:
-        return await self._contract.functions.poolRewardsPerSec(pid).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("poolRewardsPerSec", None, pid)
 
     @property
     async def rewardInfoLimit(self) -> int:
         if not self._rewardInfoLimit:
-            self._rewardInfoLimit = (
-                await self._contract.functions.rewardInfoLimit().call(
-                    block_identifier=await self.block
-                )
-            )
+            self._rewardInfoLimit = await self.call_function_autoRpc("rewardInfoLimit")
         return self._rewardInfoLimit
 
     @property
     async def rewardToken(self) -> str:
         if not self._rewardToken:
-            self._rewardToken = await self._contract.functions.rewardToken().call(
-                block_identifier=await self.block
-            )
+            self._rewardToken = await self.call_function_autoRpc("rewardToken")
         return self._rewardToken
 
     @property
@@ -848,11 +738,7 @@ class zyberswap_masterchef_rewarder(web3wrap):
             int: totalAllocPoint
         """
         if not self._totalAllocPoint:
-            self._totalAllocPoint = (
-                await self._contract.functions.totalAllocPoint().call(
-                    block_identifier=await self.block
-                )
-            )
+            self._totalAllocPoint = await self.call_function_autoRpc("totalAllocPoint")
         return self._totalAllocPoint
 
     async def userInfo(self, pid: int, user: str) -> tuple[int, int]:
@@ -868,9 +754,7 @@ class zyberswap_masterchef_rewarder(web3wrap):
                     rewardDebt — the amount of SUSHI entitled to the user
 
         """
-        return await self._contract.functions.userInfo(pid, user).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("userInfo", None, pid, user)
 
     # CUSTOM
     async def as_dict(self, convert_bint=False, static_mode: bool = False) -> dict:
@@ -964,10 +848,8 @@ class zyberswap_masterchef_v1(web3wrap):
             int: unit16
         """
         if not self._maximum_deposit_fee_rate:
-            self._maximum_deposit_fee_rate = (
-                await self._contract.functions.MAXIMUM_DEPOSIT_FEE_RATE().call(
-                    block_identifier=await self.block
-                )
+            self._maximum_deposit_fee_rate = await self.call_function_autoRpc(
+                "MAXIMUM_DEPOSIT_FEE_RATE"
             )
         return self._maximum_deposit_fee_rate
 
@@ -979,11 +861,10 @@ class zyberswap_masterchef_v1(web3wrap):
             int: unit256
         """
         if not self._maximum_harvest_interval:
-            self._maximum_harvest_interval = (
-                await self._contract.functions.MAXIMUM_HARVEST_INTERVAL().call(
-                    block_identifier=await self.block
-                )
+            self._maximum_harvest_interval = await self.call_function_autoRpc(
+                "MAXIMUM_HARVEST_INTERVAL"
             )
+
         return self._maximum_harvest_interval
 
     async def canHarvest(self, pid: int, user: str) -> bool:
@@ -996,9 +877,7 @@ class zyberswap_masterchef_v1(web3wrap):
         Returns:
             bool: _description_
         """
-        return await self._contract.functions.canHarvest(pid, user).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("canHarvest", None, pid, user)
 
     @property
     async def feeAddress(self) -> str:
@@ -1008,9 +887,7 @@ class zyberswap_masterchef_v1(web3wrap):
             str: address
         """
         if not self._feeAddress:
-            self._feeAddress = await self._contract.functions.feeAddress().call(
-                block_identifier=await self.block
-            )
+            self._feeAddress = await self.call_function_autoRpc("feeAddress")
         return self._feeAddress
 
     @property
@@ -1021,11 +898,7 @@ class zyberswap_masterchef_v1(web3wrap):
             int: unit256
         """
         if not self._getZyberPerSecond:
-            self._getZyberPerSecond = (
-                await self._contract.functions.getZyberPerSec().call(
-                    block_identifier=await self.block
-                )
-            )
+            self._getZyberPerSecond = await self.call_function_autoRpc("getZyberPerSec")
         return self._getZyberPerSecond
 
     @property
@@ -1036,10 +909,8 @@ class zyberswap_masterchef_v1(web3wrap):
             str: address
         """
         if not self._marketingAddress:
-            self._marketingAddress = (
-                await self._contract.functions.marketingAddress().call(
-                    block_identifier=await self.block
-                )
+            self._marketingAddress = await self.call_function_autoRpc(
+                "marketingAddress"
             )
         return self._marketingAddress
 
@@ -1051,10 +922,8 @@ class zyberswap_masterchef_v1(web3wrap):
             int: unit256
         """
         if not self._marketingPercent:
-            self._marketingPercent = (
-                await self._contract.functions.marketingPercent().call(
-                    block_identifier=await self.block
-                )
+            self._marketingPercent = await self.call_function_autoRpc(
+                "marketingPercent"
             )
         return self._marketingPercent
 
@@ -1066,9 +935,7 @@ class zyberswap_masterchef_v1(web3wrap):
             str: address
         """
         if not self._owner:
-            self._owner = await self._contract.functions.owner().call(
-                block_identifier=await self.block
-            )
+            self._owner = await self.call_function_autoRpc("owner")
         return self._owner
 
     async def pendingTokens(
@@ -1083,9 +950,7 @@ class zyberswap_masterchef_v1(web3wrap):
         Returns:
             tuple: addresses address[], symbols string[], decimals uint256[], amounts uint256[]
         """
-        return await self._contract.functions.pendingTokens(pid, user).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("pendingTokens", None, pid, user)
 
     async def poolInfo(self, pid: int) -> tuple[str, int, int, int, int, int, int, int]:
         """pool info
@@ -1103,9 +968,7 @@ class zyberswap_masterchef_v1(web3wrap):
                 harvestInterval uint256,
                 totalLp uint256
         """
-        return await self._contract.functions.poolInfo(pid).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("poolInfo", None, pid)
 
     @property
     async def poolLength(self) -> int:
@@ -1115,9 +978,7 @@ class zyberswap_masterchef_v1(web3wrap):
             int: unit256
         """
         if not self._poolLength:
-            self._poolLength = await self._contract.functions.poolLength().call(
-                block_identifier=await self.block
-            )
+            self._poolLength = await self.call_function_autoRpc("poolLength")
         return self._poolLength
 
     async def poolRewarders(self, pid: int) -> list[str]:
@@ -1129,9 +990,7 @@ class zyberswap_masterchef_v1(web3wrap):
         Returns:
             list[str]: address[]
         """
-        return await self._contract.functions.poolRewarders(pid).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("poolRewarders", None, pid)
 
     async def poolRewardsPerSec(
         self, pid: int
@@ -1147,9 +1006,7 @@ class zyberswap_masterchef_v1(web3wrap):
             decimals uint256[],
             rewardsPerSec uint256[]
         """
-        return await self._contract.functions.poolRewardsPerSec(pid).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("poolRewardsPerSec", None, pid)
 
     async def poolTotalLp(self, pid: int) -> int:
         """pool total lp
@@ -1160,9 +1017,7 @@ class zyberswap_masterchef_v1(web3wrap):
         Returns:
             int: unit256
         """
-        return await self._contract.functions.poolTotalLp(pid).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("poolTotalLp", None, pid)
 
     @property
     async def startTimestamp(self) -> int:
@@ -1172,9 +1027,7 @@ class zyberswap_masterchef_v1(web3wrap):
             int: unit256
         """
         if not self._startTimestamp:
-            self._startTimestamp = await self._contract.functions.startTimestamp().call(
-                block_identifier=await self.block
-            )
+            self._startTimestamp = await self.call_function_autoRpc("startTimestamp")
         return self._startTimestamp
 
     @property
@@ -1185,9 +1038,7 @@ class zyberswap_masterchef_v1(web3wrap):
             str: address
         """
         if not self._teamAddress:
-            self._teamAddress = await self._contract.functions.teamAddress().call(
-                block_identifier=await self.block
-            )
+            self._teamAddress = await self.call_function_autoRpc("teamAddress")
         return self._teamAddress
 
     @property
@@ -1198,9 +1049,7 @@ class zyberswap_masterchef_v1(web3wrap):
             int: unit256
         """
         if not self._teamPercent:
-            self._teamPercent = await self._contract.functions.teamPercent().call(
-                block_identifier=await self.block
-            )
+            self._teamPercent = await self.call_function_autoRpc("teamPercent")
         return self._teamPercent
 
     @property
@@ -1211,11 +1060,7 @@ class zyberswap_masterchef_v1(web3wrap):
             int: unit256
         """
         if not self._totalAllocPoint:
-            self._totalAllocPoint = (
-                await self._contract.functions.totalAllocPoint().call(
-                    block_identifier=await self.block
-                )
-            )
+            self._totalAllocPoint = await self.call_function_autoRpc("totalAllocPoint")
         return self._totalAllocPoint
 
     @property
@@ -1226,10 +1071,8 @@ class zyberswap_masterchef_v1(web3wrap):
             int: unit256
         """
         if not self._totalLockedUpRewards:
-            self._totalLockedUpRewards = (
-                await self._contract.functions.totalLockedUpRewards().call(
-                    block_identifier=await self.block
-                )
+            self._totalLockedUpRewards = await self.call_function_autoRpc(
+                "totalLockedUpRewards"
             )
         return self._totalLockedUpRewards
 
@@ -1241,10 +1084,8 @@ class zyberswap_masterchef_v1(web3wrap):
             int: unit256
         """
         if not self._totalZyberInPools:
-            self._totalZyberInPools = (
-                await self._contract.functions.totalZyberInPools().call(
-                    block_identifier=await self.block
-                )
+            self._totalZyberInPools = await self.call_function_autoRpc(
+                "totalZyberInPools"
             )
         return self._totalZyberInPools
 
@@ -1262,9 +1103,7 @@ class zyberswap_masterchef_v1(web3wrap):
                 rewardLockedUp uint256,
                 nextHarvestUntil uint256
         """
-        return await self._contract.functions.userInfo(pid, user).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("userInfo", None, pid, user)
 
     @property
     async def zyber(self) -> str:
@@ -1274,9 +1113,7 @@ class zyberswap_masterchef_v1(web3wrap):
             str: address
         """
         if not self._zyber:
-            self._zyber = await self._contract.functions.zyber().call(
-                block_identifier=await self.block
-            )
+            self._zyber = await self.call_function_autoRpc("zyber")
         return self._zyber
 
     @property
@@ -1287,9 +1124,7 @@ class zyberswap_masterchef_v1(web3wrap):
             int: unit256
         """
         if not self._zyberPerSec:
-            self._zyberPerSec = await self._contract.functions.zyberPerSec().call(
-                block_identifier=await self.block
-            )
+            self._zyberPerSec = await self.call_function_autoRpc("zyberPerSec")
         return self._zyberPerSec
 
 
@@ -1346,9 +1181,7 @@ class thena_voter_v3(web3wrap):
             int: uint256
         """
         if not self._max_vote_delay:
-            self._max_vote_delay = await self._contract.functions.MAX_VOTE_DELAY().call(
-                block_identifier=await self.block
-            )
+            self._max_vote_delay = await self.call_function_autoRpc("MAX_VOTE_DELAY")
         return self._max_vote_delay
 
     @property
@@ -1359,9 +1192,7 @@ class thena_voter_v3(web3wrap):
             int: uint256
         """
         if not self._vote_delay:
-            self._vote_delay = await self._contract.functions.VOTE_DELAY().call(
-                block_identifier=await self.block
-            )
+            self._vote_delay = await self.call_function_autoRpc("VOTE_DELAY")
         return self._vote_delay
 
     @property
@@ -1372,11 +1203,7 @@ class thena_voter_v3(web3wrap):
             int: uint256
         """
         if not self.__epochTimestamp:
-            self.__epochTimestamp = (
-                await self._contract.functions._epochTimestamp().call(
-                    block_identifier=await self.block
-                )
-            )
+            self.__epochTimestamp = await self.call_function_autoRpc("_epochTimestamp")
         return self.__epochTimestamp
 
     @property
@@ -1387,9 +1214,7 @@ class thena_voter_v3(web3wrap):
             list[str]: address[]
         """
         if not self.__factories:
-            self.__factories = await self._contract.functions._factories().call(
-                block_identifier=await self.block
-            )
+            self.__factories = await self.call_function_autoRpc("_factories")
         return self.__factories
 
     @property
@@ -1400,9 +1225,7 @@ class thena_voter_v3(web3wrap):
             str: address
         """
         if not self.__ve:
-            self.__ve = await self._contract.functions._ve().call(
-                block_identifier=await self.block
-            )
+            self.__ve = await self.call_function_autoRpc("_ve")
         return self.__ve
 
     @property
@@ -1413,9 +1236,7 @@ class thena_voter_v3(web3wrap):
             str: address
         """
         if not self._bribefactory:
-            self._bribefactory = await self._contract.functions.bribefactory().call(
-                block_identifier=await self.block
-            )
+            self._bribefactory = await self.call_function_autoRpc("bribefactory")
         return self._bribefactory
 
     async def claimable(self, address: str) -> int:
@@ -1427,9 +1248,7 @@ class thena_voter_v3(web3wrap):
         Returns:
             int: uint256
         """
-        return await self._contract.functions.claimable(address).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("claimable")
 
     async def external_bribes(self, address: str) -> str:
         """_summary_
@@ -1440,8 +1259,8 @@ class thena_voter_v3(web3wrap):
         Returns:
             str: address
         """
-        return await self._contract.functions.external_bribes(address).call(
-            block_identifier=await self.block
+        return await self.call_function_autoRpc(
+            "external_bribes", None, Web3.to_checksum_address(address)
         )
 
     async def factories(self, index: int) -> str:
@@ -1453,9 +1272,7 @@ class thena_voter_v3(web3wrap):
         Returns:
             str: address
         """
-        return await self._contract.functions.factories(index).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("factories", None, index)
 
     @property
     async def factory(self) -> str:
@@ -1465,9 +1282,7 @@ class thena_voter_v3(web3wrap):
             str: address
         """
         if not self._factory:
-            self._factory = await self._contract.functions.factory().call(
-                block_identifier=await self.block
-            )
+            self._factory = await self.call_function_autoRpc("factory")
         return self._factory
 
     @property
@@ -1478,9 +1293,7 @@ class thena_voter_v3(web3wrap):
             int: uint256
         """
         if not self._factoryLength:
-            self._factoryLength = await self._contract.functions.factoryLength().call(
-                block_identifier=await self.block
-            )
+            self._factoryLength = await self.call_function_autoRpc("factoryLength")
         return self._factoryLength
 
     async def gaugeFactories(self, index: int) -> str:
@@ -1492,9 +1305,7 @@ class thena_voter_v3(web3wrap):
         Returns:
             str: address
         """
-        return await self._contract.functions.gaugeFactories(index).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("gaugeFactories", None, index)
 
     @property
     async def gaugeFactoriesLength(self) -> int:
@@ -1504,10 +1315,8 @@ class thena_voter_v3(web3wrap):
             int: uint256
         """
         if not self._gaugeFactoriesLength:
-            self._gaugeFactoriesLength = (
-                await self._contract.functions.gaugeFactoriesLength().call(
-                    block_identifier=await self.block
-                )
+            self._gaugeFactoriesLength = await self.call_function_autoRpc(
+                "gaugeFactoriesLength"
             )
         return self._gaugeFactoriesLength
 
@@ -1519,9 +1328,7 @@ class thena_voter_v3(web3wrap):
             str: address
         """
         if not self._gaugefactory:
-            self._gaugefactory = await self._contract.functions.gaugefactory().call(
-                block_identifier=await self.block
-            )
+            self._gaugefactory = await self.call_function_autoRpc("gaugefactory")
         return self._gaugefactory
 
     async def gauges(self, address: str) -> str:
@@ -1533,9 +1340,9 @@ class thena_voter_v3(web3wrap):
         Returns:
             str: address
         """
-        return await self._contract.functions.gauges(
-            Web3.toChecksumAddress(address)
-        ).call(block_identifier=await self.block)
+        return await self.call_function_autoRpc(
+            "gauges", None, Web3.to_checksum_address(address)
+        )
 
     async def gaugesDistributionTimestamp(self, address: str) -> int:
         """_summary_
@@ -1546,8 +1353,8 @@ class thena_voter_v3(web3wrap):
         Returns:
             int: uint256
         """
-        return await self._contract.functions.gaugesDistributionTimestamp(address).call(
-            block_identifier=await self.block
+        return await self.call_function_autoRpc(
+            "gaugesDistributionTimestamp", None, Web3.to_checksum_address(address)
         )
 
     async def internal_bribes(self, address: str) -> str:
@@ -1559,8 +1366,8 @@ class thena_voter_v3(web3wrap):
         Returns:
             str: address
         """
-        return await self._contract.functions.internal_bribes(address).call(
-            block_identifier=await self.block
+        return await self.call_function_autoRpc(
+            "internal_bribes", None, Web3.to_checksum_address(address)
         )
 
     @property
@@ -1571,9 +1378,7 @@ class thena_voter_v3(web3wrap):
             bool: bool
         """
         if not self._isAlive:
-            self._isAlive = await self._contract.functions.isAlive().call(
-                block_identifier=await self.block
-            )
+            self._isAlive = await self.call_function_autoRpc("isAlive")
         return self._isAlive
 
     async def isFactory(self, address: str) -> bool:
@@ -1585,9 +1390,9 @@ class thena_voter_v3(web3wrap):
         Returns:
             bool: bool
         """
-        return await self._contract.functions.isFactory(
-            Web3.toChecksumAddress(address)
-        ).call(block_identifier=await self.block)
+        return await self.call_function_autoRpc(
+            "isFactory", None, Web3.to_checksum_address(address)
+        )
 
     async def isGauge(self, address: str) -> bool:
         """_summary_
@@ -1598,9 +1403,9 @@ class thena_voter_v3(web3wrap):
         Returns:
             bool: bool
         """
-        return await self._contract.functions.isGauge(
-            Web3.toChecksumAddress(address)
-        ).call(block_identifier=await self.block)
+        return await self.call_function_autoRpc(
+            "isGauge", None, Web3.to_checksum_address(address)
+        )
 
     async def isGaugeFactory(self, address: str) -> bool:
         """_summary_
@@ -1611,9 +1416,9 @@ class thena_voter_v3(web3wrap):
         Returns:
             bool: bool
         """
-        return await self._contract.functions.isGaugeFactory(
-            Web3.toChecksumAddress(address)
-        ).call(block_identifier=await self.block)
+        return await self.call_function_autoRpc(
+            "isGaugeFactory", None, Web3.to_checksum_address(address)
+        )
 
     async def isWhitelisted(self, address: str) -> bool:
         """_summary_
@@ -1624,9 +1429,9 @@ class thena_voter_v3(web3wrap):
         Returns:
             bool: bool
         """
-        return await self._contract.functions.isWhitelisted(
-            Web3.toChecksumAddress(address)
-        ).call(block_identifier=await self.block)
+        return await self.call_function_autoRpc(
+            "isWhitelisted", None, Web3.to_checksum_address(address)
+        )
 
     async def lastVoted(self, index: int) -> int:
         """_summary_
@@ -1637,9 +1442,7 @@ class thena_voter_v3(web3wrap):
         Returns:
             int: uint256
         """
-        return await self._contract.functions.lastVoted(index).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("lastVoted", None, index)
 
     @property
     async def length(self) -> int:
@@ -1649,9 +1452,7 @@ class thena_voter_v3(web3wrap):
             int: uint256
         """
         if not self._length:
-            self._length = await self._contract.functions.length().call(
-                block_identifier=await self.block
-            )
+            self._length = await self.call_function_autoRpc("length")
         return self._length
 
     @property
@@ -1662,9 +1463,7 @@ class thena_voter_v3(web3wrap):
             str: address
         """
         if not self._minter:
-            self._minter = await self._contract.functions.minter().call(
-                block_identifier=await self.block
-            )
+            self._minter = await self.call_function_autoRpc("minter")
         return self._minter
 
     @property
@@ -1675,9 +1474,7 @@ class thena_voter_v3(web3wrap):
             str: address
         """
         if not self._owner:
-            self._owner = await self._contract.functions.owner().call(
-                block_identifier=await self.block
-            )
+            self._owner = await self.call_function_autoRpc("owner")
         return self._owner
 
     @property
@@ -1688,10 +1485,8 @@ class thena_voter_v3(web3wrap):
             str: address
         """
         if not self._permissionRegistry:
-            self._permissionRegistry = (
-                await self._contract.functions.permissionRegistry().call(
-                    block_identifier=await self.block
-                )
+            self._permissionRegistry = await self.call_function_autoRpc(
+                "permissionRegistry"
             )
         return self._permissionRegistry
 
@@ -1704,8 +1499,8 @@ class thena_voter_v3(web3wrap):
         Returns:
             str: address
         """
-        return await self._contract.functions.poolForGauge(address).call(
-            block_identifier=await self.block
+        return await self.call_function_autoRpc(
+            "poolForGauge", None, Web3.to_checksum_address(address)
         )
 
     async def poolVote(self, input1: int, input2: int) -> str:
@@ -1718,9 +1513,7 @@ class thena_voter_v3(web3wrap):
         Returns:
             str: address
         """
-        return await self._contract.functions.poolVote(input1, input2).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("poolVote", None, input1, input2)
 
     async def poolVoteLength(self, tokenId: int) -> int:
         """_summary_
@@ -1731,9 +1524,7 @@ class thena_voter_v3(web3wrap):
         Returns:
             int: uint256
         """
-        return await self._contract.functions.poolVoteLength(tokenId).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("poolVoteLength", None, tokenId)
 
     async def pools(self, index: int) -> str:
         """_summary_
@@ -1744,9 +1535,7 @@ class thena_voter_v3(web3wrap):
         Returns:
             str: address
         """
-        return await self._contract.functions.pools(index).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("pools", None, index)
 
     @property
     async def totalWeight(self) -> int:
@@ -1756,9 +1545,7 @@ class thena_voter_v3(web3wrap):
             int: uint256
         """
         if not self._totalWeight:
-            self._totalWeight = await self._contract.functions.totalWeight().call(
-                block_identifier=await self.block
-            )
+            self._totalWeight = await self.call_function_autoRpc("totalWeight")
         return self._totalWeight
 
     async def totalWeightAt(self, time: int) -> int:
@@ -1770,9 +1557,7 @@ class thena_voter_v3(web3wrap):
         Returns:
             int: uint256
         """
-        return await self._contract.functions.totalWeightAt(time).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("totalWeightAt", None, time)
 
     async def usedWeights(self, index: int) -> int:
         """_summary_
@@ -1783,9 +1568,7 @@ class thena_voter_v3(web3wrap):
         Returns:
             int: uint256
         """
-        return await self._contract.functions.usedWeights(index).call(
-            block_identifier=await self.block
-        )
+        return await self.call_function_autoRpc("usedWeights", None, index)
 
     async def votes(self, index: int, address: str) -> int:
         """_summary_
@@ -1797,8 +1580,8 @@ class thena_voter_v3(web3wrap):
         Returns:
             int: uint256
         """
-        return await self._contract.functions.votes(index, address).call(
-            block_identifier=await self.block
+        return await self.call_function_autoRpc(
+            "votes", None, index, Web3.to_checksum_address(address)
         )
 
     async def weights(self, pool_address: str) -> int:
@@ -1810,8 +1593,8 @@ class thena_voter_v3(web3wrap):
         Returns:
             int: uint256
         """
-        return await self._contract.functions.weights(pool_address).call(
-            block_identifier=await self.block
+        return await self.call_function_autoRpc(
+            "weights", None, Web3.to_checksum_address(pool_address)
         )
 
     async def weightsAt(self, pool_address: str, time: int) -> int:
@@ -1824,8 +1607,8 @@ class thena_voter_v3(web3wrap):
         Returns:
             int: uint256
         """
-        return await self._contract.functions.weightsAt(pool_address, time).call(
-            block_identifier=await self.block
+        return await self.call_function_autoRpc(
+            "weightsAt", None, Web3.to_checksum_address(pool_address), time
         )
 
 
@@ -1890,9 +1673,7 @@ class thena_gauge_V2(web3wrap):
             str: address
         """
         if not self._distribution:
-            self._distribution = await self._contract.functions.DISTRIBUTION().call(
-                block_identifier=await self.block
-            )
+            self._distribution = await self.call_function_autoRpc("DISTRIBUTION")
         return self._distribution
 
     @property
@@ -1903,9 +1684,7 @@ class thena_gauge_V2(web3wrap):
             int: uint256
         """
         if not self._duration:
-            self._duration = await self._contract.functions.DURATION().call(
-                block_identifier=await self.block
-            )
+            self._duration = await self.call_function_autoRpc("DURATION")
         return self._duration
 
     @property
@@ -1916,9 +1695,7 @@ class thena_gauge_V2(web3wrap):
             str: address
         """
         if not self._token:
-            self._token = await self._contract.functions.TOKEN().call(
-                block_identifier=await self.block
-            )
+            self._token = await self.call_function_autoRpc("TOKEN")
         return self._token
 
     @property
@@ -1929,9 +1706,7 @@ class thena_gauge_V2(web3wrap):
             str: address
         """
         if not self.__ve:
-            self.__ve = await self._contract.functions._ve().call(
-                block_identifier=await self.block
-            )
+            self.__ve = await self.call_function_autoRpc("_ve")
         return self.__ve
 
     async def _balances(self, address: str) -> int:
@@ -1943,8 +1718,8 @@ class thena_gauge_V2(web3wrap):
         Returns:
             int: uint256
         """
-        return await self._contract.functions._balances(address).call(
-            block_identifier=await self.block
+        return await self.call_function_autoRpc(
+            "_balances", None, Web3.to_checksum_address(address)
         )
 
     @property
@@ -1955,9 +1730,7 @@ class thena_gauge_V2(web3wrap):
             int: uint256
         """
         if not self.__periodFinish:
-            self.__periodFinish = await self._contract.functions._periodFinish().call(
-                block_identifier=await self.block
-            )
+            self.__periodFinish = await self.call_function_autoRpc("_periodFinish")
         return self.__periodFinish
 
     # @property
@@ -1968,9 +1741,7 @@ class thena_gauge_V2(web3wrap):
     #         int: uint256
     #     """
     #     if not self.__totalSupply:
-    #         self.__totalSupply = await self._contract.functions._totalSupply().call(
-    #             block_identifier=await self.block
-    #         )
+    #         self.__totalSupply = await self.call_function_autoRpc("_totalSupply")
     #     return self.__totalSupply
 
     async def balanceOf(self, address: str) -> int:
@@ -1982,8 +1753,8 @@ class thena_gauge_V2(web3wrap):
         Returns:
             int: uint256
         """
-        return await self._contract.functions.balanceOf(address).call(
-            block_identifier=await self.block
+        return await self.call_function_autoRpc(
+            "balanceOf", None, Web3.to_checksum_address(address)
         )
 
     async def earned(self, address: str) -> int:
@@ -1995,8 +1766,8 @@ class thena_gauge_V2(web3wrap):
         Returns:
             int: uint256
         """
-        return await self._contract.functions.earned(address).call(
-            block_identifier=await self.block
+        return await self.call_function_autoRpc(
+            "earned", None, Web3.to_checksum_address(address)
         )
 
     @property
@@ -2007,9 +1778,7 @@ class thena_gauge_V2(web3wrap):
             bool: bool
         """
         if not self._emergency:
-            self._emergency = await self._contract.functions.emergency().call(
-                block_identifier=await self.block
-            )
+            self._emergency = await self.call_function_autoRpc("emergency")
         return self._emergency
 
     @property
@@ -2020,9 +1789,7 @@ class thena_gauge_V2(web3wrap):
             str: address
         """
         if not self._external_bribe:
-            self._external_bribe = await self._contract.functions.external_bribe().call(
-                block_identifier=await self.block
-            )
+            self._external_bribe = await self.call_function_autoRpc("external_bribe")
         return self._external_bribe
 
     @property
@@ -2033,9 +1800,7 @@ class thena_gauge_V2(web3wrap):
             str: address
         """
         if not self._feeVault:
-            self._feeVault = await self._contract.functions.feeVault().call(
-                block_identifier=await self.block
-            )
+            self._feeVault = await self.call_function_autoRpc("feeVault")
         return self._feeVault
 
     @property
@@ -2046,9 +1811,7 @@ class thena_gauge_V2(web3wrap):
             int: uint256
         """
         if not self._fees0:
-            self._fees0 = await self._contract.functions.fees0().call(
-                block_identifier=await self.block
-            )
+            self._fees0 = await self.call_function_autoRpc("fees0")
         return self._fees0
 
     @property
@@ -2059,9 +1822,7 @@ class thena_gauge_V2(web3wrap):
             int: uint256
         """
         if not self._fees1:
-            self._fees1 = await self._contract.functions.fees1().call(
-                block_identifier=await self.block
-            )
+            self._fees1 = await self.call_function_autoRpc("fees1")
         return self._fees1
 
     @property
@@ -2072,9 +1833,7 @@ class thena_gauge_V2(web3wrap):
             str: address
         """
         if not self._gaugeRewarder:
-            self._gaugeRewarder = await self._contract.functions.gaugeRewarder().call(
-                block_identifier=await self.block
-            )
+            self._gaugeRewarder = await self.call_function_autoRpc("gaugeRewarder")
         return self._gaugeRewarder
 
     @property
@@ -2085,9 +1844,7 @@ class thena_gauge_V2(web3wrap):
             str: address
         """
         if not self._internal_bribe:
-            self._internal_bribe = await self._contract.functions.internal_bribe().call(
-                block_identifier=await self.block
-            )
+            self._internal_bribe = await self.call_function_autoRpc("internal_bribe")
         return self._internal_bribe
 
     @property
@@ -2098,10 +1855,8 @@ class thena_gauge_V2(web3wrap):
             int: uint256
         """
         if not self._lastTimeRewardApplicable:
-            self._lastTimeRewardApplicable = (
-                await self._contract.functions.lastTimeRewardApplicable().call(
-                    block_identifier=await self.block
-                )
+            self._lastTimeRewardApplicable = await self.call_function_autoRpc(
+                "lastTimeRewardApplicable"
             )
         return self._lastTimeRewardApplicable
 
@@ -2113,9 +1868,7 @@ class thena_gauge_V2(web3wrap):
             int: uint256
         """
         if not self._lastUpdateTime:
-            self._lastUpdateTime = await self._contract.functions.lastUpdateTime().call(
-                block_identifier=await self.block
-            )
+            self._lastUpdateTime = await self.call_function_autoRpc("lastUpdateTime")
         return self._lastUpdateTime
 
     @property
@@ -2126,9 +1879,7 @@ class thena_gauge_V2(web3wrap):
             str: address
         """
         if not self._owner:
-            self._owner = await self._contract.functions.owner().call(
-                block_identifier=await self.block
-            )
+            self._owner = await self.call_function_autoRpc("owner")
         return self._owner
 
     # @property
@@ -2139,9 +1890,7 @@ class thena_gauge_V2(web3wrap):
     #         int: uint256
     #     """
     #     if not self._periodFinish:
-    #         self._periodFinish = await self._contract.functions.periodFinish().call(
-    #             block_identifier=await self.block
-    #         )
+    #         self._periodFinish = await self.call_function_autoRpc("periodFinish")
     #     return self._periodFinish
 
     @property
@@ -2152,10 +1901,8 @@ class thena_gauge_V2(web3wrap):
             int: uint256
         """
         if not self._rewardPerDuration:
-            self._rewardPerDuration = (
-                await self._contract.functions.rewardPerDuration().call(
-                    block_identifier=await self.block
-                )
+            self._rewardPerDuration = await self.call_function_autoRpc(
+                "rewardPerDuration"
             )
         return self._rewardPerDuration
 
@@ -2167,9 +1914,7 @@ class thena_gauge_V2(web3wrap):
             int: uint256
         """
         if not self._rewardPerToken:
-            self._rewardPerToken = await self._contract.functions.rewardPerToken().call(
-                block_identifier=await self.block
-            )
+            self._rewardPerToken = await self.call_function_autoRpc("rewardPerToken")
         return self._rewardPerToken
 
     @property
@@ -2180,10 +1925,8 @@ class thena_gauge_V2(web3wrap):
             int: uint256
         """
         if not self._rewardPerTokenStored:
-            self._rewardPerTokenStored = (
-                await self._contract.functions.rewardPerTokenStored().call(
-                    block_identifier=await self.block
-                )
+            self._rewardPerTokenStored = await self.call_function_autoRpc(
+                "rewardPerTokenStored"
             )
         return self._rewardPerTokenStored
 
@@ -2195,9 +1938,7 @@ class thena_gauge_V2(web3wrap):
             int: uint256
         """
         if not self._rewardRate:
-            self._rewardRate = await self._contract.functions.rewardRate().call(
-                block_identifier=await self.block
-            )
+            self._rewardRate = await self.call_function_autoRpc("rewardRate")
         return self._rewardRate
 
     @property
@@ -2208,9 +1949,7 @@ class thena_gauge_V2(web3wrap):
             str: address
         """
         if not self._rewardToken:
-            self._rewardToken = await self._contract.functions.rewardToken().call(
-                block_identifier=await self.block
-            )
+            self._rewardToken = await self.call_function_autoRpc("rewardToken")
         return self._rewardToken
 
     @property
@@ -2221,9 +1960,7 @@ class thena_gauge_V2(web3wrap):
             int: uint256
         """
         if not self._rewardPid:
-            self._rewardPid = await self._contract.functions.rewardPid().call(
-                block_identifier=await self.block
-            )
+            self._rewardPid = await self.call_function_autoRpc("rewardPid")
         return self._rewardPid
 
     async def rewards(self, address: str) -> int:
@@ -2235,8 +1972,8 @@ class thena_gauge_V2(web3wrap):
         Returns:
             int: uint256
         """
-        return await self._contract.functions.rewards(address).call(
-            block_identifier=await self.block
+        return await self.call_function_autoRpc(
+            "rewards", None, Web3.to_checksum_address(address)
         )
 
     @property
@@ -2247,9 +1984,7 @@ class thena_gauge_V2(web3wrap):
             int: uint256
         """
         if not self._totalSupply:
-            self._totalSupply = await self._contract.functions.totalSupply().call(
-                block_identifier=await self.block
-            )
+            self._totalSupply = await self.call_function_autoRpc("totalSupply")
         return self._totalSupply
 
     async def userRewardPerTokenPaid(self, address: str) -> int:
@@ -2261,6 +1996,6 @@ class thena_gauge_V2(web3wrap):
         Returns:
             int: uint256
         """
-        return await self._contract.functions.userRewardPerTokenPaid(address).call(
-            block_identifier=await self.block
+        return await self.call_function_autoRpc(
+            "userRewardPerTokenPaid", None, Web3.to_checksum_address(address)
         )

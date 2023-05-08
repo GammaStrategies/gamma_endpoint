@@ -8,11 +8,13 @@ from sources.web3.bins.w3.objects.protocols import (
     gamma_hypervisor_quickswap,
     gamma_hypervisor_thena,
     gamma_hypervisor_registry,
+)
+from sources.web3.bins.w3.objects.rewarders import (
     thena_gauge_V2,
     thena_voter_v3,
     zyberswap_masterchef_v1,
 )
-
+from sources.web3.bins.w3.objects.basic import erc20
 from sources.web3.bins.configuration import STATIC_REGISTRY_ADDRESSES
 
 
@@ -260,7 +262,40 @@ async def build_thena_gauge_anyRpc(
             break
         except Exception as e:
             # not working hype
+            # TODO: log this
             print(f" error creating hype: {e} -> rpc: {rpcUrl}")
+            pass
+
+    return result
+
+
+async def build_erc20_anyRpc(
+    address: str, network: Chain, block: int, rpcUrls: list[str], test: bool = False
+) -> erc20:
+    result = None
+    netval = enumsConverter.convert_general_to_local(chain=network).value
+    # shuffle the rpc urls
+    random.shuffle(rpcUrls)
+    # loop over the rpc urls
+
+    for rpcUrl in rpcUrls:
+        try:
+            # construct hype
+            result = erc20(
+                address=address,
+                network=netval,
+                block=block,
+                custom_web3Url=rpcUrl,
+            )
+            if test:
+                # test its working
+                await result.decimals
+            # return hype
+            break
+        except Exception as e:
+            # not working hype
+            # TODO: log this
+            print(f" error creating erc20: {e} -> rpc: {rpcUrl}")
             pass
 
     return result

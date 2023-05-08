@@ -3,16 +3,12 @@ from sources.common.general.enums import Chain, Dex, ChainId
 from sources.mongo.bins.enums import enumsConverter
 
 from sources.web3.bins.configuration import STATIC_REGISTRY_ADDRESSES, RPC_URLS
-from sources.web3.bins.w3.objects.protocols import (
+from sources.web3.bins.w3.objects.rewarders import (
     zyberswap_masterchef_v1,
     thena_voter_v3,
     thena_gauge_V2,
 )
-from sources.web3.bins.w3.helpers import (
-    build_zyberchef_anyRpc,
-    build_thena_voter_anyRpc,
-    build_thena_gauge_anyRpc,
-)
+from sources.web3.bins.w3.objects.basic import erc20
 from sources.web3.bins.formulas.fin import calculate_rewards_apr
 
 from sources.common.database.collection_endpoint import database_global, database_local
@@ -32,12 +28,9 @@ async def search_rewards_data_zyberswap(hypervisor_address: str, network: Chain)
         # create database connection
 
         # create zyberchef
-        zyberchef = await build_zyberchef_anyRpc(
+        zyberchef = zyberswap_masterchef_v1(
             address=address,
             network=network,
-            block=0,
-            rpcUrls=RPC_URLS[network],
-            test=True,
         )
 
         # get the pool length
@@ -75,9 +68,11 @@ async def get_rewards_data_zyberswap(
     if pinfo[0].lower() == hypervisor_address.lower():
         # this is the pid we are looking for
 
+        # allocPoint = pinfo[1]
+        # total_allocPoint = await zyberchef.totalAllocPoint
+
         # addresses address[], symbols string[], decimals uint256[], rewardsPerSec uint256[]
-        poolRewardsPerSec = await zyberchef.poolRewardsPerSec(pid)
-        # poolTotalLp = pinfo[6] / 10**18  # zyberchef.poolTotalLp(pid) # check
+        poolRewardsPerSec = await zyberchef.poolRewardsPerSec(pid)  # / (10**decimals)
 
         # get rewards data
         rewards = {}
@@ -103,6 +98,56 @@ async def get_rewards_data_zyberswap(
                 )
 
     return result
+
+
+async def get_rewards_data_thena(hypervisor_address: str, network: Chain):
+    netval = enumsConverter.convert_general_to_local(chain=network).value
+
+    if voter_url := STATIC_REGISTRY_ADDRESSES.get(netval, {}).get("thena_voter", None):
+        # build thena voter
+        thena_voter = thena_voter_v3(address=voter_url, network=network)
+
+        # get managing gauge from hype address
+        gauge_address = await thena_voter.gauges(address=hypervisor_address)
+
+        # build thena gauge instance
+        thena_gauge = thena_gauge_V2(
+            address=gauge_address,
+            network=network,
+        )
+        # get gauge data
+        rewardRate, rewardToken, totalSupply, block = await asyncio.gather(
+            thena_gauge.rewardRate,
+            thena_gauge.rewardToken,
+            thena_gauge.totalSupply,
+            thena_gauge.block,
+        )
+
+        # build reward token instance
+        reward_token_instance = erc20(
+            address=rewardToken,
+            network=network,
+        )
+        # get reward token data
+        rewardToken_symbol, rewardToken_decimals = await asyncio.gather(
+            reward_token_instance.symbol, reward_token_instance.decimals
+        )
+
+        # return data
+        return {
+            "network": network,
+            "block": block,
+            "timestamp": await thena_gauge.timestamp,
+            "hypervisor_address": hypervisor_address.lower(),
+            "rewarder_address": gauge_address.lower(),
+            "rewarder_type": "thena_gauge",
+            "rewarder_refIds": [-1],
+            "rewardToken": rewardToken,
+            "rewardToken_symbol": rewardToken_symbol,
+            "rewardToken_decimals": rewardToken_decimals,
+            "poolRewardsPerSec": rewardRate,
+            "poolTotalLp": totalSupply,
+        }
 
 
 async def get_rewards(dex: Dex, hypervisor_address: str, network: Chain):
@@ -133,7 +178,7 @@ async def get_rewards(dex: Dex, hypervisor_address: str, network: Chain):
         ),
     )
     # add share price
-    hypervisor_data["lpToken_price_usd"] = (
+    hypervisor_data["hypervisor_share_price_usd"] = (
         (
             (
                 hypervisor_data["token0_price_usd"]
@@ -155,28 +200,44 @@ async def get_rewards(dex: Dex, hypervisor_address: str, network: Chain):
         )
 
         for rewards in rewards_data:
+            # get rwrd token price
+            rewardToken_price = await get_token_price_usd(
+                token_address=rewards["rewardToken"].lower(),
+                network=netval,
+                block=0,
+            )
+            # convert to decimals
+            converted_rewardPoolRewardsPerSec = rewards["poolRewardsPerSec"] / (
+                10 ** rewards["rewardToken_decimals"]
+            )
+            converted_total_lp_locked = rewards["poolTotalLp"] / (
+                10 ** hypervisor_data["decimals"]
+            )
+
             # calculate rewards APR
             apr = calculate_rewards_apr(
-                token_price=await get_token_price_usd(
-                    token_address=rewards["rewardToken"].lower(),
-                    network=netval,
-                    block=0,
-                ),
-                token_decimals=rewards["rewardToken_decimals"],
-                token_reward_rate=rewards["poolRewardsPerSec"],
-                total_lp_locked=(
-                    rewards["poolTotalLp"] / (10 ** hypervisor_data["decimals"])
-                ),
-                lp_token_price=hypervisor_data["lpToken_price_usd"],
+                token_price=rewardToken_price,
+                token_reward_rate=converted_rewardPoolRewardsPerSec,
+                total_lp_locked=converted_total_lp_locked,
+                lp_token_price=hypervisor_data["hypervisor_share_price_usd"],
             )
             result.append(
                 {
-                    "symbol": hypervisor_data["symbol"],
-                    **rewards,
+                    "hypervisor_symbol": hypervisor_data["symbol"],
+                    "hypervisor_address": hypervisor_address,
+                    "dex": dex,
                     "apr": apr,
+                    "rewardToken_price_usd": rewardToken_price,
                     "token0_price_usd": hypervisor_data["token0_price_usd"],
                     "token1_price_usd": hypervisor_data["token1_price_usd"],
-                    "lpToken_price_usd": hypervisor_data["lpToken_price_usd"],
+                    "hypervisor_share_price_usd": hypervisor_data[
+                        "hypervisor_share_price_usd"
+                    ],
+                    "rewardsData": {
+                        **rewards,
+                        "converted_poolRewardsPerSec": converted_rewardPoolRewardsPerSec,
+                        "converted_total_lp_locked": converted_total_lp_locked,
+                    },
                 }
             )
 
@@ -184,61 +245,46 @@ async def get_rewards(dex: Dex, hypervisor_address: str, network: Chain):
         rewards_data = await get_rewards_data_thena(
             hypervisor_address=hypervisor_address, network=network
         )
+        # get rwrd token price
+        rewardToken_price = await get_token_price_usd(
+            token_address=rewards_data["rewardToken"].lower(),
+            network=netval,
+            block=0,
+        )
+
+        # convert to decimals
+        converted_rewardPoolRewardsPerSec = rewards_data["poolRewardsPerSec"] / (
+            10 ** rewards_data["rewardToken_decimals"]
+        )
+        converted_total_lp_locked = rewards_data["poolTotalLp"] / (
+            10 ** hypervisor_data["decimals"]
+        )
 
         # calculate rewards APR
         apr = calculate_rewards_apr(
-            token_price=await get_token_price_usd(
-                token_address=rewards_data["rewardToken"].lower(),
-                network=netval,
-                block=0,
-            ),
-            token_decimals=18,  # TODO: create erc20 instance and reat token decimals from there
-            token_reward_rate=rewards_data["poolRewardsPerSec"],
-            total_lp_locked=(
-                rewards_data["poolTotalLp"] / (10 ** hypervisor_data["decimals"])
-            ),
-            lp_token_price=hypervisor_data["lpToken_price_usd"],
+            token_price=rewardToken_price,
+            token_reward_rate=converted_rewardPoolRewardsPerSec,
+            total_lp_locked=converted_total_lp_locked,
+            lp_token_price=hypervisor_data["hypervisor_share_price_usd"],
         )
         result.append(
             {
-                "symbol": hypervisor_data["symbol"],
-                **rewards_data,
+                "hypervisor_symbol": hypervisor_data["symbol"],
+                "hypervisor_address": hypervisor_address,
+                "dex": dex,
                 "apr": apr,
+                "rewardToken_price_usd": rewardToken_price,
                 "token0_price_usd": hypervisor_data["token0_price_usd"],
                 "token1_price_usd": hypervisor_data["token1_price_usd"],
-                "lpToken_price_usd": hypervisor_data["lpToken_price_usd"],
+                "hypervisor_share_price_usd": hypervisor_data[
+                    "hypervisor_share_price_usd"
+                ],
+                "rewardsData": {
+                    **rewards_data,
+                    "converted_poolRewardsPerSec": converted_rewardPoolRewardsPerSec,
+                    "converted_total_lp_locked": converted_total_lp_locked,
+                },
             }
         )
 
     return result
-
-
-async def get_rewards_data_thena(hypervisor_address: str, network: Chain):
-    netval = enumsConverter.convert_general_to_local(chain=network).value
-
-    # build thena voter
-    thena_voter = await build_thena_voter_anyRpc(
-        network=network, block=0, rpcUrls=RPC_URLS[netval], test=True
-    )
-
-    # get managing gauge from hype address
-    gauge_address = await thena_voter.gauges(address=hypervisor_address)
-
-    # build thena gauge
-    thena_gauge = await build_thena_gauge_anyRpc(
-        address=gauge_address,
-        network=network,
-        block=0,
-        rpcUrls=RPC_URLS[netval],
-        test=True,
-    )
-
-    rewardRate, rewardToken, totalSupply = await asyncio.gather(
-        thena_gauge.rewardRate, thena_gauge.rewardToken, thena_gauge.totalSupply
-    )
-
-    return {
-        "rewardToken": rewardToken,
-        "poolRewardsPerSec": rewardRate,
-        "poolTotalLp": totalSupply,
-    }

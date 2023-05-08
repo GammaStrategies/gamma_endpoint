@@ -1,6 +1,7 @@
 import logging
 import math
 import datetime as dt
+import random
 
 from web3 import Web3, exceptions, AsyncWeb3, AsyncHTTPProvider
 from web3.eth import AsyncEth
@@ -71,7 +72,10 @@ class web3wrap:
         # setup web3
         result = AsyncWeb3(
             AsyncHTTPProvider(
-                web3Url or CONFIGURATION["sources"]["web3Providers"][network],
+                web3Url
+                or CONFIGURATION["WEB3_PROVIDER_URLS"].get("public", "private")[
+                    network
+                ],
                 request_kwargs={"timeout": 120},
             ),
             modules={"eth": AsyncEth, "net": AsyncNet},
@@ -439,6 +443,72 @@ class web3wrap:
         result["address"] = self.address.lower()
         return result
 
+    # universal failover execute funcion
+    async def call_function(self, function_name: str, rpcUrls: list[str], *args):
+        # loop choose url
+        for rpcUrl in rpcUrls:
+            try:
+                # create web3 conn
+                chain_connection = self.setup_w3(network=self._network, web3Url=rpcUrl)
+                # create contract
+                contract = chain_connection.eth.contract(
+                    address=self._address, abi=self._abi
+                )
+
+                # set root w3 to this chain conn
+                self._w3 = chain_connection
+
+                # execute function
+                return await getattr(contract.functions, function_name)(*args).call(
+                    block_identifier=await self.block
+                )
+
+            except Exception as e:
+                # not working rpc
+                logging.getLogger(__name__).debug(
+                    f" error calling function {function_name} using {rpcUrl} rpc: {e}"
+                )
+
+        # no rpcUrl worked
+        return None
+
+    async def call_function_autoRpc(
+        self,
+        function_name: str,
+        rpcKey_names: list[str] | None = None,
+        *args,
+    ):
+        """Call a function using an RPC list from configuration file
+
+        Args:
+            function_name (str): contract function name to call
+            rpcKey_names (list[str]): private or public or whatever is placed in config w3Providers
+            args: function arguments
+        Returns:
+            Any or None: depending on the function called
+        """
+        # load public rpc url's
+        for key_name in rpcKey_names or ["public", "private"]:
+            if (
+                rpcUrls := CONFIGURATION["WEB3_PROVIDER_URLS"]
+                .get(key_name, {})
+                .get(self._network, [])
+            ):
+                random.shuffle(rpcUrls)
+
+                result = await self.call_function(function_name, rpcUrls, *args)
+                if not result is None:
+                    return result
+                else:
+                    logging.getLogger(__name__).info(
+                        f" Could not use any {key_name} rpcProvider calling function {function_name} on {self._network} network {self.address}"
+                    )
+
+        logging.getLogger(__name__).error(
+            f" Could not use any available rpcProvider calling function {function_name} on {self._network} network {self.address}"
+        )
+        return None
+
 
 class erc20(web3wrap):
     # SETUP
@@ -472,18 +542,18 @@ class erc20(web3wrap):
         self._symbol = None
 
     async def init_decimals(self):
-        self._decimals = await self._contract.functions.decimals().call()
+        self._decimals = await self.call_function_autoRpc(function_name="decimals")
 
     async def init_totalSupply(self):
-        self._totalSupply = await self._contract.functions.totalSupply().call(
-            block_identifier=await self.block
+        self._totalSupply = await self.call_function_autoRpc(
+            function_name="totalSupply"
         )
 
     async def init_symbol(self):
         self._symbol = (
             "MKR"
             if self.address == "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2"
-            else await self._contract.functions.symbol().call()
+            else await self.call_function_autoRpc(function_name="symbol")
         )
 
     # PROPERTIES

@@ -71,9 +71,9 @@ RUN_FIRST_QUERY_TYPE: subgraph # database
 WEB3_PROVIDER_URLS:
   public: 
     ethereum:
-      - "https://cloudflare-eth.com",
-      - "https://ethereum.publicnode.com",
-      - "https://ethereum-mainnet-archive.allthatnode.com",
+      - "https://cloudflare-eth.com"
+      - "https://ethereum.publicnode.com"
+      - "https://ethereum-mainnet-archive.allthatnode.com"
       - "https://1rpc.io/eth"
       - "https://api.securerpc.com/v1"
     optimism:
@@ -85,31 +85,31 @@ WEB3_PROVIDER_URLS:
       - "https://rpc.ankr.com/arbitrum"
       - "https://arbitrum.blockpi.network/v1/rpc/public"
     polygon:
-      - "https://polygon-rpc.com/",
-      - "https://rpc-mainnet.matic.network",
-      - "https://matic-mainnet.chainstacklabs.com",
-      - "https://rpc-mainnet.maticvigil.com",
-      - "https://rpc-mainnet.matic.quiknode.pro",
-      - "https://matic-mainnet-full-rpc.bwarelabs.com",
-      - "https://polygon-bor.publicnode.com",
+      - "https://polygon-rpc.com/"
+      - "https://rpc-mainnet.matic.network"
+      - "https://matic-mainnet.chainstacklabs.com"
+      - "https://rpc-mainnet.maticvigil.com"
+      - "https://rpc-mainnet.matic.quiknode.pro"
+      - "https://matic-mainnet-full-rpc.bwarelabs.com"
+      - "https://polygon-bor.publicnode.com"
     polygon_zkevm:
       - "https://rpc.polygon-zkevm.gateway.fm"
       - "https://zkevm-rpc.com"
       - "https://rpc.ankr.com/polygon_zkevm"
-    binance:
-      - "https://bsc-dataseed1.binance.org",
-      - "https://bsc-dataseed2.binance.org",
-      - "https://bsc-dataseed3.binance.org",
-      - "https://bsc-dataseed4.binance.org",
-      - "https://bsc-dataseed1.defibit.io",
-      - "https://bsc-dataseed2.defibit.io",
-      - "https://bsc-dataseed3.defibit.io",
-      - "https://bsc-dataseed4.defibit.io",
-      - "https://bsc-dataseed1.ninicoin.io",
-      - "https://bsc-dataseed2.ninicoin.io",
-      - "https://bsc-dataseed3.ninicoin.io",
-      - "https://bsc-dataseed4.ninicoin.io",
-      - "https://bsc.publicnode.com",
+    bsc:
+      - "https://bsc-dataseed1.binance.org"
+      - "https://bsc-dataseed2.binance.org"
+      - "https://bsc-dataseed3.binance.org"
+      - "https://bsc-dataseed4.binance.org"
+      - "https://bsc-dataseed1.defibit.io"
+      - "https://bsc-dataseed2.defibit.io"
+      - "https://bsc-dataseed3.defibit.io"
+      - "https://bsc-dataseed4.defibit.io"
+      - "https://bsc-dataseed1.ninicoin.io"
+      - "https://bsc-dataseed2.ninicoin.io"
+      - "https://bsc-dataseed3.ninicoin.io"
+      - "https://bsc-dataseed4.ninicoin.io"
+      - "https://bsc.publicnode.com"
       - "https://bsc.rpc.blxrbdn.com"
     avalanche:
       - "https://api.avax.network/ext/bc/C/rpc"
