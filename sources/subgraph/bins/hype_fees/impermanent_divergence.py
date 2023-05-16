@@ -224,7 +224,7 @@ class ImpermanentDivergence:
         )
 
     def calculate(self) -> dict:
-        valid_total_supply = bool(
+        valid_total_supply = (
             self.data.initial.total_supply.raw > 0
             and self.data.latest.total_supply.raw > 0
         )
@@ -254,23 +254,12 @@ class ImpermanentDivergence:
         for item in [self.data.initial, self.data.latest]:
             if not item.price.value0:
                 logger.warning(
-                    " {}'s {} {} token 0 usd price is zero at block {}  [ hype address {}]".format(
-                        self.chain,
-                        self.protocol,
-                        item.symbol,
-                        item.block,
-                        item.hypervisor,
-                    )
+                    f" {self.chain}'s {self.protocol} {item.symbol} token 0 usd price is zero at block {item.block}  [ hype address {item.hypervisor}]"
                 )
+
             if not item.price.value1:
                 logger.warning(
-                    " {}'s {} {} token 1 usd price is zero at block {}  [ hype address {}]".format(
-                        self.chain,
-                        self.protocol,
-                        item.symbol,
-                        item.block,
-                        item.hypervisor,
-                    )
+                    f" {self.chain}'s {self.protocol} {item.symbol} token 1 usd price is zero at block {item.block}  [ hype address {item.hypervisor}]"
                 )
 
 

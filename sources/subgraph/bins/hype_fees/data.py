@@ -232,11 +232,9 @@ class FeeGrowthSnapshotData(FeeGrowthDataABC):
         return response
 
     def _transform_data(self, query_data: dict) -> dict[str, list[FeesData]]:
-        transformed_data = {}
         self._extract_static_data(query_data["static"])
-        # Add latest row
-        for hypervisor_latest in query_data["latest"]:
-            transformed_data[hypervisor_latest["id"]] = [
+        transformed_data = {
+            hypervisor_latest["id"]: [
                 self._init_fees_data(
                     hypervisor=hypervisor_latest,
                     hypervisor_id=hypervisor_latest["id"],
@@ -253,6 +251,8 @@ class FeeGrowthSnapshotData(FeeGrowthDataABC):
                     ],
                 )
             ]
+            for hypervisor_latest in query_data["latest"]
+        }
 
         # Add initial row
         for hypervisor_initial in query_data["initial"]:
@@ -364,7 +364,7 @@ class ImpermanentDivergenceData(FeeGrowthDataABC):
         # Transform list to dict for easier lookup in the next step
         initial_data = {hype["id"]: hype for hype in query_data["initial"]}
 
-        transformed_data = {
+        return {
             hypervisor_latest["id"]: FeesDataRange(
                 initial=self._init_fees_data(
                     hypervisor=initial_data[hypervisor_latest["id"]],
@@ -406,5 +406,3 @@ class ImpermanentDivergenceData(FeeGrowthDataABC):
             for hypervisor_latest in query_data["latest"]
             if initial_data.get(hypervisor_latest["id"])
         }
-
-        return transformed_data

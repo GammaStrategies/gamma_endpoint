@@ -8,6 +8,10 @@ class Chain(str, Enum):
     OPTIMISM = "optimism"
     POLYGON = "polygon"
     BSC = "bsc"
+    POLYGON_ZKEVM = "polygon_zkevm"
+    AVALANCHE = "avalanche"
+    FANTOM = "fantom"
+    MOONBEAM = "moonbeam"
 
 
 class PositionType(str, Enum):
@@ -20,11 +24,19 @@ class Protocol(str, Enum):
     UNISWAP = "uniswap"
     ZYBERSWAP = "zyberswap"
     THENA = "thena"
+    CAMELOT = "camelot"
+    GLACIER = "glacier"
+    RETRO = "retro"
 
 
 class QueryType(str, Enum):
     DATABASE = "database"
     SUBGRAPH = "subgraph"
+
+
+class YieldType(str, Enum):
+    TOTAL = "total"
+    LP = "lp"
 
 
 from sources.common.general import enums as general_enums

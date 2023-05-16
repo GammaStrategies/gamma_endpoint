@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sources.subgraph.endpoint.app import create_app as create_subgraph_endpoint
 from sources.web3.endpoint.app import create_app as create_web3_endpoint
 from sources.mongo.endpoint.app import create_app as create_mongo_endpoint
+from sources.internal.endpoint.app import create_app as create_internal_endpoint
 
 logging.basicConfig(
     format="[%(asctime)s:%(levelname)s:%(name)s]:%(message)s",
@@ -24,7 +25,8 @@ app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
 )
 
-# Create subgraph endpoint
+
+# Create subgraph endpoint ------------------------
 app.mount(
     path="/subgraph",
     app=create_subgraph_endpoint(
@@ -33,22 +35,28 @@ app.mount(
     name="subgraph",
 )
 
-# Create mongodb endpoint
+# Create mongodb endpoint ------------------------
 app.mount(
     path="/database",
     app=create_mongo_endpoint(title="Gamma API - web3 database", version="0.0.1"),
     name="database",
 )
 
-# Create web3 endpoint
+# Create web3 endpoint ------------------------
 app.mount(
     path="/web3",
     app=create_web3_endpoint(title="Gamma API - web3 calls", version="0.0.1"),
     name="web3",
 )
 
+# Create internal endpoint ------------------------
+app.mount(
+    path="/internal",
+    app=create_internal_endpoint(title="Gamma API - Internal", version="0.0.1"),
+    name="internal",
+)
 
-#  Add globals
+# Add globals ---------------------------------
 
 
 @app.middleware("http")

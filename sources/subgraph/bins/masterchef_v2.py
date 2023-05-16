@@ -140,7 +140,8 @@ class MasterchefV2Info(MasterchefV2Data):
                 pool_apr = 0
                 reward_per_second_usdc = 0
                 rewarder_info = {}
-                staked_lp_usdc = int(pool["totalStaked"]) * float(
+                staked_lp_amount = int(pool["totalStaked"])
+                staked_lp_usdc = staked_lp_amount * float(
                     pool["hypervisor"]["pricePerShare"]
                 )
                 for rewarder_pool in pool["rewarders"]:
@@ -182,6 +183,9 @@ class MasterchefV2Info(MasterchefV2Data):
 
                     rewarder_info[rewarder_pool["rewarder"]["id"]] = {
                         "rewardToken": reward_token,
+                        "rewardTokenDecimals": rewarder_pool["rewarder"]["rewardToken"][
+                            "decimals"
+                        ],
                         "rewardTokenSymbol": reward_token_symbol,
                         "rewardPerSecond": weighted_reward_per_second,
                         "apr": rewarder_apr,
@@ -197,6 +201,9 @@ class MasterchefV2Info(MasterchefV2Data):
 
                 pool_info[pool["hypervisor"]["id"]] = {
                     "stakeTokenSymbol": pool["stakeToken"]["symbol"],
+                    "stakedAmount": staked_lp_amount
+                    / 10 ** int(pool["stakeToken"]["decimals"]),
+                    "stakedAmountUSD": staked_lp_usdc,
                     "apr": pool_apr,
                     "lastRewardTimestamp": pool["lastRewardTimestamp"],
                     "rewarders": rewarder_info,

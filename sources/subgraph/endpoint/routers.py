@@ -7,12 +7,15 @@ from endpoint.routers.template import (
     router_builder_baseTemplate,
 )
 from sources.subgraph.bins.common import (
+    charts,
     hypervisor,
     analytics,
     aggregate_stats,
     masterchef,
     masterchef_v2,
+    subgraph_status,
     users,
+    SubgraphStatusOutput,
 )
 from sources.subgraph.bins.charts.daily import DailyChart
 from sources.subgraph.bins.dashboard import Dashboard
@@ -237,7 +240,96 @@ def build_routers_compatible() -> list:
 
 
 class subgraph_router_builder(router_builder_generalTemplate):
+    def _create_routes(self, dex, chain) -> APIRouter:
+        """Create routes for the given chain and dex combination."""
+
+        router = APIRouter()
+
+        # ROOT
+        router.add_api_route(
+            path=f"{self.prefix}/",
+            endpoint=self.root,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
+        # create special
+        router = self._create_routes_special(router=router, dex=dex, chain=chain)
+
+        # create all other routes
+        router = self._create_routes_hypervisor(router=router, dex=dex, chain=chain)
+        router = self._create_routes_hypervisor_analytics(router, dex, chain)
+
+        router = self._create_routes_hypervisors(router, dex, chain)
+        router = self._create_routes_hypervisors_rewards(router, dex, chain)
+
+        router = self._create_routes_users_rewards(router, dex, chain)
+        router = self._create_routes_users(router, dex, chain)
+
+        router = self._create_routes_vault(router, dex, chain)
+
+        return router
+
+    def _create_routes_special(
+        self, router: APIRouter, dex: str, chain: str
+    ) -> APIRouter:
+        router.add_api_route(
+            path=f"{self.prefix}{'/status/subgraph'}",
+            endpoint=self.subgraph_status,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
+        router.add_api_route(
+            path=f"{self.prefix}{'/charts/baseRange/all'}",
+            endpoint=self.base_range_chart_all,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
+        router.add_api_route(
+            path=f"{self.prefix}{'/charts/baseRange/{hypervisor_address}'}",
+            endpoint=self.base_range_chart,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
+        # create only on Mainnet
+        if self.chain == Chain.MAINNET:
+            router.add_api_route(
+                path=f"{self.prefix}{'/charts/benchmark/{hypervisor_address}'}",
+                endpoint=self.benchmark_chart,
+                methods=["GET"],
+                generate_unique_id_function=self.generate_unique_id,
+            )
+
+        return router
+
     # EXECUTION FUNCTIONS
+
+    async def subgraph_status(self, response: Response) -> SubgraphStatusOutput:
+        return await subgraph_status(self.dex, self.chain)
+
+    async def base_range_chart_all(self, response: Response, days: int = 20):
+        return await charts.base_range_chart_all(self.dex, self.chain, days)
+
+    async def base_range_chart(
+        self, response: Response, hypervisor_address: str, days: int = 20
+    ):
+        return await charts.base_range_chart(
+            self.dex, self.chain, hypervisor_address, days
+        )
+
+    async def benchmark_chart(
+        self,
+        response: Response,
+        hypervisor_address: str,
+        startDate: str = "",
+        endDate: str = "",
+    ):
+        return await charts.benchmark_chart(
+            self.dex, self.chain, hypervisor_address, startDate, endDate
+        )
 
     async def hypervisor_basic_stats(self, hypervisor_address: str, response: Response):
         return await hypervisor.hypervisor_basic_stats(

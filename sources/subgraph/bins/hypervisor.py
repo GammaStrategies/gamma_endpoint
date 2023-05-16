@@ -1,14 +1,13 @@
-from datetime import datetime, timedelta
+import asyncio
 import logging
 
 from sources.subgraph.bins import GammaClient, UniswapV3Client
 from sources.subgraph.bins.config import EXCLUDED_HYPERVISORS
 from sources.subgraph.bins.constants import DAYS_IN_PERIOD
+from sources.subgraph.bins.data import BlockRange
 from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.hype_fees.fees_yield import fee_returns_all
 from sources.subgraph.bins.utils import filter_address_by_chain, timestamp_to_date
-
-from sources.subgraph.bins.data import BlockRange
 
 
 logger = logging.getLogger(__name__)
@@ -194,8 +193,13 @@ class HypervisorData:
 
         if not start_block or not end_block:
             # overwrite any provided block with timestamp related
-            await time_range.set_initial_with_timestamp(timestamp=start_timestamp)
-            await time_range.set_end(timestamp=end_timestamp)
+            # await time_range.set_initial_with_timestamp(timestamp=start_timestamp)
+            # await time_range.set_end(timestamp=end_timestamp)
+            await asyncio.gather(
+                time_range.set_initial_with_timestamp(timestamp=start_timestamp),
+                time_range.set_end(timestamp=end_timestamp),
+            )
+
             start_block = time_range.initial.block
             end_block = time_range.end.block
             start_timestamp = time_range.initial.timestamp
@@ -251,16 +255,17 @@ class HypervisorData:
         # retrieve data
         result = {}
         try:
+            initial_hype_status, end_hype_status = await asyncio.gather(
+                self.gamma_client.query(initial_query),
+                self.gamma_client.query(end_query),
+            )
+
             initial_hype_status = {
                 hype["id"]: hype
-                for hype in (await self.gamma_client.query(initial_query))["data"][
-                    "uniswapV3Hypervisors"
-                ]
+                for hype in initial_hype_status["data"]["uniswapV3Hypervisors"]
             }
 
-            for end_hype in (await self.gamma_client.query(end_query))["data"][
-                "uniswapV3Hypervisors"
-            ]:
+            for end_hype in end_hype_status["data"]["uniswapV3Hypervisors"]:
                 # if hype id is not present at initial block, set initials to zero
                 if end_hype["id"] not in initial_hype_status:
                     initial_hype_status[end_hype["id"]] = {
@@ -276,45 +281,52 @@ class HypervisorData:
                 result[end_hype["id"]] = {
                     "symbol": end_hype["symbol"],
                     "id": end_hype["id"],
-                    "initial_block": start_block,
-                    "initial_timestamp": start_timestamp,
-                    "end_block": end_block,
-                    "end_timestamp": end_timestamp,
-                    "initial_grossFeesClaimed0": float(
+                    "initialBlock": start_block,
+                    "initialTimestamp": start_timestamp,
+                    "endBlock": end_block,
+                    "endTimestamp": end_timestamp,
+                    "initialGrossFeesClaimed0": float(
                         initial_hype_status[end_hype["id"]]["grossFeesClaimed0"]
                     )
                     / token0_conversion,
-                    "initial_grossFeesClaimed1": float(
+                    "initialGrossFeesClaimed1": float(
                         initial_hype_status[end_hype["id"]]["grossFeesClaimed1"]
                     )
                     / token1_conversion,
-                    "initial_grossFeesClaimedUSD": float(
+                    "initialGrossFeesClaimedUsd": float(
                         initial_hype_status[end_hype["id"]]["grossFeesClaimedUSD"]
                     ),
-                    "end_grossFeesClaimed0": float(end_hype["grossFeesClaimed0"])
+                    "endGrossFeesClaimed0": float(end_hype["grossFeesClaimed0"])
                     / token0_conversion,
-                    "end_grossFeesClaimed1": float(end_hype["grossFeesClaimed1"])
+                    "endGrossFeesClaimed1": float(end_hype["grossFeesClaimed1"])
                     / token1_conversion,
-                    "end_grossFeesClaimedUSD": float(end_hype["grossFeesClaimedUSD"]),
-                    "period_grossFeesClaimed0": (
+                    "endGrossFeesClaimedUsd": float(end_hype["grossFeesClaimedUSD"]),
+                    "periodGrossFeesClaimed0": (
                         float(end_hype["grossFeesClaimed0"])
                         - float(
                             initial_hype_status[end_hype["id"]]["grossFeesClaimed0"]
                         )
                     )
                     / token0_conversion,
-                    "period_grossFeesClaimed1": (
+                    "periodGrossFeesClaimed1": (
                         float(end_hype["grossFeesClaimed1"])
                         - float(
                             initial_hype_status[end_hype["id"]]["grossFeesClaimed1"]
                         )
                     )
                     / token1_conversion,
-                    "period_grossFeesClaimedUSD": float(end_hype["grossFeesClaimedUSD"])
+                    "periodGrossFeesClaimedUsd": float(end_hype["grossFeesClaimedUSD"])
                     - float(initial_hype_status[end_hype["id"]]["grossFeesClaimedUSD"]),
                 }
 
         except Exception as e:
+            # check if block is available at subgraph
+
+            if "error" in initial_hype_status:
+                raise ValueError(f"{initial_hype_status['error']}")
+            if "error" in end_hype_status:
+                raise ValueError(f"{end_hype_status['error']}")
+
             logger.debug(
                 f" Unable to retrieve collected fees data for hypervisors from subgraph: {e}"
             )
@@ -344,13 +356,15 @@ class HypervisorInfo(HypervisorData):
         basics = self.basics_data
         pools = self.pools_data
 
-        fee_yield_output = await fee_returns_all(
-            protocol=self.protocol,
-            chain=self.chain,
-            days=1,
-            hypervisors=None,
-            current_timestamp=None,
-        )
+        fee_yield_output = (
+            await fee_returns_all(
+                protocol=self.protocol,
+                chain=self.chain,
+                days=1,
+                hypervisors=None,
+                current_timestamp=None,
+            )
+        )["lp"]
 
         returns = {
             hypervisor: {
@@ -437,8 +451,6 @@ class HypervisorInfo(HypervisorData):
             except Exception as e:
                 logger.warning(f"Failed on hypervisor {hypervisor['id']}")
                 logger.exception(e)
-                pass
-
         return results
 
     # TODO: specify chain on hardcoded overrides

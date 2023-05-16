@@ -28,14 +28,13 @@ class Benchmark:
             if (not end_date) or (end_date < start_date):
                 # start date provided but no end date
                 end_date = start_date + THIRTY_DAYS
+        elif end_date:
+            # end date provided but no start date
+            start_date = end_date - THIRTY_DAYS
         else:
-            if end_date:
-                # end date provided but no start date
-                start_date = end_date - THIRTY_DAYS
-            else:
-                # missing start date and end date
-                start_date = current_date - THIRTY_DAYS
-                end_date = current_date
+            # missing start date and end date
+            start_date = current_date - THIRTY_DAYS
+            end_date = current_date
 
         self.start_timestamp = date_to_timestamp(start_date)
         self.end_timestamp = date_to_timestamp(end_date)
@@ -229,11 +228,7 @@ class Benchmark:
         # Get token prices from v3 pool
         v3_data = await self._get_v3_data(lp_pool)
 
-        # Get v2 data if needed
-        v2_data = {}
-        if v2:
-            v2_data = await self._get_v2_data(token0, token1)
-
+        v2_data = await self._get_v2_data(token0, token1) if v2 else {}
         return {
             "token0_symbol": hypervisor_data["pool"]["token0"]["symbol"],
             "token1_symbol": hypervisor_data["pool"]["token1"]["symbol"],

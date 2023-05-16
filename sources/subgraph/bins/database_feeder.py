@@ -25,6 +25,7 @@ from sources.subgraph.bins.database.managers import (
     db_static_manager,
     db_allData_manager,
     db_allRewards2_manager,
+    db_allRewards2_external_manager,
     db_aggregateStats_manager,
 )
 
@@ -42,6 +43,7 @@ CHAINS_PROTOCOLS = [
     for protocol in Protocol
     for chain in GAMMA_SUBGRAPH_URLS[protocol].keys()
 ]
+
 
 # set cron vars
 EXPR_FORMATS = {
@@ -147,6 +149,11 @@ async def feed_database_allData():
     logger.info(f" took {get_timepassed_string(_startime)} to complete the {name} feed")
 
 
+async def feed_all_allRewards2():
+    await feed_database_allRewards2()
+    await feed_database_allRewards2_externals()
+
+
 async def feed_database_allRewards2():
     name = "allRewards2"
     logger.info(f" Starting database feeding process for {name} data")
@@ -160,6 +167,31 @@ async def feed_database_allRewards2():
             protocol=protocol,
         )
         for chain, protocol in CHAINS_PROTOCOLS
+        if protocol not in [Protocol.ZYBERSWAP, Protocol.THENA]
+    ]
+
+    # execute feed
+    await asyncio.gather(*requests)
+
+    # end time log
+    logger.info(f" took {get_timepassed_string(_startime)} to complete the {name} feed")
+
+
+async def feed_database_allRewards2_externals(current_timestamp: int | None = None):
+    name = "allRewards2 external"
+    logger.info(f" Starting database feeding process for {name} data")
+    # start time log
+    _startime = datetime.now(timezone.utc)
+
+    _manager = db_allRewards2_external_manager(mongo_url=MONGO_DB_URL)
+    requests = [
+        _manager.feed_db(
+            chain=chain,
+            protocol=protocol,
+            current_timestamp=current_timestamp,
+        )
+        for chain, protocol in CHAINS_PROTOCOLS
+        if protocol in [Protocol.ZYBERSWAP, Protocol.THENA]
     ]
 
     # execute feed
@@ -199,7 +231,7 @@ async def feed_database_inSecuence():
     await feed_database_static()
     await feed_database_allData()
 
-    _endtime = datetime.now(timezone.utc)
+    _endtime = datetime.utcnow()
     if (_endtime - _startime).total_seconds() > (60 * 2):
         # end time log
         logger.warning(
@@ -210,7 +242,7 @@ async def feed_database_inSecuence():
 async def feed_all():
     await feed_database_static()
     await feed_database_allData()
-    await feed_database_allRewards2()
+    await feed_all_allRewards2()
     await feed_database_aggregateStats()
 
 
@@ -232,6 +264,10 @@ async def feed_database_with_historic_data(from_datetime: datetime, periods=None
     if not periods:
         periods = list(EXPR_ARGS["returns"].keys())
 
+    logger.info(
+        f" Feeding database with historic data  periods:{periods} chains/protocols:{CHAINS_PROTOCOLS}"
+    )
+
     for period in periods:
         cron_ex_format = EXPR_FORMATS["returns"][period]
 
@@ -249,10 +285,15 @@ async def feed_database_with_historic_data(from_datetime: datetime, periods=None
             logger.info(f" Feeding {period} database at  {txt_timestamp}")
 
             # database feed
-            await feed_database_returns(
-                periods=EXPR_ARGS["returns"][period][0],
-                current_timestamp=int(current_timestamp),
-                max_retries=0,
+            await asyncio.gather(
+                feed_database_returns(
+                    periods=EXPR_ARGS["returns"][period][0],
+                    current_timestamp=int(current_timestamp),
+                    max_retries=0,
+                ),
+                feed_database_allRewards2_externals(
+                    current_timestamp=int(current_timestamp)
+                ),
             )
 
             # set next timestamp
@@ -276,7 +317,23 @@ def convert_commandline_arguments(argv) -> dict:
     try:
         opts, args = getopt.getopt(argv, "hs:m:", ["historic", "start=", "manual="])
     except getopt.GetoptError as err:
-        _cmd_print_help(err)
+        print("             <filename>.py <options>")
+        print("Options:")
+        print(" -s <start date> or --start=<start date>")
+        print(" -m <option> or --manual=<option>")
+        print("           <option> being: secuence")
+        print(" ")
+        print(" ")
+        print(" ")
+        print("to feed database with current data  (infinite loop):")
+        print("             <filename>.py")
+        print("to feed database with historic data: (no quickswap)")
+        print("             <filename>.py -h")
+        print("             <filename>.py -s <start date as %Y-%m-%d>")
+        print("error message: {}".format(err.msg))
+        print("opt message: {}".format(err.opt))
+        sys.exit(2)
+
     # loop and retrieve each command
     for opt, arg in opts:
         if opt in ("-s", "start="):
@@ -288,25 +345,6 @@ def convert_commandline_arguments(argv) -> dict:
         elif opt in ("-m", "manual="):
             prmtrs["manual"] = arg
     return prmtrs
-
-
-def _cmd_print_help(err):
-    print("             <filename>.py <options>")
-    print("Options:")
-    print(" -s <start date> or --start=<start date>")
-    print(" -m <option> or --manual=<option>")
-    print("           <option> being: secuence")
-    print(" ")
-    print(" ")
-    print(" ")
-    print("to feed database with current data  (infinite loop):")
-    print("             <filename>.py")
-    print("to feed database with historic data: (no quickswap)")
-    print("             <filename>.py -h")
-    print("             <filename>.py -s <start date as %Y-%m-%d>")
-    print(f"error message: {err.msg}")
-    print(f"opt message: {err.opt}")
-    sys.exit(2)
 
 
 def get_timepassed_string(start_time: datetime, end_time: datetime = None) -> str:
@@ -330,7 +368,7 @@ EXPR_FUNCS = {
     "returns": feed_database_returns,
     "static": feed_database_static,
     "allData": feed_database_allData,
-    "allRewards2": feed_database_allRewards2,
+    "allRewards2": feed_all_allRewards2,
     "aggregateStats": feed_database_aggregateStats,
     "inSecuence": feed_database_inSecuence,
 }

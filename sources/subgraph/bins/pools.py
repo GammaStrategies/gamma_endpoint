@@ -5,27 +5,6 @@ from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.utils import sqrtPriceX96_to_priceDecimal
 
 
-# async def pools_from_symbol(symbol):
-#     client = UniV3Data()
-#     token_list = client.get_token_list()
-#     token_addresses = token_list.get(symbol.upper())
-#     pool_list = await client.get_pools_by_tokens(token_addresses)
-
-#     pools = [
-#         {
-#             "token0Address": pool["token0"]["id"],
-#             "token1Address": pool["token1"]["id"],
-#             "poolAddress": pool["id"],
-#             "symbol": f"{pool['token0']['symbol']}-{pool['token1']['symbol']}",
-#             "feeTier": pool["feeTier"],
-#             "volumeUSD": pool["volumeUSD"],
-#         }
-#         for pool in pool_list
-#     ]
-
-#     return pools
-
-
 class Pool:
     def __init__(self, protocol: Protocol, chain: Chain = Chain.MAINNET):
         self.client = UniswapV3Client(protocol, chain)
@@ -51,10 +30,11 @@ class Pool:
         """
         if time_delta:
             timestamp_start = int(
-                (datetime.datetime.utcnow() - time_delta)
+                (datetime.datetime.now(datetime.timezone.utc) - time_delta)
                 .replace(tzinfo=datetime.timezone.utc)
                 .timestamp()
             )
+
         else:
             timestamp_start = 0
 
@@ -99,7 +79,7 @@ class Pool:
         response = await self.client.query(query, variables)
         data = response["data"]["pools"]
 
-        pool_prices = {
+        return {
             pool["id"]: [
                 {
                     "timestamp": hour_data["periodStartUnix"],
@@ -113,5 +93,3 @@ class Pool:
             ]
             for pool in data
         }
-
-        return pool_prices

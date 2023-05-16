@@ -13,23 +13,14 @@ STATIC_DATETIME_UTCNOW = None
 
 
 def __datetime_utcnow() -> datetime.datetime:
-    if STATIC_DATETIME_UTCNOW:
-        # return defined datetime
-        return STATIC_DATETIME_UTCNOW
-
-    # return current datetime
-    return datetime.datetime.utcnow()
+    return STATIC_DATETIME_UTCNOW or datetime.datetime.now(datetime.timezone.utc)
 
 
 def timestamp_to_date(timestamp, format=None):
     """Converts UNIX timestamp to ISO date"""
     dt = datetime.datetime.utcfromtimestamp(timestamp)
 
-    if not format:
-        # Returns isoformat by default
-        return dt.isoformat()
-    else:
-        return dt.strftime(format)
+    return dt.strftime(format) if format else dt.isoformat()
 
 
 def parse_date(date_string, date_format="%Y-%m-%d"):
@@ -90,8 +81,7 @@ def estimate_block_from_timestamp_diff(
     ts_diff = current_timestamp - initial_timestamp
     block_diff = ts_diff // BLOCK_TIME_SECONDS[chain]
 
-    initial_block = current_block - block_diff
-    return initial_block
+    return current_block - block_diff
 
 
 def filter_address_by_chain(addresses: list[str], chain: Chain) -> list[str]:
@@ -106,7 +96,7 @@ def filter_address_by_chain(addresses: list[str], chain: Chain) -> list[str]:
     Returns:
         list: of addresses
     """
-    result = list()
+    result = []
     for item in addresses:
         try:
             k, address = parse_address_eip(item)

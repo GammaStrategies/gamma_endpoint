@@ -12,6 +12,10 @@ DEPLOYMENTS = [
     (Protocol.QUICKSWAP, Chain.POLYGON),
     (Protocol.ZYBERSWAP, Chain.ARBITRUM),
     (Protocol.THENA, Chain.BSC),
+    (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
+    (Protocol.CAMELOT, Chain.ARBITRUM),
+    (Protocol.GLACIER, Chain.AVALANCHE),
+    (Protocol.RETRO, Chain.POLYGON),
 ]
 
 THEGRAPH_INDEX_NODE_URL = "https://api.thegraph.com/index-node/graphql"
@@ -32,12 +36,22 @@ DEX_SUBGRAPH_URLS = {
     },
     Protocol.QUICKSWAP: {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_SUBGRAPH_URL"),
+        Chain.POLYGON_ZKEVM: get_config("QUICKSWAP_POLYGON_ZKEVM_SUBGRAPH_URL"),
     },
     Protocol.ZYBERSWAP: {
         Chain.ARBITRUM: get_config("ZYBERSWAP_ARBITRUM_SUBGRAPH_URL"),
     },
     Protocol.THENA: {
         Chain.BSC: get_config("THENA_BSC_SUBGRAPH_URL"),
+    },
+    Protocol.CAMELOT: {
+        Chain.ARBITRUM: get_config("CAMELOT_ARBITRUM_SUBGRAPH_URL"),
+    },
+    Protocol.GLACIER: {
+        Chain.AVALANCHE: get_config("GLACIER_AVALANCHE_SUBGRAPH_URL"),
+    },
+    Protocol.RETRO: {
+        Chain.POLYGON: get_config("RETRO_POLYGON_SUBGRAPH_URL"),
     },
 }
 
@@ -52,12 +66,22 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     },
     Protocol.QUICKSWAP: {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_HP_SUBGRAPH_URL"),
+        Chain.POLYGON_ZKEVM: get_config("QUICKSWAP_POLYGON_ZKEVM_HP_SUBGRAPH_URL"),
     },
     Protocol.ZYBERSWAP: {
         Chain.ARBITRUM: get_config("ZYBERSWAP_ARBITRUM_HP_SUBGRAPH_URL"),
     },
     Protocol.THENA: {
         Chain.BSC: get_config("THENA_BSC_HP_SUBGRAPH_URL"),
+    },
+    Protocol.CAMELOT: {
+        Chain.ARBITRUM: get_config("CAMELOT_ARBITRUM_HP_SUBGRAPH_URL"),
+    },
+    Protocol.GLACIER: {
+        Chain.AVALANCHE: get_config("GLACIER_AVALANCHE_HP_SUBGRAPH_URL"),
+    },
+    Protocol.RETRO: {
+        Chain.POLYGON: get_config("RETRO_POLYGON_HP_SUBGRAPH_URL"),
     },
 }
 
@@ -72,6 +96,7 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.QUICKSWAP: {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_GAMMA_SUBGRAPH_URL"),
+        Chain.POLYGON_ZKEVM: get_config("QUICKSWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH_URL"),
     },
     Protocol.ZYBERSWAP: {
         Chain.ARBITRUM: get_config("ZYBERSWAP_ARBITRUM_GAMMA_SUBGRAPH_URL"),
@@ -79,11 +104,26 @@ GAMMA_SUBGRAPH_URLS = {
     Protocol.THENA: {
         Chain.BSC: get_config("THENA_BSC_GAMMA_SUBGRAPH_URL"),
     },
+    Protocol.CAMELOT: {
+        Chain.ARBITRUM: get_config("CAMELOT_ARBITRUM_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.GLACIER: {
+        Chain.AVALANCHE: get_config("GLACIER_AVALANCHE_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.RETRO: {
+        Chain.POLYGON: get_config("RETRO_POLYGON_GAMMA_SUBGRAPH_URL"),
+    },
 }
 
 XGAMMA_SUBGRAPH_URL = "https://api.thegraph.com/subgraphs/name/l0c4t0r/xgamma"
 
 DEFAULT_TIMEZONE = get_config("TIMEZONE")
+
+CHARTS_CACHE_TIMEOUT = int(get_config("CHARTS_CACHE_TIMEOUT"))
+APY_CACHE_TIMEOUT = int(get_config("APY_CACHE_TIMEOUT"))
+DASHBOARD_CACHE_TIMEOUT = int(get_config("DASHBOARD_CACHE_TIMEOUT"))
+ALLDATA_CACHE_TIMEOUT = int(get_config("ALLDATA_CACHE_TIMEOUT"))
+DB_CACHE_TIMEOUT = int(get_config("DB_CACHE_TIMEOUT"))  # database calls cache
 
 EXCLUDED_HYPERVISORS = list(filter(None, get_config("EXCLUDED_HYPES").split(",")))
 

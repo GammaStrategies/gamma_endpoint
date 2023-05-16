@@ -32,10 +32,9 @@ class AggregateStats(ExecutionOrderWrapper):
         _mngr = db_aggregateStats_manager(mongo_url=MONGO_DB_URL)
         result = await _mngr.get_data(chain=self.chain, protocol=self.protocol)
         self.database_datetime = result.pop("datetime", "")
-
         return AggregateStatsOutput(
             totalValueLockedUSD=result["totalValueLockedUSD"],
-            pairCount=result["paiCount"],
+            pairCount=result["pairCount"],
             totalFeesClaimedUSD=result["totalFeesClaimedUSD"],
         )
 

@@ -61,7 +61,7 @@ class FeeReturns(ExecutionOrderWrapper):
             chain=self.chain,
             days=self.days,
             current_timestamp=self.current_timestamp,
-        )
+        )["lp"]
 
 
 class HypervisorsReturnsAllPeriods(ExecutionOrderWrapper):
@@ -71,14 +71,12 @@ class HypervisorsReturnsAllPeriods(ExecutionOrderWrapper):
         chain: Chain,
         hypervisors: list[str] | None = None,
         current_timestamp: int | None = None,
-        apr_type: str | None = None,
         response: Response = None,
     ):
         self.hypervisors = (
             [hypervisor.lower() for hypervisor in hypervisors] if hypervisors else None
         )
         self.current_timestamp = current_timestamp
-        self.apr_type = apr_type
         super().__init__(protocol, chain, response)
 
     async def _database(self):
@@ -88,13 +86,14 @@ class HypervisorsReturnsAllPeriods(ExecutionOrderWrapper):
             chain=self.chain, protocol=self.protocol
         )
         if len(av_result) < 0:
-            raise Exception
+            raise ValueError(" No returns")
 
         results_na = {"feeApr": 0, "feeApy": 0, "status": "unavailable on database"}
-        result = dict()
+
+        result = {}
         # CONVERT result so is equal to original
         for hypervisor in av_result:
-            result[hypervisor["_id"]] = dict()
+            result[hypervisor["_id"]] = {}
             try:
                 result[hypervisor["_id"]]["daily"] = {
                     "feeApr": hypervisor["returns"]["1"]["av_feeApr"],
@@ -133,36 +132,21 @@ class HypervisorsReturnsAllPeriods(ExecutionOrderWrapper):
     async def _subgraph(self):
         daily, weekly, monthly = await asyncio.gather(
             fee_returns_all(
-                self.protocol,
-                self.chain,
-                1,
-                self.hypervisors,
-                self.current_timestamp,
-                apr_type=self.apr_type,
+                self.protocol, self.chain, 1, self.hypervisors, self.current_timestamp
             ),
             fee_returns_all(
-                self.protocol,
-                self.chain,
-                7,
-                self.hypervisors,
-                self.current_timestamp,
-                apr_type=self.apr_type,
+                self.protocol, self.chain, 7, self.hypervisors, self.current_timestamp
             ),
             fee_returns_all(
-                self.protocol,
-                self.chain,
-                30,
-                self.hypervisors,
-                self.current_timestamp,
-                apr_type=self.apr_type,
+                self.protocol, self.chain, 30, self.hypervisors, self.current_timestamp
             ),
         )
 
         results = {}
         for hypervisor_id in daily.keys():
-            hypervisor_daily = daily.get(hypervisor_id)
-            hypervisor_weekly = weekly.get(hypervisor_id)
-            hypervisor_monthly = monthly.get(hypervisor_id)
+            hypervisor_daily = daily["lp"].get(hypervisor_id)
+            hypervisor_weekly = weekly["lp"].get(hypervisor_id)
+            hypervisor_monthly = monthly["lp"].get(hypervisor_id)
 
             symbol = hypervisor_daily.pop("symbol")
             hypervisor_weekly.pop("symbol")
@@ -174,11 +158,13 @@ class HypervisorsReturnsAllPeriods(ExecutionOrderWrapper):
             if hypervisor_monthly["feeApr"] == 0:
                 hypervisor_monthly = hypervisor_weekly
 
-            results[hypervisor_id] = {"symbol": symbol}
-            results[hypervisor_id]["daily"] = hypervisor_daily
-            results[hypervisor_id]["weekly"] = hypervisor_weekly
-            results[hypervisor_id]["monthly"] = hypervisor_monthly
-            results[hypervisor_id]["allTime"] = hypervisor_monthly
+            results[hypervisor_id] = {
+                "symbol": symbol,
+                "daily": hypervisor_daily,
+                "weekly": hypervisor_weekly,
+                "monthly": hypervisor_monthly,
+                "allTime": hypervisor_monthly,
+            }
 
         return results
 
@@ -222,9 +208,8 @@ async def hypervisor_basic_stats(
 
     if basic_stats:
         return basic_stats
-    else:
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return "Invalid hypervisor address or not enough data"
+    response.status_code = status.HTTP_400_BAD_REQUEST
+    return "Invalid hypervisor address or not enough data"
 
 
 async def recent_fees(protocol: Protocol, chain: Chain, hours: int = 24):
@@ -286,7 +271,21 @@ async def collected_fees(
     start_block: int | None = None,
     end_block: int | None = None,
     usd_total_only: bool = False,
-):
+) -> dict:
+    """Collected fees
+
+    Args:
+        protocol (Protocol):
+        chain (Chain):
+        start_timestamp (int | None, optional): . Defaults to None.
+        end_timestamp (int | None, optional): . Defaults to None.
+        start_block (int | None, optional): . Defaults to None.
+        end_block (int | None, optional): . Defaults to None.
+        usd_total_only (bool, optional): return the sum of all period_grossFeesClaimed in usd. Defaults to False.
+
+    Returns:
+        dict:
+    """
     if (not start_timestamp and not start_block) or (
         not end_timestamp and not end_block
     ):
@@ -311,32 +310,29 @@ async def collected_fees(
         start_block=start_block,
         end_block=end_block,
     )
-    # Choose what to return
     if not usd_total_only or not collected_fees:
         return collected_fees
-
-    # return the sum of all fees
     first_key = next(iter(collected_fees))
     initial_grossFeesClaimedUSD = 0
     end_grossFeesClaimedUSD = 0
     period_grossFeesClaimedUSD = 0
     for k, x in collected_fees.items():
-        initial_grossFeesClaimedUSD += x["initial_grossFeesClaimedUSD"]
-        end_grossFeesClaimedUSD += x["end_grossFeesClaimedUSD"]
-        period_grossFeesClaimedUSD += x["period_grossFeesClaimedUSD"]
+        initial_grossFeesClaimedUSD += x["initialGrossFeesClaimedUsd"]
+        end_grossFeesClaimedUSD += x["endGrossFeesClaimedUsd"]
+        period_grossFeesClaimedUSD += x["periodGrossFeesClaimedUsd"]
 
     return {
-        "initial_block": collected_fees[first_key]["initial_block"],
-        "initial_timestamp": collected_fees[first_key]["initial_timestamp"],
-        "initial_datetime": datetime.fromtimestamp(
-            collected_fees[first_key]["initial_timestamp"]
+        "initialBlock": collected_fees[first_key]["initialBlock"],
+        "initialTimestamp": collected_fees[first_key]["initialTimestamp"],
+        "initialDatetime": datetime.fromtimestamp(
+            collected_fees[first_key]["initialTimestamp"]
         ),
-        "end_block": collected_fees[first_key]["end_block"],
-        "end_timestamp": collected_fees[first_key]["end_timestamp"],
-        "end_datetime": datetime.fromtimestamp(
-            collected_fees[first_key]["end_timestamp"]
+        "endBlock": collected_fees[first_key]["endBlock"],
+        "endTimestamp": collected_fees[first_key]["endTimestamp"],
+        "endDatetime": datetime.fromtimestamp(
+            collected_fees[first_key]["endTimestamp"]
         ),
-        "initial_grossFeesClaimedUSD": initial_grossFeesClaimedUSD,
-        "end_grossFeesClaimedUSD": end_grossFeesClaimedUSD,
-        "period_grossFeesClaimedUSD": period_grossFeesClaimedUSD,
+        "initialGrossFeesClaimedUSD": initial_grossFeesClaimedUSD,
+        "endGrossFeesClaimedUSD": end_grossFeesClaimedUSD,
+        "periodGrossFeesClaimedUSD": period_grossFeesClaimedUSD,
     }

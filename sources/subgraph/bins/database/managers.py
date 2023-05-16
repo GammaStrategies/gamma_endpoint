@@ -2,6 +2,7 @@ import logging
 import asyncio
 import sys
 from datetime import datetime, timezone
+from sources.common.database.collection_endpoint import database_local
 from sources.subgraph.bins.hypervisor import HypervisorInfo, HypervisorData
 from sources.subgraph.bins.masterchef_v2 import MasterchefV2Info
 from sources.subgraph.bins.hype_fees.data import FeeGrowthSnapshotData
@@ -15,6 +16,8 @@ from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.config import MASTERCHEF_ADDRESSES
 
 from sources.common.database.common.collections_common import db_collections_common
+
+from sources.subgraph.bins.enums import enumsConverter
 
 logger = logging.getLogger(__name__)
 
@@ -39,9 +42,9 @@ class db_collection_manager(db_collections_common):
                 data=await self.create_data(chain=chain, protocol=protocol),
                 collection_name=self.db_collection_name,
             )
-        except Exception:
+        except Exception as e:
             logger.warning(
-                f" Unexpected error feeding {chain}'s {protocol} database  err:{sys.exc_info()[0]}"
+                f" Unexpected error feeding {chain}'s {protocol} database  err:{e}"
             )
 
     async def _get_data(self, query: list[dict]):
@@ -50,7 +53,7 @@ class db_collection_manager(db_collections_common):
         )
 
 
-# gamma_v1 database related
+# gamma_v1 database related classes
 
 
 class db_static_manager(db_collection_manager):
@@ -456,13 +459,13 @@ class db_returns_manager(db_collection_manager):
         )
         # set database last update field as the maximum date found within the items returned
         try:
-            db_lastUpdate = max([x["timestamp"] for x in dbdata])
+            db_lastUpdate = max(x["timestamp"] for x in dbdata)
         except Exception:
             # TODO: log error
-            db_lastUpdate = datetime.utcnow().timestamp()
+            db_lastUpdate = datetime.now(timezone.utc).timestamp()
 
         # init result
-        result = dict()
+        result = {}
         # convert result to dict
         for item in dbdata:
             address = item.pop("address")
@@ -1486,8 +1489,13 @@ class db_allRewards2_manager(db_collection_manager):
         )
 
         try:
+            for item in result:
+                if "block" in item:
+                    return item
             return result[0]
-        except Exception:
+
+        except Exception as e:
+            logger.warning(f" {chain}'s {protocol} has no Allrewards2 data at db ")
             return {}
 
     async def get_hypervisor_rewards(
@@ -1584,6 +1592,181 @@ class db_allRewards2_manager(db_collection_manager):
                 }
             },
         ]
+
+
+class db_allRewards2_external_manager(db_allRewards2_manager):
+    async def feed_db(
+        self, chain: Chain, protocol: Protocol, current_timestamp: int = None
+    ):
+        try:
+            # save as 1 item ( not separated)
+            if data := await self.create_data(
+                chain=chain, protocol=protocol, current_timestamp=current_timestamp
+            ):
+                await self.save_item_to_database(
+                    data=data,
+                    collection_name=self.db_collection_name,
+                )
+        except ValueError:
+            pass
+        except Exception as e:
+            logger.warning(
+                f" Unexpected error feeding  {chain}'s {protocol} allRewards2 to db   err:{e}"
+            )
+
+    async def create_data(
+        self, chain: Chain, protocol: Protocol, current_timestamp: int = None
+    ) -> dict:
+        """Create the data ready to be saved to database
+
+        Args:
+            chain (str):
+            protocol (str):
+
+        Returns:
+            dict:
+        """
+
+        try:
+            # create local database helper
+
+            db_name = (
+                f"{enumsConverter.convert_local_to_general(chain=chain).value}_gamma"
+            )
+            local_db_helper = database_local(
+                mongo_url=self._db_mongo_url, db_name=db_name
+            )
+            # get data from local database rewards_status ( web3 database)
+            rewards_status = await local_db_helper.query_items_from_database(
+                query=self.query_rewards(timestamp_end=current_timestamp),
+                collection_name="rewards_status",
+            )
+
+            block = rewards_status[0]["block"]
+            timestamp = rewards_status[0]["timestamp"]
+
+            # define result var
+            data = {
+                "id": f"{timestamp}_{chain}_{protocol}",
+                "chain": chain,
+                "datetime": datetime.fromtimestamp(timestamp, timezone.utc),
+                "protocol": protocol,
+                "block": block,
+            }
+
+            # format rewards status so that equals allRewards2 database format
+
+            # create pools content
+
+            for reward in rewards_status:
+                # create masterchef level in data if not exists
+                if reward["rewarder_registry"] not in data:
+                    data[reward["rewarder_registry"]] = {"pools": {}}
+
+                # create hypervisor level in data/registry if not exists
+                if (
+                    reward["hypervisor_address"]
+                    not in data[reward["rewarder_registry"]]["pools"]
+                ):
+                    data[reward["rewarder_registry"]]["pools"][
+                        reward["hypervisor_address"]
+                    ] = {
+                        "stakeTokenSymbol": reward["rewardToken_symbol"],
+                        "stakedAmount": 0,
+                        "stakedAmountUSD": 0,
+                        "apr": 0,
+                        "lastRewardTimestamp": 0,
+                        "rewarders": {},
+                    }
+
+                # add hypervisor data
+                data[reward["rewarder_registry"]]["pools"][
+                    reward["hypervisor_address"]
+                ]["stakedAmount"] += int(reward["total_hypervisorToken_qtty"]) / (
+                    10**18
+                )
+                data[reward["rewarder_registry"]]["pools"][
+                    reward["hypervisor_address"]
+                ]["stakedAmountUSD"] = (
+                    data[reward["rewarder_registry"]]["pools"][
+                        reward["hypervisor_address"]
+                    ]["stakedAmount"]
+                    * reward["hypervisor_share_price_usd"]
+                )
+
+                #
+                # create rewarder level in data/registry/hypervisor if not exists
+                # should not exist ... but just in case
+                if (
+                    reward["rewarder_address"]
+                    not in data[reward["rewarder_registry"]]["pools"][
+                        reward["hypervisor_address"]
+                    ]["rewarders"]
+                ):
+                    data[reward["rewarder_registry"]]["pools"][
+                        reward["hypervisor_address"]
+                    ]["rewarders"][reward["rewarder_address"]] = {
+                        "rewardToken": reward["rewardToken"],
+                        "rewardTokenDecimals": reward["rewardToken_decimals"],
+                        "rewardTokenSymbol": reward["rewardToken_symbol"],
+                        "rewardPerSecond": int(reward["rewards_perSecond"])
+                        / (10 ** reward["rewardToken_decimals"]),
+                        "allocPoint": 0,
+                        "apr": reward["apr"],
+                    }
+                    # add apr to hypervisor level
+                    data[reward["rewarder_registry"]]["pools"][
+                        reward["hypervisor_address"]
+                    ]["apr"] += reward["apr"]
+
+                elif (
+                    data[reward["rewarder_registry"]]["pools"][
+                        reward["hypervisor_address"]
+                    ]["rewarders"][reward["rewarder_address"]]["rewardToken"]
+                    != reward["rewardToken"]
+                ):
+                    # add apr to root pool but log error
+                    data[reward["rewarder_registry"]]["pools"][
+                        reward["hypervisor_address"]
+                    ]["apr"] += reward["apr"]
+                    logger.error(
+                        f" {chain}'s {protocol} has same rewarder address with different reward token "
+                    )
+                else:
+                    logger.error(
+                        f" {chain}'s {protocol} has same rewarder address with same reward token "
+                    )
+        except IndexError as e:
+            raise IndexError(
+                f""" {chain}'s {protocol} has no rewards data in database {f"for {current_timestamp} timestamp" if current_timestamp else ""}"""
+            ) from e
+
+        except Exception as e:
+            raise ValueError(
+                f" {chain}'s {protocol} has no external rewards implemented "
+            ) from e
+
+        # return
+        return data
+
+    @staticmethod
+    def query_rewards(timestamp_end: int | None = None) -> list[dict]:
+        result = [
+            {"$sort": {"block": -1}},
+            {
+                "$group": {
+                    "_id": "$hypervisor_address",
+                    "reward_data": {"$first": "$$ROOT"},
+                }
+            },
+            {"$replaceRoot": {"newRoot": "$reward_data"}},
+            {"$unset": ["_id"]},
+        ]
+
+        if timestamp_end:
+            result.insert(0, {"$match": {"timestamp": {"$lte": timestamp_end}}})
+
+        return result
 
 
 class db_aggregateStats_manager(db_collection_manager):

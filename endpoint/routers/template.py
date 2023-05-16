@@ -21,6 +21,7 @@ class router_builder_baseTemplate:
         return None
 
 
+# Main template to have a structure to follow
 class router_builder_generalTemplate(router_builder_baseTemplate):
     def __init__(
         self, dex: str, chain: str, tags: list | None = None, prefix: str = ""
@@ -103,7 +104,7 @@ class router_builder_generalTemplate(router_builder_baseTemplate):
             methods=["GET"],
             generate_unique_id_function=self.generate_unique_id,
         )
-        
+
         return router
 
     def _create_routes_hypervisor_analytics(

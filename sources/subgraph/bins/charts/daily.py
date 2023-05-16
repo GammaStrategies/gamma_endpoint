@@ -35,11 +35,9 @@ class DailyChart:
         response = await self.gamma_client.query(query, variables)
         hypervisors = response["data"]["uniswapV3Hypervisors"]
 
-        data = [
+        return [
             day_data for hypervisor in hypervisors for day_data in hypervisor["dayData"]
         ]
-
-        return data
 
     async def _get_hypervisor_flows(self, hypervisor_address):
         """Daily chart flows bar chart for hypervisors"""

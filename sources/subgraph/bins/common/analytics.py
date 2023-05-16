@@ -12,7 +12,7 @@ from sources.subgraph.bins.config import MONGO_DB_URL
 class HypervisorAnalytics:
     def __init__(self, chain: Chain, hypervisor_address: str):
         self.chain = chain
-        self.address = hypervisor_address
+        self.address = hypervisor_address.lower()
 
         self.returns_manager = db_returns_manager(mongo_url=MONGO_DB_URL)
         self.allrewards2_manager = db_allRewards2_manager(mongo_url=MONGO_DB_URL)

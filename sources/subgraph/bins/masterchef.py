@@ -135,10 +135,10 @@ class UserRewards(MasterchefData):
             return {}
 
         info = {}
+        hypervisor_decimal = 18
         for pool in self.data["mcPoolAccounts"]:
             hypervisor_id = pool["masterChefPool"]["hypervisor"]["id"]
             hypervisor_symbol = pool["masterChefPool"]["hypervisor"]["symbol"]
-            hypervisor_decimal = 18
             reward_token_id = pool["masterChefPool"]["masterChef"]["rewardToken"]["id"]
             reward_token_symbol = pool["masterChefPool"]["masterChef"]["rewardToken"][
                 "symbol"

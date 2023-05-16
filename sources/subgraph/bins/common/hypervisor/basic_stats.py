@@ -46,6 +46,5 @@ async def hypervisor_basic_stats(
 
     if basic_stats:
         return basic_stats
-    else:
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return "Invalid hypervisor address or not enough data"
+    response.status_code = status.HTTP_400_BAD_REQUEST
+    return "Invalid hypervisor address or not enough data"

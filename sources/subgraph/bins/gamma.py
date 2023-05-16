@@ -185,14 +185,6 @@ class GammaCalculations(GammaData):
         df_data["apy"] = (1 + df_data.dailyYield) ** 365 - 1
         df_data.distributed = df_data.distributed / self.decimal_factor
 
-        results = (
-            df_data[
-                ["timestamp", "date", "distributed", "distributedUSD", "apr", "apy"]
-            ]
-            .tail(days)
-            .to_dict("records")
-        )
-
         # results = [
         #     {
         #         "timestamp": day["date"],
@@ -203,7 +195,13 @@ class GammaCalculations(GammaData):
         #     for day in self.data["distributionDayDatas"]
         # ]
 
-        return results
+        return (
+            df_data[
+                ["timestamp", "date", "distributed", "distributedUSD", "apr", "apy"]
+            ]
+            .tail(days)
+            .to_dict("records")
+        )
 
 
 class GammaInfo(GammaCalculations):
@@ -277,16 +275,16 @@ class ProtocolFeesCalculations(ProtocolFeesData):
         self.days = days
 
     def _empty_fees(self):
-        results = {}
-        for period, _ in DAYS_IN_PERIOD.items():
-            results[period] = {}
-            results[period]["collected_usd"] = 0
-            results[period]["collected_gamma"] = 0
-            results[period]["yield"] = 0
-            results[period]["apr"] = 0
-            results[period]["apy"] = 0
-
-        return results
+        return {
+            period: {
+                "collected_usd": 0,
+                "collected_gamma": 0,
+                "yield": 0,
+                "apr": 0,
+                "apy": 0,
+            }
+            for period, _ in DAYS_IN_PERIOD.items()
+        }
 
     async def collected_fees(self, get_data=True):
         if get_data:

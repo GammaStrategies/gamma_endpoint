@@ -8,6 +8,7 @@ from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.pools import Pool
 from sources.subgraph.bins.utils import tick_to_priceDecimal, timestamp_ago
 
+
 BASE_TOKEN_PRIORITY = {
     "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": 1,  # USDC
     "0xdac17f958d2ee523a2206206994597c13d831ec7": 2,  # USDT
@@ -65,15 +66,13 @@ class BaseLimit:
             # No base token
             base_token_index = None
 
-        results = {
+        return {
             "pool": data["pool"]["id"],
             "token0_name": data["pool"]["token0"]["symbol"],
             "token1_name": data["pool"]["token1"]["symbol"],
             "base_token_index": base_token_index,
             "rebalances": rebalances,
         }
-
-        return results
 
     async def _get_data(self, hypervisor_address):
         """Get data for one hypervisor"""

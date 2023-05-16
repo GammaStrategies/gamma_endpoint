@@ -1,9 +1,13 @@
+"""Token pricing"""
+
 import asyncio
+import contextlib
 from collections import defaultdict
 
 from sources.subgraph.bins import UniswapV3Client, LlamaClient
 from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.utils import sqrtPriceX96_to_priceDecimal
+
 
 POOLS = {
     Chain.MAINNET: {
@@ -71,7 +75,36 @@ POOLS = {
             "protocol": Protocol.QUICKSWAP,
             "address": "0xd9c2c978915b907df04972cb3f577126fe55143c",
         },
+        "WOMBAT_USDC": {
+            "protocol": Protocol.QUICKSWAP,
+            "address": "0xaf835698673655e9910de8398df6c5238f5d3aeb",
+        },
+        "USDC_FIS": {
+            "protocol": Protocol.QUICKSWAP,
+            "address": "0x2877703a3ba3e712d684d22bd6d60cc0031d84e8",
+        },
+        "SD_USDC": {
+            "protocol": Protocol.QUICKSWAP,
+            "address": "0x5d0acfa39a0fca603147f1c14e53f46be76984bc",
+        },
     },
+    Chain.POLYGON_ZKEVM: {
+        "WETH_USDC": {
+            "protocol": Protocol.QUICKSWAP,
+            "address": "0xc44ad482f24fd750caeba387d2726d8653f8c4bb",
+        },
+        "QUICK_USDC": {
+            "protocol": Protocol.QUICKSWAP,
+            "address": "0x1247b70c4b41890e8c1836e88dd0c8e3b23dd60e",
+        },
+        "WETH_MATIC": {
+            "protocol": Protocol.QUICKSWAP,
+            "address": "0xb73abfb5a2c89f4038baa476ff3a7942a021c196",
+        },
+    },
+    Chain.BSC: {},
+    Chain.AVALANCHE: {},
+    Chain.ARBITRUM: {},
 }
 
 
@@ -147,7 +180,33 @@ POOL_PATHS = {
             (POOLS[Chain.POLYGON]["WMATIC_LCD"], 0),
             (POOLS[Chain.POLYGON]["WMATIC_USDC"], 1),
         ],
+        # WOMBAT
+        "0x0c9c7712c83b3c70e7c5e11100d33d9401bdf9dd": [
+            (POOLS[Chain.POLYGON]["WOMBAT_USDC"], 1),
+        ],
+        # FIS
+        "0x7a7b94f18ef6ad056cda648588181cda84800f94": [
+            (POOLS[Chain.POLYGON]["USDC_FIS"], 0),
+        ],
+        # SD
+        "0x1d734a02ef1e1f5886e66b0673b71af5b53ffa94": [
+            (POOLS[Chain.POLYGON]["SD_USDC"], 1),
+        ],
     },
+    Chain.POLYGON_ZKEVM: {
+        # WMATIC
+        "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270": [
+            (POOLS[Chain.POLYGON_ZKEVM]["WETH_MATIC"], 0),
+            (POOLS[Chain.POLYGON_ZKEVM]["WETH_USDC"], 1),
+        ],
+        # QUICK
+        "0x68286607a1d43602d880d349187c3c48c0fd05e6": [
+            (POOLS[Chain.POLYGON_ZKEVM]["QUICK_USDC"], 1),
+        ],
+    },
+    Chain.BSC: {},
+    Chain.AVALANCHE: {},
+    Chain.ARBITRUM: {},
 }
 
 
@@ -209,11 +268,13 @@ class DexPrice:
 
         await asyncio.gather(*[client.get_data() for client in dex_clients])
 
-        chain_prices = {}
-        for protocol_client in dex_clients:
-            chain_prices[protocol_client.protocol] = {
+        chain_prices = {
+            protocol_client.protocol: {
                 pool.pop("id"): pool for pool in protocol_client.data
             }
+            for protocol_client in dex_clients
+        }
+
         self.chain_prices = chain_prices
 
     async def get_token_prices(self):
@@ -273,10 +334,7 @@ async def token_prices(chain: Chain):
                 prices[token] = price
 
     llama_client = LlamaClient(Chain.MAINNET)
-    try:
+    with contextlib.suppress(Exception):
         ALCX_ADDRESS = "0xdbdb4d16eda451d0503b854cf79d55697f90c8df"
         prices[ALCX_ADDRESS] = await llama_client.current_token_price(ALCX_ADDRESS)
-    except Exception:
-        pass
-
     return prices

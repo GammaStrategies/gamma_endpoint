@@ -1,1 +1,1 @@
-from endpoint.app import app
+from endpoint.main_app_builder import app

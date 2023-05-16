@@ -63,7 +63,7 @@ class EthCalculations(EthData):
         if get_data:
             await self._get_data()
 
-        results = [
+        return [
             {
                 "timestamp": day["date"],
                 "date": timestamp_to_date(int(day["date"]), "%m/%d/%Y"),
@@ -71,8 +71,6 @@ class EthCalculations(EthData):
             }
             for day in self.data["distributionDayDatas"]
         ]
-
-        return results
 
 
 class EthDistribution(EthCalculations):
@@ -82,14 +80,13 @@ class EthDistribution(EthCalculations):
     async def output(self):
         distributions = await self.distributions(get_data=True)
 
-        fee_distributions = []
-        for i, distribution in enumerate(distributions):
-            fee_distributions.append(
-                {
-                    "title": distribution["date"],
-                    "desc": f"{float(distribution['distributed']):.2f} ETH Distributed",
-                    "id": i + 2,
-                }
-            )
+        fee_distributions = [
+            {
+                "title": distribution["date"],
+                "desc": f"{float(distribution['distributed']):.2f} ETH Distributed",
+                "id": i + 2,
+            }
+            for i, distribution in enumerate(distributions)
+        ]
 
         return {"feeDistribution": fee_distributions}
