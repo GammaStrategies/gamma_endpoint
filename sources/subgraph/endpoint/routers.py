@@ -591,7 +591,7 @@ class subgraph_router_builder(router_builder_generalTemplate):
         )
 
         return await masterchef_v2_info.run(
-            QueryType.SUBGRAPH
+            QueryType.DATABASE
             if (self.dex, self.chain) in THIRD_PARTY_REWARDERS
             else RUN_FIRST
         )
