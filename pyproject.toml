@@ -1,11 +1,14 @@
 [tool.poetry]
-name = "uniswap-v3-performance"
+name = "Gamma Endpoint"
 version = "0.1.0"
 description = "Data API for Gamma Strategies"
 authors = ["loc <l0c4t0r@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "uniswap_v3_performance"}]
+packages = [
+    {include = "endpoint"},
+    {include = "sources"},
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -20,6 +23,9 @@ gql = "^3.4.0"
 pymongo = "^4.3.3"
 gunicorn = "^20.1.0"
 pyyaml = "^6.0"
+pycoingecko = "^3.1.0"
+aiocron = "^1.8"
+croniter = "^1.3.14"
 
 
 [tool.poetry.group.dev.dependencies]

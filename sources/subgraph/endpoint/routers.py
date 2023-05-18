@@ -127,6 +127,42 @@ def build_routers() -> list:
         )
     )
 
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.CAMELOT,
+            chain=Chain.ARBITRUM,
+            tags=["Camelot - Arbitrum"],
+            prefix=f"/{Protocol.CAMELOT.value}/{Chain.ARBITRUM.value}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.GLACIER,
+            chain=Chain.AVALANCHE,
+            tags=["Glacier - Avalanche"],
+            prefix=f"/{Protocol.GLACIER.value}/{Chain.AVALANCHE.value}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.RETRO,
+            chain=Chain.POLYGON,
+            tags=["Retro - Polygon"],
+            prefix=f"/{Protocol.RETRO.value}/{Chain.POLYGON.value}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.STELLASWAP,
+            chain=Chain.MOONBEAM,
+            tags=["StellaSwap - Moonbeam"],
+            prefix=f"/{Protocol.STELLASWAP.value}/{Chain.MOONBEAM.value}",
+        )
+    )
+
     # Simulation
     routes.append(
         subgraph_router_builder_Simulator(tags=["Simulator"], prefix="/simulator")
@@ -223,6 +259,40 @@ def build_routers_compatible() -> list:
             chain=Chain.BSC,
             tags=["Thena - BSC"],
             prefix=f"/{Protocol.THENA.value}/{Chain.BSC.value}",
+        )
+    )
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.CAMELOT,
+            chain=Chain.ARBITRUM,
+            tags=["Camelot - Arbitrum"],
+            prefix=f"/{Protocol.CAMELOT.value}/{Chain.ARBITRUM.value}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.GLACIER,
+            chain=Chain.AVALANCHE,
+            tags=["Glacier - Avalanche"],
+            prefix=f"/{Protocol.GLACIER.value}/{Chain.AVALANCHE.value}",
+        )
+    )
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.STELLASWAP,
+            chain=Chain.MOONBEAM,
+            tags=["StellaSwap - Moonbeam"],
+            prefix=f"/{Protocol.STELLASWAP.value}/{Chain.MOONBEAM.value}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.RETRO,
+            chain=Chain.POLYGON,
+            tags=["Retro - Polygon"],
+            prefix=f"/{Protocol.RETRO.value}/{Chain.POLYGON.value}",
         )
     )
 
