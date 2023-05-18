@@ -302,6 +302,7 @@ def build_routers_compatible() -> list:
         subgraph_router_builder_Simulator(tags=["Simulator"], prefix="/simulator")
     )
 
+    # Charts
     routes.append(subgraph_router_builder_Charts(tags=["Charts"], prefix="/charts"))
 
     return routes
@@ -870,16 +871,16 @@ class subgraph_router_builder_Charts(router_builder_baseTemplate):
 
     # Charts
     @cache(expire=CHARTS_CACHE_TIMEOUT)
-    async def daily_tvl_chart_data(days: int = 24):
+    async def daily_tvl_chart_data(self, days: int = 24):
         daily = DailyChart(days)
         return {"data": await daily.tvl()}
 
-    async def daily_flows_chart_data(days: int = 20):
+    async def daily_flows_chart_data(self, days: int = 20):
         daily = DailyChart(days)
         return {"data": await daily.asset_flows()}
 
     async def daily_hypervisor_flows_chart_data(
-        hypervisor_address: str, days: int = 20
+        self, hypervisor_address: str, days: int = 20
     ):
         daily = DailyChart(days)
         return {"data": await daily.asset_flows(hypervisor_address)}
