@@ -720,64 +720,80 @@ class database_local(db_collections_common):
     async def get_user_status(
         self, address: str, block_ini: int = 0, block_end: int = 0
     ) -> list:
-        _main_match = {
-            "address": address,
-            "topic": {"$in": ["report", "withdraw", "deposit", "transfer"]},
+        _match = {
+            "user_address": address,
         }
         if block_ini and block_end:
-            _main_match["$and"] = [
+            _match["$and"] = [
                 {"block": {"$lte": block_end}},
                 {"block": {"$gte": block_ini}},
             ]
         elif block_ini:
-            _main_match["block"] = {"$gte": block_ini}
+            _match["block"] = {"$gte": block_ini}
         elif block_end:
-            _main_match["block"] = {"$lte": block_end}
+            _match["block"] = {"$lte": block_end}
 
         query = [
-            {"$match": _main_match},
-            {"$sort": {"block": 1}},
+            {"$match": _match},
+            {
+                "$addFields": {
+                    "shares": {"$subtract": ["$shares_in", "$shares_out"]},
+                    "fees_usd": {
+                        "$sum": [
+                            {"$multiply": ["$price_usd_token0", "$fees_token0_in"]},
+                            {"$multiply": ["$price_usd_token1", "$fees_token1_in"]},
+                        ]
+                    },
+                    "shares_cost": {"$multiply": ["$price_usd_share", "$shares_in"]},
+                    "shares_benefit": {
+                        "$multiply": ["$price_usd_share", "$shares_out"]
+                    },
+                }
+            },
             {
                 "$group": {
                     "_id": "$hypervisor_address",
-                    "hypervisor_address": {"$first": "$hypervisor_address"},
-                    "history": {
+                    "shares": {"$sum": "$shares"},
+                    "fees_usd": {"$sum": "$fees_usd"},
+                    "fees_token0": {"$sum": "$fees_token0_in"},
+                    "fees_token1": {"$sum": "$fees_token1_in"},
+                    "operations": {
                         "$push": {
-                            "hypervisor_address": "$hypervisor_address",
                             "block": "$block",
                             "timestamp": "$timestamp",
-                            "topic": "$topic",
-                            "investment_qtty_token0": "$investment_qtty_token0",
-                            "investment_qtty_token1": "$investment_qtty_token1",
-                            "total_investment_qtty_in_usd": "$total_investment_qtty_in_usd",
-                            "total_investment_qtty_in_token0": "$total_investment_qtty_in_token0",
-                            "total_investment_qtty_in_token1": "$total_investment_qtty_in_token1",
-                            "underlying_token0": "$underlying_token0",
-                            "underlying_token1": "$underlying_token1",
-                            "fees_collected_token0": "$fees_collected_token0",
-                            "fees_collected_token1": "$fees_collected_token1",
-                            "fees_owed_token0": "$fees_owed_token0",
-                            "fees_owed_token1": "$fees_owed_token1",
-                            "fees_uncollected_token0": "$fees_uncollected_token0",
-                            "fees_uncollected_token1": "$fees_uncollected_token1",
-                            "usd_price_token0": "$usd_price_token0",
-                            "usd_price_token1": "$usd_price_token1",
-                            "divestment_base_qtty_token0": "$divestment_base_qtty_token0",
-                            "divestment_base_qtty_token1": "$divestment_base_qtty_token1",
-                            "divestment_fee_qtty_token0": "$divestment_fee_qtty_token0",
-                            "divestment_fee_qtty_token1": "$divestment_fee_qtty_token1",
+                            "operation": "$topic",
+                            "shares_move": "$shares",
+                            "fees_token0_move": "$fees_token0_in",
+                            "fees_token1_move": "$fees_token1_in",
+                            "underlying_token0_move": {
+                                "$subtract": ["$token0_in", "$token0_out"]
+                            },
+                            "underlying_token1_move": {
+                                "$subtract": ["$token1_in", "$token1_out"]
+                            },
+                            "price_usd_share": "$price_usd_share",
+                            "price_usd_token0": "$price_usd_token0",
+                            "price_usd_token1": "$price_usd_token1",
                         }
                     },
                 }
             },
-            {"$unset": ["_id"]},
+            {
+                "$project": {
+                    "hypervisor_address": "$_id",
+                    "shares": "$shares",
+                    "fees_token0": "$fees_token0",
+                    "fees_token1": "$fees_token1",
+                    "fees_usd": "$fees_usd",
+                    "operations": "$operations",
+                }
+            },
         ]
 
-        debug_query = f"{query}"
         return [
             self.convert_decimal_to_float(item=self.convert_d128_to_decimal(item=item))
             for item in await self.query_items_from_database(
-                query=query, collection_name="user_status"
+                query=query, collection_name="user_operations"
             )
         ]
 

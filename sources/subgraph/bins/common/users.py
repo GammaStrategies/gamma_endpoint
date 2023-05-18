@@ -8,7 +8,8 @@ from sources.common.database.collection_endpoint import (
 )
 from sources.subgraph.bins.config import MONGO_DB_URL
 
-from sources.subgraph.bins.enums import enumsConverter
+from sources.subgraph.bins.enums import enumsConverter as general_enumsConverter
+from sources.mongo.bins.enums import enumsConverter as mongo_enumsConverter
 
 
 async def user_data(protocol: Protocol, chain: Chain, address: str):
@@ -28,8 +29,9 @@ async def get_user_analytic_data(
     block_end: int = 0,
     response: Response | None = None,
 ):
-    db_name = f"{enumsConverter.convert_local_to_general(chain=chain).value}_gamma"
-    local_db_helper = database_local(mongo_url=MONGO_DB_URL, db_name=db_name)
-    return await local_db_helper.get_user_status(
+    db_name = f"{mongo_enumsConverter.convert_general_to_local(chain=general_enumsConverter.convert_local_to_general(chain=chain)).value}_gamma"
+    db = database_local(mongo_url=MONGO_DB_URL, db_name=db_name)
+
+    return await db.get_user_status(
         address=address, block_ini=block_ini, block_end=block_end
     )
