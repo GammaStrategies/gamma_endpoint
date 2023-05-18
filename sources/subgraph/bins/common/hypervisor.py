@@ -246,7 +246,10 @@ async def uncollected_fees(
     chain: Chain,
     hypervisor_address: str,
     current_timestamp: int | None = None,
+    response: Response = None,
 ):
+    if response:
+        response.headers["X-Database"] = "false"
     return await fees_all(
         protocol=protocol,
         chain=chain,
