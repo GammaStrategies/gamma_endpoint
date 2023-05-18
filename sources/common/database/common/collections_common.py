@@ -4,7 +4,7 @@ import asyncio
 from math import log
 
 from bson.decimal128 import Decimal128, create_decimal128_context
-
+from pymongo.errors import BulkWriteError
 from sources.common.database.common.db_managers import MongoDbManager
 
 logger = logging.getLogger(__name__)
@@ -87,6 +87,39 @@ class db_collections_common:
                 f" Unable to replace data in mongo's {collection_name} collection.  error-> {e}"
             )
 
+    async def replace_items_to_database(
+        self,
+        data: list[dict],
+        collection_name: str,
+    ):
+        """Replace multiple items in a collection at once ( in bulk)
+
+        Args:
+            data (list[dict]): _description_
+            collection_name (str): _description_
+        """
+        try:
+            # create bulk data object
+            bulk_data = [{"filter": {"id": item["id"]}, "data": item} for item in data]
+
+            with MongoDbManager(
+                url=self._db_mongo_url,
+                db_name=self._db_name,
+                collections=self._db_collections,
+            ) as _db_manager:
+                # add to mongodb
+                _db_manager.replace_items_bulk(
+                    coll_name=collection_name, data=bulk_data, upsert=True
+                )
+        except BulkWriteError as bwe:
+            logging.getLogger(__name__).error(
+                f"  Error while replacing multiple items in {collection_name} collection database. Items qtty: {len(data)}  error-> {bwe.details}"
+            )
+        except Exception as e:
+            logging.getLogger(__name__).error(
+                f" Unable to replace multiple items in mongo's {collection_name} collection.  Items qtty: {len(data)}    error-> {e}"
+            )
+
     async def query_items_from_database(
         self,
         query: list[dict],
@@ -130,15 +163,10 @@ class db_collections_common:
         return result
 
     # TOOLING
-    @staticmethod
-    def bytes_needed(n):
-        if n == 0:
-            return 1
-        return int(log(abs(n), 256)) + 2 if n < 0 else int(log(n, 256)) + 1
 
     @staticmethod
-    def convert_decimal_to_d128(item: dict) -> dict | None:
-        """Converts a dictionary decimal values to BSON.decimal128, recursively.
+    def convert_decimal_to_d128(item: dict) -> dict:
+        """Converts a dictionary decimal values to BSON.decimal128, recursivelly.
             The function iterates a dict looking for types of Decimal and converts them to Decimal128.
             Embedded dictionaries and lists are called recursively.
 
@@ -151,28 +179,23 @@ class db_collections_common:
         if item is None:
             return None
 
-        # Check if item is a dictionary
-        if not isinstance(item, dict):
-            raise TypeError(f"item is not a dict: {item}")
-
         for k, v in list(item.items()):
             if isinstance(v, dict):
                 db_collections_common.convert_decimal_to_d128(v)
             elif isinstance(v, list):
                 for l in v:
-                    db_collections_common.convert_decimal_to_d128(l)
+                    if isinstance(l, dict):
+                        db_collections_common.convert_decimal_to_d128(l)
             elif isinstance(v, Decimal):
                 decimal128_ctx = create_decimal128_context()
                 with localcontext(decimal128_ctx) as ctx:
                     item[k] = Decimal128(ctx.create_decimal(str(v)))
-            else:
-                raise TypeError(f"item is not a dict, list or Decimal: {item}")
 
         return item
 
     @staticmethod
-    def convert_d128_to_decimal(item: dict) -> dict | None:
-        """Converts a dictionary decimal128 values to decimal, recursively.
+    def convert_d128_to_decimal(item: dict) -> dict:
+        """Converts a dictionary decimal128 values to decimal, recursivelly.
             The function iterates a dict looking for types of Decimal128 and converts them to Decimal.
             Embedded dictionaries and lists are called recursively.
 
@@ -185,26 +208,21 @@ class db_collections_common:
         if item is None:
             return None
 
-        # Check if item is a dictionary
-        if not isinstance(item, dict):
-            raise TypeError("item is not a dict")
-
         for k, v in list(item.items()):
             if isinstance(v, dict):
                 db_collections_common.convert_d128_to_decimal(v)
             elif isinstance(v, list):
                 for l in v:
-                    db_collections_common.convert_d128_to_decimal(l)
+                    if isinstance(l, dict):
+                        db_collections_common.convert_d128_to_decimal(l)
             elif isinstance(v, Decimal128):
                 item[k] = v.to_decimal()
-            else:
-                item[k] = v
 
         return item
 
     @staticmethod
-    def convert_decimal_to_float(item: dict) -> dict | None:
-        """Converts a dictionary decimal values to float, recursively.
+    def convert_decimal_to_float(item: dict) -> dict:
+        """Converts a dictionary decimal values to float, recursivelly.
             The function iterates a dict looking for types of Decimal and converts them to float.
             Embedded dictionaries and lists are called recursively.
 
@@ -214,29 +232,17 @@ class db_collections_common:
         Returns:
             dict: converted values dict
         """
-        # Check if item is None
         if item is None:
             return None
 
-        # Check if item is a dictionary
-        if not isinstance(item, dict):
-            raise TypeError("item is not a dict")
-
-        # Iterate over the dictionary
         for k, v in list(item.items()):
-            # Check if the value is a dictionary
             if isinstance(v, dict):
-                # If so, call the function again
                 db_collections_common.convert_decimal_to_float(v)
-            # Check if the value is a list
             elif isinstance(v, list):
-                # If so, iterate over the list
                 for l in v:
-                    # Call the function again for each list element
-                    db_collections_common.convert_decimal_to_float(l)
-            # Check if the value is a Decimal
+                    if isinstance(l, dict):
+                        db_collections_common.convert_decimal_to_float(l)
             elif isinstance(v, Decimal):
-                # If so, convert the value to float
                 item[k] = float(v)
 
         return item

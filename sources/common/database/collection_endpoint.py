@@ -4,6 +4,7 @@ import sys
 from datetime import datetime
 
 from sources.subgraph.bins.enums import Chain, Protocol
+from pymongo import DESCENDING, ASCENDING
 
 from sources.common.database.common.collections_common import db_collections_common
 
@@ -34,7 +35,16 @@ class database_global(db_collections_common):
         self, mongo_url: str, db_name: str = "global", db_collections: dict = None
     ):
         if db_collections is None:
-            db_collections = {"blocks": {"id": True}, "usd_prices": {"id": True}}
+            db_collections = {
+                "blocks": {
+                    "mono_indexes": {"id": True, "network": False, "block": False},
+                    "multi_indexes": [],
+                },
+                "usd_prices": {
+                    "mono_indexes": {"id": True, "address": False},
+                    "multi_indexes": [],
+                },
+            }
         super().__init__(
             mongo_url=mongo_url, db_name=db_name, db_collections=db_collections
         )
@@ -93,7 +103,7 @@ class database_global(db_collections_common):
         """
         return await self.get_items_from_database(
             collection_name="usd_prices",
-            find={"network": network, "block": block, "address": address},
+            find={"id": f"{network}_{block}_{address}"},
         )
 
     async def get_price_usd_closestBlock(
@@ -280,26 +290,75 @@ class database_local(db_collections_common):
     def __init__(self, mongo_url: str, db_name: str, db_collections: dict = None):
         if db_collections is None:
             db_collections = {
-                "static": {"id": True},
+                "static": {
+                    "mono_indexes": {"id": True, "address": False},
+                    "multi_indexes": [],
+                },
                 "operations": {
-                    "id": True,
-                    "address": False,
-                    "blockNumber": False,
+                    "mono_indexes": {
+                        "id": True,
+                        "blockNumber": False,
+                        "address": False,
+                        "timestamp": False,
+                    },
+                    "multi_indexes": [
+                        [("blockNumber", ASCENDING), ("logIndex", ASCENDING)],
+                    ],
                 },
                 "status": {
-                    "id": True,
-                    "address": False,
-                    "block": False,
-                    "timestamp": False,
+                    "mono_indexes": {
+                        "id": True,
+                        "block": False,
+                        "address": False,
+                        "timestamp": False,
+                    },
+                    "multi_indexes": [],
                 },
                 "user_status": {
-                    "id": True,
-                    "address": False,
-                    "hypervisor_address": False,
-                    "block": False,
-                    "timestamp": False,
+                    "mono_indexes": {
+                        "id": True,
+                        "block": False,
+                        "address": False,
+                        "hypervisor_address": False,
+                        "timestamp": False,
+                        "logIndex": False,
+                    },
+                    "multi_indexes": [
+                        [("block", DESCENDING), ("logIndex", DESCENDING)],
+                    ],
                 },
-                "rewards_static": {"id": True, "address": False},
+                "user_operations": {
+                    "mono_indexes": {
+                        "id": True,
+                        "block": False,
+                        "user_address": False,
+                        "hypervisor_address": False,
+                        "timestamp": False,
+                        "logIndex": False,
+                        "topic": False,
+                    },
+                    "multi_indexes": [
+                        [("block", DESCENDING), ("logIndex", DESCENDING)],
+                    ],
+                },
+                "rewards_static": {
+                    "mono_indexes": {
+                        "id": True,
+                        "hypervisor_address": False,
+                        "rewarder_address": False,
+                    },
+                    "multi_indexes": [],
+                },
+                "rewards_status": {
+                    "mono_indexes": {
+                        "id": True,
+                        "hypervisor_address": False,
+                        "rewarder_address": False,
+                        "block": False,
+                        "timestamp": False,
+                    },
+                    "multi_indexes": [],
+                },
             }
 
         super().__init__(
@@ -311,6 +370,24 @@ class database_local(db_collections_common):
     async def set_static(self, data: dict):
         data["id"] = data["address"]
         await self.save_item_to_database(data=data, collection_name="static")
+
+    async def get_gamma_service_fees(self) -> dict:
+        """Get the agreed service fee (%) to be collected by the gamma protocol for each hypervisor
+
+        Returns:
+            dict: {"hypervisor address":  {"symbol":<symbol>, "dex":<dex> ,"fee":<fee>} }
+        """
+        # some hypes have the pool fee at gamma fees field: those are 1/10 hardcoded
+        return {
+            x["address"]: {
+                x["symbol"],
+                x["dex"],
+                (1 / x["fee"]) if x["fee"] < 100 else 1 / 10,
+            }
+            for x in await self.get_items_from_database(
+                collection_name="static", projection={"address", "symbol", "dex", "fee"}
+            )
+        }
 
     async def get_unique_tokens(self) -> list:
         """Get a unique token list from static database
@@ -1471,3 +1548,182 @@ class database_local(db_collections_common):
             query.insert(0, {"$match": _match})
         # debug_query = f"{query}"
         return query
+
+    @staticmethod
+    def query_rewarders_by_rewardRegistry() -> list[dict]:
+        """return the query to build
+               list of {
+                    "_id": <rewarder_registry>,
+                    "rewarders": [<rewarder_address>,...]
+               }
+
+        Returns:
+            query:
+        """
+        return [
+            {
+                "$group": {
+                    "_id": "$rewarder_registry",
+                    "rewarders": {"$push": "$rewarder_address"},
+                }
+            }
+        ]
+
+    @staticmethod
+    def query_all_user_Rewarder_transactions(
+        user_address: str, rewarder_address: str
+    ) -> list[dict]:
+        """It will return a list of operations with the following Extra fields:
+                qtty_in: qtty staked in the rewarder
+                qtty_out: qtty unstaked from the rewarder
+                staked_in_rewarder: qtty_in - qtty_out
+
+                u can sum all operations <staked_in_rewarder> field to get the total staked in the rewarder
+
+        Args:
+            user_address (str):
+            rewarder_address (str):
+
+        Returns:
+            list[dict]:
+        """
+        return [
+            {
+                "$match": {
+                    "topic": "transfer",
+                    "$or": [
+                        {"dst": user_address},
+                        {"src": user_address},
+                    ],
+                }
+            },
+            {
+                "$addFields": {
+                    "qtty_in": {
+                        "$cond": [
+                            {"$eq": ["$dst", rewarder_address]},
+                            {"$toDecimal": "$qtty"},
+                            0,
+                        ]
+                    },
+                    "qtty_out": {
+                        "$cond": [
+                            {"$eq": ["$src", rewarder_address]},
+                            {"$toDecimal": "$qtty"},
+                            0,
+                        ]
+                    },
+                    "user_address": {
+                        "$cond": [{"$eq": ["$dst", rewarder_address]}, "$src", "$dst"]
+                    },
+                }
+            },
+            {
+                "$addFields": {
+                    "staked_in_rewarder": {"$subtract": ["$qtty_in", "$qtty_out"]},
+                }
+            },
+        ]
+
+    @staticmethod
+    def query_user_allRewarder_transactions(
+        user_address: str, rewarders_addresses: list[str]
+    ) -> list[dict]:
+        """Get all user transactions and summary status for all rewarders in the network with staked value gt 0
+                returns a list of operations with the following fields:
+                    "_id": <rewarder_address>,
+                    "staked: <total_staked_in_rewarder>,
+                    "operations": [<operation>,...]
+                    "rewarder_data": < static rewarder information >
+                    "hypervisor_data": < static hypervisor information >
+        Args:
+            user_address (str):
+            rewarders_addresses (list[str]):
+
+        Returns:
+            list[dict]: _description_
+        """
+        return [
+            {
+                "$match": {
+                    "topic": "transfer",
+                    "src": {"$ne": "0x0000000000000000000000000000000000000000"},
+                    "dst": {"$ne": "0x0000000000000000000000000000000000000000"},
+                    "$or": [
+                        {
+                            "$and": [
+                                {"dst": user_address},
+                                {"src": {"$in": rewarders_addresses}},
+                            ]
+                        },
+                        {
+                            "$and": [
+                                {"src": user_address},
+                                {"dst": {"$in": rewarders_addresses}},
+                            ]
+                        },
+                    ],
+                }
+            },
+            {
+                "$addFields": {
+                    "qtty_in": {
+                        "$cond": [
+                            {"$in": ["$dst", rewarders_addresses]},
+                            {"$toDecimal": "$qtty"},
+                            0,
+                        ]
+                    },
+                    "qtty_out": {
+                        "$cond": [
+                            {"$in": ["$src", rewarders_addresses]},
+                            {"$toDecimal": "$qtty"},
+                            0,
+                        ]
+                    },
+                    "user_address": {
+                        "$cond": [{"$eq": ["$dst", user_address]}, "$dst", "$src"]
+                    },
+                    "rewarder_address": {
+                        "$cond": [{"$eq": ["$src", user_address]}, "$dst", "$src"]
+                    },
+                }
+            },
+            {
+                "$addFields": {
+                    "staked_in_rewarder": {"$subtract": ["$qtty_in", "$qtty_out"]},
+                }
+            },
+            {
+                "$group": {
+                    "_id": {"$concat": ["$address", "_", "$rewarder_address"]},
+                    "hypervisor_address": {"$first": "$address"},
+                    "rewarder_address": {"$first": "$rewarder_address"},
+                    "staked": {"$sum": "$staked_in_rewarder"},
+                    "operations": {"$push": "$$ROOT"},
+                }
+            },
+            {
+                "$match": {
+                    "staked": {"$gt": 0},
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "rewards_static",
+                    "localField": "_id",
+                    "foreignField": "id",
+                    "as": "rewarder_data",
+                }
+            },
+            {"$unwind": "$rewarder_data"},
+            {
+                "$lookup": {
+                    "from": "static",
+                    "localField": "hypervisor_address",
+                    "foreignField": "address",
+                    "as": "hypervisor_data",
+                }
+            },
+            {"$unwind": "$hypervisor_data"},
+        ]
