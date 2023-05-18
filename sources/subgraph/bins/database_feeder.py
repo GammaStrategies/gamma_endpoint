@@ -11,6 +11,13 @@ from aiocron import crontab
 from croniter import croniter
 from datetime import datetime, timezone
 
+########################################
+# append parent directory pth
+CURRENT_FOLDER = os.path.dirname(os.path.realpath(__file__))
+PARENT_FOLDER = os.path.dirname(os.path.dirname(os.path.dirname(CURRENT_FOLDER)))
+sys.path.append(PARENT_FOLDER)
+########################################
+
 from sources.subgraph.bins import utils
 
 from sources.subgraph.bins.enums import Protocol
@@ -286,11 +293,11 @@ async def feed_database_with_historic_data(from_datetime: datetime, periods=None
 
             # database feed
             await asyncio.gather(
-                feed_database_returns(
-                    periods=EXPR_ARGS["returns"][period][0],
-                    current_timestamp=int(current_timestamp),
-                    max_retries=0,
-                ),
+                # feed_database_returns(
+                #     periods=EXPR_ARGS["returns"][period][0],
+                #     current_timestamp=int(current_timestamp),
+                #     max_retries=0,
+                # ),
                 feed_database_allRewards2_externals(
                     current_timestamp=int(current_timestamp)
                 ),
@@ -374,6 +381,8 @@ EXPR_FUNCS = {
 }
 
 if __name__ == "__main__":
+    os.chdir(PARENT_FOLDER)
+
     # convert command line arguments to dict variables
     cml_parameters = convert_commandline_arguments(sys.argv[1:])
 
