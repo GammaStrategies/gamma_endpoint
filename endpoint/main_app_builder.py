@@ -4,6 +4,8 @@ from fastapi import Request
 
 from fastapi.middleware.cors import CORSMiddleware
 
+from endpoint.config.version import GIT_BRANCH, APP_VERSION, get_version_info
+
 from sources.subgraph.endpoint.app import create_app as create_subgraph_endpoint
 from sources.web3.endpoint.app import create_app as create_web3_endpoint
 from sources.mongo.endpoint.app import create_app as create_mongo_endpoint
@@ -17,7 +19,7 @@ logging.basicConfig(
 
 # Create root
 app = create_subgraph_endpoint(
-    title="Gamma API", backwards_compatible=True, version="1"
+    title="Gamma API", backwards_compatible=True, version=get_version_info()
 )  # legacy endpoint
 
 # Allow CORS
@@ -30,7 +32,9 @@ app.add_middleware(
 app.mount(
     path="/subgraph",
     app=create_subgraph_endpoint(
-        title="Gamma API - Subgraph data", backwards_compatible=False, version="0.0.1"
+        title="Gamma API - Subgraph data",
+        backwards_compatible=False,
+        version=get_version_info(),
     ),
     name="subgraph",
 )
@@ -38,21 +42,27 @@ app.mount(
 # Create mongodb endpoint ------------------------
 app.mount(
     path="/database",
-    app=create_mongo_endpoint(title="Gamma API - web3 database", version="0.0.1"),
+    app=create_mongo_endpoint(
+        title="Gamma API - web3 database", version=get_version_info()
+    ),
     name="database",
 )
 
 # Create web3 endpoint ------------------------
 app.mount(
     path="/web3",
-    app=create_web3_endpoint(title="Gamma API - web3 calls", version="0.0.1"),
+    app=create_web3_endpoint(
+        title="Gamma API - web3 calls", version=get_version_info()
+    ),
     name="web3",
 )
 
 # Create internal endpoint ------------------------
 app.mount(
     path="/internal",
-    app=create_internal_endpoint(title="Gamma API - Internal", version="0.0.1"),
+    app=create_internal_endpoint(
+        title="Gamma API - Internal", version=get_version_info()
+    ),
     name="internal",
 )
 
@@ -65,4 +75,12 @@ async def add_process_time_header(request: Request, call_next):
     response = await call_next(request)
     response.headers["X-responseTime"] = f"{ time.time() - start_time} sec"
 
+    return response
+
+
+@app.middleware("http")
+async def add_git_branch_running(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-branch"] = GIT_BRANCH
+    response.headers["X-version"] = APP_VERSION
     return response
