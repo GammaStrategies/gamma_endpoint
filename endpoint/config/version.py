@@ -1,4 +1,4 @@
-import git
+# import git
 import os
 
 APP_VERSION = "0.0.1"
