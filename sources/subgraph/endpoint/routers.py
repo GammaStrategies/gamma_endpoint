@@ -517,7 +517,18 @@ class subgraph_router_builder(router_builder_generalTemplate):
         masterchef_v2_info = masterchef_v2.AllRewards2(
             protocol=self.dex, chain=self.chain, response=response
         )
-        return await masterchef_v2_info.run(RUN_FIRST)
+
+        local_run_first = RUN_FIRST
+        # choose 3rd party rewarders or native
+        third_party_rewarders = [
+            (Protocol.ZYBERSWAP, Chain.ARBITRUM),
+            (Protocol.THENA, Chain.BSC),
+        ]
+        if (self.dex, self.chain) in third_party_rewarders:
+            # force 3rd party rewarders to go thru database data because no subgraph exists yet
+            local_run_first = QueryType.DATABASE
+
+        return await masterchef_v2_info.run(local_run_first)
 
     async def user_rewards(self, user_address: str, response: Response):
         return await masterchef.user_rewards(
