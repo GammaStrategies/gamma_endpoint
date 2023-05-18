@@ -19,6 +19,12 @@ DEPLOYMENTS = [
     (Protocol.STELLASWAP, Chain.MOONBEAM),
 ]
 
+# Protocol-Chains not supported by the subgraph but web3 api
+THIRD_PARTY_REWARDERS = [
+    (Protocol.ZYBERSWAP, Chain.ARBITRUM),
+    (Protocol.THENA, Chain.BSC),
+]
+
 THEGRAPH_INDEX_NODE_URL = "https://api.thegraph.com/index-node/graphql"
 ETH_BLOCKS_SUBGRAPH_URL = (
     "https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks"
