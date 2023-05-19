@@ -5,7 +5,7 @@ from sources.common.general.config import get_config
 CONFIGURATION = {"cache": {"save_path": "data/cache"}}  # load_configuration()
 # load rpc providers
 CONFIGURATION["WEB3_PROVIDER_URLS"] = get_config("WEB3_PROVIDER_URLS")
-
+CONFIGURATION["WEB3_PROVIDER_DEFAULT_ORDER"] = get_config("WEB3_PROVIDER_DEFAULT_ORDER")
 
 # check configuration
 # check_configuration_file(CONFIGURATION)

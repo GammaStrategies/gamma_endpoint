@@ -84,6 +84,8 @@ MONGO_DB_TIMEOUTMS: 2000
 RUN_FIRST_QUERY_TYPE: subgraph # database
 
 
+# Web3 config
+
 WEB3_PROVIDER_URLS:
   public: 
     ethereum:
@@ -138,3 +140,6 @@ WEB3_PROVIDER_URLS:
       - "https://rpc.ankr.com/celo"
       - "https://1rpc.io/celo"
   private:
+
+WEB3_PROVIDER_DEFAULT_ORDER: ["public", "private"]
+
