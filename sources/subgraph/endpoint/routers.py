@@ -479,11 +479,6 @@ class subgraph_router_builder(router_builder_generalTemplate):
         )
         return await result.run(RUN_FIRST)
 
-    async def hypervisors_recent_fees(self, response: Response, hours: int = 24):
-        return await hypervisor.recent_fees(
-            protocol=self.dex, chain=self.chain, hours=hours
-        )
-
     @cache(expire=APY_CACHE_TIMEOUT)
     async def hypervisors_returns(self, response: Response):
         """fee's Apr and Apy"""

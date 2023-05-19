@@ -1,9 +1,11 @@
 import asyncio
 import re
-from fastapi import Response, APIRouter, status
+from fastapi import Response, APIRouter, status, Query
 from fastapi.routing import APIRoute
 from fastapi_cache.decorator import cache
 from endpoint.routers.template import router_builder_baseTemplate
+
+import typing
 
 from sources.common.general.enums import Dex, Chain
 
@@ -167,6 +169,13 @@ class web3_router_builder(router_builder_baseTemplate):
             generate_unique_id_function=self.generate_unique_id,
         )
 
+        router.add_api_route(
+            path=f"{self.prefix}{'/hypervisor/{hypervisor_address}'}",
+            endpoint=self.hypervisor_data,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
         return router
 
     def _create_routes_hypervisors(
@@ -203,3 +212,21 @@ class web3_router_builder(router_builder_baseTemplate):
     async def hypervisors_list(self, response: Response):
         """Returns a list of low case hypervisor addresses found in registry"""
         return await hypervisors.hypervisors_list(network=self.chain, dex=self.dex)
+
+    async def hypervisor_data(
+        self,
+        hypervisor_address: str,
+        response: Response,
+        fields: typing.List[str] = Query(None),
+        block: int | None = None,
+    ):
+        """Given a contract function list [fields] returns the data for the given hypervisor address at the given block, if supplied
+        By default returns decimals, totalSupply and getTotalAmounts
+        """
+        return await hypervisors.get_hypervisor_data(
+            network=self.chain,
+            dex=self.dex,
+            hypervisor_address=hypervisor_address,
+            fields=fields or ["decimals", "totalSupply", "getTotalAmounts"],
+            block=block,
+        )
