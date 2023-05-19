@@ -1,13 +1,11 @@
 from sources.common.general.enums import Chain, Dex, ChainId
 import asyncio
 from sources.mongo.bins.enums import enumsConverter
+from sources.web3.bins.general.general_utilities import async_rgetattr
 
 from sources.web3.bins.w3.helpers import (
     build_hypervisor,
-    build_hypervisor_anyRpc,
     build_hypervisor_registry,
-    build_hypervisor_registry_anyRpc,
-    build_zyberchef_anyRpc,
 )
 
 from sources.web3.bins.w3.objects.protocols import gamma_hypervisor
@@ -20,8 +18,10 @@ async def hypervisors_list(network: Chain, dex: Dex):
     netval = enumsConverter.convert_general_to_local(chain=network).value
 
     # get network registry address
-    registry = await build_hypervisor_registry_anyRpc(
-        network=network, dex=dex, block=0, rpcUrls=RPC_URLS[netval], test=True
+    registry = build_hypervisor_registry(
+        network=network,
+        dex=dex,
+        block=0,
     )
 
     return await registry.get_hypervisors_addresses()
@@ -31,92 +31,95 @@ async def hypervisor_uncollected_fees(
     network: Chain, dex: Dex, hypervisor_address: str, block: int = None
 ):
     netval = enumsConverter.convert_general_to_local(chain=network).value
-    hypervisor = await build_hypervisor_anyRpc(
+
+    if hypervisor := build_hypervisor(
         network=network,
         dex=dex,
+        block=block or 0,
         hypervisor_address=hypervisor_address,
-        block=block if block else 0,
-        rpcUrls=RPC_URLS[netval],
-        test=True,
-    )
+    ):
+        block, timestamp = await hypervisor.init_block()
 
-    block, timestamp = await hypervisor.init_block()
+        # get property vars
+        (
+            symbol,
+            baseUpper,
+            baseLower,
+            limitUpper,
+            limitLower,
+            pool,
+        ) = await asyncio.gather(
+            hypervisor.symbol,
+            hypervisor.baseUpper,
+            hypervisor.baseLower,
+            hypervisor.limitUpper,
+            hypervisor.limitLower,
+            hypervisor.pool,
+        )
 
-    # get property vars
-    symbol, baseUpper, baseLower, limitUpper, limitLower, pool = await asyncio.gather(
-        hypervisor.symbol,
-        hypervisor.baseUpper,
-        hypervisor.baseLower,
-        hypervisor.limitUpper,
-        hypervisor.limitLower,
-        hypervisor.pool,
-    )
+        base, limit = await asyncio.gather(
+            pool.get_fees_uncollected(
+                ownerAddress=hypervisor.address,
+                tickUpper=baseUpper,
+                tickLower=baseLower,
+                inDecimal=True,
+            ),
+            pool.get_fees_uncollected(
+                ownerAddress=hypervisor.address,
+                tickUpper=limitUpper,
+                tickLower=limitLower,
+                inDecimal=True,
+            ),
+        )
 
-    base, limit = await asyncio.gather(
-        pool.get_fees_uncollected(
-            ownerAddress=hypervisor.address,
-            tickUpper=baseUpper,
-            tickLower=baseLower,
-            inDecimal=True,
-        ),
-        pool.get_fees_uncollected(
-            ownerAddress=hypervisor.address,
-            tickUpper=limitUpper,
-            tickLower=limitLower,
-            inDecimal=True,
-        ),
-    )
+        totalFees0 = (
+            float(base["qtty_token0"])
+            + float(base["qtty_token0_owed"])
+            + float(limit["qtty_token0"])
+            + float(limit["qtty_token0_owed"])
+        )
+        totalFees1 = (
+            float(base["qtty_token1"])
+            + float(base["qtty_token1_owed"])
+            + float(limit["qtty_token1"])
+            + float(limit["qtty_token1_owed"])
+        )
 
-    totalFees0 = (
-        float(base["qtty_token0"])
-        + float(base["qtty_token0_owed"])
-        + float(limit["qtty_token0"])
-        + float(limit["qtty_token0_owed"])
-    )
-    totalFees1 = (
-        float(base["qtty_token1"])
-        + float(base["qtty_token1_owed"])
-        + float(limit["qtty_token1"])
-        + float(limit["qtty_token1_owed"])
-    )
-
-    return {
-        "block": block,
-        "timestamp": timestamp,
-        "symbol": symbol,
-        "baseFees0": float(base["qtty_token0"]),
-        "baseFees1": float(base["qtty_token1"]),
-        "baseTokensOwed0": float(base["qtty_token0_owed"]),
-        "baseTokensOwed1": float(base["qtty_token1_owed"]),
-        "limitFees0": float(limit["qtty_token0"]),
-        "limitFees1": float(limit["qtty_token1"]),
-        "limitTokensOwed0": float(limit["qtty_token0_owed"]),
-        "limitTokensOwed1": float(limit["qtty_token1_owed"]),
-        # "baseFees0USD": float(base[0]) * hypervisor.baseTokenPrice,
-        # "baseFees1USD": float(base[1]) * hypervisor.quoteTokenPrice,
-        # "baseTokensOwed0USD": float(base[2]) * hypervisor.baseTokenPrice,
-        # "baseTokensOwed1USD": float(base[3]) * hypervisor.quoteTokenPrice,
-        # "limitFees0USD": float(limit[0]) * hypervisor.baseTokenPrice,
-        # "limitFees1USD": float(limit[1]) * hypervisor.quoteTokenPrice,
-        # "limitTokensOwed0USD": float(limit[2]) * hypervisor.baseTokenPrice,
-        # "limitTokensOwed1USD": float(limit[3]) * hypervisor.quoteTokenPrice,
-        "totalFees0": totalFees0,
-        "totalFees1": totalFees1,
-        # "totalFeesUSD": (float(base[0]) + float(limit[0])) * hypervisor.baseTokenPrice + (float(base[1]) + float(limit[1])) * hypervisor.quoteTokenPrice,
-    }
+        return {
+            "block": block,
+            "timestamp": timestamp,
+            "symbol": symbol,
+            "baseFees0": float(base["qtty_token0"]),
+            "baseFees1": float(base["qtty_token1"]),
+            "baseTokensOwed0": float(base["qtty_token0_owed"]),
+            "baseTokensOwed1": float(base["qtty_token1_owed"]),
+            "limitFees0": float(limit["qtty_token0"]),
+            "limitFees1": float(limit["qtty_token1"]),
+            "limitTokensOwed0": float(limit["qtty_token0_owed"]),
+            "limitTokensOwed1": float(limit["qtty_token1_owed"]),
+            # "baseFees0USD": float(base[0]) * hypervisor.baseTokenPrice,
+            # "baseFees1USD": float(base[1]) * hypervisor.quoteTokenPrice,
+            # "baseTokensOwed0USD": float(base[2]) * hypervisor.baseTokenPrice,
+            # "baseTokensOwed1USD": float(base[3]) * hypervisor.quoteTokenPrice,
+            # "limitFees0USD": float(limit[0]) * hypervisor.baseTokenPrice,
+            # "limitFees1USD": float(limit[1]) * hypervisor.quoteTokenPrice,
+            # "limitTokensOwed0USD": float(limit[2]) * hypervisor.baseTokenPrice,
+            # "limitTokensOwed1USD": float(limit[3]) * hypervisor.quoteTokenPrice,
+            "totalFees0": totalFees0,
+            "totalFees1": totalFees1,
+            # "totalFeesUSD": (float(base[0]) + float(limit[0])) * hypervisor.baseTokenPrice + (float(base[1]) + float(limit[1])) * hypervisor.quoteTokenPrice,
+        }
 
 
-async def get_hypervisor_data(
+async def get_hypervisor_data_for_rewards(
     network: Chain, dex: Dex, hypervisor_address: str, convert_to_decimal: bool = False
 ):
     netval = enumsConverter.convert_general_to_local(chain=network).value
-    if hypervisor := await build_hypervisor_anyRpc(
+    if hypervisor := build_hypervisor(
         network=network,
         dex=dex,
         block=0,
         hypervisor_address=hypervisor_address,
-        rpcUrls=RPC_URLS[netval],
-        test=True,
     ):
         block, timestamp = await hypervisor.init_block()
         (
@@ -160,3 +163,34 @@ async def get_hypervisor_data(
             "totalSupply": totalSupply,
             "totalAmounts": totalAmounts,
         }
+
+
+async def get_hypervisor_data(
+    network: Chain,
+    dex: Dex,
+    hypervisor_address: str,
+    fields: list[str],
+    block: int | None = None,
+):
+    netval = enumsConverter.convert_general_to_local(chain=network).value
+
+    hype = build_hypervisor(
+        network=network,
+        dex=dex,
+        block=block or 0,
+        hypervisor_address=hypervisor_address,
+    )
+    callables = ["as_dict", "get_tvl", "get_fees_uncollected", "get_qtty_depoloyed"]
+
+    _block, _timestamp = await hype.init_block()
+
+    _results = await asyncio.gather(
+        *[async_rgetattr(hype, field, callables=callables) for field in fields]
+    )
+
+    fields.append("block")
+    _results.append(_block)
+    fields.append("timestamp")
+    _results.append(_timestamp)
+
+    return dict(zip(fields, _results))

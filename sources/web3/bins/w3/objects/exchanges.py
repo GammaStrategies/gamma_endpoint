@@ -957,13 +957,14 @@ class algebrav3_pool(web3wrap):
         }
 
         # get position and slot data
-        pos = await self.position(
-            ownerAddress=Web3.to_checksum_address(ownerAddress.lower()),
-            tickLower=tickLower,
-            tickUpper=tickUpper,
+        pos, slot0 = await asyncio.gather(
+            self.position(
+                ownerAddress=Web3.to_checksum_address(ownerAddress.lower()),
+                tickLower=tickLower,
+                tickUpper=tickUpper,
+            ),
+            self.globalState,
         )
-
-        slot0 = self.globalState
 
         # get current tick from slot
         tickCurrent = slot0["tick"]
@@ -984,14 +985,16 @@ class algebrav3_pool(web3wrap):
 
         # convert to decimal as needed
         if inDecimal:
-            self._get_qtty_depoloyed_todecimal(result)
+            await self._get_qtty_depoloyed_todecimal(result)
         # return result
         return result.copy()
 
-    def _get_qtty_depoloyed_todecimal(self, result):
+    async def _get_qtty_depoloyed_todecimal(self, result):
         # get token decimals
-        decimals_token0 = self.token0.decimals
-        decimals_token1 = self.token1.decimals
+
+        decimals_token0, decimals_token1 = await asyncio.gather(
+            self._token0.decimals, self._token1.decimals
+        )
 
         result["qtty_token0"] = Decimal(result["qtty_token0"]) / Decimal(
             10**decimals_token0
@@ -1108,6 +1111,9 @@ class algebrav3_pool(web3wrap):
 
         result = await super().as_dict(convert_bint=convert_bint)
 
+        # init tokens
+        await asyncio.gather(self.init_token0(), self.init_token1())
+
         (
             result["activeIncentive"],
             result["liquidityCooldown"],
@@ -1119,12 +1125,12 @@ class algebrav3_pool(web3wrap):
             self.activeIncentive,
             self.liquidityCooldown,
             self.maxLiquidityPerTick,
-            self.token0.as_dict(convert_bint=convert_bint),
-            self.token1.as_dict(convert_bint=convert_bint),
+            self._token0.as_dict(convert_bint=convert_bint),
+            self._token1.as_dict(convert_bint=convert_bint),
             self.globalState,
         )
 
-        result["fee"] = (result["globalState"]["fee"],)
+        result["fee"] = result["globalState"]["fee"]
 
         if convert_bint:
             result["liquidityCooldown"] = str(result["liquidityCooldown"])

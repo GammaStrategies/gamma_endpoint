@@ -506,19 +506,23 @@ class gamma_hypervisor(erc20):
                    "fees_owed_token1":0,    # quantity of token 1 fees owed to the position ( not included in qtty_token1 and this is not uncollected fees)
                  }
         """
-        # positions
+
+        # init pool and tokens
+        pool, baseUpper, baseLower, limitUpper, limitLower = await asyncio.gather(
+            self.pool, self.baseUpper, self.baseLower, self.limitUpper, self.limitLower
+        )
 
         base, limit = await asyncio.gather(
-            self.pool.get_qtty_depoloyed(
+            pool.get_qtty_depoloyed(
                 ownerAddress=self.address,
-                tickUpper=self.baseUpper,
-                tickLower=self.baseLower,
+                tickUpper=baseUpper,
+                tickLower=baseLower,
                 inDecimal=inDecimal,
             ),
-            self.pool.get_qtty_depoloyed(
+            pool.get_qtty_depoloyed(
                 ownerAddress=self.address,
-                tickUpper=self.limitUpper,
-                tickLower=self.limitLower,
+                tickUpper=limitUpper,
+                tickLower=limitLower,
                 inDecimal=inDecimal,
             ),
         )
@@ -535,18 +539,24 @@ class gamma_hypervisor(erc20):
                     "qtty_token1":0,  # quantity of uncollected token 1
                 }
         """
+
+        # init pool and tokens
+        pool, baseUpper, baseLower, limitUpper, limitLower = await asyncio.gather(
+            self.pool, self.baseUpper, self.baseLower, self.limitUpper, self.limitLower
+        )
+
         # positions
         base, limit = await asyncio.gather(
-            self.pool.get_fees_uncollected(
+            pool.get_fees_uncollected(
                 ownerAddress=self.address,
-                tickUpper=self.baseUpper,
-                tickLower=self.baseLower,
+                tickUpper=baseUpper,
+                tickLower=baseLower,
                 inDecimal=inDecimal,
             ),
-            self.pool.get_fees_uncollected(
+            pool.get_fees_uncollected(
                 ownerAddress=self.address,
-                tickUpper=self.limitUpper,
-                tickLower=self.limitLower,
+                tickUpper=limitUpper,
+                tickLower=limitLower,
                 inDecimal=inDecimal,
             ),
         )
@@ -570,6 +580,11 @@ class gamma_hypervisor(erc20):
         """
         result = {}
 
+        # init pool and tokens
+        await asyncio.gather(self.init_pool(), self.init_token0(), self.init_token1())
+        pool_token0, pool_token1 = await asyncio.gather(
+            self._pool.token0, self._pool.token1
+        )
         # get deployed fees as int ( force no decimals)
         (
             deployed,
@@ -577,8 +592,8 @@ class gamma_hypervisor(erc20):
             result["parked_token1"],
         ) = await asyncio.gather(
             self.get_qtty_depoloyed(inDecimal=False),
-            self.pool.token0.balanceOf(await self.address),
-            self.pool.token1.balanceOf(await self.address),
+            pool_token0.balanceOf(self.address),
+            pool_token1.balanceOf(self.address),
         )
 
         result["deployed_token0"] = deployed["qtty_token0"]
@@ -603,11 +618,11 @@ class gamma_hypervisor(erc20):
             for key in result:
                 if "token0" in key:
                     result[key] = Decimal(result[key]) / Decimal(
-                        10**self._token0.decimals
+                        10 ** await self._token0.decimals
                     )
                 elif "token1" in key:
                     result[key] = Decimal(result[key]) / Decimal(
-                        10**self._token1.decimals
+                        10 ** await self._token1.decimals
                     )
                 else:
                     raise ValueError(f"Cant convert '{key}' field to decimal")
@@ -626,18 +641,21 @@ class gamma_hypervisor(erc20):
         """
         result = await super().as_dict(convert_bint=convert_bint)
 
+        # init pool
+        await self.init_pool()
+
         (
             result["name"],
             result["fee"],
             result["deposit0Max"],
             result["deposit1Max"],
             result["pool"],
-        ) = (
-            await asyncio.gather(self.name),
+        ) = await asyncio.gather(
+            self.name,
             self.fee,
             self.deposit0Max,
             self.deposit1Max,
-            self.pool.as_dict(convert_bint=convert_bint, static_mode=static_mode),
+            self._pool.as_dict(convert_bint=convert_bint, static_mode=static_mode),
         )
 
         # identify hypervisor dex

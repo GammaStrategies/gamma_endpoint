@@ -155,7 +155,7 @@ async def get_rewards(dex: Dex, hypervisor_address: str, network: Chain):
     netval = enumsConverter.convert_general_to_local(chain=network).value
 
     # retrieve hypervisor related data
-    hypervisor_data = await hypervisors.get_hypervisor_data(
+    hypervisor_data = await hypervisors.get_hypervisor_data_for_rewards(
         network=network,
         dex=dex,
         hypervisor_address=hypervisor_address,

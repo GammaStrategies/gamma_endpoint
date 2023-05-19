@@ -3,7 +3,7 @@ import math
 import datetime as dt
 import random
 
-from web3 import Web3, exceptions, AsyncWeb3, AsyncHTTPProvider
+from web3 import Web3, exceptions, AsyncWeb3, AsyncHTTPProvider, types
 from web3.eth import AsyncEth
 from web3.net import AsyncNet
 from web3.contract import Contract
@@ -51,7 +51,7 @@ class web3wrap:
 
     # initializers
     async def init_block(self) -> tuple[int, int]:
-        self._block_data = await self._w3.eth.get_block(self._block or "latest")
+        self._block_data = await self._getBlockData(self._block or "latest")
         self.block = self._block_data.number
         self.timestamp = self._block_data.timestamp
 
@@ -450,14 +450,12 @@ class web3wrap:
             try:
                 # create web3 conn
                 chain_connection = self.setup_w3(network=self._network, web3Url=rpcUrl)
+                # set root w3 conn
+                self._w3 = chain_connection
                 # create contract
                 contract = chain_connection.eth.contract(
                     address=self._address, abi=self._abi
                 )
-
-                # set root w3 to this chain conn
-                self._w3 = chain_connection
-
                 # execute function
                 return await getattr(contract.functions, function_name)(*args).call(
                     block_identifier=await self.block
@@ -466,7 +464,7 @@ class web3wrap:
             except Exception as e:
                 # not working rpc
                 logging.getLogger(__name__).debug(
-                    f" error calling function {function_name} using {rpcUrl} rpc: {e}"
+                    f" can't call function {function_name} using {rpcUrl} rpc: {e}"
                 )
 
         # no rpcUrl worked
@@ -487,26 +485,94 @@ class web3wrap:
         Returns:
             Any or None: depending on the function called
         """
-        # load public rpc url's
-        for key_name in rpcKey_names or ["public", "private"]:
+
+        result = await self.call_function(
+            function_name,
+            self.get_rpcUrls(rpcKey_names=rpcKey_names),
+            *args,
+        )
+        if not result is None:
+            return result
+        else:
+            logging.getLogger(__name__).error(
+                f" Could not use any rpcProvider calling function {function_name} with params {args} on {self._network} network {self.address} block {self._block}"
+            )
+
+        return None
+
+    def get_rpcUrls(
+        self, rpcKey_names: list[str] | None = None, shuffle: bool = True
+    ) -> list[str]:
+        """Get a list of rpc urls from configuration file
+
+        Args:
+            rpcKey_names (list[str] | None, optional): private or public or whatever is placed in config w3Providers. Defaults to None.
+            shuffle (bool, optional): shuffle configured order. Defaults to True.
+
+        Returns:
+            list[str]: RPC urls
+        """
+        result = []
+        # load configured rpc url's
+        for key_name in rpcKey_names or CONFIGURATION.get(
+            "WEB3_PROVIDER_DEFAULT_ORDER", ["public", "private"]
+        ):
             if (
                 rpcUrls := CONFIGURATION["WEB3_PROVIDER_URLS"]
                 .get(key_name, {})
                 .get(self._network, [])
             ):
-                random.shuffle(rpcUrls)
+                # shuffle if needed
+                if shuffle:
+                    random.shuffle(rpcUrls)
 
-                result = await self.call_function(function_name, rpcUrls, *args)
-                if not result is None:
-                    return result
-                else:
-                    logging.getLogger(__name__).info(
-                        f" Could not use any {key_name} rpcProvider calling function {function_name} on {self._network} network {self.address}"
-                    )
+                # add to result
+                result.extend([x for x in rpcUrls])
+        #
+        return result
 
-        logging.getLogger(__name__).error(
-            f" Could not use any available rpcProvider calling function {function_name} on {self._network} network {self.address}"
-        )
+    async def _getTransactionReceipt(self, txHash: str):
+        """Get transaction receipt
+
+        Args:
+            txHash (str): transaction hash
+
+        Returns:
+            dict: transaction receipt
+        """
+
+        # execute query till it works
+        for rpcUrl in self.get_rpcUrls():
+            try:
+                _w3 = self.setup_w3(network=self._network, web3Url=rpcUrl)
+                return await _w3.eth.get_transaction_receipt(txHash)
+            except Exception as e:
+                logging.getLogger(__name__).debug(
+                    f" error getting transaction receipt using {rpcUrl} rpc: {e}"
+                )
+                continue
+
+        return None
+
+    async def _getBlockData(self, block: int | str) -> types.BlockData:
+        """Get block data
+
+        Args:
+            block (int): block number or 'latest'
+
+        """
+
+        # execute query till it works
+        for rpcUrl in self.get_rpcUrls():
+            try:
+                _w3 = self.setup_w3(network=self._network, web3Url=rpcUrl)
+                return await _w3.eth.get_block(block)
+            except Exception as e:
+                logging.getLogger(__name__).debug(
+                    f" error getting block data using {rpcUrl} rpc: {e}"
+                )
+                continue
+
         return None
 
 
