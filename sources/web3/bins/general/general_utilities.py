@@ -1,5 +1,6 @@
 import contextlib
 from functools import wraps
+import functools
 import getopt
 import logging
 from logging import Logger, getLogger
@@ -280,3 +281,46 @@ def log_execution_time(f):
         return result
 
     return wrapper
+
+
+def rsetattr(obj, attr, val):
+    pre, _, post = attr.rpartition(".")
+    return setattr(rgetattr(obj, pre) if pre else obj, post, val)
+
+
+def rgetattr(obj, attr, *args):
+    def _getattr(obj, attr):
+        return getattr(obj, attr, *args)
+
+    return functools.reduce(_getattr, [obj] + attr.split("."))
+
+
+async def async_rgetattr(obj, attr, callables: list[str] = None, *args):
+    async def _getattr(obj, attr):
+        if callables and attr in callables:
+            return await getattr(obj, attr)()
+        else:
+            return await getattr(obj, attr)
+
+    _initial_missing = object()
+    initial = _initial_missing
+
+    it = iter([obj] + attr.split("."))
+
+    if initial is _initial_missing:
+        try:
+            value = next(it)
+        except StopIteration:
+            raise TypeError(
+                "reduce() of empty iterable with no initial value"
+            ) from None
+    else:
+        value = initial
+    for element in it:
+        # async
+        try:
+            value = await _getattr(value, element)
+        except TypeError as e:
+            # sync
+            value = getattr(value, element)
+    return value
