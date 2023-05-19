@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi import Request
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.inmemory import InMemoryBackend
 
@@ -30,5 +31,11 @@ def create_app(
     @app.on_event("startup")
     async def startup():
         FastAPICache.init(InMemoryBackend())
+
+    @app.middleware("http")
+    async def add_database_headers(request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-database"] = "true"
+        return response
 
     return app
