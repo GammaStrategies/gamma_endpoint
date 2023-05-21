@@ -113,6 +113,14 @@ def build_routers() -> list:
     )
     routes.append(
         subgraph_router_builder(
+            dex=Protocol.QUICKSWAP,
+            chain=Chain.POLYGON_ZKEVM,
+            tags=["Quickswap - Polygon zkEVM"],
+            prefix=f"/{Protocol.QUICKSWAP.value}/{Chain.POLYGON_ZKEVM.value}",
+        )
+    )
+    routes.append(
+        subgraph_router_builder(
             dex=Protocol.ZYBERSWAP,
             chain=Chain.ARBITRUM,
             tags=["Zyberswap - Arbitrum"],
@@ -244,6 +252,14 @@ def build_routers_compatible() -> list:
             chain=Chain.POLYGON,
             tags=["Quickswap - Polygon"],
             prefix=f"/{Protocol.QUICKSWAP.value}/{Chain.POLYGON.value}",
+        )
+    )
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.QUICKSWAP,
+            chain=Chain.POLYGON_ZKEVM,
+            tags=["Quickswap - Polygon zkEVM"],
+            prefix=f"/{Protocol.QUICKSWAP.value}/{Chain.POLYGON_ZKEVM.value}",
         )
     )
     routes.append(
