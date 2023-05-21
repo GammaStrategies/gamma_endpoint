@@ -143,14 +143,17 @@ class HypervisorsReturnsAllPeriods(ExecutionOrderWrapper):
         )
 
         results = {}
-        for hypervisor_id in daily.keys():
+        for hypervisor_id in daily.get("lp", {}).keys():
             hypervisor_daily = daily["lp"].get(hypervisor_id)
             hypervisor_weekly = weekly["lp"].get(hypervisor_id)
             hypervisor_monthly = monthly["lp"].get(hypervisor_id)
 
-            symbol = hypervisor_daily.pop("symbol")
-            hypervisor_weekly.pop("symbol")
-            hypervisor_monthly.pop("symbol")
+            if hypervisor_daily:
+                symbol = hypervisor_daily.pop("symbol")
+            if hypervisor_weekly:
+                hypervisor_weekly.pop("symbol")
+            if hypervisor_monthly:
+                hypervisor_monthly.pop("symbol")
 
             if hypervisor_weekly["feeApr"] == 0:
                 hypervisor_weekly = hypervisor_daily
