@@ -12,8 +12,24 @@ def create_app(
     title: str,
     version="0.0.1",
 ):
+    description = """
+
+                Gamma Web3 API
+            
+                Mainly focused in sourcing data from direct onchain calls.
+                Some fields, like prices, may be gathered from any available source.
+
+    """
+    contact = (
+        {
+            "name": "Gamma Strategies",
+            "url": "https://www.gamma.xyz/",
+        },
+    )
+
     app = FastAPI(
         title=title,
+        description=description,
         swagger_ui_parameters={"docExpansion": "none"},
         version=version,
     )

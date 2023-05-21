@@ -13,8 +13,22 @@ def create_app(
     title: str,
     version="0.0.1",
 ):
+    description = """
+
+                Gamma Database API
+            
+                Mainly focused in sourcing data from our custom database.
+                
+    """
+    contact = (
+        {
+            "name": "Gamma Strategies",
+            "url": "https://www.gamma.xyz/",
+        },
+    )
     app = FastAPI(
         title=title,
+        description=description,
         swagger_ui_parameters={"docExpansion": "none"},
         version=version,
     )
