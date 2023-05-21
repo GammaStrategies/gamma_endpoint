@@ -203,9 +203,12 @@ class web3_router_builder(router_builder_baseTemplate):
         )
 
     async def hypervisor_rewards(self, hypervisor_address: str, response: Response):
-        return await rewards.get_rewards(
-            dex=self.dex, hypervisor_address=hypervisor_address, network=self.chain
-        )
+        if self.dex in [Dex.THENA, Dex.ZYBERSWAP]:
+            return await rewards.get_rewards(
+                dex=self.dex, hypervisor_address=hypervisor_address, network=self.chain
+            )
+        else:
+            return " Not implemented yet"
 
     #    hypervisors
 
@@ -221,7 +224,9 @@ class web3_router_builder(router_builder_baseTemplate):
         block: int | None = None,
     ):
         """Given a contract function list [fields] returns the data for the given hypervisor address at the given block, if supplied
-        By default returns decimals, totalSupply and getTotalAmounts
+        By default returns decimals, totalSupply and getTotalAmounts.
+        * To get **addresses**, specify so like:  pool.address or pool.token0.address
+        * To get a **full dict** object, specify 'as_dict' like: pool.as_dict  or as_dict ( if you want to get all the hype data, including the pool)
         """
         return await hypervisors.get_hypervisor_data(
             network=self.chain,
