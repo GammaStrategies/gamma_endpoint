@@ -53,32 +53,39 @@ class univ3_pool(web3wrap):
 
     async def init_factory(self):
         self._factory = await self.call_function_autoRpc(function_name="factory")
+        return self._factory
 
     async def init_fee(self):
         self._fee = await self.call_function_autoRpc(function_name="fee")
+        return self._fee
 
     async def init_feeGrowthGlobal0X128(self):
         self._feeGrowthGlobal0X128 = await self.call_function_autoRpc(
             function_name="feeGrowthGlobal0X128"
         )
+        return self._feeGrowthGlobal0X128
 
     async def init_feeGrowthGlobal1X128(self):
-        self._feeGrowthGlobal1X128 = self.call_function_autoRpc(
+        self._feeGrowthGlobal1X128 = await self.call_function_autoRpc(
             function_name="feeGrowthGlobal1X128"
         )
+        return self._feeGrowthGlobal1X128
 
     async def init_liquidity(self):
         self._liquidity = await self.call_function_autoRpc(function_name="liquidity")
+        return self._liquidity
 
     async def init_maxLiquidityPerTick(self):
-        self._maxLiquidityPerTick = self.call_function_autoRpc(
+        self._maxLiquidityPerTick = await self.call_function_autoRpc(
             function_name="maxLiquidityPerTick"
         )
+        return self._maxLiquidityPerTick
 
     async def init_protocolFees(self):
         self._protocolFees = await self.call_function_autoRpc(
             function_name="protocolFees"
         )
+        return self._protocolFees
 
     async def init_slot0(self):
         """The 0th storage slot in the pool stores many values, and is exposed as a single method to save gas when accessed externally.
@@ -102,11 +109,13 @@ class univ3_pool(web3wrap):
             "feeProtocol": tmp[5],
             "unlocked": tmp[6],
         }
+        return self._slot0
 
     async def init_tickSpacing(self):
         self._tickSpacing = await self.call_function_autoRpc(
             function_name="tickSpacing"
         )
+        return self._tickSpacing
 
     async def init_token0(self):
         self._token0_address = await self.call_function_autoRpc(function_name="token0")
@@ -117,6 +126,7 @@ class univ3_pool(web3wrap):
             timestamp=await self.timestamp,
             custom_web3Url=self.w3.provider.endpoint_uri,
         )
+        return self._token0
 
     async def init_token1(self):
         self._token1_address = await self.call_function_autoRpc(function_name="token1")
@@ -127,6 +137,7 @@ class univ3_pool(web3wrap):
             timestamp=await self.timestamp,
             custom_web3Url=self.w3.provider.endpoint_uri,
         )
+        return self._token1
 
     # PROPERTIES
 
@@ -500,17 +511,19 @@ class univ3_pool(web3wrap):
         """
         result = await super().as_dict(convert_bint=convert_bint)
 
+        token0, token1 = await asyncio.gather(self.token0, self.token1)
+
         (
             result["fee"],
             result["tickSpacing"],
             result["token0"],
             result["token1"],
             result["protocolFees"],
-        ) = await asyncio(
+        ) = await asyncio.gather(
             self.fee,
             self.tickSpacing,
-            self.token0.as_dict(convert_bint=convert_bint),
-            self.token1.as_dict(convert_bint=convert_bint),
+            token0.as_dict(convert_bint=convert_bint),
+            token1.as_dict(convert_bint=convert_bint),
             self.protocolFees,
         )
 

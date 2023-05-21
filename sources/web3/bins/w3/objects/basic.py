@@ -609,11 +609,13 @@ class erc20(web3wrap):
 
     async def init_decimals(self):
         self._decimals = await self.call_function_autoRpc(function_name="decimals")
+        return self._decimals
 
     async def init_totalSupply(self):
         self._totalSupply = await self.call_function_autoRpc(
             function_name="totalSupply"
         )
+        return self._totalSupply
 
     async def init_symbol(self):
         self._symbol = (
@@ -621,6 +623,7 @@ class erc20(web3wrap):
             if self.address == "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2"
             else await self.call_function_autoRpc(function_name="symbol")
         )
+        return self._symbol
 
     # PROPERTIES
 

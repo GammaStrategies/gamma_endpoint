@@ -7,6 +7,7 @@ from sources.web3.bins.w3.helpers import (
     build_hypervisor,
     build_hypervisor_registry,
 )
+from sources.web3.bins.w3.objects.basic import web3wrap
 
 from sources.web3.bins.w3.objects.protocols import gamma_hypervisor
 from sources.web3.bins.w3.objects.exchanges import univ3_pool, algebrav3_pool
@@ -193,4 +194,18 @@ async def get_hypervisor_data(
     fields.append("timestamp")
     _results.append(_timestamp)
 
-    return dict(zip(fields, _results))
+    final_result = {
+        "block": block,
+        "timestamp": _timestamp,
+    }
+    try:
+        for i, result in enumerate(_results):
+            # add only renderable fields
+            if result and not issubclass(type(result), web3wrap):
+                final_result[fields[i]] = result
+
+        # return dict(zip(fields, _results))
+    except Exception as e:
+        raise e
+
+    return final_result

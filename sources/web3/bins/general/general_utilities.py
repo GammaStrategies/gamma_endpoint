@@ -295,17 +295,22 @@ def rgetattr(obj, attr, *args):
     return functools.reduce(_getattr, [obj] + attr.split("."))
 
 
-async def async_rgetattr(obj, attr, callables: list[str] = None, *args):
-    async def _getattr(obj, attr):
-        if callables and attr in callables:
-            return await getattr(obj, attr)()
-        else:
-            return await getattr(obj, attr)
+_initial_missing = object()
 
-    _initial_missing = object()
-    initial = _initial_missing
 
-    it = iter([obj] + attr.split("."))
+async def functools_reduce(function, sequence, initial=_initial_missing):
+    """
+    reduce(function, iterable[, initial]) -> value
+
+    Apply a function of two arguments cumulatively to the items of a sequence
+    or iterable, from left to right, so as to reduce the iterable to a single
+    value.  For example, reduce(lambda x, y: x+y, [1, 2, 3, 4, 5]) calculates
+    ((((1+2)+3)+4)+5).  If initial is present, it is placed before the items
+    of the iterable in the calculation, and serves as a default when the
+    iterable is empty.
+    """
+
+    it = iter(sequence)
 
     if initial is _initial_missing:
         try:
@@ -316,11 +321,26 @@ async def async_rgetattr(obj, attr, callables: list[str] = None, *args):
             ) from None
     else:
         value = initial
+
     for element in it:
         # async
         try:
-            value = await _getattr(value, element)
+            value = await function(value, element)
         except TypeError as e:
             # sync
-            value = getattr(value, element)
+            value = function(value, element)
+
     return value
+
+
+async def async_rgetattr(obj, attr, callables: list[str] = None, *args):
+    async def _getattr(obj, attr):
+        try:
+            if callables and attr in callables:
+                return await getattr(obj, attr)()
+            else:
+                return await getattr(obj, attr)
+        except (TypeError, AttributeError) as e:
+            return getattr(obj, attr, None)
+
+    return await functools_reduce(_getattr, [obj] + attr.split("."))
