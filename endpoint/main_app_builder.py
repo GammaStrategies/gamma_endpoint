@@ -1,8 +1,11 @@
+import json
 import logging
 import time
-from fastapi import Request
+from fastapi import Request, Response
 
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware import Middleware
+from endpoint.config.middleware import BaseMiddleware
 
 from endpoint.config.version import GIT_BRANCH, APP_VERSION, get_version_info
 
@@ -17,6 +20,8 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
+logger = logging.getLogger(__name__)
+
 # Create root
 app = create_subgraph_endpoint(
     title="Gamma API", backwards_compatible=True, version=get_version_info()
@@ -26,6 +31,8 @@ app = create_subgraph_endpoint(
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
 )
+
+app.add_middleware(BaseMiddleware)
 
 
 # Create subgraph endpoint ------------------------
@@ -65,22 +72,3 @@ app.mount(
     ),
     name="internal",
 )
-
-# Add globals ---------------------------------
-
-
-@app.middleware("http")
-async def add_process_time_header(request: Request, call_next):
-    start_time = time.time()
-    response = await call_next(request)
-    response.headers["X-responseTime"] = f"{ time.time() - start_time} sec"
-
-    return response
-
-
-@app.middleware("http")
-async def add_git_branch_running(request: Request, call_next):
-    response = await call_next(request)
-    response.headers["X-branch"] = GIT_BRANCH
-    response.headers["X-version"] = APP_VERSION
-    return response
