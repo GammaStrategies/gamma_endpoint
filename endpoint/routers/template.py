@@ -3,13 +3,6 @@ from fastapi import APIRouter, Response, status
 from fastapi_cache.decorator import cache
 from fastapi.routing import APIRoute
 
-from endpoint.config.cache import (
-    ALLDATA_CACHE_TIMEOUT,
-    APY_CACHE_TIMEOUT,
-    DASHBOARD_CACHE_TIMEOUT,
-    DB_CACHE_TIMEOUT,
-)
-
 
 class router_builder_baseTemplate:
     def __init__(self, tags: list, prefix: str = ""):
