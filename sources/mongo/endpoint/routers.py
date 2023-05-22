@@ -3,6 +3,7 @@ import re
 from fastapi import Response, APIRouter, status
 from fastapi.routing import APIRoute
 from fastapi_cache.decorator import cache
+from endpoint.config.cache import DB_CACHE_TIMEOUT
 
 from endpoint.routers.template import (
     router_builder_generalTemplate,
@@ -227,6 +228,7 @@ class mongo_router_builder(router_builder_baseTemplate):
 
     # Hypervisor
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisor_uncollected_fees(
         self,
         hypervisor_address: str,
@@ -241,6 +243,7 @@ class mongo_router_builder(router_builder_baseTemplate):
             block=block,
         )
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisor_collected_fees(
         self,
         hypervisor_address: str,
@@ -259,6 +262,7 @@ class mongo_router_builder(router_builder_baseTemplate):
             end_block=end_block,
         )
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisor_prices(
         self,
         hypervisor_address: str,
@@ -270,17 +274,19 @@ class mongo_router_builder(router_builder_baseTemplate):
         )
 
     # Hypervisors
-
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_list(self, response: Response):
         """Returns the hypervisor found in the database"""
         return await hypervisor.hypervisors_list(network=self.chain, dex=self.dex)
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_uncollected_fees(
         self,
         response: Response,
     ):
         return await hypervisor.hypervisors_uncollected_fees(network=self.chain)
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_collected_fees(
         self,
         response: Response,
@@ -298,10 +304,11 @@ class mongo_router_builder(router_builder_baseTemplate):
         )
 
     # User
-
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def user_data(self, address: str, response: Response):
         return await user.get_user_historic_info(chain=self.chain, address=address)
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def user_analytics(self, address: str, response: Response):
         return await user.get_user_analytic_data(chain=self.chain, address=address)
 
@@ -390,18 +397,21 @@ class mongo_router_builder_compatible(router_builder_generalTemplate):
         return router
 
     # EXECUTION FUNCTIONS
-
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisor_basic_stats(self, hypervisor_address: str, response: Response):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisor_returns(self, hypervisor_address: str, response: Response):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisor_average_returns(
         self, hypervisor_address: str, response: Response
     ):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisor_uncollected_fees(
         self,
         hypervisor_address: str,
@@ -416,6 +426,7 @@ class mongo_router_builder_compatible(router_builder_generalTemplate):
             block=block,
         )
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisor_collected_fees(
         self,
         hypervisor_address: str,
@@ -434,6 +445,7 @@ class mongo_router_builder_compatible(router_builder_generalTemplate):
             end_block=end_block,
         )
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisor_prices(
         self,
         hypervisor_address: str,
@@ -445,51 +457,60 @@ class mongo_router_builder_compatible(router_builder_generalTemplate):
         )
 
     #    hypervisor analytics
-
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisor_analytics_basic_daily(
         self, hypervisor_address: str, response: Response
     ):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisor_analytics_basic_weekly(
         self, hypervisor_address: str, response: Response
     ):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisor_analytics_basic_biweekly(
         self, hypervisor_address: str, response: Response
     ):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisor_analytics_basic_monthly(
         self, hypervisor_address: str, response: Response
     ):
         return "Not implemented yet"
 
     #    hypervisors
-
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_list(self, response: Response):
         """Returns the hypervisor found in the database"""
         return await hypervisor.hypervisors_list(network=self.chain, dex=self.dex)
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_aggregate_stats(self, response: Response):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_returns(self, response: Response):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_average_returns(self, response: Response):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_all_data(self, response: Response):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_uncollected_fees(
         self,
         response: Response,
     ):
         return await hypervisor.hypervisors_uncollected_fees(network=self.chain)
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_collected_fees(
         self,
         response: Response,
@@ -506,42 +527,55 @@ class mongo_router_builder_compatible(router_builder_generalTemplate):
             end_block=end_block,
         )
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_feeReturns_daily(self, response: Response):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_feeReturns_weekly(self, response: Response):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_feeReturns_monthly(self, response: Response):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_impermanentDivergence_daily(self, response: Response):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_impermanentDivergence_weekly(self, response: Response):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_impermanentDivergence_monthly(self, response: Response):
         return "Not implemented yet"
 
     # others
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_rewards(self, response: Response):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_rewards2(self, response: Response):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def user_rewards(self, user_address: str, response: Response):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def user_rewards2(self, user_address: str, response: Response):
         return "Not implemented yet"
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def user_data(self, address: str, response: Response):
         return await user.get_user_historic_info(chain=self.chain, address=address)
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def user_analytics(self, address: str, response: Response):
         return await user.get_user_analytic_data(chain=self.chain, address=address)
 
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def vault_data(self, address: str, response: Response):
         return "Not implemented yet"
