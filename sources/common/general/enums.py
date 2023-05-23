@@ -2,16 +2,39 @@ from enum import Enum, unique
 
 
 class Chain(str, Enum):
-    ARBITRUM = "arbitrum"
-    CELO = "celo"
-    ETHEREUM = "ethereum"
-    OPTIMISM = "optimism"
-    POLYGON = "polygon"
-    BSC = "bsc"
-    POLYGON_ZKEVM = "polygon_zkevm"
-    AVALANCHE = "avalanche"
-    FANTOM = "fantom"
-    MOONBEAM = "moonbeam"
+    #            ( value , id , url, fantasy_name )
+    ARBITRUM = ("arbitrum", 42161, "arbitrum", "Arbitrum")
+    CELO = ("celo", 42220, "celo", "Celo")
+    ETHEREUM = ("ethereum", 1, "ethereum", "Ethereum")
+    OPTIMISM = ("optimism", 10, "optimism", "Optimism")
+    POLYGON = ("polygon", 137, "polygon", "Polygon")
+    BSC = ("bsc", 56, "bsc", "Binance Chain")
+    POLYGON_ZKEVM = ("polygon_zkevm", 1101, "polygon-zkevm", "Polygon zkevm")
+    AVALANCHE = ("avalanche", 43114, "avalanche", "Avalanche")
+    FANTOM = ("fantom", 250, "fantom", "Fantom")
+    MOONBEAM = ("moonbeam", 1287, "moonbeam", "Moonbeam")
+
+    # extra properties
+    id: int
+    url: str
+    fantasy_name: str
+
+    def __new__(self, value: str, id: int, url: str, fantasy_name: str):
+        """
+
+        Args:
+            value (_type_): chain name
+            id (_type_): chain id
+
+        Returns:
+            : Chain
+        """
+        obj = str.__new__(self)
+        obj._value_ = value
+        obj.id = id
+        obj.url = url
+        obj.fantasy_name = fantasy_name
+        return obj
 
 
 class Dex(str, Enum):

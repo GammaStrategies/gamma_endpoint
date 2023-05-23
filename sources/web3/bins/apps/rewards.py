@@ -1,5 +1,5 @@
 import asyncio
-from sources.common.general.enums import Chain, Dex, ChainId
+from sources.common.general.enums import Chain, Dex
 from sources.mongo.bins.enums import enumsConverter
 
 from sources.web3.bins.configuration import STATIC_REGISTRY_ADDRESSES, RPC_URLS
