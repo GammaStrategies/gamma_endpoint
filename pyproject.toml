@@ -26,6 +26,7 @@ pyyaml = "^6.0"
 pycoingecko = "^3.1.0"
 aiocron = "^1.8"
 croniter = "^1.3.14"
+gitpython = "^3.1.31"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -49,3 +50,4 @@ extension-pkg-whitelist = "pydantic"
 
 [tool.poe.tasks]
 run = "uvicorn app:app --reload"
+requirements = "poetry export -f requirements.txt --output requirements.txt --without-hashes"
