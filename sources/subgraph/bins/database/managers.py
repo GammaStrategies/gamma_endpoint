@@ -1180,10 +1180,10 @@ class db_returns_manager(db_collection_manager):
                             }
                         },
                         {"$sort": {"datetime": -1}},
-                        {"$limit": 1},
                         {"$addFields": {"obj_as_arr": {"$objectToArray": "$$ROOT"}}},
                         {"$unwind": "$obj_as_arr"},
                         {"$match": _allrewards2_match},
+                        {"$limit": 1},
                     ],
                     "as": "allRewards2",
                 }
