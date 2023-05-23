@@ -238,7 +238,7 @@ async def feed_database_inSecuence():
     await feed_database_static()
     await feed_database_allData()
 
-    _endtime = datetime.utc(timezone.utc)
+    _endtime = datetime.now(timezone.utc)
     if (_endtime - _startime).total_seconds() > (60 * 2):
         # end time log
         logger.warning(
