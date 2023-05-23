@@ -10,7 +10,7 @@ QUICKSWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/quer
 ZYBERSWAP_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/zyberswap-arbitrum
 THENA_BSC_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/thena
 CAMELOT_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-camelot-arbitrum
-GLACIER_AVALANCHE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-glacier-avalanche
+GLACIER_AVALANCHE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-glacier-avax
 RETRO_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-retro-polygon
 STELLASWAP_MOONBEAM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-stellaswap-moonbeam
 
@@ -42,7 +42,7 @@ QUICKSWAP_POLYGON_ZKEVM_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/4
 ZYBERSWAP_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-zyberswap-arbitrum
 THENA_BSC_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-thena-bsc
 CAMELOT_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-camelot-arbitrum
-GLACIER_AVALANCHE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-glacier-avalanche
+GLACIER_AVALANCHE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-glacier-avax
 RETRO_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-retro-polygon
 STELLASWAP_MOONBEAM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-stellaswap-moonbeam
 
