@@ -1,4 +1,4 @@
-from sources.common.general.enums import Chain, Dex
+from sources.common.general.enums import Chain, Dex, ChainId
 from sources.common.database.collection_endpoint import database_global, database_local
 from sources.mongo.bins.enums import enumsConverter
 

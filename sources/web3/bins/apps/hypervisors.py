@@ -1,4 +1,4 @@
-from sources.common.general.enums import Chain, Dex
+from sources.common.general.enums import Chain, Dex, ChainId
 import asyncio
 from sources.mongo.bins.enums import enumsConverter
 from sources.web3.bins.general.general_utilities import async_rgetattr
