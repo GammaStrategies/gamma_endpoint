@@ -111,12 +111,14 @@ def build_routers() -> list:
             prefix=f"/{Protocol.QUICKSWAP.value}/{Chain.POLYGON.value}",
         )
     )
+
+    # TODO: add url variable linked to Enum Chain
     routes.append(
         subgraph_router_builder(
             dex=Protocol.QUICKSWAP,
             chain=Chain.POLYGON_ZKEVM,
             tags=["Quickswap - Polygon zkEVM"],
-            prefix=f"/{Protocol.QUICKSWAP.value}/{Chain.POLYGON_ZKEVM.value}",
+            prefix=f"/{Protocol.QUICKSWAP.value}/polygon-zkevm",
         )
     )
     routes.append(
@@ -259,7 +261,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.QUICKSWAP,
             chain=Chain.POLYGON_ZKEVM,
             tags=["Quickswap - Polygon zkEVM"],
-            prefix=f"/{Protocol.QUICKSWAP.value}/{Chain.POLYGON_ZKEVM.value}",
+            prefix=f"/{Protocol.QUICKSWAP.value}/polygon-zkevm",
         )
     )
     routes.append(
