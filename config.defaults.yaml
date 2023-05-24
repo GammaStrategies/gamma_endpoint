@@ -13,6 +13,7 @@ CAMELOT_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c
 GLACIER_AVALANCHE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-glacier-avax
 RETRO_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-retro-polygon
 STELLASWAP_MOONBEAM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-stellaswap-moonbeam
+BEAMSWAP_MOONBEAM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-beamswap-moonbeam
 
 # DEX Subgraph URL
 UNISWAP_MAINNET_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3
@@ -29,6 +30,7 @@ CAMELOT_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/iliaazhel
 GLACIER_AVALANCHE_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/iliaazhel/glacier-info
 RETRO_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ruvlol/univ3-test
 STELLASWAP_MOONBEAM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/stellaswap/pulsar
+BEAMSWAP_MOONBEAM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/rock-n-block/beamswap-v3-subgraph
 
 # HypePool Subgraph URL
 UNISWAP_MAINNET_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-mainnet
@@ -45,6 +47,7 @@ CAMELOT_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0
 GLACIER_AVALANCHE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-glacier-avax
 RETRO_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-retro-polygon
 STELLASWAP_MOONBEAM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-stellaswap-moonbeam
+BEAMSWAP_MOONBEAM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-beamswap-moonbeam
 
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {

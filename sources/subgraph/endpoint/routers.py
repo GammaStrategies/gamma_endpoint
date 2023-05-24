@@ -174,6 +174,15 @@ def build_routers() -> list:
         )
     )
 
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.BEAMSWAP,
+            chain=Chain.MOONBEAM,
+            tags=["BeamSwap - Moonbeam"],
+            prefix=f"/{Protocol.BEAMSWAP.value}/{Chain.MOONBEAM.value}",
+        )
+    )
+
     # Simulation
     routes.append(
         subgraph_router_builder_Simulator(tags=["Simulator"], prefix="/simulator")
@@ -297,6 +306,16 @@ def build_routers_compatible() -> list:
             prefix=f"/{Protocol.GLACIER.value}/{Chain.AVALANCHE.value}",
         )
     )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.RETRO,
+            chain=Chain.POLYGON,
+            tags=["Retro - Polygon"],
+            prefix=f"/{Protocol.RETRO.value}/{Chain.POLYGON.value}",
+        )
+    )
+
     routes.append(
         subgraph_router_builder(
             dex=Protocol.STELLASWAP,
@@ -308,10 +327,10 @@ def build_routers_compatible() -> list:
 
     routes.append(
         subgraph_router_builder(
-            dex=Protocol.RETRO,
-            chain=Chain.POLYGON,
-            tags=["Retro - Polygon"],
-            prefix=f"/{Protocol.RETRO.value}/{Chain.POLYGON.value}",
+            dex=Protocol.BEAMSWAP,
+            chain=Chain.MOONBEAM,
+            tags=["BeamSwap - Moonbeam"],
+            prefix=f"/{Protocol.BEAMSWAP.value}/{Chain.MOONBEAM.value}",
         )
     )
 

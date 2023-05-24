@@ -17,6 +17,7 @@ DEPLOYMENTS = [
     (Protocol.GLACIER, Chain.AVALANCHE),
     (Protocol.RETRO, Chain.POLYGON),
     (Protocol.STELLASWAP, Chain.MOONBEAM),
+    (Protocol.BEAMSWAP, Chain.MOONBEAM),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -63,6 +64,9 @@ DEX_SUBGRAPH_URLS = {
     Protocol.STELLASWAP: {
         Chain.MOONBEAM: get_config("STELLASWAP_MOONBEAM_SUBGRAPH_URL"),
     },
+    Protocol.BEAMSWAP: {
+        Chain.MOONBEAM: get_config("BEAMSWAP_MOONBEAM_SUBGRAPH_URL"),
+    },
 }
 
 DEX_HYPEPOOL_SUBGRAPH_URLS = {
@@ -96,6 +100,9 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.STELLASWAP: {
         Chain.MOONBEAM: get_config("STELLASWAP_MOONBEAM_HP_SUBGRAPH_URL"),
     },
+    Protocol.BEAMSWAP: {
+        Chain.MOONBEAM: get_config("BEAMSWAP_MOONBEAM_HP_SUBGRAPH_URL"),
+    },
 }
 
 GAMMA_SUBGRAPH_URLS = {
@@ -128,6 +135,9 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.STELLASWAP: {
         Chain.MOONBEAM: get_config("STELLASWAP_MOONBEAM_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.BEAMSWAP: {
+        Chain.MOONBEAM: get_config("BEAMSWAP_MOONBEAM_GAMMA_SUBGRAPH_URL"),
     },
 }
 

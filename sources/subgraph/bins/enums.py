@@ -28,6 +28,7 @@ class Protocol(str, Enum):
     GLACIER = "glacier"
     RETRO = "retro"
     STELLASWAP = "stellaswap"
+    BEAMSWAP = "beamswap"
 
 
 class QueryType(str, Enum):
