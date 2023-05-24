@@ -4,10 +4,9 @@ import asyncio
 import contextlib
 from collections import defaultdict
 
-from sources.subgraph.bins import UniswapV3Client, LlamaClient
+from sources.subgraph.bins import LlamaClient, UniswapV3Client
 from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.utils import sqrtPriceX96_to_priceDecimal
-
 
 POOLS = {
     Chain.MAINNET: {
@@ -87,6 +86,10 @@ POOLS = {
             "protocol": Protocol.QUICKSWAP,
             "address": "0x5d0acfa39a0fca603147f1c14e53f46be76984bc",
         },
+        "USDC_DAI": {
+            "protocol": Protocol.QUICKSWAP,
+            "address": "0xe7e0eb9f6bcccfe847fdf62a3628319a092f11a2",
+        },
     },
     Chain.POLYGON_ZKEVM: {
         "WETH_USDC": {
@@ -105,7 +108,7 @@ POOLS = {
     Chain.BSC: {},
     Chain.AVALANCHE: {},
     Chain.ARBITRUM: {},
-    Chain.MOONBEAM: {}
+    Chain.MOONBEAM: {},
 }
 
 
@@ -195,6 +198,10 @@ POOL_PATHS = {
         "0x1d734a02ef1e1f5886e66b0673b71af5b53ffa94": [
             (POOLS[Chain.POLYGON]["SD_USDC"], 1),
         ],
+        # DAI
+        "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063": [
+            (POOLS[Chain.POLYGON]["USDC_DAI"], 0),
+        ],
     },
     Chain.POLYGON_ZKEVM: {
         # WMATIC
@@ -210,7 +217,7 @@ POOL_PATHS = {
     Chain.BSC: {},
     Chain.AVALANCHE: {},
     Chain.ARBITRUM: {},
-    Chain.MOONBEAM: {}
+    Chain.MOONBEAM: {},
 }
 
 
@@ -248,6 +255,7 @@ class DexPriceData:
         """
 
     async def get_data(self):
+        """Get DEX price data from subgraph"""
         self._init_queries()
         variables = {"pools": self.pools}
         response = await self.uniswap_client.query(self.pool_query, variables)
@@ -255,6 +263,7 @@ class DexPriceData:
 
 
 class DexPrice:
+    """ Class for getting prices from DEXes """
     def __init__(self, chain: Chain):
         self.chain_prices: dict
         self.token_prices: dict
@@ -282,6 +291,7 @@ class DexPrice:
         self.chain_prices = chain_prices
 
     async def get_token_prices(self):
+        """Get all defined token prices for the chain"""
         await self._get_data()
         token_pricing = {}
         for token, path in POOL_PATHS[self.chain].items():
@@ -313,12 +323,14 @@ class DexPrice:
 
 
 async def gamma_price():
+    """Get price of GAMMA"""
     dex_pricing = DexPrice(Chain.MAINNET)
     await dex_pricing.get_token_prices()
     return dex_pricing.token_prices["0x6bea7cfef803d1e3d5f7c0103f7ded065644e197"]
 
 
 async def token_prices(chain: Chain):
+    """Get token prices"""
     dex_pricing = DexPrice(chain)
     await dex_pricing.get_token_prices()
     prices = dex_pricing.token_prices
