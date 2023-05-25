@@ -1,4 +1,5 @@
 import asyncio
+from sources.mongo.bins.apps.prices import get_prices
 from sources.web3.bins.mixed.price_utilities import price_scraper
 
 
@@ -66,6 +67,14 @@ async def get_token_price_usd(token_address: str, network: str, block: int) -> f
     Returns:
         float: token price in usd
     """
+
+    # TODO: try getting price from database first, if block is set
+    if block:
+        if price := get_prices(
+            token_addresses=[token_address], network=network, block=block
+        ):
+            return price[0]["price"]
+
     price_helper = price_scraper(cache=False)
 
     try:
@@ -79,3 +88,25 @@ async def get_token_price_usd(token_address: str, network: str, block: int) -> f
         price_token = 0
 
     return price_token
+
+
+async def get_prices_usd(
+    token_addresses: list[str], network: str, block: int
+) -> dict | None:
+    """Try to get usd prices for the token list using the database as source
+
+    Args:
+        token_address (str): token address
+        network (str):
+        block (int):
+
+    Returns:
+        dict: token price in usd
+    """
+
+    if prices := get_prices(
+        token_addresses=token_addresses, network=network, block=block
+    ):
+        return prices
+
+    return None

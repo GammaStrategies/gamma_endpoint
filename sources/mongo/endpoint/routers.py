@@ -1,6 +1,7 @@
 import asyncio
 import re
-from fastapi import Response, APIRouter, status
+import typing
+from fastapi import Query, Response, APIRouter, status
 from fastapi.routing import APIRoute
 from fastapi_cache.decorator import cache
 from endpoint.config.cache import DB_CACHE_TIMEOUT
@@ -12,6 +13,7 @@ from endpoint.routers.template import (
 from sources.common.general.enums import Dex, Chain
 from sources.mongo.bins.apps import hypervisor
 from sources.mongo.bins.apps import user
+from sources.mongo.bins.apps import prices
 
 
 def build_routers() -> list:
@@ -147,6 +149,13 @@ class mongo_router_builder(router_builder_baseTemplate):
 
         router = self._create_routes_user(router=router, dex=dex, chain=chain)
 
+        router.add_api_route(
+            path=f"{self.prefix}{'/prices'}",
+            endpoint=self.prices,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
         return router
 
     def _create_routes_hypervisor(
@@ -271,6 +280,22 @@ class mongo_router_builder(router_builder_baseTemplate):
         """ """
         return await hypervisor.get_hypervisor_prices(
             network=self.chain, dex=self.dex, hypervisor_address=hypervisor_address
+        )
+
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def prices(
+        self,
+        response: Response,
+        token_addresses: typing.List[str] = Query(None),
+        block: int | None = None,
+    ):
+        """ """
+        if token_addresses is None:
+            return "Please provide a list of token addresses"
+        return await prices.get_prices(
+            token_addresses=[x.lower().strip() for x in token_addresses],
+            network=self.chain,
+            block=block,
         )
 
     # Hypervisors
