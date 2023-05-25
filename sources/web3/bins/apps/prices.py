@@ -74,7 +74,8 @@ async def get_token_price_usd(token_address: str, network: str, block: int) -> f
             token_id=token_address,
             block=block,
         )
-    except Exception:
+    except Exception as e:
+        # logging.error(f"Error getting token price: {e}")
         price_token = 0
 
     return price_token

@@ -1,6 +1,9 @@
 import contextlib
+from datetime import datetime
 import sys
 import logging
+import time
+from sources.web3.bins.apis.geckoterminal_helper import geckoterminal_price_helper
 from sources.web3.bins.cache import cache_utilities
 from sources.web3.bins.apis import thegraph_utilities, coingecko_utilities
 from sources.web3.bins.configuration import CONFIGURATION
@@ -11,7 +14,11 @@ LOG_NAME = "price"
 
 class price_scraper:
     def __init__(
-        self, cache: bool = True, cache_filename: str = "", coingecko: bool = True
+        self,
+        cache: bool = True,
+        cache_filename: str = "",
+        coingecko: bool = True,
+        geckoterminal: bool = True,
     ):
         cache_folderName = CONFIGURATION["cache"]["save_path"]
 
@@ -23,6 +30,7 @@ class price_scraper:
         )
 
         self.coingecko = coingecko
+        self.geckoterminal = geckoterminal
 
         # create price helpers
         self.init_apis(cache, cache_folderName)
@@ -53,6 +61,10 @@ class price_scraper:
             retries=1, request_timeout=5
         )
 
+        self.geckoterminal_price_connector = geckoterminal_price_helper(
+            retries=2, request_timeout=10
+        )
+
     ## PUBLIC ##
     def get_price(
         self, network: str, token_id: str, block: int = 0, of: str = "USD"
@@ -75,11 +87,28 @@ class price_scraper:
         except Exception:
             _price = None
 
+        # geckoterminal
+        if (
+            self.geckoterminal
+            and _price in [None, 0]
+            and network in self.geckoterminal_price_connector.networks
+        ):
+            # GET FROM GECKOTERMINAL
+            logging.getLogger(LOG_NAME).debug(
+                f" Trying to get {network}'s token {token_id} price at block {block} from geckoterminal"
+            )
+            try:
+                _price = self._get_price_from_geckoterminal(
+                    network, token_id, block, of
+                )
+            except Exception as e:
+                logging.getLogger(LOG_NAME).debug(
+                    f" Could not get {network}'s token {token_id} price at block {block} from geckoterminal. error-> {e}"
+                )
+
         if _price in [None, 0]:
             # get a list of thegraph_connectors
-            thegraph_connectors = self._get_connector_candidates(
-                network=network, block=block
-            )
+            thegraph_connectors = self._get_connector_candidates(network=network)
 
             for dex, connector in thegraph_connectors.items():
                 logging.getLogger(LOG_NAME).debug(
@@ -112,23 +141,13 @@ class price_scraper:
 
             try:
                 _price = self._get_price_from_coingecko(network, token_id, block, of)
-            except Exception:
+            except Exception as e:
                 logging.getLogger(LOG_NAME).debug(
-                    f" Could not get {network}'s token {token_id} price at block {block} from coingecko."
+                    f" Could not get {network}'s token {token_id} price at block {block} from coingecko. error-> {e}"
                 )
 
         # SAVE CACHE
         if _price not in [None, 0]:
-            if type(_price) == dict:
-                _price_tmp = _price.get(token_id, {}).get("usd", 0)
-                if _price_tmp == 0:
-                    logging.getLogger(LOG_NAME).error(
-                        f" Can't format price given by coingecko -> {_price}   ->{network}'s token {token_id} price at block {block} not found"
-                    )
-                    return
-                else:
-                    _price = _price_tmp
-
             logging.getLogger(LOG_NAME).debug(
                 f" {network}'s token {token_id} price at block {block} was found: {_price}"
             )
@@ -266,8 +285,9 @@ class price_scraper:
 
         if block != 0:
             # convert block to timestamp
-            timestamp = self._convert_block_to_timestamp(network=network, block=block)
-            if timestamp != 0:
+            if timestamp := self._convert_block_to_timestamp(
+                network=network, block=block
+            ):
                 # get price at block
                 _price = self.coingecko_price_connector.get_price_historic(
                     network, token_id, timestamp
@@ -279,28 +299,109 @@ class price_scraper:
         #
         return _price
 
+    def _get_price_from_geckoterminal(
+        self, network: str, token_id: str, block: int, of: str
+    ) -> float:
+        _price = 0
+
+        if of != "USD":
+            raise NotImplementedError(
+                f" Cannot find {of} price method to be gathered from"
+            )
+
+        if block != 0:
+            # convert block to timestamp
+            if timestamp := self._convert_block_to_timestamp(
+                network=network, block=block
+            ):
+                # get price at block
+                _price = self.geckoterminal_price_connector.get_price_historic(
+                    network=network, token_address=token_id, before_timestamp=timestamp
+                )
+
+                # if no historical price was found but timestamp is 5 minute close to current time, get current price
+                if _price in [0, None] and (time.time() - timestamp) <= (5 * 60):
+                    logging.getLogger(__name__).warning(
+                        f" Price at block {block} not found using ohlcvs geckoterminal. Because timestamp date {datetime.fromtimestamp(timestamp)} is close to current time, try getting current price"
+                    )
+                    _price = self.geckoterminal_price_connector.get_price_now(
+                        network=network, token_address=token_id
+                    )
+
+        else:
+            # get current block price
+            _price = self.geckoterminal_price_connector.get_price_now(
+                network=network, token_address=token_id
+            )
+
+        #
+        return _price
+
     # HELPERS
     def _convert_block_to_timestamp(self, network: str, block: int) -> int:
         # try database
-        with contextlib.suppress(Exception):
+        try:
             # create global database manager
             global_db = database_global(
                 mongo_url=CONFIGURATION["sources"]["database"]["mongo_server_url"]
             )
             return global_db.get_items_from_database(
-                collection_name="block", find={"block": block}
+                collection_name="blocks", find={"block": block}
             )[0]["timestamp"]
+        except IndexError:
+            logging.getLogger(__name__).error(
+                f" {network}'s block {block} not found in database"
+            )
+        except Exception as e:
+            logging.getLogger(LOG_NAME).exception(
+                f"Error while getting block {block} timestamp from database. Error: {e}"
+            )
+
         # try thegraph
         try:
-            block_data = self.thegraph_block_connector.get_all_results(
-                network=network, query_name="blocks", where=f""" number: "{block}" """
-            )[0]
+            if network in self.thegraph_block_connector._URLS.keys():
+                block_data = self.thegraph_block_connector.get_all_results(
+                    network=network,
+                    query_name="blocks",
+                    where=f""" number: "{block}" """,
+                )[0]
 
-            return block_data["timestamp"]
-        except Exception:
+                logging.getLogger(__name__).error(
+                    f"     --> {network}'s block {block} found in subgraph"
+                )
+
+                return block_data["timestamp"]
+            else:
+                logging.getLogger(__name__).debug(
+                    f" No {network} thegraph block connector found. Can't get block {block} timestamp from thegraph"
+                )
+        except Exception as e:
+            logging.getLogger(LOG_NAME).exception(
+                f"Error while getting block {block} timestamp from thegraph. Error: {e}"
+            )
             return 0
 
-    def _get_connector_candidates(self, network: str, block: int | None = None) -> dict:
+        # try web3
+        try:
+            # create an erc20 dummy token
+            from sources.web3.bins.w3.objects.basic import erc20
+
+            dummy = erc20(
+                address="0x0000000000000000000000000000000000000000", network=network
+            )
+            if block_data := dummy._getBlockData(block=block):
+                logging.getLogger(__name__).error(
+                    f"     --> {network}'s block {block} found placing web3 calls"
+                )
+                return block_data["timestamp"]
+
+        except Exception as e:
+            logging.getLogger(LOG_NAME).exception(
+                f"Error while getting block {block} timestamp from web3. Error: {e}"
+            )
+            return 0
+
+    def _get_connector_candidates(self, network: str) -> dict:
         """get thegraph connectors with data for the specified network
 
         Args:
@@ -309,20 +410,8 @@ class price_scraper:
         Returns:
             dict: { <connector name> : <connector>}
         """
-        result = {}
-        for name, connector in self.thegraph_connectors.items():
-            if network in connector.networks:
-                if block:
-                    latest_block = connector._get_last_block(
-                        network=network, query_name="tokens"
-                    )
-                    if latest_block >= block:
-                        result[name] = connector
-                else:
-                    result[name] = connector
-        return result
-        # return {
-        #     name: connector
-        #     for name, connector in self.thegraph_connectors.items()
-        #     if network in connector.networks and (not block or connector._get_last_block(network=network, query_name="tokens") > block)
-        # }
+        return {
+            name: connector
+            for name, connector in self.thegraph_connectors.items()
+            if network in connector.networks
+        }
