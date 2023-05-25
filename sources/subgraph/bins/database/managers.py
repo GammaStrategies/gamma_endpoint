@@ -1611,7 +1611,7 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
             pass
         except Exception as e:
             logger.warning(
-                f" Unexpected error feeding  {chain}'s {protocol} allRewards2 to db   err:{e}"
+                f" Unexpected error feeding  {chain}'s {protocol} external allRewards2 to db   err:{e}"
             )
 
     async def create_data(
