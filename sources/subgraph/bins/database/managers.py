@@ -1630,9 +1630,14 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
         try:
             # create local database helper
 
-            db_name = (
-                f"{enumsConverter.convert_local_to_general(chain=chain).value}_gamma"
-            )
+            ############
+            # TODO: change once enums are merged
+            if chain == Chain.BSC:
+                db_name = "binance_gamma"
+            elif chain == Chain.MAINNET:
+                db_name = "ethereum_gamma"
+            ##### #####
+
             local_db_helper = database_local(
                 mongo_url=self._db_mongo_url, db_name=db_name
             )
