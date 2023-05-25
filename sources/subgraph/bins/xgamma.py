@@ -33,7 +33,7 @@ class XGammaData(SubgraphData):
     def __init__(self):
         super().__init__()
         self.data: XGammaInfo
-        self.client = GammaClient(Protocol.UNISWAP, Chain.MAINNET)
+        self.client = GammaClient(Protocol.UNISWAP, Chain.ETHEREUM)
 
     async def _query_data(self) -> dict:
         ds = self.client.data_schema

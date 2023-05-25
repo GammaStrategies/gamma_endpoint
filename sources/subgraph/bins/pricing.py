@@ -9,7 +9,7 @@ from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.utils import sqrtPriceX96_to_priceDecimal
 
 POOLS = {
-    Chain.MAINNET: {
+    Chain.ETHEREUM: {
         "USDC_WETH": {
             "protocol": Protocol.UNISWAP,
             "address": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
@@ -113,20 +113,20 @@ POOLS = {
 
 
 POOL_PATHS = {
-    Chain.MAINNET: {
+    Chain.ETHEREUM: {
         # GAMMA
         "0x6bea7cfef803d1e3d5f7c0103f7ded065644e197": [
-            (POOLS[Chain.MAINNET]["GAMMA_WETH"], 1),
-            (POOLS[Chain.MAINNET]["USDC_WETH"], 0),
+            (POOLS[Chain.ETHEREUM]["GAMMA_WETH"], 1),
+            (POOLS[Chain.ETHEREUM]["USDC_WETH"], 0),
         ],
         # RPL
         "0xd33526068d116ce69f19a9ee46f0bd304f21a51f": [
-            (POOLS[Chain.MAINNET]["WETH_RPL"], 0),
-            (POOLS[Chain.MAINNET]["USDC_WETH"], 0),
+            (POOLS[Chain.ETHEREUM]["WETH_RPL"], 0),
+            (POOLS[Chain.ETHEREUM]["USDC_WETH"], 0),
         ],
         # AXL
         "0x467719ad09025fcc6cf6f8311755809d45a5e5f3": [
-            (POOLS[Chain.MAINNET]["AXL_USDC"], 1)
+            (POOLS[Chain.ETHEREUM]["AXL_USDC"], 1)
         ],
     },
     Chain.OPTIMISM: {
@@ -263,7 +263,8 @@ class DexPriceData:
 
 
 class DexPrice:
-    """ Class for getting prices from DEXes """
+    """Class for getting prices from DEXes"""
+
     def __init__(self, chain: Chain):
         self.chain_prices: dict
         self.token_prices: dict
@@ -324,7 +325,7 @@ class DexPrice:
 
 async def gamma_price():
     """Get price of GAMMA"""
-    dex_pricing = DexPrice(Chain.MAINNET)
+    dex_pricing = DexPrice(Chain.ETHEREUM)
     await dex_pricing.get_token_prices()
     return dex_pricing.token_prices["0x6bea7cfef803d1e3d5f7c0103f7ded065644e197"]
 
@@ -336,8 +337,8 @@ async def token_prices(chain: Chain):
     prices = dex_pricing.token_prices
 
     # Stop gap until refactoring to get multichain prices
-    if chain != Chain.MAINNET:
-        dex_pricing_mainnet = DexPrice(Chain.MAINNET)
+    if chain != Chain.ETHEREUM:
+        dex_pricing_mainnet = DexPrice(Chain.ETHEREUM)
         await dex_pricing_mainnet.get_token_prices()
 
         AXL_MAINNET = "0x467719ad09025fcc6cf6f8311755809d45a5e5f3"
@@ -349,7 +350,7 @@ async def token_prices(chain: Chain):
                     prices[AXL_POLYGON] = price
                 prices[token] = price
 
-    llama_client = LlamaClient(Chain.MAINNET)
+    llama_client = LlamaClient(Chain.ETHEREUM)
     with contextlib.suppress(Exception):
         ALCX_ADDRESS = "0xdbdb4d16eda451d0503b854cf79d55697f90c8df"
         prices[ALCX_ADDRESS] = await llama_client.current_token_price(ALCX_ADDRESS)

@@ -17,7 +17,6 @@ from sources.subgraph.bins.config import MASTERCHEF_ADDRESSES
 
 from sources.common.database.common.collections_common import db_collections_common
 
-from sources.subgraph.bins.enums import enumsConverter
 
 logger = logging.getLogger(__name__)
 
@@ -1629,14 +1628,7 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
 
         try:
             # create local database helper
-
-            ############
-            # TODO: change once enums are merged
-            if chain == Chain.BSC:
-                db_name = "binance_gamma"
-            elif chain == Chain.MAINNET:
-                db_name = "ethereum_gamma"
-            ##### #####
+            db_name = f"{chain.database_name}_gamma"
 
             local_db_helper = database_local(
                 mongo_url=self._db_mongo_url, db_name=db_name

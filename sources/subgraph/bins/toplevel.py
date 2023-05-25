@@ -16,7 +16,7 @@ from sources.subgraph.bins.utils import filter_address_by_chain, timestamp_ago
 class TopLevelData:
     """Top level stats"""
 
-    def __init__(self, protocol: Protocol, chain: Chain = Chain.MAINNET):
+    def __init__(self, protocol: Protocol, chain: Chain = Chain.ETHEREUM):
         self.protocol = protocol
         self.chain = chain
         self.gamma_client = GammaClient(protocol, chain)

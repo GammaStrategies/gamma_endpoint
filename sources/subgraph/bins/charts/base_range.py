@@ -25,7 +25,7 @@ OVERRIDE_TS = [1625162739, 1625332777, 1627458476]
 
 class BaseLimit:
     def __init__(
-        self, hours, protocol: Protocol, chart=True, chain: Chain = Chain.MAINNET
+        self, hours, protocol: Protocol, chart=True, chain: Chain = Chain.ETHEREUM
     ):
         self.protocol = protocol
         self.chain = chain

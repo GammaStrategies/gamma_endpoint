@@ -1,7 +1,6 @@
 import asyncio
-from sources.common.general.enums import Chain, Dex, ChainId
+from sources.common.general.enums import Chain, Dex
 from sources.common.database.collection_endpoint import database_global, database_local
-from sources.mongo.bins.enums import enumsConverter
 
 from sources.common.database.common.collections_common import db_collections_common
 
@@ -14,16 +13,15 @@ from sources.subgraph.bins.config import MONGO_DB_URL
 # General database helpers
 
 
-def create_local_database(network: Chain):
+def local_database_helper(network: Chain):
     """Create a local database for a hypervisor."""
-    chainvar = enumsConverter.convert_general_to_local(chain=network).value
     return database_local(
         mongo_url=MONGO_DB_URL,
-        db_name=f"{enumsConverter.convert_general_to_local(chain=network).value}_gamma",
+        db_name=f"{network.database_name}_gamma",
     )
 
 
-def create_global_database():
+def global_database_helper():
     """Create a global database."""
     return database_global(mongo_url=MONGO_DB_URL)
 
@@ -32,10 +30,9 @@ def create_global_database():
 
 
 async def hypervisors_list(network: Chain, dex: Dex):
-    dexval = enumsConverter.convert_general_to_local(dex=dex).value
-    return await create_local_database(network=network).get_items_from_database(
+    return await local_database_helper(network=network).get_items_from_database(
         collection_name="static",
-        find={"dex": enumsConverter.convert_general_to_local(dex=dex).value},
+        find={"dex": dex.value},
         projection={"_id": 0},
     )
 
@@ -50,7 +47,7 @@ async def hypervisors_uncollected_fees(
         db_collections_common.convert_decimal_to_float(
             item=db_collections_common.convert_d128_to_decimal(item=item)
         )
-        for item in await create_local_database(
+        for item in await local_database_helper(
             network=network
         ).query_items_from_database(
             collection_name="status",
@@ -74,7 +71,7 @@ async def hypervisors_collected_fees(
         db_collections_common.convert_decimal_to_float(
             item=db_collections_common.convert_d128_to_decimal(item=item)
         )
-        for item in await create_local_database(
+        for item in await local_database_helper(
             network=network
         ).query_items_from_database(
             collection_name="operations",
@@ -102,7 +99,7 @@ async def hypervisor_uncollected_fees(
         db_collections_common.convert_decimal_to_float(
             item=db_collections_common.convert_d128_to_decimal(item=item)
         )
-        for item in await create_local_database(
+        for item in await local_database_helper(
             network=network
         ).query_items_from_database(
             collection_name="status",
@@ -127,7 +124,7 @@ async def hypervisor_collected_fees(
         db_collections_common.convert_decimal_to_float(
             item=db_collections_common.convert_d128_to_decimal(item=item)
         )
-        for item in await create_local_database(
+        for item in await local_database_helper(
             network=network
         ).query_items_from_database(
             collection_name="operations",
@@ -143,11 +140,11 @@ async def hypervisor_collected_fees(
 
 
 async def get_hypervisor_last_status(network: Chain, dex: Dex, address: str) -> dict:
-    local_db = create_local_database(network=network)
-
     try:
         # get hypervisor's last status found in database
-        hypervisor_data = await local_db.get_items_from_database(
+        hypervisor_data = await local_database_helper(
+            network=network
+        ).get_items_from_database(
             collection_name="status",
             find={"address": address.lower()},
             sort=[("block", -1)],
@@ -170,23 +167,21 @@ async def get_hypervisor_prices(
     )
     """ Get the latest hypervisor tokens and per share usd prices found in database. """
 
-    netval = enumsConverter.convert_general_to_local(chain=network).value
-
     price_token0, price_token1 = await asyncio.gather(
-        create_global_database().get_items_from_database(
+        global_database_helper().get_items_from_database(
             collection_name="usd_prices",
             find={
-                "network": netval,
+                "network": network.database_name,
                 "address": hype_last_status["pool"]["token0"]["address"],
             },
             projection={"_id": 0, "id": 0, "address": 0, "network": 0},
             sort=[("block", -1)],
             limit=1,
         ),
-        create_global_database().get_items_from_database(
+        global_database_helper().get_items_from_database(
             collection_name="usd_prices",
             find={
-                "network": netval,
+                "network": network.database_name,
                 "address": hype_last_status["pool"]["token1"]["address"],
             },
             projection={"_id": 0, "id": 0, "address": 0, "network": 0},
@@ -245,9 +240,10 @@ async def get_hypervisor_return(
     start_block: int | None = None,
     end_block: int | None = None,
 ) -> dict:
-    netval = enumsConverter.convert_general_to_local(chain=network).value
     hype_helper = direct_db_hypervisor_info(
-        hypervisor_address=hypervisor_address.lower(), network=netval, protocol="gamma"
+        hypervisor_address=hypervisor_address.lower(),
+        network=network.database_name,
+        protocol="gamma",
     )
 
     # result = hype_helper.get_feeReturn_and_IL(
@@ -266,18 +262,17 @@ async def add_prices_to_hypervisor(hypervisor: dict, network: str) -> dict:
     Returns:
         dict: database hypervisor item with usd prices
     """
-    global_db = create_global_database()
 
     try:
         # get token prices
         price_token0, price_token1 = await asyncio.gather(
-            global_db.get_price_usd(
-                network=network,
+            global_database_helper().get_price_usd(
+                network=network.database_name,
                 address=hypervisor["pool"]["token0"]["address"],
                 block=hypervisor["block"],
             ),
-            global_db.get_price_usd(
-                network=network,
+            global_database_helper().get_price_usd(
+                network=network.database_name,
                 address=hypervisor["pool"]["token1"]["address"],
                 block=hypervisor["block"],
             ),

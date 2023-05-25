@@ -58,9 +58,9 @@ def build_routers() -> list:
     routes.append(
         subgraph_router_builder(
             dex=Protocol.UNISWAP,
-            chain=Chain.MAINNET,
+            chain=Chain.ETHEREUM,
             tags=["Uniswap - Ethereum"],
-            prefix=f"/{Protocol.UNISWAP.value}/{Chain.MAINNET.value}",
+            prefix=f"/{Protocol.UNISWAP.value}/{Chain.ETHEREUM.value}",
         )
     )
     routes.append(
@@ -213,7 +213,7 @@ def build_routers_compatible() -> list:
     routes.append(
         subgraph_router_builder_compatible(
             dex=Protocol.UNISWAP,
-            chain=Chain.MAINNET,
+            chain=Chain.ETHEREUM,
             tags=["Mainnet"],
         )
     )
@@ -404,7 +404,7 @@ class subgraph_router_builder(router_builder_generalTemplate):
         )
 
         # create only on Mainnet
-        if self.chain == Chain.MAINNET:
+        if self.chain == Chain.ETHEREUM:
             router.add_api_route(
                 path=f"{self.prefix}{'/charts/benchmark/{hypervisor_address}'}",
                 endpoint=self.benchmark_chart,
@@ -700,11 +700,11 @@ class subgraph_router_builder_compatible(subgraph_router_builder):
         return router
 
     async def gamma_basic_stats(self, response: Response):
-        result = GammaInfo(Chain.MAINNET, days=30)
+        result = GammaInfo(Chain.ETHEREUM, days=30)
         return await result.output()
 
     async def gamma_yield(self, response: Response):
-        result = GammaYield(Chain.MAINNET, days=30)
+        result = GammaYield(Chain.ETHEREUM, days=30)
         return await result.output()
 
     @cache(expire=DASHBOARD_CACHE_TIMEOUT)
@@ -808,11 +808,11 @@ class subgraph_router_builder_allDeployments(router_builder_baseTemplate):
         )
 
     async def gamma_basic_stats(self, response: Response):
-        result = GammaInfo(Chain.MAINNET, days=30)
+        result = GammaInfo(Chain.ETHEREUM, days=30)
         return await result.output()
 
     async def gamma_yield(self, response: Response):
-        result = GammaYield(Chain.MAINNET, days=30)
+        result = GammaYield(Chain.ETHEREUM, days=30)
         return await result.output()
 
     @cache(expire=DASHBOARD_CACHE_TIMEOUT)
@@ -851,26 +851,26 @@ class subgraph_router_builder_Simulator(router_builder_baseTemplate):
         return router
 
     async def token_list(self):
-        tokens = await SimulatorInfo(Protocol.UNISWAP, Chain.MAINNET).token_list()
+        tokens = await SimulatorInfo(Protocol.UNISWAP, Chain.ETHEREUM).token_list()
 
         return tokens
 
     async def pool_ticks(self, poolAddress: str):
-        ticks = await SimulatorInfo(Protocol.UNISWAP, Chain.MAINNET).pool_ticks(
+        ticks = await SimulatorInfo(Protocol.UNISWAP, Chain.ETHEREUM).pool_ticks(
             poolAddress
         )
 
         return ticks
 
     async def pool_from_tokens(self, token0: str, token1: str):
-        pools = await SimulatorInfo(Protocol.UNISWAP, Chain.MAINNET).pools_from_tokens(
+        pools = await SimulatorInfo(Protocol.UNISWAP, Chain.ETHEREUM).pools_from_tokens(
             token0, token1
         )
 
         return pools
 
     async def pool_24hr_volume(self, poolAddress: str):
-        volume = await SimulatorInfo(Protocol.UNISWAP, Chain.MAINNET).pool_volume(
+        volume = await SimulatorInfo(Protocol.UNISWAP, Chain.ETHEREUM).pool_volume(
             poolAddress
         )
 

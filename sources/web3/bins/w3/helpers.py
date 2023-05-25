@@ -1,6 +1,5 @@
 import random
 from sources.common.general.enums import Chain, Dex, ChainId
-from sources.mongo.bins.enums import enumsConverter
 
 from sources.web3.bins.w3.objects.protocols import (
     gamma_hypervisor,
@@ -29,21 +28,21 @@ def build_hypervisor(
     if dex == Dex.ZYBERSWAP:
         hypervisor = gamma_hypervisor_zyberswap(
             address=hypervisor_address,
-            network=network.value,
+            network=network.database_name,
             block=block,
             custom_web3Url=custom_web3Url,
         )
     elif dex == Dex.QUICKSWAP:
         hypervisor = gamma_hypervisor_quickswap(
             address=hypervisor_address,
-            network=network.value,
+            network=network.database_name,
             block=block,
             custom_web3Url=custom_web3Url,
         )
     elif dex == Dex.THENA:
         hypervisor = gamma_hypervisor_thena(
             address=hypervisor_address,
-            network=network.value,
+            network=network.database_name,
             block=block,
             custom_web3Url=custom_web3Url,
         )
@@ -51,7 +50,7 @@ def build_hypervisor(
         # build hype
         hypervisor = gamma_hypervisor(
             address=hypervisor_address,
-            network=network.value,
+            network=network.database_name,
             block=block,
             custom_web3Url=custom_web3Url,
         )
@@ -67,15 +66,15 @@ def build_hypervisor_registry(
 ) -> gamma_hypervisor_registry:
     # get the list of registry addresses
 
-    netval = enumsConverter.convert_general_to_local(chain=network).value
-
     if registry_address := (
-        STATIC_REGISTRY_ADDRESSES.get(netval, {}).get("hypervisors", {}).get(dex.value)
+        STATIC_REGISTRY_ADDRESSES.get(network.database_name, {})
+        .get("hypervisors", {})
+        .get(dex.value)
     ):
         # build hype
         registry = gamma_hypervisor_registry(
             address=registry_address,
-            network=network.value,
+            network=network.database_name,
             block=block,
             custom_web3Url=custom_web3Url,
         )

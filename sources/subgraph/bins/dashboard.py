@@ -18,7 +18,7 @@ from sources.subgraph.bins.xgamma import XGammaData
 
 class Dashboard:
     def __init__(self, period: str):
-        self.chain = Chain.MAINNET
+        self.chain = Chain.ETHEREUM
         self.gamma_client = GammaClient(Protocol.UNISWAP, self.chain)
         self.period = period
         self.days = 30

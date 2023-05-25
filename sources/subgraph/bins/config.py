@@ -3,7 +3,7 @@ from sources.subgraph.bins.enums import Chain, Protocol, QueryType
 
 
 DEPLOYMENTS = [
-    (Protocol.UNISWAP, Chain.MAINNET),
+    (Protocol.UNISWAP, Chain.ETHEREUM),
     (Protocol.UNISWAP, Chain.ARBITRUM),
     (Protocol.UNISWAP, Chain.OPTIMISM),
     (Protocol.UNISWAP, Chain.POLYGON),
@@ -35,7 +35,7 @@ UNI_V2_SUBGRAPH_URL = "https://api.thegraph.com/subgraphs/name/ianlapham/uniswap
 
 DEX_SUBGRAPH_URLS = {
     Protocol.UNISWAP: {
-        Chain.MAINNET: get_config("UNISWAP_MAINNET_SUBGRAPH_URL"),
+        Chain.ETHEREUM: get_config("UNISWAP_MAINNET_SUBGRAPH_URL"),
         Chain.POLYGON: get_config("UNISWAP_POLYGON_SUBGRAPH_URL"),
         Chain.ARBITRUM: get_config("UNISWAP_ARBITRUM_SUBGRAPH_URL"),
         Chain.OPTIMISM: get_config("UNISWAP_OPTIMISM_SUBGRAPH_URL"),
@@ -71,7 +71,7 @@ DEX_SUBGRAPH_URLS = {
 
 DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.UNISWAP: {
-        Chain.MAINNET: get_config("UNISWAP_MAINNET_HP_SUBGRAPH_URL"),
+        Chain.ETHEREUM: get_config("UNISWAP_MAINNET_HP_SUBGRAPH_URL"),
         Chain.POLYGON: get_config("UNISWAP_POLYGON_HP_SUBGRAPH_URL"),
         Chain.ARBITRUM: get_config("UNISWAP_ARBITRUM_HP_SUBGRAPH_URL"),
         Chain.OPTIMISM: get_config("UNISWAP_OPTIMISM_HP_SUBGRAPH_URL"),
@@ -107,7 +107,7 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
 
 GAMMA_SUBGRAPH_URLS = {
     Protocol.UNISWAP: {
-        Chain.MAINNET: get_config("UNISWAP_MAINNET_GAMMA_SUBGRAPH_URL"),
+        Chain.ETHEREUM: get_config("UNISWAP_MAINNET_GAMMA_SUBGRAPH_URL"),
         Chain.POLYGON: get_config("UNISWAP_POLYGON_GAMMA_SUBGRAPH_URL"),
         Chain.ARBITRUM: get_config("UNISWAP_ARBITRUM_GAMMA_SUBGRAPH_URL"),
         Chain.OPTIMISM: get_config("UNISWAP_OPTIMISM_GAMMA_SUBGRAPH_URL"),
@@ -173,7 +173,7 @@ MONGO_DB_COLLECTIONS = {
 # local chain name <-> standard chain short name convention as in
 # https://chainid.network/chains.json  or https://chainid.network/chains_mini.json
 CHAIN_NAME_CONVERSION = {
-    "eth": Chain.MAINNET,
+    "eth": Chain.ETHEREUM,
     "matic": Chain.POLYGON,
     "oeth": Chain.OPTIMISM,
     "arb1": Chain.ARBITRUM,

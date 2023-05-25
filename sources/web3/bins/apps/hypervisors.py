@@ -1,6 +1,5 @@
 from sources.common.general.enums import Chain, Dex, ChainId
 import asyncio
-from sources.mongo.bins.enums import enumsConverter
 from sources.web3.bins.general.general_utilities import async_rgetattr
 
 from sources.web3.bins.w3.helpers import (
@@ -16,8 +15,6 @@ from sources.web3.bins.mixed.price_utilities import price_scraper
 
 
 async def hypervisors_list(network: Chain, dex: Dex):
-    netval = enumsConverter.convert_general_to_local(chain=network).value
-
     # get network registry address
     registry = build_hypervisor_registry(
         network=network,
@@ -31,8 +28,6 @@ async def hypervisors_list(network: Chain, dex: Dex):
 async def hypervisor_uncollected_fees(
     network: Chain, dex: Dex, hypervisor_address: str, block: int = None
 ):
-    netval = enumsConverter.convert_general_to_local(chain=network).value
-
     if hypervisor := build_hypervisor(
         network=network,
         dex=dex,
@@ -119,7 +114,6 @@ async def get_hypervisor_data_for_rewards(
     block: int | None = None,
     convert_to_decimal: bool = False,
 ):
-    netval = enumsConverter.convert_general_to_local(chain=network).value
     if hypervisor := build_hypervisor(
         network=network,
         dex=dex,
@@ -177,8 +171,6 @@ async def get_hypervisor_data(
     fields: list[str],
     block: int | None = None,
 ):
-    netval = enumsConverter.convert_general_to_local(chain=network).value
-
     hype = build_hypervisor(
         network=network,
         dex=dex,

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class HypervisorData:
-    def __init__(self, protocol: Protocol, chain: Chain = Chain.MAINNET):
+    def __init__(self, protocol: Protocol, chain: Chain = Chain.ETHEREUM):
         self.protocol = protocol
         self.chain = chain
         self.gamma_client = GammaClient(protocol, chain)

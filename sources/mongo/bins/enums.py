@@ -25,7 +25,7 @@ class enumsConverter:
         chain: Chain | None = None, dex: Dex | None = None
     ) -> general_enums.Chain | general_enums.Dex:
         if chain:
-            # if chain == Chain.MAINNET:
+            # if chain == Chain.ETHEREUM:
             #     return general_enums.Chain.ETHEREUM
             # else:
             return getattr(general_enums.Chain, chain.name)

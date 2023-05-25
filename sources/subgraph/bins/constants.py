@@ -14,7 +14,7 @@ DAY_SECONDS = 24 * 60 * 60
 YEAR_SECONDS = 365 * DAY_SECONDS
 
 BLOCK_TIME_SECONDS = {
-    Chain.MAINNET: 12,
+    Chain.ETHEREUM: 12,
     Chain.POLYGON: 2,
     Chain.OPTIMISM: 1,
     Chain.ARBITRUM: 1,

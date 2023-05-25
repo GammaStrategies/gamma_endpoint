@@ -23,7 +23,7 @@ async_client = httpx.AsyncClient(
 
 
 class SubgraphClient:
-    def __init__(self, url: str, chain: Chain = Chain.MAINNET):
+    def __init__(self, url: str, chain: Chain = Chain.ETHEREUM):
         self._url = url
         self.chain = chain
 
@@ -193,7 +193,7 @@ class LlamaClient:
         self.chain = self._translate_chain_name(chain)
 
     def _translate_chain_name(self, chain):
-        mapping = {Chain.MAINNET: "ethereum"}
+        mapping = {Chain.ETHEREUM: "ethereum"}
         return mapping.get(chain, chain)
 
     async def block_from_timestamp(self, timestamp, return_timestamp=False):

@@ -7,7 +7,7 @@ from sources.subgraph.bins.enums import Chain, Protocol
 class DailyChart:
     def __init__(self, days=20):
         self.days = days
-        self.gamma_client = GammaClient(Protocol.UNISWAP, Chain.MAINNET)
+        self.gamma_client = GammaClient(Protocol.UNISWAP, Chain.ETHEREUM)
 
     async def _get_all_flows(self):
         """Daily chart flows bar chart for hypervisors"""

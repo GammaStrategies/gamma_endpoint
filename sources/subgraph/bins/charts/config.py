@@ -1,7 +1,7 @@
 from sources.subgraph.bins.enums import Chain
 
 BASE_POOLS_CONFIG = {
-    Chain.MAINNET: {
+    Chain.ETHEREUM: {
         # OHM
         "0x64aa3364f17a4d01c6f1751fd97c2bd3d7e7f1d5": {
             "priority": 1,
@@ -242,7 +242,7 @@ BASE_POOLS_CONFIG = {
 }
 
 WETH_USDC_POOL = {
-    Chain.MAINNET: "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",
+    Chain.ETHEREUM: "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",
     Chain.POLYGON: "0x45dda9cb7c25131df268515131f647d726f50608",
     Chain.OPTIMISM: "0x85149247691df622eaf1a8bd0cafd40bc45154a9",
     Chain.ARBITRUM: "0x17c14d2c404d167802b16c450d3c99f88f2c4f4d",

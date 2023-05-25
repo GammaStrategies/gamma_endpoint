@@ -9,7 +9,7 @@ from sources.subgraph.bins.pricing import gamma_price
 class AccountData:
     def __init__(self, protocol: Protocol, chain: Chain, account_address: str):
         self.gamma_client = GammaClient(protocol, chain)
-        self.gamma_client_mainnet = GammaClient(Protocol.UNISWAP, Chain.MAINNET)
+        self.gamma_client_mainnet = GammaClient(Protocol.UNISWAP, Chain.ETHEREUM)
         self.address = account_address.lower()
         self.reward_hypervisor_address = XGAMMA_ADDRESS
         self.decimal_factor = 10**18

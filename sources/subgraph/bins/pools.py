@@ -6,7 +6,7 @@ from sources.subgraph.bins.utils import sqrtPriceX96_to_priceDecimal
 
 
 class Pool:
-    def __init__(self, protocol: Protocol, chain: Chain = Chain.MAINNET):
+    def __init__(self, protocol: Protocol, chain: Chain = Chain.ETHEREUM):
         self.client = UniswapV3Client(protocol, chain)
 
     async def swap_prices(self, pool_address, time_delta=None):

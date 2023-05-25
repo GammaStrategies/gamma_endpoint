@@ -7,7 +7,7 @@ from sources.subgraph.bins.pricing import token_prices
 
 
 class MasterchefV2Data:
-    def __init__(self, protocol: Protocol, chain: Chain = Chain.MAINNET):
+    def __init__(self, protocol: Protocol, chain: Chain = Chain.ETHEREUM):
         self.protocol = protocol
         self.chain = chain
         self.gamma_client = GammaClient(protocol, chain)
@@ -215,7 +215,7 @@ class MasterchefV2Info(MasterchefV2Data):
 
 class UserRewardsV2(MasterchefV2Data):
     def __init__(
-        self, user_address: str, protocol: Protocol, chain: Chain = Chain.MAINNET
+        self, user_address: str, protocol: Protocol, chain: Chain = Chain.ETHEREUM
     ):
         super().__init__(protocol, chain)
         self.user_address = user_address.lower()

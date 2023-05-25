@@ -6,9 +6,6 @@ from sources.subgraph.bins.config import MONGO_DB_URL
 from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.masterchef_v2 import MasterchefV2Info, UserRewardsV2
 
-from sources.subgraph.bins.enums import enumsConverter as general_enumsConverter
-from sources.mongo.bins.enums import enumsConverter as mongo_enumsConverter
-
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +33,7 @@ async def user_rewards_thirdParty(user_address: str, protocol: Protocol, chain: 
     result = []
     from sources.common.database.collection_endpoint import database_local
 
-    db_name = f"{mongo_enumsConverter.convert_general_to_local(chain=general_enumsConverter.convert_local_to_general(chain=chain)).value}_gamma"
+    db_name = f"{chain.database_name}_gamma"
     db = database_local(mongo_url=MONGO_DB_URL, db_name=db_name)
 
     # get all rewarders for this chain

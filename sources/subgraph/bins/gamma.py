@@ -237,7 +237,7 @@ class GammaDistribution(GammaCalculations):
 
 
 class ProtocolFeesData:
-    def __init__(self, chain: Chain = Chain.MAINNET):
+    def __init__(self, chain: Chain = Chain.ETHEREUM):
         self.gamma_client = GammaClient(Protocol.UNISWAP, chain)
 
     def _get_data(self, time_delta):

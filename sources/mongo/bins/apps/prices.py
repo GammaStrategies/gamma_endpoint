@@ -1,7 +1,6 @@
 import asyncio
 from sources.common.database.collection_endpoint import database_global
-from sources.common.general.enums import Chain, Dex
-from sources.mongo.bins.enums import enumsConverter
+from sources.common.general.enums import Chain
 from sources.subgraph.bins.config import MONGO_DB_URL
 
 
@@ -20,15 +19,11 @@ async def get_prices(
     Returns:
         dict: with token 'address' as key and 'price' as value
     """
-    netval = enumsConverter.convert_general_to_local(chain=network).value
-
-    if netval == "bsc":
-        netval = "binance"
 
     price_queries = []
     for address in token_addresses:
         find = {
-            "network": netval,
+            "network": network.database_name,
             "address": address,
         }
         if block:
