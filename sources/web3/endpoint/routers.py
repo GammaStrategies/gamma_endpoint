@@ -202,10 +202,17 @@ class web3_router_builder(router_builder_baseTemplate):
             network=self.chain, dex=self.dex, hypervisor_address=hypervisor_address
         )
 
-    async def hypervisor_rewards(self, hypervisor_address: str, response: Response):
+    async def hypervisor_rewards(
+        self, hypervisor_address: str, response: Response, block: int | None = None
+    ):
+        """Rewards for a given hypervisor at a given block. If block is not supplied, it will return the latest block"""
+
         if self.dex in [Dex.THENA, Dex.ZYBERSWAP]:
             return await rewards.get_rewards(
-                dex=self.dex, hypervisor_address=hypervisor_address, network=self.chain
+                dex=self.dex,
+                hypervisor_address=hypervisor_address,
+                network=self.chain,
+                block=block,
             )
         else:
             return " Not implemented yet"

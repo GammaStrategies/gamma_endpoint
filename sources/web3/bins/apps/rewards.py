@@ -20,7 +20,9 @@ from sources.web3.bins.apps import hypervisors
 from sources.subgraph.bins.config import MONGO_DB_URL
 
 
-async def search_rewards_data_zyberswap(hypervisor_address: str, network: Chain):
+async def search_rewards_data_zyberswap(
+    hypervisor_address: str, network: Chain, block: int | None = None
+):
     result = []
     netval = enumsConverter.convert_general_to_local(chain=network).value
     # get the list of registry addresses
@@ -31,6 +33,7 @@ async def search_rewards_data_zyberswap(hypervisor_address: str, network: Chain)
         zyberchef = zyberswap_masterchef_v1(
             address=address,
             network=network,
+            block=block or 0,
         )
 
         # get the pool length
@@ -41,6 +44,7 @@ async def search_rewards_data_zyberswap(hypervisor_address: str, network: Chain)
                 network=network,
                 pid=pid,
                 zyberchef=zyberchef,
+                block=block,
             )
 
     return result
@@ -52,13 +56,16 @@ async def get_rewards_data_zyberswap(
     pid: int,
     zyberchef_address: str | None = None,
     zyberchef: zyberswap_masterchef_v1 | None = None,
+    block: int | None = None,
 ) -> list[dict]:
     result = []
     netval = enumsConverter.convert_general_to_local(chain=network).value
 
     # create zyberchef
     if not zyberchef and zyberchef_address:
-        zyberchef = zyberswap_masterchef_v1(address=zyberchef_address, network=netval)
+        zyberchef = zyberswap_masterchef_v1(
+            address=zyberchef_address, network=netval, block=block or 0
+        )
     elif not zyberchef and not zyberchef_address:
         raise Exception("zyberchef_address or zyberchef must be provided")
 
@@ -100,12 +107,18 @@ async def get_rewards_data_zyberswap(
     return result
 
 
-async def get_rewards_data_thena(hypervisor_address: str, network: Chain):
+async def get_rewards_data_thena(
+    hypervisor_address: str,
+    network: Chain,
+    block: int | None = None,
+):
     netval = enumsConverter.convert_general_to_local(chain=network).value
 
     if voter_url := STATIC_REGISTRY_ADDRESSES.get(netval, {}).get("thena_voter", None):
         # build thena voter
-        thena_voter = thena_voter_v3(address=voter_url, network=network)
+        thena_voter = thena_voter_v3(
+            address=voter_url, network=network, block=block or 0
+        )
 
         # get managing gauge from hype address
         gauge_address = await thena_voter.gauges(address=hypervisor_address)
@@ -114,6 +127,7 @@ async def get_rewards_data_thena(hypervisor_address: str, network: Chain):
         thena_gauge = thena_gauge_V2(
             address=gauge_address,
             network=network,
+            block=block or 0,
         )
         # get gauge data
         rewardRate, rewardToken, totalSupply, block = await asyncio.gather(
@@ -127,6 +141,7 @@ async def get_rewards_data_thena(hypervisor_address: str, network: Chain):
         reward_token_instance = erc20(
             address=rewardToken,
             network=network,
+            block=block or 0,
         )
         # get reward token data
         rewardToken_symbol, rewardToken_decimals = await asyncio.gather(
@@ -150,7 +165,9 @@ async def get_rewards_data_thena(hypervisor_address: str, network: Chain):
         }
 
 
-async def get_rewards(dex: Dex, hypervisor_address: str, network: Chain):
+async def get_rewards(
+    dex: Dex, hypervisor_address: str, network: Chain, block: int | None = None
+):
     result = []
     netval = enumsConverter.convert_general_to_local(chain=network).value
 
@@ -159,6 +176,7 @@ async def get_rewards(dex: Dex, hypervisor_address: str, network: Chain):
         network=network,
         dex=dex,
         hypervisor_address=hypervisor_address,
+        block=block,
         convert_to_decimal=True,
     )
     # add prices hype
@@ -169,12 +187,12 @@ async def get_rewards(dex: Dex, hypervisor_address: str, network: Chain):
         get_token_price_usd(
             token_address=hypervisor_data["token0_address"].lower(),
             network=netval,
-            block=0,
+            block=block or 0,
         ),
         get_token_price_usd(
             token_address=hypervisor_data["token1_address"].lower(),
             network=netval,
-            block=0,
+            block=block or 0,
         ),
     )
     # add share price
@@ -204,7 +222,7 @@ async def get_rewards(dex: Dex, hypervisor_address: str, network: Chain):
             rewardToken_price = await get_token_price_usd(
                 token_address=rewards["rewardToken"].lower(),
                 network=netval,
-                block=0,
+                block=block or 0,
             )
             # convert to decimals
             converted_rewardPoolRewardsPerSec = rewards["poolRewardsPerSec"] / (
@@ -243,13 +261,13 @@ async def get_rewards(dex: Dex, hypervisor_address: str, network: Chain):
 
     elif dex == Dex.THENA:
         rewards_data = await get_rewards_data_thena(
-            hypervisor_address=hypervisor_address, network=network
+            hypervisor_address=hypervisor_address, network=network, block=block
         )
         # get rwrd token price
         rewardToken_price = await get_token_price_usd(
             token_address=rewards_data["rewardToken"].lower(),
             network=netval,
-            block=0,
+            block=block or 0,
         )
 
         # convert to decimals

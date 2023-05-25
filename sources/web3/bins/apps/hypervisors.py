@@ -113,13 +113,17 @@ async def hypervisor_uncollected_fees(
 
 
 async def get_hypervisor_data_for_rewards(
-    network: Chain, dex: Dex, hypervisor_address: str, convert_to_decimal: bool = False
+    network: Chain,
+    dex: Dex,
+    hypervisor_address: str,
+    block: int | None = None,
+    convert_to_decimal: bool = False,
 ):
     netval = enumsConverter.convert_general_to_local(chain=network).value
     if hypervisor := build_hypervisor(
         network=network,
         dex=dex,
-        block=0,
+        block=block or 0,
         hypervisor_address=hypervisor_address,
     ):
         block, timestamp = await hypervisor.init_block()
