@@ -40,6 +40,10 @@ class FeesYield:
 
         # Apply gamma fees to total fees if calculating LP returns
         if yield_type == YieldType.LP:
+            if self.protocol == Protocol.THENA and self.chain == Chain.BSC:
+                # TODO: Removee this hardcode to get around the fact that the fee on thena>bsc is wrong at the subgraph lvl
+                df_snapshots["fee"] = 1
+
             # fee % is 1 / fee or 1/10 if fee > 100
             df_snapshots["gamma_fee_rate"] = df_snapshots["fee"].apply(
                 lambda x: 1 / x if x < 100 else 1 / 10
