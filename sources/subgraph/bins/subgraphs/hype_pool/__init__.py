@@ -59,6 +59,7 @@ class HypePoolClient(SubgraphClient):
         frag.on(ds_hypervisor)
         frag.select(
             ds_hypervisor.id,
+            ds_hypervisor.fee,
             ds_hypervisor.totalSupply,
             ds_hypervisor.tvl0,
             ds_hypervisor.tvl1,
@@ -73,9 +74,6 @@ class HypePoolClient(SubgraphClient):
             ds_hypervisor.basePosition.select(position_fields_fragment),
             ds_hypervisor.limitPosition.select(position_fields_fragment),
         )
-
-        # if self.protocol == Protocol.THENA and self.chain == Chain.BSC:
-        #     frag.select(ds_hypervisor.fee)
 
         return frag
 
@@ -119,6 +117,7 @@ class HypePoolClient(SubgraphClient):
         frag.on(ds_fee_collection_snapshot)
         frag.select(
             ds_fee_collection_snapshot.tick,
+            ds_fee_collection_snapshot.fee,
             ds_fee_collection_snapshot.feeGrowthGlobal0X128,
             ds_fee_collection_snapshot.feeGrowthGlobal1X128,
             ds_fee_collection_snapshot.price0,
@@ -133,8 +132,5 @@ class HypePoolClient(SubgraphClient):
                 position_snapshot_fields_fragment
             ),
         )
-
-        # if self.protocol == Protocol.THENA and self.chain == Chain.BSC:
-        #     frag.select(ds_fee_collection_snapshot.fee)
 
         return frag
