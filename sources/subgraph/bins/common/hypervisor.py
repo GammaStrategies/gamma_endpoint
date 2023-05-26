@@ -56,11 +56,13 @@ class FeeReturns(ExecutionOrderWrapper):
         return result
 
     async def _subgraph(self):
-        return await fee_returns_all(
-            protocol=self.protocol,
-            chain=self.chain,
-            days=self.days,
-            current_timestamp=self.current_timestamp,
+        return (
+            await fee_returns_all(
+                protocol=self.protocol,
+                chain=self.chain,
+                days=self.days,
+                current_timestamp=self.current_timestamp,
+            )
         )["lp"]
 
 
