@@ -1556,7 +1556,7 @@ class database_local(db_collections_common):
 
         # add hype address
         if hypervisor_address:
-            _and.append({"address": {"$lte": hypervisor_address}})
+            _and.append({"address": hypervisor_address})
 
         # add to query
         if _and:
