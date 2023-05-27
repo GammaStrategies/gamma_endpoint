@@ -14,6 +14,7 @@ from endpoint.routers.template import (
     router_builder_baseTemplate,
     router_builder_generalTemplate,
 )
+from sources.common.general.enums import Period
 from sources.subgraph.bins.charts.daily import DailyChart
 from sources.subgraph.bins.common import (
     SubgraphStatusOutput,
@@ -414,6 +415,20 @@ class subgraph_router_builder(router_builder_generalTemplate):
 
         return router
 
+    def _create_routes_hypervisor_analytics(
+        self, router: APIRouter, dex: str, chain: str
+    ) -> APIRouter:
+        router.add_api_route(
+            path=f"{self.prefix}{'/hypervisor/{hypervisor_address}/analytics/basic'}",
+            endpoint=self.hypervisor_analytics_basic,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
+        router = super()._create_routes_hypervisor_analytics(router, dex, chain)
+
+        return router
+
     # EXECUTION FUNCTIONS
 
     async def subgraph_status(self, response: Response) -> SubgraphStatusOutput:
@@ -507,6 +522,14 @@ class subgraph_router_builder(router_builder_generalTemplate):
     ):
         return await analytics.get_hype_data(
             chain=self.chain, hypervisor_address=hypervisor_address, period=30
+        )
+
+    @cache(expire=APY_CACHE_TIMEOUT)
+    async def hypervisor_analytics_basic(
+        self, hypervisor_address: str, response: Response, period: Period
+    ):
+        return await analytics.get_hype_data(
+            chain=self.chain, hypervisor_address=hypervisor_address, period=period.days
         )
 
     #    hypervisors
