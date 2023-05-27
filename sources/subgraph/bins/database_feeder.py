@@ -77,10 +77,10 @@ EXPR_FORMATS = {
 }
 EXPR_ARGS = {
     "returns": {
-        # Period.DAILY.value: [[Period.DAILY.days]],
-        # Period.WEEKLY.value: [[Period.WEEKLY.days]],
-        # Period.BIWEEKLY.value: [[Period.BIWEEKLY.days]],
-        # Period.MONTHLY.value: [[Period.MONTHLY.days]],
+        Period.DAILY.value: [[Period.DAILY.days]],
+        Period.WEEKLY.value: [[Period.WEEKLY.days]],
+        Period.BIWEEKLY.value: [[Period.BIWEEKLY.days]],
+        Period.MONTHLY.value: [[Period.MONTHLY.days]],
         Period.TRIMONTHLY.value: [[Period.TRIMONTHLY.days]],
         Period.SEMESTRIAL.value: [[Period.SEMESTRIAL.days]],
         Period.YEARLY.value: [[Period.YEARLY.days]],
