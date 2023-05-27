@@ -1,5 +1,5 @@
 import random
-from sources.common.general.enums import Chain, Dex, ChainId
+from sources.common.general.enums import Chain, Dex
 
 from sources.web3.bins.w3.objects.protocols import (
     gamma_hypervisor,
