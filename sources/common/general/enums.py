@@ -143,3 +143,101 @@ class Protocol(str, Enum):
         obj.database_name = database_name or value.lower()
         obj.fantasy_name = fantasy_name or value.lower()
         return obj
+
+
+class Period(str, Enum):
+    ##       value  api_url, api_name, subgraph_name, database_name, cron, days
+    DAILY = (
+        "daily",
+        None,
+        None,
+        None,
+        None,
+        "*/60 */2 * * *",
+        1,
+    )  # (At every 60th minute past every 2nd hour. )
+    WEEKLY = (
+        "weekly",
+        None,
+        None,
+        None,
+        None,
+        "*/60 */12 * * *",
+        7,
+    )  # (At every 60th minute past every 12th hour. )
+    BIWEEKLY = (
+        "biweekly",
+        None,
+        None,
+        None,
+        None,
+        "0 6 */1 * *",
+        14,
+    )  # ( At 06:00 on every day-of-month.)
+    MONTHLY = (
+        "monthly",
+        None,
+        None,
+        None,
+        None,
+        "0 12 */2 * *",
+        30,
+    )  # ( At 12:00 on every 2nd day-of-month.)
+    # BIMONTHLY = ("bimonthly", None, None, None, None, None, "0 12 */4 * *", 60)
+    TRIMONTHLY = (
+        "trimonthly",
+        None,
+        None,
+        None,
+        None,
+        "0 4 */6 * *",
+        90,
+    )  # ( At 00:00 on every 6th day-of-month.)
+    SEMESTRIAL = (
+        "semestrial",
+        None,
+        None,
+        None,
+        None,
+        "0 15 */12 * *",
+        180,
+    )  # ( At 00:00 on every 12th day-of-month.)
+    YEARLY = ("yearly", None, None, None, None, "0 2 */24 * *", 365)
+
+    # extra properties
+    api_url: str
+    api_name: str
+    subgraph_name: str
+    database_name: str
+    cron: str
+    days: int
+
+    def __new__(
+        self,
+        value: str,
+        api_url: str | None = None,
+        api_name: str | None = None,
+        subgraph_name: str | None = None,
+        database_name: str | None = None,
+        cron: str | None = None,
+        days: int | None = None,
+    ):
+        """
+
+        Args:
+            value (_type_): chain name
+            id (_type_): chain id
+
+        Returns:
+            : Chain
+        """
+        obj = str.__new__(self, value)
+        obj._value_ = value
+        # optional properties
+        obj.api_url = api_url or value.lower()
+        obj.api_name = api_name or value.lower()
+        obj.subgraph_name = subgraph_name or value.lower()
+        obj.database_name = database_name or value.lower()
+        obj.cron = cron or ""
+        obj.days = days or 0
+        return obj

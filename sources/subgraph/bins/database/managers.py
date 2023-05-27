@@ -3,6 +3,7 @@ import asyncio
 import sys
 from datetime import datetime, timezone
 from sources.common.database.collection_endpoint import database_local
+from sources.common.general.enums import Period
 from sources.subgraph.bins.hypervisor import HypervisorInfo, HypervisorData
 from sources.subgraph.bins.masterchef_v2 import MasterchefV2Info
 from sources.subgraph.bins.hype_fees.data import FeeGrowthSnapshotData
@@ -279,12 +280,12 @@ class db_returns_manager(db_collection_manager):
         Args:
             chain (Chain):
             protocol (Protocol):
-            periods (list[int], optional): . Defaults to [1, 7, 14, 30].
+            periods (list[int], optional): . Defaults to [1, 7, 14, 30, 90, 180, 365].
             retried (int, optional): current number of retries . Defaults to 0.
         """
         # set default periods
         if not periods:
-            periods = [1, 7, 14, 30]
+            periods = [x.days for x in Period]
 
         # create data
         try:

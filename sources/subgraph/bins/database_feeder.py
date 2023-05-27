@@ -19,6 +19,7 @@ sys.path.append(PARENT_FOLDER)
 ########################################
 
 from sources.subgraph.bins import utils
+from sources.common.general.enums import Period
 
 from sources.subgraph.bins.enums import Protocol
 from sources.subgraph.bins.config import (
@@ -48,6 +49,7 @@ logger = logging.getLogger(__name__)
 CHAINS_PROTOCOLS = [
     (chain, protocol)
     for protocol in Protocol
+    if protocol in GAMMA_SUBGRAPH_URLS
     for chain in GAMMA_SUBGRAPH_URLS[protocol].keys()
 ]
 
@@ -55,10 +57,13 @@ CHAINS_PROTOCOLS = [
 # set cron vars
 EXPR_FORMATS = {
     "returns": {
-        "daily": "*/60 */2 * * *",  # (At every 60th minute past every 2nd hour. )
-        "weekly": "*/60 */12 * * *",  # (At every 60th minute past every 12th hour. )  # can't do every 14 hours
-        "biweekly": "0 6 */1 * * ",  # ( At 06:00 on every day-of-month.)
-        "monthly": "0 12 */2 * *",  # ( At 12:00 on every 2nd day-of-month.)
+        Period.DAILY.value: Period.DAILY.cron,  # (At every 60th minute past every 2nd hour. )
+        Period.WEEKLY.value: Period.WEEKLY.cron,  # (At every 60th minute past every 12th hour. )  # can't do every 14 hours
+        Period.BIWEEKLY.value: Period.BIWEEKLY.cron,  # ( At 06:00 on every day-of-month.)
+        Period.MONTHLY.value: Period.MONTHLY.cron,  # ( At 12:00 on every 2nd day-of-month.)
+        Period.TRIMONTHLY.value: Period.TRIMONTHLY.cron,  # ( At 00:00 on every 6rd day-of-month.)
+        Period.SEMESTRIAL.value: Period.SEMESTRIAL.cron,  # ( At 00:00 on every 12th day-of-month.)
+        Period.YEARLY.value: Period.YEARLY.cron,  # ( At 00:00 on every 24th day-of-month.)
     },
     "inSecuence": {  # allData + static hypervisor info
         "mins": "*/30 * * * *",
@@ -72,10 +77,13 @@ EXPR_FORMATS = {
 }
 EXPR_ARGS = {
     "returns": {
-        "daily": [[1]],
-        "weekly": [[7]],
-        "biweekly": [[14]],
-        "monthly": [[30]],
+        # Period.DAILY.value: [[Period.DAILY.days]],
+        # Period.WEEKLY.value: [[Period.WEEKLY.days]],
+        # Period.BIWEEKLY.value: [[Period.BIWEEKLY.days]],
+        # Period.MONTHLY.value: [[Period.MONTHLY.days]],
+        Period.TRIMONTHLY.value: [[Period.TRIMONTHLY.days]],
+        Period.SEMESTRIAL.value: [[Period.SEMESTRIAL.days]],
+        Period.YEARLY.value: [[Period.YEARLY.days]],
     }
 }
 
@@ -293,11 +301,11 @@ async def feed_database_with_historic_data(from_datetime: datetime, periods=None
 
             # database feed
             await asyncio.gather(
-                # feed_database_returns(
-                #     periods=EXPR_ARGS["returns"][period][0],
-                #     current_timestamp=int(current_timestamp),
-                #     max_retries=0,
-                # ),
+                feed_database_returns(
+                    periods=EXPR_ARGS["returns"][period][0],
+                    current_timestamp=int(current_timestamp),
+                    max_retries=0,
+                ),
                 feed_database_allRewards2_externals(
                     current_timestamp=int(current_timestamp)
                 ),
