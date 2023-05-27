@@ -72,3 +72,27 @@ app.mount(
     ),
     name="internal",
 )
+
+
+# to be able to auto test all endpoint urls
+@app.get("/url-list", include_in_schema=False)
+def get_all_urls():
+    url_list = []
+
+    def add_urls(original_list: list, routes, parent_path: str | None = None):
+        for route in routes:
+            if subroutes := getattr(route, "routes", None):
+                if parent_path:
+                    add_urls(original_list, route.routes, f"{parent_path}{route.path}")
+                else:
+                    add_urls(original_list, route.routes, route.path)
+
+            if parent_path:
+                original_list.append(
+                    {"path": f"{parent_path}{route.path}", "name": route.name}
+                )
+            else:
+                original_list.append({"path": route.path, "name": route.name})
+
+    add_urls(url_list, app.routes)
+    return url_list
