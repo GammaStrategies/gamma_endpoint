@@ -172,8 +172,8 @@ class Period(str, Enum):
         30,
     )  # ( At 12:00 on every 2nd day-of-month.)
     # BIMONTHLY = ("bimonthly", None, None, None, None, None, "0 12 */4 * *", 60)
-    TRIMONTHLY = (
-        "trimonthly",
+    QUARTERLY = (
+        "quarterly",
         None,
         None,
         None,
@@ -181,8 +181,8 @@ class Period(str, Enum):
         "0 4 */6 * *",
         90,
     )  # ( At 00:00 on every 6th day-of-month.)
-    SEMESTRIAL = (
-        "semestrial",
+    BIANNUAL = (
+        "biannual",
         None,
         None,
         None,

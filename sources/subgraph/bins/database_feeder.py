@@ -61,8 +61,8 @@ EXPR_FORMATS = {
         Period.WEEKLY.value: Period.WEEKLY.cron,  # (At every 60th minute past every 12th hour. )  # can't do every 14 hours
         Period.BIWEEKLY.value: Period.BIWEEKLY.cron,  # ( At 06:00 on every day-of-month.)
         Period.MONTHLY.value: Period.MONTHLY.cron,  # ( At 12:00 on every 2nd day-of-month.)
-        Period.TRIMONTHLY.value: Period.TRIMONTHLY.cron,  # ( At 00:00 on every 6rd day-of-month.)
-        Period.SEMESTRIAL.value: Period.SEMESTRIAL.cron,  # ( At 00:00 on every 12th day-of-month.)
+        Period.QUARTERLY.value: Period.QUARTERLY.cron,  # ( At 00:00 on every 6rd day-of-month.)
+        Period.BIANNUAL.value: Period.BIANNUAL.cron,  # ( At 00:00 on every 12th day-of-month.)
         Period.YEARLY.value: Period.YEARLY.cron,  # ( At 00:00 on every 24th day-of-month.)
     },
     "inSecuence": {  # allData + static hypervisor info
@@ -81,8 +81,8 @@ EXPR_ARGS = {
         Period.WEEKLY.value: [[Period.WEEKLY.days]],
         Period.BIWEEKLY.value: [[Period.BIWEEKLY.days]],
         Period.MONTHLY.value: [[Period.MONTHLY.days]],
-        Period.TRIMONTHLY.value: [[Period.TRIMONTHLY.days]],
-        Period.SEMESTRIAL.value: [[Period.SEMESTRIAL.days]],
+        Period.QUARTERLY.value: [[Period.QUARTERLY.days]],
+        Period.BIANNUAL.value: [[Period.BIANNUAL.days]],
         Period.YEARLY.value: [[Period.YEARLY.days]],
     }
 }
