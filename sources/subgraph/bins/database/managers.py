@@ -1735,6 +1735,9 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
                         f" {chain}'s {protocol} has same rewarder address with same reward token "
                     )
         except IndexError as e:
+            logger.exception(
+                f" allrewars2 external error {chain}'s {protocol}    err:{e}"
+            )
             raise IndexError(
                 f""" {chain}'s {protocol} has no rewards data in database {f"for {current_timestamp} timestamp" if current_timestamp else ""}"""
             ) from e
