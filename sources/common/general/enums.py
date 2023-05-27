@@ -68,25 +68,13 @@ class Chain(str, Enum):
 
 class Dex(str, Enum):
     QUICKSWAP = "quickswap"
-    UNISWAP = "uniswap"
+    UNISWAP = "uniswapv3"
     ZYBERSWAP = "zyberswap"
     THENA = "thena"
     GLACIER = "glacier"
     CAMELOT = "camelot"
     RETRO = "retro"
     STELLASWAP = "stellaswap"
-
-
-@unique
-class ChainId(int, Enum):
-    ARBITRUM = 42161
-    CELO = 42220
-    ETHEREUM = 1
-    OPTIMISM = 10
-    POLYGON = 137
-    BSC = 56
-    POLYGON_ZKEVM = 1101
-    AVALANCHE = 43114
 
 
 class Protocol(str, Enum):

@@ -10,7 +10,7 @@ from endpoint.routers.template import (
     router_builder_generalTemplate,
     router_builder_baseTemplate,
 )
-from sources.common.general.enums import Dex, Chain
+from sources.common.general.enums import Dex, Chain, Protocol
 from sources.mongo.bins.apps import hypervisor
 from sources.mongo.bins.apps import user
 from sources.mongo.bins.apps import prices
@@ -29,7 +29,7 @@ def build_routers() -> list:
             dex=Dex.UNISWAP,
             chain=Chain.ETHEREUM,
             tags=["Uniswap - Ethereum"],
-            prefix=f"/{Dex.UNISWAP.value}/{Chain.ETHEREUM.value}",
+            prefix=f"/{Protocol.UNISWAP.api_url}/{Chain.ETHEREUM.api_url}",
         )
     )
     routes.append(
@@ -37,7 +37,7 @@ def build_routers() -> list:
             dex=Dex.UNISWAP,
             chain=Chain.POLYGON,
             tags=["Uniswap - Polygon"],
-            prefix=f"/{Dex.UNISWAP.value}/{Chain.POLYGON.value}",
+            prefix=f"/{Protocol.UNISWAP.api_url}/{Chain.POLYGON.api_url}",
         )
     )
     routes.append(
@@ -45,7 +45,7 @@ def build_routers() -> list:
             dex=Dex.UNISWAP,
             chain=Chain.ARBITRUM,
             tags=["Uniswap - Arbitrum"],
-            prefix=f"/{Dex.UNISWAP.value}/{Chain.ARBITRUM.value}",
+            prefix=f"/{Protocol.UNISWAP.api_url}/{Chain.ARBITRUM.api_url}",
         )
     )
     routes.append(
@@ -53,7 +53,7 @@ def build_routers() -> list:
             dex=Dex.UNISWAP,
             chain=Chain.OPTIMISM,
             tags=["Uniswap - Optimism"],
-            prefix=f"/{Dex.UNISWAP.value}/{Chain.OPTIMISM.value}",
+            prefix=f"/{Protocol.UNISWAP.api_url}/{Chain.OPTIMISM.api_url}",
         )
     )
     routes.append(
@@ -61,7 +61,7 @@ def build_routers() -> list:
             dex=Dex.UNISWAP,
             chain=Chain.CELO,
             tags=["Uniswap - Celo"],
-            prefix=f"/{Dex.UNISWAP.value}/{Chain.CELO.value}",
+            prefix=f"/{Protocol.UNISWAP.api_url}/{Chain.CELO.api_url}",
         )
     )
     routes.append(
@@ -69,7 +69,7 @@ def build_routers() -> list:
             dex=Dex.UNISWAP,
             chain=Chain.BSC,
             tags=["Uniswap - Binance"],
-            prefix=f"/{Dex.UNISWAP.value}/{Chain.BSC.value}",
+            prefix=f"/{Protocol.UNISWAP.api_url}/{Chain.BSC.api_url}",
         )
     )
     routes.append(
@@ -77,7 +77,7 @@ def build_routers() -> list:
             dex=Dex.QUICKSWAP,
             chain=Chain.POLYGON,
             tags=["Quickswap - Polygon"],
-            prefix=f"/{Dex.QUICKSWAP.value}/{Chain.POLYGON.value}",
+            prefix=f"/{Protocol.QUICKSWAP.api_url}/{Chain.POLYGON.api_url}",
         )
     )
     routes.append(
@@ -85,7 +85,7 @@ def build_routers() -> list:
             dex=Dex.ZYBERSWAP,
             chain=Chain.ARBITRUM,
             tags=["Zyberswap - Arbitrum"],
-            prefix=f"/{Dex.ZYBERSWAP.value}/{Chain.ARBITRUM.value}",
+            prefix=f"/{Protocol.ZYBERSWAP.api_url}/{Chain.ARBITRUM.api_url}",
         )
     )
     routes.append(
@@ -93,7 +93,7 @@ def build_routers() -> list:
             dex=Dex.THENA,
             chain=Chain.BSC,
             tags=["Thena - BSC"],
-            prefix=f"/{Dex.THENA.value}/{Chain.BSC.value}",
+            prefix=f"/{Protocol.THENA.api_url}/{Chain.BSC.api_url}",
         )
     )
 
