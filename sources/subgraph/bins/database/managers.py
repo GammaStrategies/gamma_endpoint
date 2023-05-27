@@ -1634,16 +1634,7 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
             local_db_helper = database_local(
                 mongo_url=self._db_mongo_url, db_name=db_name
             )
-            # TODO: remove desperate debug err wire2
-            print(f"database name:  {db_name}")
-            print(f"db url:  {self._db_mongo_url}")
-            query = self.query_rewards(timestamp_end=current_timestamp)
-            print(f"query:   {query} ")
-            print(" ")
-            print(" ")
-            ###
-             
-            
+
             # get data from local database rewards_status ( web3 database)
             rewards_status = await local_db_helper.query_items_from_database(
                 query=self.query_rewards(timestamp_end=current_timestamp),
