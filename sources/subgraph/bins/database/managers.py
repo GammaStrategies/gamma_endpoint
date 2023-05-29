@@ -1254,7 +1254,7 @@ class db_returns_manager(db_collection_manager):
                     }
                 }
             },
-            {"$match": {"exclude": {"$lte": 0.2}}},
+            {"$match": {"exclude": {"$lte": 0.2 if period < 90 else 100}}},
             {"$unset": ["_id", "exclude"]},
         ]
 
