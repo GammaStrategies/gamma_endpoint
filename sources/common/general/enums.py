@@ -5,7 +5,7 @@ class Chain(str, Enum):
     #       ( value , id , API url, API name, subgraph name, database name, fantasy_name )
     ARBITRUM = ("arbitrum", 42161, "arbitrum", "Arbitrum", None, None, "Arbitrum")
     CELO = ("celo", 42220, "celo", "Celo", None, None, "Celo")
-    ETHEREUM = ("mainnet", 1, "mainnet", "Ethereum", None, None, "Ethereum")
+    ETHEREUM = ("mainnet", 1, "mainnet", "Ethereum", None, "ethereum", "Ethereum")
     OPTIMISM = ("optimism", 10, "optimism", "Optimism", None, None, "Optimism")
     POLYGON = ("polygon", 137, "polygon", "Polygon", None, None, "Polygon")
     BSC = ("bsc", 56, "bsc", "Binance chain", "bsc", "binance", "Binance Chain")
