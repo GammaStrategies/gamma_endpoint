@@ -205,7 +205,7 @@ POOL_PATHS = {
     },
     Chain.POLYGON_ZKEVM: {
         # WMATIC
-        "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270": [
+        "0xa2036f0538221a77a3937f1379699f44945018d0": [
             (POOLS[Chain.POLYGON_ZKEVM]["WETH_MATIC"], 0),
             (POOLS[Chain.POLYGON_ZKEVM]["WETH_USDC"], 1),
         ],
