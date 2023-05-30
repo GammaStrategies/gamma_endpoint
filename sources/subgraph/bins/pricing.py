@@ -107,7 +107,12 @@ POOLS = {
     },
     Chain.BSC: {},
     Chain.AVALANCHE: {},
-    Chain.ARBITRUM: {},
+    Chain.ARBITRUM: {
+        "DAI_USDC": {
+            "protocol": Protocol.UNISWAP,
+            "address": "0xf0428617433652c9dc6d1093a42adfbf30d29f74",
+        },
+    },
     Chain.MOONBEAM: {},
 }
 
@@ -216,7 +221,12 @@ POOL_PATHS = {
     },
     Chain.BSC: {},
     Chain.AVALANCHE: {},
-    Chain.ARBITRUM: {},
+    Chain.ARBITRUM: {
+        # DAI
+        "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1": [
+            (POOLS[Chain.ARBITRUM]["DAI_USDC"], 1),
+        ]
+    },
     Chain.MOONBEAM: {},
 }
 
