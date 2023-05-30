@@ -6,12 +6,13 @@ from sources.subgraph.bins.database.managers import (
     db_returns_manager,
     db_allRewards2_manager,
 )
-from sources.subgraph.bins.config import MONGO_DB_URL
+from sources.subgraph.bins.config import MASTERCHEF_ADDRESSES, MONGO_DB_URL
 
 
 class HypervisorAnalytics:
-    def __init__(self, chain: Chain, hypervisor_address: str):
+    def __init__(self, chain: Chain, protocol: Protocol, hypervisor_address: str):
         self.chain = chain
+        self.protocol = protocol
         self.address = hypervisor_address.lower()
 
         self.returns_manager = db_returns_manager(mongo_url=MONGO_DB_URL)
@@ -31,27 +32,23 @@ class HypervisorAnalytics:
                 period=period,
                 ini_date=ini_date,
                 end_date=end_date,
+                filter_valid_masterchef=self.protocol
+                in MASTERCHEF_ADDRESSES.get(self.chain, {}),
             )
         )
 
-        # allrewards2_data = await self.allrewards2_manager.get_hypervisor_rewards(
-        #     chain=self.chain, address=self.address, ini_date=ini_date, end_date=end_date
-        # )
-
-        # # merge first found allrewards2 to returns and il data
-        # returns_il_data["allRewards2"] = (
-        #     allrewards2_data[0]["rewards2"] if allrewards2_data else {}
-        # )
-
-        # # return data
-        # return returns_il_data
-
 
 async def get_hype_data(
-    chain: Chain, hypervisor_address: str, period: int, response: Response = None
+    protocol: Protocol,
+    chain: Chain,
+    hypervisor_address: str,
+    period: int,
+    response: Response = None,
 ):
     if response:
         # this is a database query only
         response.headers["X-Database"] = "true"
-    atest = HypervisorAnalytics(chain=chain, hypervisor_address=hypervisor_address)
+    atest = HypervisorAnalytics(
+        chain=chain, protocol=protocol, hypervisor_address=hypervisor_address
+    )
     return await atest.get_data(period=period)

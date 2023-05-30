@@ -515,7 +515,10 @@ class subgraph_router_builder(router_builder_generalTemplate):
         self, hypervisor_address: str, response: Response
     ):
         return await analytics.get_hype_data(
-            chain=self.chain, hypervisor_address=hypervisor_address, period=1
+            protocol=self.dex,
+            chain=self.chain,
+            hypervisor_address=hypervisor_address,
+            period=1,
         )
 
     @cache(expire=APY_CACHE_TIMEOUT)
@@ -523,7 +526,10 @@ class subgraph_router_builder(router_builder_generalTemplate):
         self, hypervisor_address: str, response: Response
     ):
         return await analytics.get_hype_data(
-            chain=self.chain, hypervisor_address=hypervisor_address, period=7
+            protocol=self.dex,
+            chain=self.chain,
+            hypervisor_address=hypervisor_address,
+            period=7,
         )
 
     @cache(expire=APY_CACHE_TIMEOUT)
@@ -531,7 +537,10 @@ class subgraph_router_builder(router_builder_generalTemplate):
         self, hypervisor_address: str, response: Response
     ):
         return await analytics.get_hype_data(
-            chain=self.chain, hypervisor_address=hypervisor_address, period=14
+            protocol=self.dex,
+            chain=self.chain,
+            hypervisor_address=hypervisor_address,
+            period=14,
         )
 
     @cache(expire=APY_CACHE_TIMEOUT)
@@ -539,7 +548,10 @@ class subgraph_router_builder(router_builder_generalTemplate):
         self, hypervisor_address: str, response: Response
     ):
         return await analytics.get_hype_data(
-            chain=self.chain, hypervisor_address=hypervisor_address, period=30
+            protocol=self.dex,
+            chain=self.chain,
+            hypervisor_address=hypervisor_address,
+            period=30,
         )
 
     @cache(expire=APY_CACHE_TIMEOUT)
@@ -547,7 +559,10 @@ class subgraph_router_builder(router_builder_generalTemplate):
         self, hypervisor_address: str, response: Response, period: Period
     ):
         return await analytics.get_hype_data(
-            chain=self.chain, hypervisor_address=hypervisor_address, period=period.days
+            protocol=self.dex,
+            chain=self.chain,
+            hypervisor_address=hypervisor_address,
+            period=period.days,
         )
 
     #    hypervisors

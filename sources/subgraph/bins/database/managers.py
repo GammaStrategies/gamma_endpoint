@@ -1096,6 +1096,7 @@ class db_returns_manager(db_collection_manager):
         hypervisor_address: str,
         ini_date: datetime = None,
         end_date: datetime = None,
+        filter_valid_masterchef: bool = False,
     ) -> list[dict]:
         """
             matches the first lte return timestamp rewards2 measure and adds it
@@ -1106,6 +1107,7 @@ class db_returns_manager(db_collection_manager):
             hypervisor_address (str):
             ini_date (datetime, optional): . Defaults to None.
             end_date (datetime, optional): . Defaults to None.
+            filer_valid_masterchef (bool, optional): using MASTERCHEF_ADDRESSES . Defaults to False.
 
         Returns:
             list[dict]: query
@@ -1126,11 +1128,15 @@ class db_returns_manager(db_collection_manager):
 
         # construct the allRewards2 match part of the query ( filter masterchefs addresses)
         _allrewards2_match = {}
-        valid_masterchefs = [
-            {"obj_as_arr.k": address.lower()}
-            for dex, address_list in MASTERCHEF_ADDRESSES.get(chain, {}).items()
-            for address in address_list
-        ]
+        valid_masterchefs = (
+            [
+                {"obj_as_arr.k": address.lower()}
+                for dex, address_list in MASTERCHEF_ADDRESSES.get(chain, {}).items()
+                for address in address_list
+            ]
+            if filter_valid_masterchef
+            else []
+        )
         if valid_masterchefs:
             _allrewards2_match = {
                 "$and": [
@@ -1219,6 +1225,7 @@ class db_returns_manager(db_collection_manager):
                     "period_hodl_fifty": "$impermanent.hodl_fifty",
                     "period_hodl_token0": "$impermanent.hodl_token0",
                     "period_hodl_token1": "$impermanent.hodl_token1",
+                    # "allRewards2": "$allRewards2",
                 }
             },
             {
@@ -1256,6 +1263,7 @@ class db_returns_manager(db_collection_manager):
             },
             {"$match": {"exclude": {"$lte": 0.2 if period < 90 else 100}}},
             {"$unset": ["_id", "exclude"]},
+            # {"$unset": ["_id", "exclude", "allRewards2._id"]},
         ]
 
         # debug_query = f"{_query}"
