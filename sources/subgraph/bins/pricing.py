@@ -114,6 +114,7 @@ POOLS = {
         },
     },
     Chain.MOONBEAM: {},
+    Chain.FANTOM: {},
 }
 
 
@@ -228,6 +229,7 @@ POOL_PATHS = {
         ]
     },
     Chain.MOONBEAM: {},
+    Chain.FANTOM: {},
 }
 
 
