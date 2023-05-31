@@ -181,7 +181,7 @@ class FeeGrowthSnapshotData(FeeGrowthDataABC):
         hypervisor_filter = {"where": {"id_in": hypervisors}} if hypervisors else {}
 
         query = DSLQuery(
-            ds.Query.hypervisors(**hypervisor_filter)
+            ds.Query.hypervisors(**({"first": 1000} | hypervisor_filter))
             .alias("static")
             .select(
                 ds.Hypervisor.id,
@@ -192,19 +192,22 @@ class FeeGrowthSnapshotData(FeeGrowthDataABC):
                 ),
             ),
             ds.Query.hypervisors(
-                **({"block": {"number": self.time_range.end.block}} | hypervisor_filter)
+                **(
+                    {"first": 1000, "block": {"number": self.time_range.end.block}}
+                    | hypervisor_filter
+                )
             )
             .alias("latest")
             .select(self.hype_pool_client.hypervisor_fields_fragment()),
             ds.Query.hypervisors(
                 **(
-                    {"block": {"number": self.time_range.initial.block}}
+                    {"first": 1000, "block": {"number": self.time_range.initial.block}}
                     | hypervisor_filter
                 )
             )
             .alias("initial")
             .select(self.hype_pool_client.hypervisor_fields_fragment()),
-            ds.Query.hypervisors(**hypervisor_filter)
+            ds.Query.hypervisors(**({"first": 1000} | hypervisor_filter))
             .alias("snapshots")
             .select(
                 ds.Hypervisor.id,
