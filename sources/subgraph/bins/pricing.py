@@ -112,6 +112,14 @@ POOLS = {
             "protocol": Protocol.UNISWAP,
             "address": "0xf0428617433652c9dc6d1093a42adfbf30d29f74",
         },
+        "WETH_NOISEGPT": {
+            "protocol": Protocol.UNISWAP,
+            "address": "0xda5660ff6de514eecfa20a39160db6ef671f996f",
+        },
+        "WETH_USDC": {
+            "protocol": Protocol.UNISWAP,
+            "address": "0xc31e54c7a869b9fcbecc14363cf510d1c41fa443",
+        }
     },
     Chain.MOONBEAM: {},
     Chain.FANTOM: {},
@@ -226,6 +234,11 @@ POOL_PATHS = {
         # DAI
         "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1": [
             (POOLS[Chain.ARBITRUM]["DAI_USDC"], 1),
+        ],
+        # NOISEGPT
+        "0xadd5620057336f868eae78a451c503ae7b576bad": [
+            (POOLS[Chain.ARBITRUM]["WETH_NOISEGPT"], 0),
+            (POOLS[Chain.ARBITRUM]["WETH_USDC"], 1),
         ]
     },
     Chain.MOONBEAM: {},
