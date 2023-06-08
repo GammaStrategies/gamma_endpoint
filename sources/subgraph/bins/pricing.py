@@ -129,7 +129,12 @@ POOLS = {
             "address": "0xc31e54c7a869b9fcbecc14363cf510d1c41fa443",
         }
     },
-    Chain.MOONBEAM: {},
+    Chain.MOONBEAM: {
+        "USDC_WGLMR": {
+            "protocol": Protocol.UNISWAP,
+            "address": "0xab8c35164a8e3ef302d18da953923ea31f0fe393",
+        }
+    },
     Chain.FANTOM: {},
 }
 
@@ -255,7 +260,12 @@ POOL_PATHS = {
             (POOLS[Chain.ARBITRUM]["WETH_USDC"], 1),
         ]
     },
-    Chain.MOONBEAM: {},
+    Chain.MOONBEAM: {
+        # WGLMR
+        "0xacc15dc74880c9944775448304b263d191c6077f": [
+            (POOLS[Chain.ARBITRUM]["USDC_WGLMR"], 0),
+        ]
+    },
     Chain.FANTOM: {},
 }
 
@@ -391,6 +401,11 @@ async def token_prices(chain: Chain):
 
     llama_client = LlamaClient(Chain.ETHEREUM)
     with contextlib.suppress(Exception):
-        ALCX_ADDRESS = "0xdbdb4d16eda451d0503b854cf79d55697f90c8df"
-        prices[ALCX_ADDRESS] = await llama_client.current_token_price(ALCX_ADDRESS)
+        if chain == Chain.OPTIMISM:
+            ALCX_ADDRESS = "0xdbdb4d16eda451d0503b854cf79d55697f90c8df"
+            prices[ALCX_ADDRESS] = await llama_client.current_token_price(ALCX_ADDRESS)
+        
+        if chain == Chain.MOONBEAM:
+            GLINT_ADDRESS = "0xcd3b51d98478d53f4515a306be565c6eebef1d58"
+            prices[GLINT_ADDRESS] = await llama_client.current_token_price(GLINT_ADDRESS)
     return prices
