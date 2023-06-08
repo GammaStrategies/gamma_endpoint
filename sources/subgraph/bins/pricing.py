@@ -263,7 +263,7 @@ POOL_PATHS = {
     Chain.MOONBEAM: {
         # WGLMR
         "0xacc15dc74880c9944775448304b263d191c6077f": [
-            (POOLS[Chain.ARBITRUM]["USDC_WGLMR"], 0),
+            (POOLS[Chain.MOONBEAM]["USDC_WGLMR"], 0),
         ]
     },
     Chain.FANTOM: {},
