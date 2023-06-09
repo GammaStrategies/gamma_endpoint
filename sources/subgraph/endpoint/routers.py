@@ -193,6 +193,15 @@ def build_routers() -> list:
         )
     )
 
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.SUSHI,
+            chain=Chain.POLYGON,
+            tags=["Sushi - Polygon"],
+            prefix=f"/{Protocol.SUSHI.value}/{Chain.POLYGON.value}",
+        )
+    )
+
     # Simulation
     routes.append(
         subgraph_router_builder_Simulator(tags=["Simulator"], prefix="/simulator")
@@ -352,6 +361,16 @@ def build_routers_compatible() -> list:
             prefix=f"/{Protocol.SPIRITSWAP.value}/{Chain.FANTOM.value}",
         )
     )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.SUSHI,
+            chain=Chain.POLYGON,
+            tags=["Sushi - Polygon"],
+            prefix=f"/{Protocol.SUSHI.value}/{Chain.POLYGON.value}",
+        )
+    )
+
 
     # Simulation
     routes.append(

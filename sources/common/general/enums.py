@@ -75,6 +75,7 @@ class Dex(str, Enum):
     CAMELOT = "camelot"
     RETRO = "retro"
     STELLASWAP = "stellaswap"
+    SUSHI = "sushi"
 
 
 class Protocol(str, Enum):
@@ -96,6 +97,7 @@ class Protocol(str, Enum):
     BEAMSWAP = ("beamswap", None, None, None, "Beamswap")
     RAMSES = ("ramses", None, None, None, "Ramses")
     VEZARD = ("vezard", None, None, None, "veZard")
+    SUSHI = ("sushi", None, None, None, "sushi")
 
     # extra properties
     api_url: str

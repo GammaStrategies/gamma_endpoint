@@ -19,6 +19,7 @@ DEPLOYMENTS = [
     (Protocol.STELLASWAP, Chain.MOONBEAM),
     (Protocol.BEAMSWAP, Chain.MOONBEAM),
     (Protocol.SPIRITSWAP, Chain.FANTOM),
+    (Protocol.SUSHI, Chain.POLYGON),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -71,6 +72,9 @@ DEX_SUBGRAPH_URLS = {
     Protocol.SPIRITSWAP: {
         Chain.FANTOM: get_config("SPIRITSWAP_FANTOM_SUBGRAPH_URL"),
     },
+    Protocol.SUSHI: {
+        Chain.POLYGON: get_config("SUSHI_POLYGON_SUBGRAPH_URL"),
+    },
 }
 
 DEX_HYPEPOOL_SUBGRAPH_URLS = {
@@ -110,6 +114,9 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.SPIRITSWAP: {
         Chain.FANTOM: get_config("SPIRITSWAP_FANTOM_HP_SUBGRAPH_URL"),
     },
+    Protocol.SUSHI: {
+        Chain.POLYGON: get_config("SUSHI_POLYGON_HP_SUBGRAPH_URL"),
+    },
 }
 
 GAMMA_SUBGRAPH_URLS = {
@@ -148,6 +155,9 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.SPIRITSWAP: {
         Chain.FANTOM: get_config("SPIRITSWAP_FANTOM_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.SUSHI: {
+        Chain.POLYGON: get_config("SUSHI_POLYGON_GAMMA_SUBGRAPH_URL"),
     },
 }
 
