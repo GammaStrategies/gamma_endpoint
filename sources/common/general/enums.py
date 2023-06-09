@@ -231,3 +231,15 @@ class Period(str, Enum):
         obj.cron = cron or ""
         obj.days = days or 0
         return obj
+
+
+class rewarderType(str, Enum):
+    GAMMA_masterchef_v1 = "gamma_masterchef_v1"
+    GAMMA_masterchef_v2 = "gamma_masterchef_v2"
+
+    ZYBERSWAP_masterchef_v1 = "zyberswap_masterchef_v1"
+    ZYBERSWAP_masterchef_v1_rewarder = "zyberswap_masterchef_v1_rewarder"
+    THENA_gauge_v2 = "thena_gauge_v2"
+    THENA_voter_v3 = "thena_voter_v3"
+    BEAMSWAP_masterchef_v2 = "beamswap_masterchef_v2"
+    BEAMSWAP_masterchef_v2_rewarder = "beamswap_masterchef_v2_rewarder"

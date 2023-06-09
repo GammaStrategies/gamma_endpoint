@@ -52,7 +52,7 @@ WEB3_CHAIN_IDS = {
 STATIC_REGISTRY_ADDRESSES = {
     "ethereum": {
         "hypervisors": {
-            "uniswap": "0x31ccdb5bd6322483bebd0787e1dabd1bf1f14946",
+            "uniswapv3": "0x31ccdb5bd6322483bebd0787e1dabd1bf1f14946",
         },
         "MasterChefV2Registry": {},
         "feeDistributors": [
@@ -62,26 +62,26 @@ STATIC_REGISTRY_ADDRESSES = {
     },
     "polygon": {
         "hypervisors": {
-            "uniswap": "0x0Ac4C7b794f3D7e7bF1093A4f179bA792CF15055",
+            "uniswapv3": "0x0Ac4C7b794f3D7e7bF1093A4f179bA792CF15055",
             "quickswap": "0xAeC731F69Fa39aD84c7749E913e3bC227427Adfd",
         },
         "MasterChefRegistry": "0x135B02F8b110Fe2Dd8B6a5e2892Ee781264c2fbe",
         "MasterChefV2Registry": {
-            "uniswap": "0x02C8D3FCE5f072688e156F503Bd5C7396328613A",
+            "uniswapv3": "0x02C8D3FCE5f072688e156F503Bd5C7396328613A",
             "quickswap": "0x62cD3612233B2F918BBf0d17B9Eda3005b84e16f",
         },
     },
     "optimism": {
         "hypervisors": {
-            "uniswap": "0xF5BFA20F4A77933fEE0C7bB7F39E7642A070d599",
+            "uniswapv3": "0xF5BFA20F4A77933fEE0C7bB7F39E7642A070d599",
         },
         "MasterChefV2Registry": {
-            "uniswap": "0x81d9bF667205662bfa729C790F67D97D54EA391C",
+            "uniswapv3": "0x81d9bF667205662bfa729C790F67D97D54EA391C",
         },
     },
     "arbitrum": {
         "hypervisors": {
-            "uniswap": "0x66CD859053c458688044d816117D5Bdf42A56813",
+            "uniswapv3": "0x66CD859053c458688044d816117D5Bdf42A56813",
             "zyberswap": "0x37595FCaF29E4fBAc0f7C1863E3dF2Fe6e2247e9",
         },
         "MasterChefV2Registry": {},
@@ -91,7 +91,7 @@ STATIC_REGISTRY_ADDRESSES = {
     },
     "celo": {
         "hypervisors": {
-            "uniswap": "0x0F548d7AD1A0CB30D1872b8C18894484d76e1569",
+            "uniswapv3": "0x0F548d7AD1A0CB30D1872b8C18894484d76e1569",
         },
         "MasterChefV2Registry": {},
     },

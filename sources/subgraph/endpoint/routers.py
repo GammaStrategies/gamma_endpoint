@@ -44,6 +44,26 @@ RUN_FIRST = RUN_FIRST_QUERY_TYPE
 
 # Route builders
 
+DEPLOYED: list[tuple[Protocol, Chain]] = [
+    (Protocol.UNISWAP, Chain.ETHEREUM),
+    (Protocol.UNISWAP, Chain.POLYGON),
+    (Protocol.UNISWAP, Chain.ARBITRUM),
+    (Protocol.UNISWAP, Chain.OPTIMISM),
+    (Protocol.UNISWAP, Chain.CELO),
+    (Protocol.UNISWAP, Chain.BSC),
+    (Protocol.QUICKSWAP, Chain.POLYGON),
+    (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
+    (Protocol.ZYBERSWAP, Chain.ARBITRUM),
+    (Protocol.THENA, Chain.BSC),
+    (Protocol.CAMELOT, Chain.ARBITRUM),
+    (Protocol.GLACIER, Chain.AVALANCHE),
+    (Protocol.RETRO, Chain.POLYGON),
+    (Protocol.STELLASWAP, Chain.MOONBEAM),
+    (Protocol.BEAMSWAP, Chain.MOONBEAM),
+    (Protocol.SPIRITSWAP, Chain.FANTOM),
+    (Protocol.SUSHI, Chain.POLYGON),
+]
+
 
 def build_routers() -> list:
     routes = []
@@ -56,151 +76,15 @@ def build_routers() -> list:
     )
 
     # setup dex + chain endpoints
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.UNISWAP,
-            chain=Chain.ETHEREUM,
-            tags=["Uniswap - Ethereum"],
-            prefix=f"/{Protocol.UNISWAP.value}/{Chain.ETHEREUM.value}",
+    for protocol, chain in DEPLOYED:
+        routes.append(
+            subgraph_router_builder(
+                dex=protocol,
+                chain=chain,
+                tags=[f"{protocol.fantasy_name} - {chain.fantasy_name}"],
+                prefix=f"/{protocol.api_url}/{chain.api_url}",
+            )
         )
-    )
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.UNISWAP,
-            chain=Chain.POLYGON,
-            tags=["Uniswap - Polygon"],
-            prefix=f"/{Protocol.UNISWAP.value}/{Chain.POLYGON.value}",
-        )
-    )
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.UNISWAP,
-            chain=Chain.ARBITRUM,
-            tags=["Uniswap - Arbitrum"],
-            prefix=f"/{Protocol.UNISWAP.value}/{Chain.ARBITRUM.value}",
-        )
-    )
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.UNISWAP,
-            chain=Chain.OPTIMISM,
-            tags=["Uniswap - Optimism"],
-            prefix=f"/{Protocol.UNISWAP.value}/{Chain.OPTIMISM.value}",
-        )
-    )
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.UNISWAP,
-            chain=Chain.CELO,
-            tags=["Uniswap - Celo"],
-            prefix=f"/{Protocol.UNISWAP.value}/{Chain.CELO.value}",
-        )
-    )
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.UNISWAP,
-            chain=Chain.BSC,
-            tags=["Uniswap - Binance"],
-            prefix=f"/{Protocol.UNISWAP.value}/{Chain.BSC.value}",
-        )
-    )
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.QUICKSWAP,
-            chain=Chain.POLYGON,
-            tags=["Quickswap - Polygon"],
-            prefix=f"/{Protocol.QUICKSWAP.value}/{Chain.POLYGON.value}",
-        )
-    )
-
-    # TODO: add url variable linked to Enum Chain
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.QUICKSWAP,
-            chain=Chain.POLYGON_ZKEVM,
-            tags=["Quickswap - Polygon zkEVM"],
-            prefix=f"/{Protocol.QUICKSWAP.value}/polygon-zkevm",
-        )
-    )
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.ZYBERSWAP,
-            chain=Chain.ARBITRUM,
-            tags=["Zyberswap - Arbitrum"],
-            prefix=f"/{Protocol.ZYBERSWAP.value}/{Chain.ARBITRUM.value}",
-        )
-    )
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.THENA,
-            chain=Chain.BSC,
-            tags=["Thena - BSC"],
-            prefix=f"/{Protocol.THENA.value}/{Chain.BSC.value}",
-        )
-    )
-
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.CAMELOT,
-            chain=Chain.ARBITRUM,
-            tags=["Camelot - Arbitrum"],
-            prefix=f"/{Protocol.CAMELOT.value}/{Chain.ARBITRUM.value}",
-        )
-    )
-
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.GLACIER,
-            chain=Chain.AVALANCHE,
-            tags=["Glacier - Avalanche"],
-            prefix=f"/{Protocol.GLACIER.value}/{Chain.AVALANCHE.value}",
-        )
-    )
-
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.RETRO,
-            chain=Chain.POLYGON,
-            tags=["Retro - Polygon"],
-            prefix=f"/{Protocol.RETRO.value}/{Chain.POLYGON.value}",
-        )
-    )
-
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.STELLASWAP,
-            chain=Chain.MOONBEAM,
-            tags=["StellaSwap - Moonbeam"],
-            prefix=f"/{Protocol.STELLASWAP.value}/{Chain.MOONBEAM.value}",
-        )
-    )
-
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.BEAMSWAP,
-            chain=Chain.MOONBEAM,
-            tags=["BeamSwap - Moonbeam"],
-            prefix=f"/{Protocol.BEAMSWAP.value}/{Chain.MOONBEAM.value}",
-        )
-    )
-
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.SPIRITSWAP,
-            chain=Chain.FANTOM,
-            tags=["SpiritSwap - Fantom"],
-            prefix=f"/{Protocol.SPIRITSWAP.value}/{Chain.FANTOM.value}",
-        )
-    )
-
-    routes.append(
-        subgraph_router_builder(
-            dex=Protocol.SUSHI,
-            chain=Chain.POLYGON,
-            tags=["Sushi - Polygon"],
-            prefix=f"/{Protocol.SUSHI.value}/{Chain.POLYGON.value}",
-        )
-    )
 
     # Simulation
     routes.append(
@@ -241,7 +125,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.UNISWAP,
             chain=Chain.POLYGON,
             tags=["Polygon"],
-            prefix=f"/{Chain.POLYGON.value}",
+            prefix=f"/{Chain.POLYGON.api_url}",
         )
     )
     routes.append(
@@ -249,7 +133,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.UNISWAP,
             chain=Chain.ARBITRUM,
             tags=["Arbitrum"],
-            prefix=f"/{Chain.ARBITRUM.value}",
+            prefix=f"/{Chain.ARBITRUM.api_url}",
         )
     )
     routes.append(
@@ -257,7 +141,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.UNISWAP,
             chain=Chain.OPTIMISM,
             tags=["Optimism"],
-            prefix=f"/{Chain.OPTIMISM.value}",
+            prefix=f"/{Chain.OPTIMISM.api_url}",
         )
     )
     routes.append(
@@ -265,7 +149,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.UNISWAP,
             chain=Chain.CELO,
             tags=["Celo"],
-            prefix=f"/{Chain.CELO.value}",
+            prefix=f"/{Chain.CELO.api_url}",
         )
     )
     routes.append(
@@ -273,7 +157,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.UNISWAP,
             chain=Chain.BSC,
             tags=["BSC"],
-            prefix=f"/{Chain.BSC.value}",
+            prefix=f"/{Chain.BSC.api_url}",
         )
     )
     routes.append(
@@ -281,7 +165,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.QUICKSWAP,
             chain=Chain.POLYGON,
             tags=["Quickswap - Polygon"],
-            prefix=f"/{Protocol.QUICKSWAP.value}/{Chain.POLYGON.value}",
+            prefix=f"/{Protocol.QUICKSWAP.api_url}/{Chain.POLYGON.api_url}",
         )
     )
     routes.append(
@@ -289,7 +173,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.QUICKSWAP,
             chain=Chain.POLYGON_ZKEVM,
             tags=["Quickswap - Polygon zkEVM"],
-            prefix=f"/{Protocol.QUICKSWAP.value}/polygon-zkevm",
+            prefix=f"/{Protocol.QUICKSWAP.api_url}/{Chain.POLYGON_ZKEVM.api_url}",
         )
     )
     routes.append(
@@ -297,7 +181,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.ZYBERSWAP,
             chain=Chain.ARBITRUM,
             tags=["Zyberswap - Arbitrum"],
-            prefix=f"/{Protocol.ZYBERSWAP.value}/{Chain.ARBITRUM.value}",
+            prefix=f"/{Protocol.ZYBERSWAP.api_url}/{Chain.ARBITRUM.api_url}",
         )
     )
     routes.append(
@@ -305,7 +189,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.THENA,
             chain=Chain.BSC,
             tags=["Thena - BSC"],
-            prefix=f"/{Protocol.THENA.value}/{Chain.BSC.value}",
+            prefix=f"/{Protocol.THENA.api_url}/{Chain.BSC.api_url}",
         )
     )
     routes.append(
@@ -313,7 +197,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.CAMELOT,
             chain=Chain.ARBITRUM,
             tags=["Camelot - Arbitrum"],
-            prefix=f"/{Protocol.CAMELOT.value}/{Chain.ARBITRUM.value}",
+            prefix=f"/{Protocol.CAMELOT.api_url}/{Chain.ARBITRUM.api_url}",
         )
     )
 
@@ -322,7 +206,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.GLACIER,
             chain=Chain.AVALANCHE,
             tags=["Glacier - Avalanche"],
-            prefix=f"/{Protocol.GLACIER.value}/{Chain.AVALANCHE.value}",
+            prefix=f"/{Protocol.GLACIER.api_url}/{Chain.AVALANCHE.api_url}",
         )
     )
 
@@ -331,7 +215,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.RETRO,
             chain=Chain.POLYGON,
             tags=["Retro - Polygon"],
-            prefix=f"/{Protocol.RETRO.value}/{Chain.POLYGON.value}",
+            prefix=f"/{Protocol.RETRO.api_url}/{Chain.POLYGON.api_url}",
         )
     )
 
@@ -340,7 +224,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.STELLASWAP,
             chain=Chain.MOONBEAM,
             tags=["StellaSwap - Moonbeam"],
-            prefix=f"/{Protocol.STELLASWAP.value}/{Chain.MOONBEAM.value}",
+            prefix=f"/{Protocol.STELLASWAP.api_url}/{Chain.MOONBEAM.api_url}",
         )
     )
 
@@ -349,7 +233,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.BEAMSWAP,
             chain=Chain.MOONBEAM,
             tags=["BeamSwap - Moonbeam"],
-            prefix=f"/{Protocol.BEAMSWAP.value}/{Chain.MOONBEAM.value}",
+            prefix=f"/{Protocol.BEAMSWAP.api_url}/{Chain.MOONBEAM.api_url}",
         )
     )
 
@@ -358,7 +242,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.SPIRITSWAP,
             chain=Chain.FANTOM,
             tags=["SpiritSwap - Fantom"],
-            prefix=f"/{Protocol.SPIRITSWAP.value}/{Chain.FANTOM.value}",
+            prefix=f"/{Protocol.SPIRITSWAP.api_url}/{Chain.FANTOM.api_url}",
         )
     )
 
@@ -367,7 +251,7 @@ def build_routers_compatible() -> list:
             dex=Protocol.SUSHI,
             chain=Chain.POLYGON,
             tags=["Sushi - Polygon"],
-            prefix=f"/{Protocol.SUSHI.value}/{Chain.POLYGON.value}",
+            prefix=f"/{Protocol.SUSHI.api_url}/{Chain.POLYGON.api_url}",
         )
     )
 

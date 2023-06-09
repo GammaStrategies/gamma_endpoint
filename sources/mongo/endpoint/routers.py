@@ -16,92 +16,40 @@ from sources.mongo.bins.apps import user
 from sources.mongo.bins.apps import prices
 
 
+DEPLOYED: list[tuple[Protocol, Chain]] = [
+    (Protocol.UNISWAP, Chain.ETHEREUM),
+    (Protocol.UNISWAP, Chain.POLYGON),
+    (Protocol.UNISWAP, Chain.ARBITRUM),
+    (Protocol.UNISWAP, Chain.OPTIMISM),
+    (Protocol.UNISWAP, Chain.CELO),
+    (Protocol.UNISWAP, Chain.BSC),
+    (Protocol.QUICKSWAP, Chain.POLYGON),
+    (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
+    (Protocol.ZYBERSWAP, Chain.ARBITRUM),
+    (Protocol.THENA, Chain.BSC),
+    (Protocol.CAMELOT, Chain.ARBITRUM),
+    (Protocol.GLACIER, Chain.AVALANCHE),
+    (Protocol.RETRO, Chain.POLYGON),
+    (Protocol.STELLASWAP, Chain.MOONBEAM),
+    (Protocol.BEAMSWAP, Chain.MOONBEAM),
+    (Protocol.SPIRITSWAP, Chain.FANTOM),
+    (Protocol.SUSHI, Chain.POLYGON),
+]
+
+
 def build_routers() -> list:
     routes = []
 
-    # all-deployments
-    # TODO: add all-deployments route
-
     # setup dex + chain endpoints
-
-    routes.append(
-        mongo_router_builder(
-            dex=Dex.UNISWAP,
-            chain=Chain.ETHEREUM,
-            tags=["Uniswap - Ethereum"],
-            prefix=f"/{Protocol.UNISWAP.api_url}/{Chain.ETHEREUM.api_url}",
+    for protocol, chain in DEPLOYED:
+        routes.append(
+            mongo_router_builder(
+                dex=protocol,
+                chain=chain,
+                tags=[f"{protocol.fantasy_name} - {chain.fantasy_name}"],
+                prefix=f"/{protocol.api_url}/{chain.api_url}",
+            )
         )
-    )
-    routes.append(
-        mongo_router_builder(
-            dex=Dex.UNISWAP,
-            chain=Chain.POLYGON,
-            tags=["Uniswap - Polygon"],
-            prefix=f"/{Protocol.UNISWAP.api_url}/{Chain.POLYGON.api_url}",
-        )
-    )
-    routes.append(
-        mongo_router_builder(
-            dex=Dex.UNISWAP,
-            chain=Chain.ARBITRUM,
-            tags=["Uniswap - Arbitrum"],
-            prefix=f"/{Protocol.UNISWAP.api_url}/{Chain.ARBITRUM.api_url}",
-        )
-    )
-    routes.append(
-        mongo_router_builder(
-            dex=Dex.UNISWAP,
-            chain=Chain.OPTIMISM,
-            tags=["Uniswap - Optimism"],
-            prefix=f"/{Protocol.UNISWAP.api_url}/{Chain.OPTIMISM.api_url}",
-        )
-    )
-    routes.append(
-        mongo_router_builder(
-            dex=Dex.UNISWAP,
-            chain=Chain.CELO,
-            tags=["Uniswap - Celo"],
-            prefix=f"/{Protocol.UNISWAP.api_url}/{Chain.CELO.api_url}",
-        )
-    )
-    routes.append(
-        mongo_router_builder(
-            dex=Dex.UNISWAP,
-            chain=Chain.BSC,
-            tags=["Uniswap - Binance"],
-            prefix=f"/{Protocol.UNISWAP.api_url}/{Chain.BSC.api_url}",
-        )
-    )
-    routes.append(
-        mongo_router_builder(
-            dex=Dex.QUICKSWAP,
-            chain=Chain.POLYGON,
-            tags=["Quickswap - Polygon"],
-            prefix=f"/{Protocol.QUICKSWAP.api_url}/{Chain.POLYGON.api_url}",
-        )
-    )
-    routes.append(
-        mongo_router_builder(
-            dex=Dex.ZYBERSWAP,
-            chain=Chain.ARBITRUM,
-            tags=["Zyberswap - Arbitrum"],
-            prefix=f"/{Protocol.ZYBERSWAP.api_url}/{Chain.ARBITRUM.api_url}",
-        )
-    )
-    routes.append(
-        mongo_router_builder(
-            dex=Dex.THENA,
-            chain=Chain.BSC,
-            tags=["Thena - BSC"],
-            prefix=f"/{Protocol.THENA.api_url}/{Chain.BSC.api_url}",
-        )
-    )
-
-    # Simulation
-    # TODO: add simulation route
-
-    # Charts
-    # TODO: add charts route
 
     return routes
 
