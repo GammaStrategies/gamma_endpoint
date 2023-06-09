@@ -1763,9 +1763,26 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
             {
                 "$group": {
                     "_id": "$hypervisor_address",
-                    "reward_data": {"$first": "$$ROOT"},
+                    "last_block": {"$first": "$block"},
+                    "reward_data": {"$push": "$$ROOT"},
                 }
             },
+            {"$unwind": "$reward_data"},
+            {
+                "$group": {
+                    "_id": "$_id",
+                    "reward_data": {
+                        "$push": {
+                            "$cond": [
+                                {"$eq": ["$last_block", "$reward_data.block"]},
+                                "$reward_data",
+                                "$$REMOVE",
+                            ]
+                        },
+                    },
+                }
+            },
+            {"$unwind": "$reward_data"},
             {"$replaceRoot": {"newRoot": "$reward_data"}},
             {"$unset": ["_id"]},
         ]
