@@ -371,7 +371,6 @@ def build_routers_compatible() -> list:
         )
     )
 
-
     # Simulation
     routes.append(
         subgraph_router_builder_Simulator(tags=["Simulator"], prefix="/simulator")
@@ -795,6 +794,9 @@ class subgraph_router_builder_compatible(subgraph_router_builder):
         days: int = 6,
         timezone: str = DEFAULT_TIMEZONE,
     ):
+        # TODO: softcode max days back (config)
+        max_days_back = 365
+
         token_symbol = token_symbol.lower()
         timezone = timezone.upper()
 
@@ -812,8 +814,12 @@ class subgraph_router_builder_compatible(subgraph_router_builder):
             "eth": EthDistribution,
         }
 
+        # make sure days is not greater than max_days_back
+        days = max_days_back if days > max_days_back else days
+
+        # get the distribution class
         token_distributions = distribution_class_map[token_symbol](
-            self.chain, days=60, timezone=timezone
+            self.chain, days=days if days > 60 else 60, timezone=timezone
         )
         return await token_distributions.output(days)
 
