@@ -794,8 +794,8 @@ class subgraph_router_builder_compatible(subgraph_router_builder):
         days: int = 6,
         timezone: str = DEFAULT_TIMEZONE,
     ):
-        # TODO: softcode max days back (config)
-        max_days_back = 365
+        # maximum subgraph query = 1000 items (in this case days)
+        max_days_back = 1000
 
         token_symbol = token_symbol.lower()
         timezone = timezone.upper()
@@ -819,7 +819,7 @@ class subgraph_router_builder_compatible(subgraph_router_builder):
 
         # get the distribution class
         token_distributions = distribution_class_map[token_symbol](
-            self.chain, days=days if days > 60 else 60, timezone=timezone
+            self.chain, days=days, timezone=timezone
         )
         return await token_distributions.output(days)
 
