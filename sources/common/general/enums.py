@@ -79,25 +79,25 @@ class Dex(str, Enum):
 
 
 class Protocol(str, Enum):
-    #            ( value , url, fantasy_name )
-    GAMMA = ("gamma", None, None, None, "Gamma Strategies")
+    #  ( value , api_url, api_name, subgraph_name, database_name, fantasy_name )
+    GAMMA = ("gamma", None, None, None, "gamma", "Gamma Strategies")
 
-    ALGEBRAv3 = ("algebrav3", None, None, None, "UniswapV3")
-    UNISWAPv3 = ("uniswapv3", None, None, None, "AlgebraV3")
+    ALGEBRAv3 = ("algebrav3", None, None, None, "algebrav3", "Algebra V3")
+    UNISWAPv3 = ("uniswapv3", None, None, None, "uniswapv3", "Uniswap V3")
 
-    QUICKSWAP = ("quickswap", None, None, None, "QuickSwap")
-    UNISWAP = ("uniswap", None, None, None, "Uniswap")
-    ZYBERSWAP = ("zyberswap", None, None, None, "Zyberswap")
-    THENA = ("thena", None, None, None, "Thena")
-    GLACIER = ("glacier", None, None, None, "Glacier")
-    SPIRITSWAP = ("spiritswap", None, None, None, "SpiritSwap")
-    CAMELOT = ("camelot", None, None, None, "Camelot")
-    RETRO = ("retro", None, None, None, "Retro")
-    STELLASWAP = ("stellaswap", None, None, None, "Stellaswap")
-    BEAMSWAP = ("beamswap", None, None, None, "Beamswap")
-    RAMSES = ("ramses", None, None, None, "Ramses")
-    VEZARD = ("vezard", None, None, None, "veZard")
-    SUSHI = ("sushi", None, None, None, "sushi")
+    QUICKSWAP = ("quickswap", None, None, None, "quickswap", "QuickSwap")
+    UNISWAP = ("uniswap", None, None, None, "uniswapv3", "Uniswap")
+    ZYBERSWAP = ("zyberswap", None, None, None, "zyberswap", "Zyberswap")
+    THENA = ("thena", None, None, None, "thena", "Thena")
+    GLACIER = ("glacier", None, None, None, "glacier", "Glacier")
+    SPIRITSWAP = ("spiritswap", None, None, None, "spiritswap", "SpiritSwap")
+    CAMELOT = ("camelot", None, None, None, "camelot", "Camelot")
+    RETRO = ("retro", None, None, None, "retro", "Retro")
+    STELLASWAP = ("stellaswap", None, None, None, "stellaswap", "Stellaswap")
+    BEAMSWAP = ("beamswap", None, None, None, "beamswap", "Beamswap")
+    RAMSES = ("ramses", None, None, None, "ramses", "Ramses")
+    VEZARD = ("vezard", None, None, None, "vezard", "veZard")
+    SUSHI = ("sushi", None, None, None, "sushi", "Sushi")
 
     # extra properties
     api_url: str

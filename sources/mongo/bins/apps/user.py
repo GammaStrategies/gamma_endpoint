@@ -1,5 +1,5 @@
-from sources.common.general.enums import Chain, Dex
-from sources.common.database.collection_endpoint import database_global, database_local
+from sources.common.general.enums import Chain
+from sources.common.database.collection_endpoint import database_local
 
 # TODO: restruct global config and local config
 from sources.subgraph.bins.config import MONGO_DB_URL
