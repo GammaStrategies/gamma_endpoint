@@ -10,7 +10,7 @@ from sources.web3.bins.w3.objects.basic import web3wrap
 
 from sources.web3.bins.w3.objects.protocols import gamma_hypervisor
 from sources.web3.bins.w3.objects.exchanges import univ3_pool, algebrav3_pool
-from sources.web3.bins.configuration import RPC_URLS, CONFIGURATION
+
 from sources.web3.bins.mixed.price_utilities import price_scraper
 
 

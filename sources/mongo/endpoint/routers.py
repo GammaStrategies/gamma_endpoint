@@ -10,7 +10,7 @@ from endpoint.routers.template import (
     router_builder_generalTemplate,
     router_builder_baseTemplate,
 )
-from sources.common.general.enums import Dex, Chain, Protocol
+from sources.common.general.enums import Chain, Protocol
 from sources.mongo.bins.apps import hypervisor
 from sources.mongo.bins.apps import user
 from sources.mongo.bins.apps import prices
@@ -40,11 +40,11 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
 def build_routers() -> list:
     routes = []
 
-    # setup dex + chain endpoints
+    # setup protocol + chain endpoints
     for protocol, chain in DEPLOYED:
         routes.append(
             mongo_router_builder(
-                dex=protocol,
+                protocol=protocol,
                 chain=chain,
                 tags=[f"{protocol.fantasy_name} - {chain.fantasy_name}"],
                 prefix=f"/{protocol.api_url}/{chain.api_url}",
@@ -56,14 +56,18 @@ def build_routers() -> list:
 
 class mongo_router_builder(router_builder_baseTemplate):
     def __init__(
-        self, dex: str, chain: str, tags: list | None = None, prefix: str = ""
+        self,
+        protocol: Protocol,
+        chain: Chain,
+        tags: list | None = None,
+        prefix: str = "",
     ):
         super().__init__(tags=tags, prefix=prefix)
 
-        self.dex = dex
+        self.protocol = protocol
         self.chain = chain
         # set tags if not supplied
-        self.tags = self.tags or [f"{chain} - {dex}"]
+        self.tags = self.tags or [f"{chain.fantasy_name} - {protocol.fantasy_name}"]
         self.name = type(self).__name__
 
     def generate_unique_id(self, route: "APIRoute") -> str:
@@ -75,10 +79,10 @@ class mongo_router_builder(router_builder_baseTemplate):
 
     # ROUTEs BUILD FUNCTIONS
     def router(self) -> APIRouter:
-        return self._create_routes(dex=self.dex, chain=self.chain)
+        return self._create_routes()
 
-    def _create_routes(self, dex, chain) -> APIRouter:
-        """Create routes for the given chain and dex combination."""
+    def _create_routes(self) -> APIRouter:
+        """Create routes for the given chain and protocol combination."""
 
         router = APIRouter()
 
@@ -91,11 +95,11 @@ class mongo_router_builder(router_builder_baseTemplate):
         )
 
         # create all other routes
-        router = self._create_routes_hypervisor(router=router, dex=dex, chain=chain)
+        router = self._create_routes_hypervisor(router=router)
 
-        router = self._create_routes_hypervisors(router=router, dex=dex, chain=chain)
+        router = self._create_routes_hypervisors(router=router)
 
-        router = self._create_routes_user(router=router, dex=dex, chain=chain)
+        router = self._create_routes_user(router=router)
 
         router.add_api_route(
             path=f"{self.prefix}{'/prices'}",
@@ -107,7 +111,8 @@ class mongo_router_builder(router_builder_baseTemplate):
         return router
 
     def _create_routes_hypervisor(
-        self, router: APIRouter, dex: str, chain: str
+        self,
+        router: APIRouter,
     ) -> APIRouter:
         """Create /hypervisor routes for the given chain and dex combination."""
 
@@ -135,7 +140,8 @@ class mongo_router_builder(router_builder_baseTemplate):
         return router
 
     def _create_routes_hypervisors(
-        self, router: APIRouter, dex: str, chain: str
+        self,
+        router: APIRouter,
     ) -> APIRouter:
         # add hypervisor list
         router.add_api_route(
@@ -161,7 +167,7 @@ class mongo_router_builder(router_builder_baseTemplate):
 
         return router
 
-    def _create_routes_user(self, router: APIRouter, dex: str, chain: str) -> APIRouter:
+    def _create_routes_user(self, router: APIRouter) -> APIRouter:
         router.add_api_route(
             path=f"{self.prefix}{'/user/{user_address}'}",
             endpoint=self.user_data,
@@ -181,7 +187,7 @@ class mongo_router_builder(router_builder_baseTemplate):
     # EXECUTION FUNCTIONS
 
     def root(self) -> str:
-        return f"Gamma Strategies on {self.chain}'s {self.dex} "
+        return f"Gamma Strategies on {self.chain.fantasy_name}'s {self.protocol.fantasy_name} "
 
     # Hypervisor
 
@@ -227,7 +233,7 @@ class mongo_router_builder(router_builder_baseTemplate):
     ):
         """ """
         return await hypervisor.get_hypervisor_prices(
-            network=self.chain, dex=self.dex, hypervisor_address=hypervisor_address
+            network=self.chain, hypervisor_address=hypervisor_address
         )
 
     @cache(expire=DB_CACHE_TIMEOUT)
@@ -250,7 +256,9 @@ class mongo_router_builder(router_builder_baseTemplate):
     @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_list(self, response: Response):
         """Returns the hypervisor found in the database"""
-        return await hypervisor.hypervisors_list(network=self.chain, dex=self.dex)
+        return await hypervisor.hypervisors_list(
+            network=self.chain, protocol=self.protocol
+        )
 
     @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_uncollected_fees(
@@ -426,7 +434,7 @@ class mongo_router_builder_compatible(router_builder_generalTemplate):
     ):
         """ """
         return await hypervisor.get_hypervisor_prices(
-            network=self.chain, dex=self.dex, hypervisor_address=hypervisor_address
+            network=self.chain, hypervisor_address=hypervisor_address
         )
 
     #    hypervisor analytics
@@ -458,7 +466,9 @@ class mongo_router_builder_compatible(router_builder_generalTemplate):
     @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_list(self, response: Response):
         """Returns the hypervisor found in the database"""
-        return await hypervisor.hypervisors_list(network=self.chain, dex=self.dex)
+        return await hypervisor.hypervisors_list(
+            network=self.chain, protocol=self.protocol
+        )
 
     @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisors_aggregate_stats(self, response: Response):

@@ -1,5 +1,5 @@
 import asyncio
-from sources.common.general.enums import Chain, Dex
+from sources.common.general.enums import Chain, Protocol
 from sources.common.database.collection_endpoint import database_global, database_local
 
 from sources.common.database.common.collections_common import db_collections_common
@@ -29,10 +29,10 @@ def global_database_helper():
 # Hypervisors
 
 
-async def hypervisors_list(network: Chain, dex: Dex):
+async def hypervisors_list(network: Chain, protocol: Protocol):
     return await local_database_helper(network=network).get_items_from_database(
         collection_name="static",
-        find={"dex": dex.value},
+        find={"dex": protocol.database_name},
         projection={"_id": 0},
     )
 
@@ -139,7 +139,7 @@ async def hypervisor_collected_fees(
     ]
 
 
-async def get_hypervisor_last_status(network: Chain, dex: Dex, address: str) -> dict:
+async def get_hypervisor_last_status(network: Chain, address: str) -> dict:
     try:
         # get hypervisor's last status found in database
         hypervisor_data = await local_database_helper(
@@ -159,11 +159,9 @@ async def get_hypervisor_last_status(network: Chain, dex: Dex, address: str) -> 
     return hypervisor_data
 
 
-async def get_hypervisor_prices(
-    hypervisor_address: str, network: Chain, dex=Dex
-) -> dict:
+async def get_hypervisor_prices(hypervisor_address: str, network: Chain) -> dict:
     hype_last_status = await get_hypervisor_last_status(
-        network=network, dex=dex, address=hypervisor_address
+        network=network, address=hypervisor_address
     )
     """ Get the latest hypervisor tokens and per share usd prices found in database. """
 
@@ -233,7 +231,6 @@ async def get_hypervisor_prices(
 
 async def get_hypervisor_return(
     network: Chain,
-    dex: Dex,
     hypervisor_address: str,
     start_timestamp: int | None = None,
     end_timestamp: int | None = None,
