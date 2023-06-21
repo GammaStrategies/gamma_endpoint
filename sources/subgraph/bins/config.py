@@ -75,8 +75,6 @@ DEX_SUBGRAPH_URLS = {
     },
     Protocol.SUSHI: {
         Chain.POLYGON: get_config("SUSHI_POLYGON_SUBGRAPH_URL"),
-    },
-    Protocol.SUSHI: {
         Chain.ARBITRUM: get_config("SUSHI_ARBITRUM_SUBGRAPH_URL"),
     },
 }
@@ -120,8 +118,6 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     },
     Protocol.SUSHI: {
         Chain.POLYGON: get_config("SUSHI_POLYGON_HP_SUBGRAPH_URL"),
-    },
-    Protocol.SUSHI: {
         Chain.ARBITRUM: get_config("SUSHI_ARBITRUM_HP_SUBGRAPH_URL"),
     },
 }
@@ -165,8 +161,6 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.SUSHI: {
         Chain.POLYGON: get_config("SUSHI_POLYGON_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.SUSHI: {
         Chain.ARBITRUM: get_config("SUSHI_ARBITRUM_GAMMA_SUBGRAPH_URL"),
     },
 }
