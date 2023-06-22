@@ -182,7 +182,8 @@ async def feed_database_allRewards2():
             protocol=protocol,
         )
         for chain, protocol in CHAINS_PROTOCOLS
-        if protocol not in [Protocol.ZYBERSWAP, Protocol.THENA]
+        if protocol
+        not in [Protocol.ZYBERSWAP, Protocol.THENA, Protocol.SUSHI, Protocol.BEAMSWAP]
     ]
 
     # execute feed
@@ -206,7 +207,8 @@ async def feed_database_allRewards2_externals(current_timestamp: int | None = No
             current_timestamp=current_timestamp,
         )
         for chain, protocol in CHAINS_PROTOCOLS
-        if protocol in [Protocol.ZYBERSWAP, Protocol.THENA]
+        if protocol
+        in [Protocol.ZYBERSWAP, Protocol.THENA, Protocol.SUSHI, Protocol.BEAMSWAP]
     ]
 
     # execute feed
