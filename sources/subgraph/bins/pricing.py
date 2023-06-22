@@ -98,6 +98,14 @@ POOLS = {
             "protocol": Protocol.QUICKSWAP,
             "address": "0x55caabb0d2b704fd0ef8192a7e35d8837e678207",
         },
+        "ANKRMATIC_ANKR": {
+            "protocol": Protocol.QUICKSWAP,
+            "address": "0xe629eb79d27f727747c80ccb937e3a51fbacfd4d",
+        },
+        "WMATIC_ANKRMATIC": {
+            "protocol": Protocol.QUICKSWAP,
+            "address": "0x5baaffa2cb0f71af28a1bd9dcfbb98c95b52fb20",
+        },
     },
     Chain.POLYGON_ZKEVM: {
         "WETH_USDC": {
@@ -197,7 +205,8 @@ POOL_PATHS = {
         ],
         # ANKR
         "0x101a023270368c0d50bffb62780f4afd4ea79c35": [
-            (POOLS[Chain.POLYGON]["WMATIC_ANKR"], 0),
+            (POOLS[Chain.POLYGON]["ANKRMATIC_ANKR"], 0),
+            (POOLS[Chain.POLYGON]["WMATIC_ANKRMATIC"], 0),
             (POOLS[Chain.POLYGON]["WMATIC_USDC"], 1),
         ],
         # DAVOS
@@ -408,4 +417,9 @@ async def token_prices(chain: Chain):
         if chain == Chain.MOONBEAM:
             GLINT_ADDRESS = "0xcd3b51d98478d53f4515a306be565c6eebef1d58"
             prices[GLINT_ADDRESS] = await llama_client.current_token_price(GLINT_ADDRESS)
+
+        if chain == Chain.POLYGON:
+            FIS_ADDRESS_MAINNET = "0xef3a930e1ffffacd2fc13434ac81bd278b0ecc8d"
+            FIS_ADDRESS_POLYGON = "0x7a7b94f18ef6ad056cda648588181cda84800f94"
+            prices[FIS_ADDRESS_POLYGON] = await llama_client.current_token_price(FIS_ADDRESS_MAINNET)
     return prices
