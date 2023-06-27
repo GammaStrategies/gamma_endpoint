@@ -421,5 +421,13 @@ async def token_prices(chain: Chain):
         if chain == Chain.POLYGON:
             FIS_ADDRESS_MAINNET = "0xef3a930e1ffffacd2fc13434ac81bd278b0ecc8d"
             FIS_ADDRESS_POLYGON = "0x7a7b94f18ef6ad056cda648588181cda84800f94"
-            prices[FIS_ADDRESS_POLYGON] = await llama_client.current_token_price(FIS_ADDRESS_MAINNET)
+
+            T_MAINNET = "0xcdf7028ceab81fa0c6971208e83fa7872994bee5"
+            T_POLYGON = "0x1d0ab64ed0f1ee4a886462146d26effc6dd00d0b"
+
+            prices[FIS_ADDRESS_POLYGON], prices[T_POLYGON] =await asyncio.gather(
+                llama_client.current_token_price(FIS_ADDRESS_MAINNET),
+                llama_client.current_token_price(T_MAINNET)
+            )
+
     return prices
