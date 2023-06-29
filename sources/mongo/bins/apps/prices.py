@@ -44,3 +44,22 @@ async def get_prices(
         for items in await asyncio.gather(*price_queries)
         for item in items
     }
+
+
+async def get_current_prices(
+    network: Chain, token_addresses: list[str] | None = None
+) -> list[dict]:
+    find = {"network": network.database_name}
+    if token_addresses:
+        # build ids
+        ids = [f"{network.database_name}_{address}" for address in token_addresses]
+        find = {"id": {"$in": ids}}
+    else:
+        find = {"network": network.database_name}
+
+    return await database_global(mongo_url=MONGO_DB_URL).get_items_from_database(
+        collection_name="current_usd_prices",
+        find=find,
+        projection={"_id": False, "id": False},
+        batch_size=50000,
+    )

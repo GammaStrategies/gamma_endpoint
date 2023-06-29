@@ -44,6 +44,15 @@ class database_global(db_collections_common):
                     "mono_indexes": {"id": True, "address": False},
                     "multi_indexes": [],
                 },
+                "current_usd_prices": {
+                    "mono_indexes": {"id": True, "address": False},
+                    "multi_indexes": [
+                        [
+                            ("address", ASCENDING),
+                            ("network", ASCENDING),
+                        ],
+                    ],
+                },
             }
         super().__init__(
             mongo_url=mongo_url, db_name=db_name, db_collections=db_collections
