@@ -105,7 +105,8 @@ class mongo_router_builder(router_builder_baseTemplate):
     ):
         super().__init__(tags=tags, prefix=prefix)
 
-        self.protocol = protocol
+        # uniswap is the pool protocol... gamma is the hype protocol ( dex in database to-be-changed)
+        self.protocol = Protocol.GAMMA if protocol is Protocol.UNISWAP else protocol
         self.chain = chain
         # set tags if not supplied
         self.tags = self.tags or [f"{chain.fantasy_name} - {protocol.fantasy_name}"]
