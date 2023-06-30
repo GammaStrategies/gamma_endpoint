@@ -115,6 +115,15 @@ class database_global(db_collections_common):
             find={"id": f"{network}_{block}_{address}"},
         )
 
+    async def get_prices_usd_last(
+        self, network: str, limit: int | None = 10000
+    ) -> list[dict]:
+        """get last block known prices of all tokens present in the database"""
+        return await self.get_items_from_database(
+            collection_name="usd_prices",
+            aggregate=self.query_last_prices(network=network, limit=limit),
+        )
+
     async def get_price_usd_closestBlock(
         self,
         network: str,
@@ -233,6 +242,27 @@ class database_global(db_collections_common):
             # Take the first one
             {"$limit": 1},
         ]
+
+    @staticmethod
+    def query_last_prices(network: str, limit: int | None = 10000) -> list[dict]:
+        """get last prices from database
+
+        Args:
+            network (str):
+
+        Returns:
+            list[dict]:
+        """
+        query = [
+            {"$match": {"network": network}},
+            {"$sort": {"block": -1}},
+        ]
+        if limit:
+            query.append({"$limit": limit})
+
+        query.append({"$group": {"_id": "$address", "doc": {"$first": "$$ROOT"}}})
+        query.append({"$replaceRoot": {"newRoot": "$doc"}})
+        return query
 
 
 class database_local(db_collections_common):

@@ -5,8 +5,8 @@ from sources.subgraph.bins.config import MONGO_DB_URL
 
 
 async def get_prices(
-    token_addresses: list[str],
     network: Chain,
+    token_addresses: list[str] | None = None,
     block: int | None = None,
 ) -> dict:
     """Get a list of token prices from database
@@ -20,6 +20,28 @@ async def get_prices(
         dict: with token 'address' as key and 'price' as value
     """
 
+    if not token_addresses and block:
+        # return all available prices at block
+        find = {
+            "network": network.database_name,
+            "block": block,
+        }
+        return {
+            item["address"]: {"price": item["price"], "block": item["block"]}
+            for item in await database_global(
+                mongo_url=MONGO_DB_URL
+            ).get_items_from_database(collection_name="usd_prices", find=find)
+        }
+    elif not token_addresses and not block:
+        # return last available prices for all known tokens ( within the last 10000 scraped prices in the nework)
+        return {
+            item["address"]: {"price": item["price"], "block": item["block"]}
+            for item in await database_global(
+                mongo_url=MONGO_DB_URL
+            ).get_prices_usd_last(network=network.database_name)
+        }
+
+    # return prices for the given token addresses at the given block (or last available block)
     price_queries = []
     for address in token_addresses:
         find = {
