@@ -13,6 +13,7 @@ from sources.subgraph.endpoint.app import create_app as create_subgraph_endpoint
 from sources.web3.endpoint.app import create_app as create_web3_endpoint
 from sources.mongo.endpoint.app import create_app as create_mongo_endpoint
 from sources.internal.endpoint.app import create_app as create_internal_endpoint
+from sources.strats.endpoint.app import create_app as create_strats_endpoint
 
 logging.basicConfig(
     format="[%(asctime)s:%(levelname)s:%(name)s]:%(message)s",
@@ -71,6 +72,13 @@ app.mount(
         title="Gamma API - Internal", version=get_version_info()
     ),
     name="internal",
+)
+
+# Create strats endpoint ------------------------
+app.mount(
+    path="/strats",
+    app=create_strats_endpoint(title="Gamma API - Strats", version=get_version_info()),
+    name="strats",
 )
 
 
