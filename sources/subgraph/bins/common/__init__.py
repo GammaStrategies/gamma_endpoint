@@ -18,22 +18,48 @@ class ExecutionOrderWrapper(ABC):
         self.database_datetime: str = ""
 
     async def run(self, first: QueryType = QueryType.SUBGRAPH):
-        first_func = self._subgraph
-        first_headers = self._set_subgraph_headers
-
-        second_func = self._database
-        second_headers = self._set_database_headers
-
+        functions_and_headers = []
         if first == QueryType.DATABASE:
-            first_func, second_func = second_func, first_func
-            first_headers, second_headers = second_headers, first_headers
-        try:
-            results = await first_func()
-            first_headers()
-        except Exception:
-            logger.exception(f"{first} run failed for {self.__class__.__name__}")
-            results = await second_func()
-            second_headers()
+            functions_and_headers = [
+                (self._database, self._set_database_headers),
+                (self._subgraph, self._set_subgraph_headers),
+            ]
+        elif first == QueryType.SUBGRAPH:
+            functions_and_headers = [
+                (self._subgraph, self._set_subgraph_headers),
+                (self._database, self._set_database_headers),
+            ]
+        else:
+            raise NotImplementedError(f" {first} is not a valid QueryType")
+
+        # first_func = self._subgraph
+        # first_headers = self._set_subgraph_headers
+
+        # second_func = self._database
+        # second_headers = self._set_database_headers
+
+        # if first == QueryType.DATABASE:
+        #     first_func, second_func = second_func, first_func
+        #     first_headers, second_headers = second_headers, first_headers
+        results = None
+        for func, headers in functions_and_headers:
+            try:
+                results = await func()
+
+                # check resonse
+                if self.response and self.response.status_code == 504:
+                    # 504 Gateway Timeout : try to get data from second source
+                    logger.error(f"{func} response error for {self.__class__.__name__}")
+                    continue
+
+                # set headers and exit
+                headers()
+                break
+
+            except Exception:
+                logger.exception(f"{func} run failed for {self.__class__.__name__}")
+                # results = await second_func()
+                # second_headers()
 
         return results
 
