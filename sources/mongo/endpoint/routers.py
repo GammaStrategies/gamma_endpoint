@@ -367,9 +367,13 @@ class mongo_router_builder(router_builder_baseTemplate):
 
     # User
     @cache(expire=DB_CACHE_TIMEOUT)
-    async def user_data(self, address: str, response: Response):
-        return await user.get_user_historic_info(chain=self.chain, address=address)
+    async def user_data(self, user_address: str, response: Response):
+        return await user.get_user_historic_info(
+            chain=self.chain, address=user_address.lower()
+        )
 
     @cache(expire=DB_CACHE_TIMEOUT)
-    async def user_analytics(self, address: str, response: Response):
-        return await user.get_user_analytic_data(chain=self.chain, address=address)
+    async def user_analytics(self, user_address: str, response: Response):
+        return await user.get_user_analytic_data(
+            chain=self.chain, address=user_address.lower()
+        )
