@@ -155,7 +155,7 @@ class web3_router_builder(router_builder_baseTemplate):
     ):
         """Rewards for a given hypervisor at a given block. If block is not supplied, it will return the latest block"""
 
-        if self.dex in [Dex.THENA, Dex.ZYBERSWAP]:
+        if self.dex in [Dex.THENA, Dex.ZYBERSWAP, Dex.SUSHI]:
             return await rewards.get_rewards(
                 dex=self.dex,
                 hypervisor_address=hypervisor_address,
