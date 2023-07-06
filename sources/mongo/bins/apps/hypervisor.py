@@ -248,6 +248,44 @@ async def get_hypervisor_return(
     # )
 
 
+async def get_hypervisor_rewards_status(
+    network: Chain,
+    hypervisor_address: str,
+    start_timestamp: int | None = None,
+    end_timestamp: int | None = None,
+    start_block: int | None = None,
+    end_block: int | None = None,
+) -> list[dict]:
+    find = {"hypervisor_address": hypervisor_address.lower()}
+
+    if not start_timestamp and not end_timestamp and not start_block and not end_block:
+        # DEFAULT RETURN LAST REWARDS STATUS
+        return await local_database_helper(network=network).get_items_from_database(
+            collection_name="rewards_status",
+            find=find,
+            sort=[("block", -1)],
+            limit=1,
+            projection={"_id": 0, "id": 0},
+        )
+    else:
+        if start_block:
+            find["block"] = {"$gte": start_block}
+        elif start_timestamp:
+            find["timestamp"] = {"$gte": start_timestamp}
+
+        if end_block:
+            find["block"] = {"$lte": end_block}
+        if end_timestamp:
+            find["timestamp"] = {"$lte": end_timestamp}
+
+        return await local_database_helper(network=network).get_items_from_database(
+            collection_name="rewards_status",
+            find=find,
+            sort=[("block", 1)],
+            projection={"_id": 0, "id": 0},
+        )
+
+
 # TODO: delete or decide if we need it
 async def add_prices_to_hypervisor(hypervisor: dict, network: str) -> dict:
     """Try to add usd prices for the hypervisor's tokens and LPtoken using database info only
