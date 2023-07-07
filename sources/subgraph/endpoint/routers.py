@@ -759,7 +759,7 @@ class subgraph_router_builder_allDeployments(router_builder_baseTemplate):
                 aggregate_stats.AggregateStats(
                     deployment[0], deployment[1], response
                 ).run(RUN_FIRST)
-                for deployment in DEPLOYMENTS
+                for deployment in DEPLOYMENTS if deployment[0] != Protocol.GLACIER
             ],
             return_exceptions=True,
         )
