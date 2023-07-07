@@ -762,6 +762,9 @@ class database_local(db_collections_common):
         query = [
             {"$match": _match},
             {
+                "$sort": {"block": 1},
+            },
+            {
                 "$addFields": {
                     "shares": {"$subtract": ["$shares_in", "$shares_out"]},
                     "fees_usd": {
@@ -773,9 +776,6 @@ class database_local(db_collections_common):
                     "shares_buy": {"$multiply": ["$price_usd_share", "$shares_in"]},
                     "shares_sell": {"$multiply": ["$price_usd_share", "$shares_out"]},
                 }
-            },
-            {
-                "$sort": {"block": 1},
             },
             {
                 "$group": {
@@ -828,29 +828,11 @@ class database_local(db_collections_common):
             {
                 "$project": {
                     "hypervisor_address": "$_id",
-                    "timeframe_seconds": {
+                    "period_seconds": {
                         "$subtract": ["$last_timestamp", "$first_timestamp"]
                     },
                     "shares": {
-                        "current_qtty": "$shares",
-                        "first_value_usd": {
-                            "$sum": [
-                                {
-                                    "$multiply": [
-                                        "$shares",
-                                        "$first_prices.underlying_token0_per_share",
-                                        "$first_prices.price_usd_token0",
-                                    ]
-                                },
-                                {
-                                    "$multiply": [
-                                        "$shares",
-                                        "$first_prices.underlying_token1_per_share",
-                                        "$first_prices.price_usd_token1",
-                                    ]
-                                },
-                            ]
-                        },
+                        "total": "$shares",
                         "last_value_usd": {
                             "$sum": [
                                 {
@@ -869,27 +851,45 @@ class database_local(db_collections_common):
                                 },
                             ]
                         },
+                        "first_value_usd": {
+                            "$sum": [
+                                {
+                                    "$multiply": [
+                                        "$shares",
+                                        "$first_prices.underlying_token0_per_share",
+                                        "$first_prices.price_usd_token0",
+                                    ]
+                                },
+                                {
+                                    "$multiply": [
+                                        "$shares",
+                                        "$first_prices.underlying_token1_per_share",
+                                        "$first_prices.price_usd_token1",
+                                    ]
+                                },
+                            ]
+                        },
                     },
                     "underlying_tokens": {
-                        "token0_first_qtty": {
+                        "first_qtty_token0": {
                             "$multiply": [
                                 "$shares",
                                 "$first_prices.underlying_token0_per_share",
                             ]
                         },
-                        "token1_first_qtty": {
+                        "first_qtty_token1": {
                             "$multiply": [
                                 "$shares",
                                 "$first_prices.underlying_token1_per_share",
                             ]
                         },
-                        "token0_last_qtty": {
+                        "last_qtty_token0": {
                             "$multiply": [
                                 "$shares",
                                 "$last_prices.underlying_token0_per_share",
                             ]
                         },
-                        "token1_last_qtty": {
+                        "last_qtty_token1": {
                             "$multiply": [
                                 "$shares",
                                 "$last_prices.underlying_token1_per_share",
@@ -897,9 +897,9 @@ class database_local(db_collections_common):
                         },
                     },
                     "fees": {
-                        "fees_token0": "$fees_token0",
-                        "fees_token1": "$fees_token1",
-                        "fees_usd": "$fees_usd",
+                        "total_token0": "$fees_token0",
+                        "total_token1": "$fees_token1",
+                        "total_usd": "$fees_usd",
                     },
                     "prices": {
                         "price_variation": {
@@ -928,13 +928,13 @@ class database_local(db_collections_common):
                         "$sum": [
                             {
                                 "$multiply": [
-                                    "$underlying_tokens.token0_first_qtty",
+                                    "$underlying_tokens.first_qtty_token0",
                                     "$prices.last_prices.price_usd_token0",
                                 ]
                             },
                             {
                                 "$multiply": [
-                                    "$underlying_tokens.token1_first_qtty",
+                                    "$underlying_tokens.first_qtty_token1",
                                     "$prices.last_prices.price_usd_token1",
                                 ]
                             },
@@ -944,12 +944,7 @@ class database_local(db_collections_common):
                         "$divide": [
                             {
                                 "$multiply": [
-                                    {
-                                        "$divide": [
-                                            "$fees.fees_usd",
-                                            "$timeframe_seconds",
-                                        ]
-                                    },
+                                    {"$divide": ["$fees.total_usd", "$period_seconds"]},
                                     365 * 24 * 3600,
                                 ]
                             },
