@@ -940,17 +940,6 @@ class database_local(db_collections_common):
                             },
                         ]
                     },
-                    "fees.apy": {
-                        "$divide": [
-                            {
-                                "$multiply": [
-                                    {"$divide": ["$fees.total_usd", "$period_seconds"]},
-                                    365 * 24 * 3600,
-                                ]
-                            },
-                            "$shares.first_value_usd",
-                        ]
-                    },
                 },
             },
             {"$unset": ["_id"]},
