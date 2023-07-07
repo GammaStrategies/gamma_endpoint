@@ -770,19 +770,38 @@ class database_local(db_collections_common):
                             {"$multiply": ["$price_usd_token1", "$fees_token1_in"]},
                         ]
                     },
-                    "shares_cost": {"$multiply": ["$price_usd_share", "$shares_in"]},
-                    "shares_benefit": {
-                        "$multiply": ["$price_usd_share", "$shares_out"]
-                    },
+                    "shares_buy": {"$multiply": ["$price_usd_share", "$shares_in"]},
+                    "shares_sell": {"$multiply": ["$price_usd_share", "$shares_out"]},
                 }
+            },
+            {
+                "$sort": {"block": 1},
             },
             {
                 "$group": {
                     "_id": "$hypervisor_address",
                     "shares": {"$sum": "$shares"},
+                    "first_prices": {
+                        "$first": {
+                            "underlying_token0_per_share": "$underlying_token0_per_share",
+                            "underlying_token1_per_share": "$underlying_token1_per_share",
+                            "price_usd_token0": "$price_usd_token0",
+                            "price_usd_token1": "$price_usd_token1",
+                        }
+                    },
+                    "last_prices": {
+                        "$last": {
+                            "underlying_token0_per_share": "$underlying_token0_per_share",
+                            "underlying_token1_per_share": "$underlying_token1_per_share",
+                            "price_usd_token0": "$price_usd_token0",
+                            "price_usd_token1": "$price_usd_token1",
+                        }
+                    },
                     "fees_usd": {"$sum": "$fees_usd"},
                     "fees_token0": {"$sum": "$fees_token0_in"},
                     "fees_token1": {"$sum": "$fees_token1_in"},
+                    "first_timestamp": {"$first": "$timestamp"},
+                    "last_timestamp": {"$last": "$timestamp"},
                     "operations": {
                         "$push": {
                             "block": "$block",
@@ -800,6 +819,8 @@ class database_local(db_collections_common):
                             "price_usd_share": "$price_usd_share",
                             "price_usd_token0": "$price_usd_token0",
                             "price_usd_token1": "$price_usd_token1",
+                            "underlying_token0_per_share": "$underlying_token0_per_share",
+                            "underlying_token1_per_share": "$underlying_token1_per_share",
                         }
                     },
                 }
@@ -807,13 +828,137 @@ class database_local(db_collections_common):
             {
                 "$project": {
                     "hypervisor_address": "$_id",
-                    "shares": "$shares",
-                    "fees_token0": "$fees_token0",
-                    "fees_token1": "$fees_token1",
-                    "fees_usd": "$fees_usd",
+                    "timeframe_seconds": {
+                        "$subtract": ["$last_timestamp", "$first_timestamp"]
+                    },
+                    "shares": {
+                        "qtty": "$shares",
+                        "first_value_usd": {
+                            "$sum": [
+                                {
+                                    "$multiply": [
+                                        "$shares",
+                                        "$first_prices.underlying_token0_per_share",
+                                        "$first_prices.price_usd_token0",
+                                    ]
+                                },
+                                {
+                                    "$multiply": [
+                                        "$shares",
+                                        "$first_prices.underlying_token1_per_share",
+                                        "$first_prices.price_usd_token1",
+                                    ]
+                                },
+                            ]
+                        },
+                        "last_value_usd": {
+                            "$sum": [
+                                {
+                                    "$multiply": [
+                                        "$shares",
+                                        "$last_prices.underlying_token0_per_share",
+                                        "$last_prices.price_usd_token0",
+                                    ]
+                                },
+                                {
+                                    "$multiply": [
+                                        "$shares",
+                                        "$last_prices.underlying_token1_per_share",
+                                        "$last_prices.price_usd_token1",
+                                    ]
+                                },
+                            ]
+                        },
+                    },
+                    "underlying_tokens": {
+                        "token0_first_qtty": {
+                            "$multiply": [
+                                "$shares",
+                                "$first_prices.underlying_token0_per_share",
+                            ]
+                        },
+                        "token1_first_qtty": {
+                            "$multiply": [
+                                "$shares",
+                                "$first_prices.underlying_token1_per_share",
+                            ]
+                        },
+                        "token0_last_qtty": {
+                            "$multiply": [
+                                "$shares",
+                                "$last_prices.underlying_token0_per_share",
+                            ]
+                        },
+                        "token1_last_qtty": {
+                            "$multiply": [
+                                "$shares",
+                                "$last_prices.underlying_token1_per_share",
+                            ]
+                        },
+                    },
+                    "fees": {
+                        "fees_token0": "$fees_token0",
+                        "fees_token1": "$fees_token1",
+                        "fees_usd": "$fees_usd",
+                    },
+                    "prices": {
+                        "price_variation": {
+                            "token0_usd": {
+                                "$subtract": [
+                                    "$last_prices.price_usd_token0",
+                                    "$first_prices.price_usd_token0",
+                                ]
+                            },
+                            "token1_usd": {
+                                "$subtract": [
+                                    "$last_prices.price_usd_token1",
+                                    "$first_prices.price_usd_token1",
+                                ]
+                            },
+                        },
+                        "first_prices": "$first_prices",
+                        "last_prices": "$last_prices",
+                    },
                     "operations": "$operations",
                 }
             },
+            {
+                "$addFields": {
+                    "shares.first_value_in_current_prices_usd": {
+                        "$sum": [
+                            {
+                                "$multiply": [
+                                    "$underlying_tokens.token0_first_qtty",
+                                    "$prices.last_prices.price_usd_token0",
+                                ]
+                            },
+                            {
+                                "$multiply": [
+                                    "$underlying_tokens.token1_first_qtty",
+                                    "$prices.last_prices.price_usd_token1",
+                                ]
+                            },
+                        ]
+                    },
+                    "fees.apy": {
+                        "$divide": [
+                            {
+                                "$multiply": [
+                                    {
+                                        "$divide": [
+                                            "$fees.fees_usd",
+                                            "$timeframe_seconds",
+                                        ]
+                                    },
+                                    365 * 24 * 3600,
+                                ]
+                            },
+                            "$shares.first_value_usd",
+                        ]
+                    },
+                },
+            },
+            {"$unset": ["_id"]},
         ]
 
         return [
