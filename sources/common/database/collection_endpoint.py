@@ -902,6 +902,8 @@ class database_local(db_collections_common):
                         "total_usd": "$fees_usd",
                     },
                     "prices": {
+                        "first_prices": "$first_prices",
+                        "last_prices": "$last_prices",
                         "price_variation": {
                             "token0_usd": {
                                 "$subtract": [
@@ -916,8 +918,6 @@ class database_local(db_collections_common):
                                 ]
                             },
                         },
-                        "first_prices": "$first_prices",
-                        "last_prices": "$last_prices",
                     },
                     "operations": "$operations",
                 }
