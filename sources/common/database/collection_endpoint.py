@@ -832,7 +832,7 @@ class database_local(db_collections_common):
                         "$subtract": ["$last_timestamp", "$first_timestamp"]
                     },
                     "shares": {
-                        "qtty": "$shares",
+                        "current_qtty": "$shares",
                         "first_value_usd": {
                             "$sum": [
                                 {
