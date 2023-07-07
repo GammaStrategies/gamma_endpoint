@@ -924,7 +924,7 @@ class database_local(db_collections_common):
             },
             {
                 "$addFields": {
-                    "shares.first_value_in_current_prices_usd": {
+                    "shares.first_value_in_last_prices_usd": {
                         "$sum": [
                             {
                                 "$multiply": [
