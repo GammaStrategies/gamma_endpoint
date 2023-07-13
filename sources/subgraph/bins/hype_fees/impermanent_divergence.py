@@ -274,6 +274,16 @@ async def impermanent_divergence_all(
     await divergence_data.init_time(days_ago=days, end_timestamp=current_timestamp)
     await divergence_data.get_data(hypervisors)
 
+    # 100 result limit temporary fix
+    if hypervisors:
+        for i in range(100, len(hypervisors), 100):
+            # save data
+            temp_data = divergence_data.data.copy()
+            # get new data
+            await divergence_data.get_data(hypervisors[i : i + 100])
+            # merge data
+            divergence_data.data = {**temp_data, **divergence_data.data}
+
     results = {}
     for hypervisor_id, hypervisor in divergence_data.data.items():
         divergence = ImpermanentDivergence(hypervisor, protocol, chain)

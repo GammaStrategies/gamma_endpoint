@@ -210,10 +210,13 @@ class db_returns_manager(db_collection_manager):
         await fees_data.get_data()
 
         returns_data = {}
+        hypervisor_addresses = []
         for hypervisor_id, fees_data_item in fees_data.data.items():
             fees_yield = FeesYield(fees_data_item, protocol, chain)
             returns = fees_yield.calculate_returns()
             returns_data[hypervisor_id] = returns
+            # add hype id to list
+            hypervisor_addresses.append(hypervisor_id)
 
         # calculate impermanent divergence
         imperm_data = await impermanent_divergence_all(
@@ -221,6 +224,7 @@ class db_returns_manager(db_collection_manager):
             chain=chain,
             days=period_days,
             current_timestamp=fees_data.time_range.end.timestamp,
+            hypervisors=hypervisor_addresses,
         )
 
         # get block n timestamp
@@ -265,6 +269,16 @@ class db_returns_manager(db_collection_manager):
                     "hodl_token0": v["hodl_token0"],
                     "hodl_token1": v["hodl_token1"],
                 }
+            else:
+                logger.warning(
+                    f" {k} hypervisor has no fee yield data but impermanent. This should not happen"
+                )
+
+        # log hypervisors without impermanent data
+        # if hypervisors_without_il := set(returns_data.keys()) - set(imperm_data.keys()):
+        #     logger.warning(
+        #         f" There are {len(hypervisors_without_il)} hypervisors without impermanent data: {hypervisors_without_il}"
+        #     )
 
         return result
 
