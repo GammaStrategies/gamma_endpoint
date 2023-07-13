@@ -195,12 +195,20 @@ class MongoDbManager:
         )
 
         # add/ update to database (add or replace)
-        self.database[coll_name].bulk_write(
+        if result := self.database[coll_name].bulk_write(
             [
                 ReplaceOne(filter=item["filter"], replacement=item["data"], upsert=True)
                 for item in data
             ]
-        )
+        ):
+            if (
+                result.upserted_count == 0
+                and result.modified_count == 0
+                and result.inserted_count == 0
+            ):
+                logger.warning(
+                    f" Data not saved/replaced in {coll_name} collection: {data}"
+                )
 
     def get_items(self, coll_name: str, **kwargs):
         """get items cursor from database

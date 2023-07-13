@@ -41,6 +41,35 @@ class db_collections_common:
 
         await asyncio.gather(*requests)
 
+    async def save_items_to_database_inBulk(
+        self,
+        data: dict,
+        collection_name: str,
+    ):
+        """Save dictionary values to the database collection replacing any equal id defined in bulk
+
+        Args:
+            data (list): data list following tool_mongodb_general class to be saved to database in a dict format
+            collection_name (str): collection name to save data to
+        """
+        data = [
+            {"filter": {"id": item["id"]}, "data": item} for key, item in data.items()
+        ]
+        try:
+            with MongoDbManager(
+                url=self._db_mongo_url,
+                db_name=self._db_name,
+                collections=self._db_collections,
+            ) as _db_manager:
+                # add to mongodb
+                _db_manager.replace_items_bulk(
+                    coll_name=collection_name, data=data, upsert=True
+                )
+        except Exception as e:
+            logging.getLogger(__name__).exception(
+                f" Unable to save/replace data in bulk to mongo's {collection_name} collection.  error-> {e}"
+            )
+
     async def save_item_to_database(
         self,
         data: dict,

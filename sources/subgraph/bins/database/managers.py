@@ -304,7 +304,8 @@ class db_returns_manager(db_collection_manager):
         # create data
         try:
             requests = [
-                self.save_items_to_database(
+                # self.save_items_to_database(
+                self.save_items_to_database_inBulk(
                     data=await self.create_data(
                         chain=chain,
                         protocol=protocol,
@@ -316,7 +317,7 @@ class db_returns_manager(db_collection_manager):
                 for days in periods
             ]
 
-            await asyncio.gather(*requests)
+            await asyncio.gather(*requests, return_exceptions=True)
 
         except Exception as err:
             # retry when possible
@@ -336,8 +337,8 @@ class db_returns_manager(db_collection_manager):
                 )
             elif err:
                 # {'message': 'Failed to decode `block.number` value: `subgraph QmXUphAvAEiGcTzdopmaEt8YDxZ2uEmLJcCQGcfaDvRhp2 only has data starting at block number 63562887 and data for block number 50084142 is therefore not available`'}
-                logger.debug(
-                    f" Can't feed database {chain}'s {protocol} returns to db  err:{err.args[0]}. Retries: {retried}."
+                logger.error(
+                    f" Can't feed database {chain}'s {protocol} returns to db  err:{err}. Retries: {retried}."
                 )
             else:
                 logger.exception(
