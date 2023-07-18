@@ -120,6 +120,14 @@ POOLS = {
             "protocol": Protocol.QUICKSWAP,
             "address": "0xb73abfb5a2c89f4038baa476ff3a7942a021c196",
         },
+        "FXS_FRAX": {
+            "protocol": Protocol.QUICKSWAP,
+            "address": "0xcbb9d995933c4f7a8ceb0c7cb096cb9b7d9defc8",
+        },
+        "USDC_FRAX": {
+            "protocol": Protocol.QUICKSWAP,
+            "address": "0xc4ad89d0a07081871f3007079f816b0757d2638e",
+        },
     },
     Chain.BSC: {},
     Chain.AVALANCHE: {},
@@ -255,6 +263,12 @@ POOL_PATHS = {
         "0x68286607a1d43602d880d349187c3c48c0fd05e6": [
             (POOLS[Chain.POLYGON_ZKEVM]["QUICK_USDC"], 1),
         ],
+        # FRAX
+        "0x6b856a14cea1d7dcfaf80fa6936c0b75972ccace": [
+            (POOLS[Chain.POLYGON_ZKEVM]["FXS_FRAX"], 1),
+            (POOLS[Chain.POLYGON_ZKEVM]["USDC_FRAX"], 0),
+        ],
+
     },
     Chain.BSC: {},
     Chain.AVALANCHE: {},
