@@ -311,6 +311,7 @@ async def feed_database_with_historic_data(from_datetime: datetime, periods=None
                 feed_database_allRewards2_externals(
                     current_timestamp=int(current_timestamp)
                 ),
+                return_exceptions=True,
             )
 
             # set next timestamp
