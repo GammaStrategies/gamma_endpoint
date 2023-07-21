@@ -84,6 +84,7 @@ STATIC_REGISTRY_ADDRESSES = {
             "zyberswap": "0x37595FCaF29E4fBAc0f7C1863E3dF2Fe6e2247e9".lower(),
             "camelot": "0xa216C2b6554A0293f69A1555dd22f4b7e60Fe907".lower(),
             "sushi": "0x0f867f14b39a5892a39841a03ba573426de4b1d0".lower(),
+            "ramses": "0x34Ffbd9Db6B9bD8b095A0d156de69a2AD2944666".lower(),
         },
         "MasterChefV2Registry": {
             "camelot": "0x26da8473AaA54e8c7835fA5fdd1599eB4c144d31".lower(),

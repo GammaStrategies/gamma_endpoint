@@ -265,6 +265,15 @@ def build_routers_compatible() -> list:
         )
     )
 
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.RAMSES,
+            chain=Chain.ARBITRUM,
+            tags=["Ramses - Arbitrum"],
+            prefix=f"/{Protocol.RAMSES.api_url}/{Chain.ARBITRUM.api_url}",
+        )
+    )
+
     # Simulation
     routes.append(
         subgraph_router_builder_Simulator(tags=["Simulator"], prefix="/simulator")
