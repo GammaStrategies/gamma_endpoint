@@ -1,4 +1,5 @@
 from decimal import Decimal
+import logging
 from math import prod
 from sources.common.general.enums import Chain
 from sources.common.database.collection_endpoint import database_local
@@ -96,6 +97,10 @@ class user_analytics:
             },
         }
         # underlying token ----------------------------
+        if "underlying_token0_per_share" in operation:
+            logging.getLogger(__name__).debug(
+                f" no underlying_token0_per_share in operation -> {operation}"
+            )
         operation_item["underlying_token0_qtty"] = (
             operation_item["shares"] * operation["underlying_token0_per_share"]
         )

@@ -106,6 +106,10 @@ POOLS = {
             "protocol": Protocol.QUICKSWAP,
             "address": "0x5baaffa2cb0f71af28a1bd9dcfbb98c95b52fb20",
         },
+        "PUSH_WETH": {
+            "protocol": Protocol.QUICKSWAP,
+            "address": "0xf66066175bc4dcbcb7ee6e01becd8489b6eeb344",
+        },
     },
     Chain.POLYGON_ZKEVM: {
         "WETH_USDC": {
