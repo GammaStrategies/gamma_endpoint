@@ -128,6 +128,10 @@ POOLS = {
             "protocol": Protocol.QUICKSWAP,
             "address": "0xc4ad89d0a07081871f3007079f816b0757d2638e",
         },
+        "PUSH_WETH": {
+            "protocol": Protocol.QUICKSWAP,
+            "address": "0xf66066175bc4dcbcb7ee6e01becd8489b6eeb344",
+        },
     },
     Chain.BSC: {},
     Chain.AVALANCHE: {},
@@ -143,7 +147,7 @@ POOLS = {
         "WETH_USDC": {
             "protocol": Protocol.UNISWAP,
             "address": "0xc31e54c7a869b9fcbecc14363cf510d1c41fa443",
-        }
+        },
     },
     Chain.MOONBEAM: {
         "USDC_WGLMR": {
@@ -251,7 +255,11 @@ POOL_PATHS = {
             (POOLS[Chain.POLYGON]["WETH_FBX"], 0),
             (POOLS[Chain.POLYGON]["USDC_WETH"], 0),
         ],
-
+        # PUSH
+        "0x58001cc1a9e17a20935079ab40b1b8f4fc19efd1": [
+            (POOLS[Chain.POLYGON]["PUSH_WETH"], 1),
+            (POOLS[Chain.POLYGON]["USDC_WETH"], 0),
+        ],
     },
     Chain.POLYGON_ZKEVM: {
         # WMATIC
@@ -268,7 +276,6 @@ POOL_PATHS = {
             (POOLS[Chain.POLYGON_ZKEVM]["FXS_FRAX"], 1),
             (POOLS[Chain.POLYGON_ZKEVM]["USDC_FRAX"], 0),
         ],
-
     },
     Chain.BSC: {},
     Chain.AVALANCHE: {},
@@ -281,7 +288,7 @@ POOL_PATHS = {
         "0xadd5620057336f868eae78a451c503ae7b576bad": [
             (POOLS[Chain.ARBITRUM]["WETH_NOISEGPT"], 0),
             (POOLS[Chain.ARBITRUM]["WETH_USDC"], 1),
-        ]
+        ],
     },
     Chain.MOONBEAM: {
         # WGLMR
@@ -427,10 +434,12 @@ async def token_prices(chain: Chain):
         if chain == Chain.OPTIMISM:
             ALCX_ADDRESS = "0xdbdb4d16eda451d0503b854cf79d55697f90c8df"
             prices[ALCX_ADDRESS] = await llama_client.current_token_price(ALCX_ADDRESS)
-        
+
         if chain == Chain.MOONBEAM:
             GLINT_ADDRESS = "0xcd3b51d98478d53f4515a306be565c6eebef1d58"
-            prices[GLINT_ADDRESS] = await llama_client.current_token_price(GLINT_ADDRESS)
+            prices[GLINT_ADDRESS] = await llama_client.current_token_price(
+                GLINT_ADDRESS
+            )
 
         if chain == Chain.POLYGON:
             FIS_ADDRESS_MAINNET = "0xef3a930e1ffffacd2fc13434ac81bd278b0ecc8d"
@@ -439,9 +448,9 @@ async def token_prices(chain: Chain):
             T_MAINNET = "0xcdf7028ceab81fa0c6971208e83fa7872994bee5"
             T_POLYGON = "0x1d0ab64ed0f1ee4a886462146d26effc6dd00d0b"
 
-            prices[FIS_ADDRESS_POLYGON], prices[T_POLYGON] =await asyncio.gather(
+            prices[FIS_ADDRESS_POLYGON], prices[T_POLYGON] = await asyncio.gather(
                 llama_client.current_token_price(FIS_ADDRESS_MAINNET),
-                llama_client.current_token_price(T_MAINNET)
+                llama_client.current_token_price(T_MAINNET),
             )
 
     return prices
