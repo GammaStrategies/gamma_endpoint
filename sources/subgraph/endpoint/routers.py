@@ -99,6 +99,7 @@ def build_routers() -> list:
     return routes
 
 
+# manual
 def build_routers_compatible() -> list:
     """Build backwards compatible routes for the old endpoint
 
