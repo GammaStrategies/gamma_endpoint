@@ -22,6 +22,8 @@ class Chain(str, Enum):
     FANTOM = ("fantom", 250, "fantom", "Fantom", None, None, "Fantom")
     MOONBEAM = ("moonbeam", 1287, "moonbeam", "Moonbeam", None, None, "Moonbeam")
 
+    # MANTLE = ("mantle", 5000, "mantle", "Mantle", None, None, "Mantle")
+
     # extra properties
     id: int
     api_url: str
@@ -76,6 +78,8 @@ class Dex(str, Enum):
     RETRO = "retro"
     STELLASWAP = "stellaswap"
     SUSHI = "sushi"
+    RAMSES = "ramses"
+    BEAMSWAP = "beamswap"
 
 
 class Protocol(str, Enum):
@@ -243,3 +247,7 @@ class rewarderType(str, Enum):
     THENA_voter_v3 = "thena_voter_v3"
     BEAMSWAP_masterchef_v2 = "beamswap_masterchef_v2"
     BEAMSWAP_masterchef_v2_rewarder = "beamswap_masterchef_v2_rewarder"
+
+    ANGLE_MERKLE = "angle_merkle"
+
+    RAMSES_v2 = "ramses_v2"
