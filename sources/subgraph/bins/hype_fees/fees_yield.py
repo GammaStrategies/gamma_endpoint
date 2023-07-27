@@ -41,9 +41,19 @@ class FeesYield:
         # Apply gamma fees to total fees if calculating LP returns
         if yield_type == YieldType.LP:
             # fee % is 1 / fee or 1/10 if fee > 100
-            df_snapshots["gamma_fee_rate"] = df_snapshots["fee"].apply(
-                lambda x: 1 / x if x < 100 else 1 / 10
+            def fee_func_ramses(fee_rate):
+                return fee_rate / 100
+
+            def fee_func_others(fee_rate):
+                return 1 / fee_rate if fee_rate < 100 else 1 / 10
+
+            fee_func = (
+                fee_func_ramses
+                if (self.protocol == Protocol.RAMSES)
+                else fee_func_others
             )
+
+            df_snapshots["gamma_fee_rate"] = df_snapshots["fee"].apply(fee_func)
             df_snapshots["effective_fees_0"] = df_snapshots.total_fees_0 * (
                 1 - df_snapshots.gamma_fee_rate
             )
