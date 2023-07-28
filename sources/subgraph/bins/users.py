@@ -1,8 +1,5 @@
-import asyncio
-
 from sources.subgraph.bins import GammaClient
 from sources.subgraph.bins.accounts import AccountInfo
-from sources.subgraph.bins.constants import XGAMMA_ADDRESS
 from sources.subgraph.bins.enums import Chain, Protocol
 
 
@@ -53,43 +50,10 @@ class UserData:
         """
         variables = {"userAddress": self.address}
 
-        query_xgamma = """
-        query userXgamma($userAddress: String!, $rewardHypervisorAddress: String!) {
-            user(
-                id: $userAddress
-            ){
-                accountsOwned {
-                    id
-                    parent { id }
-                    gammaDeposited
-                    gammaEarnedRealized
-                    rewardHypervisorShares{
-                        rewardHypervisor { id }
-                        shares
-                    }
-                }
-            }
-            rewardHypervisor(
-                id: $rewardHypervisorAddress
-            ){
-                totalGamma
-                totalSupply
-            }
-        }
-        """
-        variables_xgamma = {
-            "userAddress": self.address,
-            "rewardHypervisorAddress": XGAMMA_ADDRESS,
-        }
-
-        hypervisor_response, xgamma_response = await asyncio.gather(
-            self.gamma_client.query(query, variables),
-            self.gamma_client_mainnet.query(query_xgamma, variables_xgamma),
-        )
+        hypervisor_response = await self.gamma_client.query(query, variables)
 
         self.data = {
             "hypervisor": hypervisor_response["data"],
-            "xgamma": xgamma_response["data"],
         }
 
 
@@ -99,12 +63,10 @@ class UserInfo(UserData):
             await self._get_data()
 
         hypervisor_data = self.data["hypervisor"]
-        xgamma_data = self.data["xgamma"]
 
         has_hypervisor_data = hypervisor_data.get("user")
-        has_xgamma_data = xgamma_data.get("user")
 
-        if not (has_hypervisor_data or has_xgamma_data):
+        if not has_hypervisor_data:
             return {}
 
         if has_hypervisor_data:
@@ -115,16 +77,8 @@ class UserInfo(UserData):
         else:
             hypervisor_lookup = {}
 
-        if has_xgamma_data:
-            xgamma_lookup = {
-                account.pop("id"): account
-                for account in xgamma_data["user"]["accountsOwned"]
-            }
-        else:
-            xgamma_lookup = {}
-
         # combine accounts owned for both hype and xgamma
-        all_accounts = set(list(hypervisor_lookup.keys()) + list(xgamma_lookup.keys()))
+        all_accounts = set(list(hypervisor_lookup.keys()))
 
         accounts = {}
         # for accountHypervisor in hypervisor_data["user"]["accountsOwned"]:
@@ -133,10 +87,6 @@ class UserInfo(UserData):
             account_info = AccountInfo(self.protocol, self.chain, account_address)
             account_info.data = {
                 "hypervisor": {"account": hypervisor_lookup.get(account_address)},
-                "xgamma": {
-                    "account": xgamma_lookup.get(account_address),
-                    "rewardHypervisor": xgamma_data["rewardHypervisor"],
-                },
             }
             accounts[account_address] = await account_info.output(get_data=False)
 

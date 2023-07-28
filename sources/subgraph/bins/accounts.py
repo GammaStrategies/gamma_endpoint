@@ -1,9 +1,5 @@
-import asyncio
-
 from sources.subgraph.bins import GammaClient
-from sources.subgraph.bins.constants import XGAMMA_ADDRESS
 from sources.subgraph.bins.enums import Chain, Protocol
-from sources.subgraph.bins.pricing import gamma_price
 
 
 class AccountData:
@@ -11,7 +7,6 @@ class AccountData:
         self.gamma_client = GammaClient(protocol, chain)
         self.gamma_client_mainnet = GammaClient(Protocol.UNISWAP, Chain.ETHEREUM)
         self.address = account_address.lower()
-        self.reward_hypervisor_address = XGAMMA_ADDRESS
         self.decimal_factor = 10**18
         self.data: dict
 
@@ -51,43 +46,11 @@ class AccountData:
             "accountAddress": self.address,
         }
 
-        query_xgamma = """
-        query accountXgamma(
-            $accountAddress: String!,
-            $rewardHypervisorAddress: String!
-        ){
-            account(
-                id: $accountAddress
-            ){
-                parent { id }
-                gammaDeposited
-                gammaEarnedRealized
-                rewardHypervisorShares{
-                    rewardHypervisor { id }
-                    shares
-                }
-            }
-            rewardHypervisor(
-                id: $rewardHypervisorAddress
-            ){
-                totalGamma
-                totalSupply
-            }
-        }
-        """
-        variables_xgamma = {
-            "accountAddress": self.address,
-            "rewardHypervisorAddress": self.reward_hypervisor_address,
-        }
 
-        hypervisor_response, xgamma_response = await asyncio.gather(
-            self.gamma_client.query(query, variables),
-            self.gamma_client_mainnet.query(query_xgamma, variables_xgamma),
-        )
+        hypervisor_response = await self.gamma_client.query(query, variables)
 
         self.data = {
             "hypervisor": hypervisor_response["data"],
-            "xgamma": xgamma_response["data"],
         }
 
 
@@ -154,84 +117,16 @@ class AccountInfo(AccountData):
             await self._get_data()
 
         hypervisor_data = self.data["hypervisor"]
-        xgamma_data = self.data["xgamma"]
 
         has_hypervisor_data = bool(hypervisor_data.get("account"))
-        has_xgamma_data = bool(xgamma_data.get("account"))
 
-        if not (has_hypervisor_data or has_xgamma_data):
+
+        if not has_hypervisor_data:
             return {}
+            
+        owner = hypervisor_data["account"]["parent"]["id"]
 
-        if has_hypervisor_data:
-            owner = hypervisor_data["account"]["parent"]["id"]
-        else:
-            owner = xgamma_data["account"]["parent"]["id"]
-
-        account_info = {
-            "owner": owner,
-            "gammaStaked": 0,
-            "gammaStakedUSD": 0,
-            "gammaDeposited": 0,
-            "pendingGammaEarned": 0,
-            "pendingGammaEarnedUSD": 0,
-            "totalGammaEarned": 0,
-            "totalGammaEarnedUSD": 0,
-            "gammaStakedShare": 0,
-            "xgammaAmount": 0,
-        }
-
-        if has_xgamma_data:
-            reward_hypervisor_shares = xgamma_data["account"]["rewardHypervisorShares"]
-            xgamma_shares = 0
-            for shares in reward_hypervisor_shares:
-                if (
-                    shares.get("rewardHypervisor", {}).get("id")
-                    == self.reward_hypervisor_address
-                ):
-                    xgamma_shares = int(shares["shares"])
-
-            total_gamma_staked = int(xgamma_data["rewardHypervisor"]["totalGamma"])
-            xgamma_virtual_price = total_gamma_staked / int(
-                xgamma_data["rewardHypervisor"]["totalSupply"]
-            )
-
-            # Get pricing
-            gamma_price_usd = await gamma_price()
-
-            gamma_staked = (xgamma_shares * xgamma_virtual_price) / self.decimal_factor
-            gamma_deposited = (
-                int(xgamma_data["account"]["gammaDeposited"]) / self.decimal_factor
-            )
-            gamma_earned_realized = (
-                int(xgamma_data["account"]["gammaEarnedRealized"]) / self.decimal_factor
-            )
-            gamma_staked_share = gamma_staked / (
-                total_gamma_staked / self.decimal_factor
-            )
-            pending_gamma_earned = gamma_staked - gamma_deposited
-            total_gamma_earned = gamma_staked - gamma_deposited + gamma_earned_realized
-            account_info.update(
-                {
-                    "gammaStaked": gamma_staked,
-                    "gammaStakedUSD": gamma_staked * gamma_price_usd,
-                    "gammaDeposited": gamma_deposited,
-                    "pendingGammaEarned": pending_gamma_earned,
-                    "pendingGammaEarnedUSD": pending_gamma_earned * gamma_price_usd,
-                    "totalGammaEarned": total_gamma_earned,
-                    "totalGammaEarnedUSD": total_gamma_earned * gamma_price_usd,
-                    "gammaStakedShare": f"{gamma_staked_share:.2%}",
-                    "xgammaAmount": xgamma_shares / self.decimal_factor,
-                }
-            )
-            # The below for compatability
-            account_info.update(
-                {
-                    "visrStaked": account_info["gammaStaked"],
-                    "visrDeposited": account_info["gammaDeposited"],
-                    "totalVisrEarned": account_info["totalGammaEarned"],
-                    "visrStakedShare": account_info["gammaStakedShare"],
-                }
-            )
+        account_info = {"owner": owner}
 
         if has_hypervisor_data:
             returns = self._returns()
