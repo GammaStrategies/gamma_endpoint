@@ -41,15 +41,18 @@ class FeesYield:
         # Apply gamma fees to total fees if calculating LP returns
         if yield_type == YieldType.LP:
             # fee % is 1 / fee or 1/10 if fee > 100
-            def fee_func_ramses(fee_rate):
+            def fee_func_percentage(fee_rate):
                 return fee_rate / 100
 
             def fee_func_others(fee_rate):
                 return 1 / fee_rate if fee_rate < 100 else 1 / 10
 
             fee_func = (
-                fee_func_ramses
-                if (self.protocol == Protocol.RAMSES)
+                fee_func_percentage
+                if (
+                    self.protocol == Protocol.RAMSES
+                    or self.protocol == Protocol.CAMELOT
+                )
                 else fee_func_others
             )
 
