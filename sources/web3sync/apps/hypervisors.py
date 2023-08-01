@@ -1,11 +1,11 @@
 from sources.common.general.enums import Chain, Dex, Protocol
 
-from ..w3.builders import (
+from ..bins.w3.builders import (
     build_hypervisor,
     build_hypervisor_registry,
 )
-from ...bins.w3.protocols.general import web3wrap
-from ...bins.mixed.price_utilities import price_scraper
+from ..bins.w3.protocols.general import web3wrap
+from ..bins.mixed.price_utilities import price_scraper
 
 
 async def hypervisors_list(chain: Chain, protocol: Protocol):

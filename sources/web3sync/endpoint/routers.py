@@ -1,14 +1,14 @@
 import re
+import typing
 from fastapi import Response, APIRouter, status, Query
 from fastapi.routing import APIRoute
 from fastapi_cache.decorator import cache
-from endpoint.routers.template import router_builder_baseTemplate
 
-import typing
+from endpoint.routers.template import router_builder_baseTemplate
 
 from ...common.general.enums import Dex, Chain, Protocol
 
-from ..bins.apps import hypervisors, rewards
+from ..apps import hypervisors, rewards
 
 # Route builders
 

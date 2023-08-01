@@ -5,7 +5,7 @@ from fastapi_cache.backends.inmemory import InMemoryBackend
 from fastapi.middleware.cors import CORSMiddleware
 from endpoint.config.cache import CHARTS_CACHE_TIMEOUT
 
-from ..endpoint.routers import build_routers
+from .routers import build_routers
 
 
 def create_app(

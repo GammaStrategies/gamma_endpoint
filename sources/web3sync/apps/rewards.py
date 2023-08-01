@@ -1,9 +1,9 @@
 from sources.common.general.enums import Chain, Protocol
-from ..w3.builders import build_hypervisor
+from ..bins.w3.builders import build_hypervisor
 
 
 async def get_rewards(
-    chain: Chain, protocol: Protocol, hypervisor_address: str,  block: int | None = None
+    chain: Chain, protocol: Protocol, hypervisor_address: str, block: int | None = None
 ):
     result = []
 
@@ -27,4 +27,3 @@ async def get_ramses_reward_apr(
             )
             for rewardToken in hypervisor.getRewardTokens
         }
-

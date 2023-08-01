@@ -1,5 +1,5 @@
 from sources.mongo.bins.apps.prices import get_prices
-from ..mixed.price_utilities import price_scraper
+from ..bins.mixed.price_utilities import price_scraper
 
 
 def add_prices_to_hypervisor(hypervisor: dict, network: str) -> dict:
