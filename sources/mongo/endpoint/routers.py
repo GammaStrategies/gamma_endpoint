@@ -378,7 +378,10 @@ class mongo_router_builder(router_builder_baseTemplate):
         self,
         response: Response,
     ):
-        """Latest known hypervisor rewards"""
+        """
+        Returns the latest known by database rewards for all hypervisors in the network:
+        ***(Be aware that rewards are calculated on every deposit, withraw, rebalance, zeroFee hypervisor operation)***
+        """
         return await hypervisor.hypervisors_rewards_status(network=self.chain)
 
     # User
