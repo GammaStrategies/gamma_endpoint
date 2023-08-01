@@ -85,10 +85,9 @@ async def hypervisors_collected_fees(
     ]
 
 
-async def hypervisors_rewards_status(
-    network: Chain,
-):
+async def hypervisors_rewards_status(network: Chain, protocol: Protocol):
     query = [
+        {"$match": {"dex": protocol.database_name}},
         {"$sort": {"block": -1}},
         {
             "$group": {
@@ -101,7 +100,8 @@ async def hypervisors_rewards_status(
                 "apr": {"$first": "$apr"},
                 "block": {"$first": "$block"},
                 "timestamp": {"$first": "$timestamp"},
-                # //"rewards_perSecond":{"$first":"$rewards_perSecond"},
+                "rewards_perSecond": {"$first": "$rewards_perSecond"},
+                "rewardToken_decimals": {"$first": "$rewardToken_decimals"},
                 # //"rewardToken_price_usd":{"$first":"$rewardToken_price_usd"},
             }
         },
@@ -114,8 +114,9 @@ async def hypervisors_rewards_status(
                 "apr": "$apr",
                 "block": "$block",
                 "timestamp": "$timestamp",
-                # //"rewards_perSecond":"$rewards_perSecond",
                 # //"rewardToken_price_usd":"$rewardToken_price_usd",
+                "rewards_perSecond": "$rewards_perSecond",
+                "rewardToken_decimals": "$rewardToken_decimals",
             }
         },
         {"$sort": {"hypervisor_address": 1}},
