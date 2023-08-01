@@ -85,6 +85,48 @@ async def hypervisors_collected_fees(
     ]
 
 
+async def hypervisors_rewards_status(
+    network: Chain,
+):
+    query = [
+        {"$sort": {"block": -1}},
+        {
+            "$group": {
+                "_id": {
+                    "hypervisor_address": "$hypervisor_address",
+                    "rewardToken": "$rewardToken",
+                },
+                "symbol": {"$first": "$hypervisor_symbol"},
+                "rewardToken_symbol": {"$first": "$rewardToken_symbol"},
+                "apr": {"$first": "$apr"},
+                "block": {"$first": "$block"},
+                "timestamp": {"$first": "$timestamp"},
+                # //"rewards_perSecond":{"$first":"$rewards_perSecond"},
+                # //"rewardToken_price_usd":{"$first":"$rewardToken_price_usd"},
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "hypervisor_address": "$_id.hypervisor_address",
+                "hypervisor_symbol": "$symbol",
+                "rewardToken_symbol": "$rewardToken_symbol",
+                "apr": "$apr",
+                "block": "$block",
+                "timestamp": "$timestamp",
+                # //"rewards_perSecond":"$rewards_perSecond",
+                # //"rewardToken_price_usd":"$rewardToken_price_usd",
+            }
+        },
+        {"$sort": {"hypervisor_address": 1}},
+    ]
+
+    return await local_database_helper(network=network).get_items_from_database(
+        collection_name="rewards_status",
+        aggregate=query,
+    )
+
+
 # Hypervisor
 
 

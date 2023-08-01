@@ -214,6 +214,13 @@ class mongo_router_builder(router_builder_baseTemplate):
             generate_unique_id_function=self.generate_unique_id,
         )
 
+        router.add_api_route(
+            path=f"{self.prefix}{'/hypervisors/rewards'}",
+            endpoint=self.hypervisors_rewards_status,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
         return router
 
     def _create_routes_user(self, router: APIRouter) -> APIRouter:
@@ -365,6 +372,14 @@ class mongo_router_builder(router_builder_baseTemplate):
             start_block=start_block,
             end_block=end_block,
         )
+
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def hypervisors_rewards_status(
+        self,
+        response: Response,
+    ):
+        """Latest known hypervisor rewards"""
+        return await hypervisor.hypervisors_rewards_status(network=self.chain)
 
     # User
     @cache(expire=DB_CACHE_TIMEOUT)
