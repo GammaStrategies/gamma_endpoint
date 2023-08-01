@@ -14,6 +14,7 @@ from sources.web3.endpoint.app import create_app as create_web3_endpoint
 from sources.mongo.endpoint.app import create_app as create_mongo_endpoint
 from sources.internal.endpoint.app import create_app as create_internal_endpoint
 from sources.strats.endpoint.app import create_app as create_strats_endpoint
+from sources.web3sync.endpoint.app import create_app as create_web3sync_endpoint
 
 logging.basicConfig(
     format="[%(asctime)s:%(levelname)s:%(name)s]:%(message)s",
@@ -63,6 +64,14 @@ app.mount(
         title="Gamma API - web3 calls", version=get_version_info()
     ),
     name="web3",
+)
+# Create web3sync endpoint ------------------------
+app.mount(
+    path="/web3sync",
+    app=create_web3sync_endpoint(
+        title="Gamma API - web3 sync calls", version=get_version_info()
+    ),
+    name="web3sync",
 )
 
 # Create internal endpoint ------------------------

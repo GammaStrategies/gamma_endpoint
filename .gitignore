@@ -143,3 +143,5 @@ cython_debug/
 config.yaml
 debug.py
 test/
+test/*
+*config.yaml
