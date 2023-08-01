@@ -382,7 +382,9 @@ class mongo_router_builder(router_builder_baseTemplate):
         Returns the latest known by database rewards for all hypervisors in the network:
         ***(Be aware that rewards are calculated on every deposit, withraw, rebalance, zeroFee hypervisor operation)***
         """
-        return await hypervisor.hypervisors_rewards_status(network=self.chain)
+        return await hypervisor.hypervisors_rewards_status(
+            network=self.chain, protocol=self.protocol
+        )
 
     # User
     @cache(expire=DB_CACHE_TIMEOUT)
