@@ -104,6 +104,11 @@ async def hypervisors_rewards_status(network: Chain, protocol: Protocol):
                 "rewardToken_decimals": {"$first": "$rewardToken_decimals"},
                 "rewardToken": {"$first": "$rewardToken"},
                 "rewardToken_price_usd": {"$first": "$rewardToken_price_usd"},
+                "hypervisor_share_price_usd": {"$first": "$hypervisor_share_price_usd"},
+                "total_hypervisorToken_qtty": {"$first": "$total_hypervisorToken_qtty"},
+                "token0_price_usd": {"$first": "$token0_price_usd"},
+                "token1_price_usd": {"$first": "$token1_price_usd"},
+                "rewarder_address": {"$first": "$rewarder_address"},
             }
         },
         {
@@ -120,6 +125,11 @@ async def hypervisors_rewards_status(network: Chain, protocol: Protocol):
                 "rewardToken_decimals": "$rewardToken_decimals",
                 "rewardToken": "$rewardToken",
                 "rewardToken_price_usd": "$rewardToken_price_usd",
+                "hypervisor_share_price_usd": "$hypervisor_share_price_usd",
+                "total_hypervisorToken_qtty": "$total_hypervisorToken_qtty",
+                "token0_price_usd": "$token0_price_usd",
+                "token1_price_usd": "$token1_price_usd",
+                "rewarder_address": "$rewarder_address",
             }
         },
         {"$sort": {"hypervisor_address": 1}},
