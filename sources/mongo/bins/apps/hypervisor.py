@@ -102,6 +102,7 @@ async def hypervisors_rewards_status(network: Chain, protocol: Protocol):
                 "timestamp": {"$first": "$timestamp"},
                 "rewards_perSecond": {"$first": "$rewards_perSecond"},
                 "rewardToken_decimals": {"$first": "$rewardToken_decimals"},
+                "rewardToken": {"$first": "$rewardToken"},
                 # //"rewardToken_price_usd":{"$first":"$rewardToken_price_usd"},
             }
         },
@@ -117,6 +118,7 @@ async def hypervisors_rewards_status(network: Chain, protocol: Protocol):
                 # //"rewardToken_price_usd":"$rewardToken_price_usd",
                 "rewards_perSecond": "$rewards_perSecond",
                 "rewardToken_decimals": "$rewardToken_decimals",
+                "rewardToken": "$rewardToken",
             }
         },
         {"$sort": {"hypervisor_address": 1}},
