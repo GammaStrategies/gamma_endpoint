@@ -385,6 +385,33 @@ class database_local(db_collections_common):
                     },
                     "multi_indexes": [],
                 },
+                "queue": {
+                    "mono_indexes": {
+                        "id": True,
+                        "type": False,
+                    },
+                    "multi_indexes": [],
+                },
+                "hypervisor_returns": {
+                    "mono_indexes": {
+                        "id": True,
+                        "address": False,
+                        "ini_block": False,
+                        "end_block": False,
+                        "ini_timestamp": False,
+                        "end_timestamp": False,
+                    },
+                    "multi_indexes": [],
+                },
+                "latest_multifeedistribution": {
+                    "mono_indexes": {
+                        "id": True,
+                        "block": False,
+                        "timestamp": False,
+                        "address": False,
+                    },
+                    "multi_indexes": [],
+                },
             }
 
         super().__init__(
@@ -976,6 +1003,32 @@ class database_local(db_collections_common):
         return await self.get_items_from_database(
             collection_name=collection,
             aggregate=self.query_max(field=field),
+        )
+
+    # latest
+    async def get_latest_multifeedistribution(
+        self,
+        mfd_addresses: list[str] | None = None,
+        hypervisor_addresses: list[str] | None = None,
+        dex: str | None = None,
+    ) -> list:
+        """Get the latest multifeedistributor contract status
+
+        Args:
+            mfd_addresses (list[str] | None, optional): multiFeeDistributor contract addresses.
+            hypervisor_addresses (list[str] | None, optional): Hypervisor addresses.
+            dex (str | None, optional):
+
+        Returns:
+            list: of the latest multifeedistributor contract status
+        """
+        return await self.get_items_from_database(
+            collection_name="latest_multifeedistribution",
+            aggregate=self.query_latest_multifeedistributor(
+                mfd_addresses=mfd_addresses,
+                hypervisor_addresses=hypervisor_addresses,
+                dex=dex,
+            ),
         )
 
     # queries
@@ -1898,3 +1951,27 @@ class database_local(db_collections_common):
             },
             {"$unwind": "$hypervisor_data"},
         ]
+
+    @staticmethod
+    def query_latest_multifeedistributor(
+        mfd_addresses: list[str] | None = None,
+        hypervisor_addresses: list[str] | None = None,
+        dex: str | None = None,
+    ) -> list[dict]:
+        match = {}
+        if mfd_addresses:
+            match["address"] = {"$in": mfd_addresses}
+        if hypervisor_addresses:
+            match["hypervisor_address"] = {"$in": hypervisor_addresses}
+        if dex:
+            match["dex"] = dex
+
+        query = [
+            {"$sort": {"address": -1}},
+            {"$unset": ["_id","id","last_updated_data.id"]},
+        ]
+
+        if match:
+            query.insert(0, {"$match": match})
+
+        return query

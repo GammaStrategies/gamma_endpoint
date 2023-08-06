@@ -14,6 +14,7 @@ from sources.common.general.enums import Chain, Protocol
 from sources.mongo.bins.apps import hypervisor
 from sources.mongo.bins.apps import user
 from sources.mongo.bins.apps import prices
+from sources.mongo.bins.apps import rewards
 
 
 DEPLOYED: list[tuple[Protocol, Chain]] = [
@@ -221,6 +222,13 @@ class mongo_router_builder(router_builder_baseTemplate):
             generate_unique_id_function=self.generate_unique_id,
         )
 
+        router.add_api_route(
+            path=f"{self.prefix}{'/hypervisors/rewards/mfd'}",
+            endpoint=self.hypervisors_latest_multiFeeDistribution_rewards,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
         return router
 
     def _create_routes_user(self, router: APIRouter) -> APIRouter:
@@ -383,6 +391,19 @@ class mongo_router_builder(router_builder_baseTemplate):
         ***(Be aware that rewards are calculated on every deposit, withraw, rebalance, zeroFee hypervisor operation)***
         """
         return await hypervisor.hypervisors_rewards_status(
+            network=self.chain, protocol=self.protocol
+        )
+
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def hypervisors_latest_multiFeeDistribution_rewards(self, response: Response):
+        """
+        Returns the latest known by database multiFee distribution contract rewards
+        * 'last_updated_data' filed is the snapshot taken on the last known mfd event ( getAllRewards, stake, unstake )
+        * 'total_staked' is the total amount of LP tokens staked in the multiFeeDistribution contract
+        * 'rewards.max_...' is the maximum amount of rewards that can be distributed in the period
+        * 'rewards.current...' is the current real amount of rewards distributed in the period till snapshot block
+        """
+        return await rewards.latest_multifeeDistributor(
             network=self.chain, protocol=self.protocol
         )
 
