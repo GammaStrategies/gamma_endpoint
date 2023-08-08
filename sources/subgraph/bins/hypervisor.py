@@ -410,6 +410,15 @@ class HypervisorInfo(HypervisorData):
                     totalSupply / maxTotalSupply if maxTotalSupply > 0 else "No cap"
                 )
 
+                tvl0 = int(hypervisor["tvl0"]) / 10**decimals0,
+                tvl1 =  int(hypervisor["tvl1"]) / 10**decimals1,
+
+                if self.chain == Chain.ARBITRUM and hypervisor_id == "0x8ab16e90409690098ed94ef437a138b7cf702bd5":
+                    arb_price = 1.14
+                    tvl_usd = (float(tvl0[0]) * arb_price) + float(tvl1[0])
+                else: 
+                    tvl_usd = hypervisor["tvlUSD"]
+
                 results[hypervisor_id] = {
                     "createDate": timestamp_to_date(
                         int(hypervisor["created"]), "%d %b, %Y"
@@ -434,7 +443,7 @@ class HypervisorInfo(HypervisorData):
                     "feesReinvestedUSD": hypervisor["feesReinvestedUSD"],
                     "tvl0": int(hypervisor["tvl0"]) / 10**decimals0,
                     "tvl1": int(hypervisor["tvl1"]) / 10**decimals1,
-                    "tvlUSD": hypervisor["tvlUSD"],
+                    "tvlUSD": tvl_usd,
                     "totalSupply": totalSupply,
                     "maxTotalSupply": maxTotalSupply,
                     "capacityUsed": capacityUsed,
