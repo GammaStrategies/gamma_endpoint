@@ -64,6 +64,7 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.SUSHI, Chain.POLYGON),
     (Protocol.SUSHI, Chain.ARBITRUM),
     (Protocol.RAMSES, Chain.ARBITRUM),
+    (Protocol.ASCENT, Chain.POLYGON),
 ]
 
 
@@ -273,6 +274,15 @@ def build_routers_compatible() -> list:
             chain=Chain.ARBITRUM,
             tags=["Ramses - Arbitrum"],
             prefix=f"/{Protocol.RAMSES.api_url}/{Chain.ARBITRUM.api_url}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.ASCENT,
+            chain=Chain.POLYGON,
+            tags=["Ascent - Polygon"],
+            prefix=f"/{Protocol.ASCENT.api_url}/{Chain.POLYGON.api_url}",
         )
     )
 

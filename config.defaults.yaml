@@ -18,6 +18,7 @@ SPIRITSWAP_FANTOM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0
 SUSHI_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-sushi-polygon
 SUSHI_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-sushi-arbitrum
 RAMSES_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-ramses-arbitrum
+ASCENT_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-ascent-polygon
 
 # DEX Subgraph URL
 UNISWAP_MAINNET_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3
@@ -39,6 +40,7 @@ SPIRITSWAP_FANTOM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/iliaazhe
 SUSHI_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/sushi-v3/v3-polygon
 SUSHI_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/sushi-v3/v3-arbitrum
 RAMSES_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ramsesexchange/concentrated-liquidity-graph
+ASCENT_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/seme0801/ascent-subgraph2
 
 # HypePool Subgraph URL
 UNISWAP_MAINNET_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-mainnet
@@ -60,6 +62,7 @@ SPIRITSWAP_FANTOM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t
 SUSHI_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-sushi-polygon
 SUSHI_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-sushi-arbitrum
 RAMSES_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-ramses-arbitrum
+ASCENT_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-ascent-polygon
 
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {

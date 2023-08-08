@@ -21,7 +21,8 @@ DEPLOYMENTS = [
     (Protocol.SPIRITSWAP, Chain.FANTOM),
     (Protocol.SUSHI, Chain.POLYGON),
     (Protocol.SUSHI, Chain.ARBITRUM),
-    (Protocol.RAMSES, Chain.ARBITRUM)
+    (Protocol.RAMSES, Chain.ARBITRUM),
+    (Protocol.ASCENT, Chain.POLYGON)
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -81,6 +82,9 @@ DEX_SUBGRAPH_URLS = {
     Protocol.RAMSES: {
         Chain.ARBITRUM: get_config("RAMSES_ARBITRUM_SUBGRAPH_URL"),
     },
+    Protocol.ASCENT: {
+        Chain.POLYGON: get_config("ASCENT_POLYGON_SUBGRAPH_URL"),
+    },
 }
 
 DEX_HYPEPOOL_SUBGRAPH_URLS = {
@@ -127,6 +131,9 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.RAMSES: {
         Chain.ARBITRUM: get_config("RAMSES_ARBITRUM_HP_SUBGRAPH_URL"),
     },
+    Protocol.ASCENT: {
+        Chain.POLYGON: get_config("ASCENT_POLYGON_HP_SUBGRAPH_URL"),
+    },
 }
 
 GAMMA_SUBGRAPH_URLS = {
@@ -172,6 +179,9 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.RAMSES: {
         Chain.ARBITRUM: get_config("RAMSES_ARBITRUM_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.ASCENT: {
+        Chain.POLYGON: get_config("ASCENT_POLYGON_GAMMA_SUBGRAPH_URL"),
     },
 }
 
