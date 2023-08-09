@@ -25,9 +25,7 @@ async def latest_multifeeDistributor(network: Chain, protocol: Protocol):
         stakedAmount = int(item.get("last_updated_data", {}).get("total_staked", 0)) / (
             10 ** item.get("hypervisor_static", {}).get("decimals", 0)
         )
-        stakedAmountUSD = stakedAmount * item.get("last_updated_data", {}).get(
-            "hypervisor_price_x_share", 0
-        )
+        stakedAmountUSD = stakedAmount * item.get("hypervisor_price_x_share", 0)
 
         # add hypervisor address in result
         if not item["hypervisor_address"] in result[item["address"]]["hypervisors"]:
