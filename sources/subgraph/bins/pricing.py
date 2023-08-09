@@ -457,4 +457,12 @@ async def token_prices(chain: Chain):
                 llama_client.current_token_price(T_MAINNET),
             )
 
+        if chain == Chain.OPTIMISM:
+            OATH_ADDRESS_MAINNET = "0x6f9c26fa731c7ea4139fa669962cf8f1ce6c8b0b"
+            OATH_ADDRESS_OPTIMISM = "0x39fde572a18448f8139b7788099f0a0740f51205"
+
+            prices[OATH_ADDRESS_OPTIMISM] = await llama_client.current_token_price(
+                OATH_ADDRESS_MAINNET
+            )
+
     return prices
