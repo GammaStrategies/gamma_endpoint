@@ -117,7 +117,7 @@ async def latest_multifeeDistributor(network: Chain, protocol: Protocol):
                 "boostRewardPerSecond": boostRewardPerSecond,
                 "baseRewardsSinceLastUpdateTime": baseRewards,
                 "boostRewardsSinceLastUpdateTime": boostRewards,
-                "lastRewardTimestamp": item["last_updated_data"]["timestamp"],
+                "lastUpdateTime": item["last_updated_data"]["timestamp"],
             }
         else:
             logging.getLogger(__name__).error(
