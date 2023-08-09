@@ -53,11 +53,11 @@ async def latest_multifeeDistributor(network: Chain, protocol: Protocol):
             .get("current_baseRewards", 0)
         )
         boostRewards = int(
-            item.get("current_period_rewards", {}).get("current_boostRewards", 0)
+            item.get("current_period_rewards", {}).get("current_boostedRewards", 0)
         ) - int(
             item.get("last_updated_data", {})
             .get("current_period_rewards", {})
-            .get("current_boostRewards", 0)
+            .get("current_boostedRewards", 0)
         )
         baseRewardPerSecond = baseRewards / seconds_elapsed
         boostRewardPerSecond = boostRewards / seconds_elapsed
