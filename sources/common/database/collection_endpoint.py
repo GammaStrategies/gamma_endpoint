@@ -1968,9 +1968,25 @@ class database_local(db_collections_common):
 
         query = [
             {"$sort": {"address": -1}},
-            {"$unset": ["_id","id","last_updated_data.id"]},
+            {
+                "$lookup": {
+                    "from": "static",
+                    "localField": "hypervisor_address",
+                    "foreignField": "address",
+                    "as": "hypervisor_static",
+                }
+            },
+            {"$unwind": "$hypervisor_static"},
+            {
+                "$unset": [
+                    "_id",
+                    "id",
+                    "last_updated_data.id",
+                    "hypervisor_status._id",
+                    "hypervisor_status.id",
+                ]
+            },
         ]
-
         if match:
             query.insert(0, {"$match": match})
 
