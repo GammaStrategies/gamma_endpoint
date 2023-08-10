@@ -25,7 +25,16 @@ async def latest_multifeeDistributor(network: Chain, protocol: Protocol):
         stakedAmount = int(item.get("last_updated_data", {}).get("total_staked", 0)) / (
             10 ** item.get("hypervisor_static", {}).get("decimals", 0)
         )
-        stakedAmountUSD = stakedAmount * item.get("hypervisor_price_x_share", 0)
+
+        if "last_updated_data" not in item:
+            logging.getLogger(__name__).error(
+                f"last_updated_data not found in mfd contract {item['address']} hype:{item['hypervisor_address']}"
+            )
+            continue
+
+        stakedAmountUSD = (
+            stakedAmount * item["last_updated_data"]["hypervisor_price_x_share"]
+        )
 
         # add hypervisor address in result
         if not item["hypervisor_address"] in result[item["address"]]["hypervisors"]:
