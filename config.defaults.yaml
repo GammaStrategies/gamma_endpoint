@@ -41,7 +41,7 @@ SPIRITSWAP_FANTOM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/iliaazhe
 SUSHI_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/sushi-v3/v3-polygon
 SUSHI_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/sushi-v3/v3-arbitrum
 RAMSES_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ramsesexchange/concentrated-liquidity-graph
-ASCENT_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/seme0801/ascent-subgraph2
+ASCENT_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/seme0801/ascent-v3
 FUSIONX_MANTLE_SUBGRAPH_URL: https://graph.fusionx.finance/subgraphs/name/fusionx/exchange-v31
 
 # HypePool Subgraph URL
