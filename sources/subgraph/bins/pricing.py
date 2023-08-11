@@ -152,6 +152,10 @@ POOLS = {
             "protocol": Protocol.UNISWAP,
             "address": "0xc31e54c7a869b9fcbecc14363cf510d1c41fa443",
         },
+        "ARB_USDC": {
+            "protocol": Protocol.UNISWAP,
+            "address": "0xcda53b1f66614552f834ceef361a8d12a0b8dad8",
+        },
     },
     Chain.MOONBEAM: {
         "USDC_WGLMR": {
@@ -292,6 +296,10 @@ POOL_PATHS = {
         "0xadd5620057336f868eae78a451c503ae7b576bad": [
             (POOLS[Chain.ARBITRUM]["WETH_NOISEGPT"], 0),
             (POOLS[Chain.ARBITRUM]["WETH_USDC"], 1),
+        ],
+        # ARB
+        "0x912ce59144191c1204e64559fe8253a0e49e6548": [
+            (POOLS[Chain.ARBITRUM]["ARB_USDC"], 1),
         ],
     },
     Chain.MOONBEAM: {
