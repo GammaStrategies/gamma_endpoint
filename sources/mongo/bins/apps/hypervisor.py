@@ -86,8 +86,9 @@ async def hypervisors_collected_fees(
 
 
 async def hypervisors_rewards_status(network: Chain, protocol: Protocol):
+    """Get the rewards status for all hypervisors."""
     query = [
-        {"$match": {"dex": protocol.database_name}},
+        {"$match": {"dex": "ramses"}},
         {"$sort": {"block": -1}},
         {
             "$group": {
@@ -95,46 +96,13 @@ async def hypervisors_rewards_status(network: Chain, protocol: Protocol):
                     "hypervisor_address": "$hypervisor_address",
                     "rewardToken": "$rewardToken",
                 },
-                "symbol": {"$first": "$hypervisor_symbol"},
-                "rewardToken_symbol": {"$first": "$rewardToken_symbol"},
-                "apr": {"$first": "$apr"},
-                "block": {"$first": "$block"},
-                "timestamp": {"$first": "$timestamp"},
-                "rewards_perSecond": {"$first": "$rewards_perSecond"},
-                "rewardToken_decimals": {"$first": "$rewardToken_decimals"},
-                "rewardToken": {"$first": "$rewardToken"},
-                "rewardToken_price_usd": {"$first": "$rewardToken_price_usd"},
-                "hypervisor_share_price_usd": {"$first": "$hypervisor_share_price_usd"},
-                "total_hypervisorToken_qtty": {"$first": "$total_hypervisorToken_qtty"},
-                "token0_price_usd": {"$first": "$token0_price_usd"},
-                "token1_price_usd": {"$first": "$token1_price_usd"},
-                "rewarder_address": {"$first": "$rewarder_address"},
-            }
-        },
-        {
-            "$project": {
-                "_id": 0,
-                "hypervisor_address": "$_id.hypervisor_address",
-                "hypervisor_symbol": "$symbol",
-                "rewardToken_symbol": "$rewardToken_symbol",
-                "apr": "$apr",
-                "block": "$block",
-                "timestamp": "$timestamp",
-                # //"rewardToken_price_usd":"$rewardToken_price_usd",
-                "rewards_perSecond": "$rewards_perSecond",
-                "rewardToken_decimals": "$rewardToken_decimals",
-                "rewardToken": "$rewardToken",
-                "rewardToken_price_usd": "$rewardToken_price_usd",
-                "hypervisor_share_price_usd": "$hypervisor_share_price_usd",
-                "total_hypervisorToken_qtty": "$total_hypervisorToken_qtty",
-                "token0_price_usd": "$token0_price_usd",
-                "token1_price_usd": "$token1_price_usd",
-                "rewarder_address": "$rewarder_address",
-            }
+                "data": {"$first": "$$ROOT"},
+            },
         },
         {"$sort": {"hypervisor_address": 1}},
+        {"$replaceRoot": {"newRoot": "$data"}},
+        {"$unset": ["_id", "id"]},
     ]
-
     return await local_database_helper(network=network).get_items_from_database(
         collection_name="rewards_status",
         aggregate=query,
