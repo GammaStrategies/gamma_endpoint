@@ -22,19 +22,11 @@ async def latest_multifeeDistributor(network: Chain, protocol: Protocol):
             result[item["address"]] = {"hypervisors": {}}
 
         # prepare vars
-        stakedAmount = int(item.get("last_updated_data", {}).get("total_staked", 0)) / (
+        stakedAmount = int(item.get("hypervisor_staked", 0)) / (
             10 ** item.get("hypervisor_static", {}).get("decimals", 0)
         )
 
-        if "last_updated_data" not in item:
-            logging.getLogger(__name__).error(
-                f"last_updated_data not found in mfd contract {item['address']} hype:{item['hypervisor_address']}"
-            )
-            continue
-
-        stakedAmountUSD = (
-            stakedAmount * item["last_updated_data"]["hypervisor_price_x_share"]
-        )
+        stakedAmountUSD = stakedAmount * item.get("hypervisor_share_price_usd", 0)
 
         # add hypervisor address in result
         if not item["hypervisor_address"] in result[item["address"]]["hypervisors"]:
@@ -47,27 +39,12 @@ async def latest_multifeeDistributor(network: Chain, protocol: Protocol):
                 "boostApr": 0,
                 "rewarders": {},
             }
-            #  <token_address>:{ "rewardToken": "", "rewardTokenDecimals": 0, "rewardTokenSymbol":"", "rewardPerSecond":0, apr:0,}
 
-        # vars
-        seconds_elapsed = int(item["timestamp"]) - int(
-            item["last_updated_data"]["timestamp"]
-        )
-
-        baseRewards = int(
-            item.get("current_period_rewards", {}).get("current_baseRewards", 0)
-        ) - int(
-            item.get("last_updated_data", {})
-            .get("current_period_rewards", {})
-            .get("current_baseRewards", 0)
-        )
-        boostRewards = int(
-            item.get("current_period_rewards", {}).get("current_boostedRewards", 0)
-        ) - int(
-            item.get("last_updated_data", {})
-            .get("current_period_rewards", {})
-            .get("current_boostedRewards", 0)
-        )
+        # seconds elapsed since last update
+        seconds_elapsed = item["seconds_sinceLastUpdateTime"]
+        # rewards since last update
+        baseRewards = float(item.get("baseRewards_sinceLastUpdateTime", 0))
+        boostRewards = float(item.get("boostedRewards_sinceLastUpdateTime", 0))
         baseRewardPerSecond = baseRewards / seconds_elapsed
         boostRewardPerSecond = boostRewards / seconds_elapsed
         if baseRewardPerSecond.is_integer():
@@ -76,31 +53,8 @@ async def latest_multifeeDistributor(network: Chain, protocol: Protocol):
             boostRewardPerSecond = int(boostRewardPerSecond)
 
         # calculate apr
-        baseApr = (
-            (
-                (
-                    (baseRewardPerSecond / (10 ** item["rewardToken_decimals"]))
-                    * 31536000
-                    * item["rewardToken_price"]
-                )
-                / stakedAmountUSD
-            )
-            if stakedAmountUSD
-            else 0
-        )
-
-        boostApr = (
-            (
-                (
-                    (boostRewardPerSecond / (10 ** item["rewardToken_decimals"]))
-                    * 31536000
-                    * item["rewardToken_price"]
-                )
-                / stakedAmountUSD
-            )
-            if stakedAmountUSD
-            else 0
-        )
+        baseApr = item.get("apr_baseRewards", 0)
+        boostApr = item.get("apr_boostedRewards", 0)
 
         # add data to rewarders
         if (
@@ -112,6 +66,7 @@ async def latest_multifeeDistributor(network: Chain, protocol: Protocol):
             result[item["address"]]["hypervisors"][item["hypervisor_address"]][
                 "rewarders"
             ][item["rewardToken"]] = {
+                "timestamp": item["timestamp"],
                 "rewardToken": item["rewardToken"],
                 "rewardTokenDecimals": item["rewardToken_decimals"],
                 "rewardTokenSymbol": item.get("rewardToken_symbol", None)
@@ -124,7 +79,7 @@ async def latest_multifeeDistributor(network: Chain, protocol: Protocol):
                 "boostRewardPerSecond": boostRewardPerSecond,
                 "baseRewardsSinceLastUpdateTime": baseRewards,
                 "boostRewardsSinceLastUpdateTime": boostRewards,
-                "lastUpdateTime": item["last_updated_data"]["timestamp"],
+                "seconds_sinceLastUpdateTime": item["seconds_sinceLastUpdateTime"],
             }
         else:
             logging.getLogger(__name__).error(
@@ -141,20 +96,5 @@ async def latest_multifeeDistributor(network: Chain, protocol: Protocol):
         result[item["address"]]["hypervisors"][item["hypervisor_address"]][
             "boostApr"
         ] += boostApr
-
-    # # convert total apr in string
-    # for mfd in result:
-    #     for hypervisor in result[mfd]["hypervisors"]:
-    #         result[mfd]["hypervisors"][hypervisor]["apr"] = result[mfd]["hypervisors"][
-    #             hypervisor
-    #         ]["apr"]
-
-    #         result[mfd]["hypervisors"][hypervisor]["baseApr"] = result[mfd][
-    #             "hypervisors"
-    #         ][hypervisor]["baseApr"]
-
-    #         result[mfd]["hypervisors"][hypervisor]["boostApr"] = result[mfd][
-    #             "hypervisors"
-    #         ][hypervisor]["boostApr"]
 
     return result
