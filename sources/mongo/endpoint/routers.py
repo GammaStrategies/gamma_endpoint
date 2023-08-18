@@ -398,11 +398,10 @@ class mongo_router_builder(router_builder_baseTemplate):
     async def hypervisors_latest_multiFeeDistribution_rewards(self, response: Response):
         """
         Returns the latest known by database multiFee distribution contract rewards
-        * 'last_updated_data' filed is the snapshot taken on the last known mfd event ( getAllRewards, stake, unstake )
-        * 'total_staked' is the total amount of LP tokens staked in the multiFeeDistribution contract
-        * 'rewards.max_...' is the maximum amount of rewards that can be distributed in the period
-        * 'rewards.current...' is the current real amount of rewards distributed in the period till snapshot block
-        * 'rewards.current_period_seconds' are the seconds passed since the beguining of the period
+        * 'stakedAmount' is the total amount of LP tokens staked in the multiFeeDistribution contract
+        * 'baseRewardsSinceLastUpdateTime' rewards uncollected since last update
+        * 'boostRewardsSinceLastUpdateTime' rewards uncollected since last update
+        * 'seconds_sinceLastUpdateTime' seconds passed since last update ( to timestamp field)
         """
         return await rewards.latest_multifeeDistributor(
             network=self.chain, protocol=self.protocol
