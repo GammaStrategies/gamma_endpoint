@@ -45,12 +45,13 @@ async def latest_multifeeDistributor(network: Chain, protocol: Protocol):
         # rewards since last update
         baseRewards = float(item.get("baseRewards_sinceLastUpdateTime", 0))
         boostRewards = float(item.get("boostedRewards_sinceLastUpdateTime", 0))
-        baseRewardPerSecond = baseRewards / seconds_elapsed
-        boostRewardPerSecond = boostRewards / seconds_elapsed
-        if baseRewardPerSecond.is_integer():
-            baseRewardPerSecond = int(baseRewardPerSecond)
-        if boostRewardPerSecond.is_integer():
-            boostRewardPerSecond = int(boostRewardPerSecond)
+        # force integer rewards per second
+        baseRewardPerSecond = baseRewards // seconds_elapsed
+        boostRewardPerSecond = boostRewards // seconds_elapsed
+        # if baseRewardPerSecond.is_integer():
+        #     baseRewardPerSecond = int(baseRewardPerSecond)
+        # if boostRewardPerSecond.is_integer():
+        #     boostRewardPerSecond = int(boostRewardPerSecond)
 
         # calculate apr
         baseApr = item.get("apr_baseRewards", 0)
