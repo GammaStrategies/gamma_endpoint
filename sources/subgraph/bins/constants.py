@@ -24,4 +24,5 @@ BLOCK_TIME_SECONDS = {
     Chain.AVALANCHE: 3,
     Chain.FANTOM: 1,
     Chain.MOONBEAM: 12,
+    Chain.MANTLE: 10,
 }
