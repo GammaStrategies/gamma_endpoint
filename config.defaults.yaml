@@ -20,6 +20,7 @@ SUSHI_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t
 RAMSES_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-ramses-arbitrum
 ASCENT_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-ascent-polygon
 FUSIONX_MANTLE_GAMMA_SUBGRAPH_URL: https://graph.fusionx.finance/subgraphs/name/gamma-fusionx-mantle
+SYNTHSWAP_BASE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-synthswap-base
 
 # DEX Subgraph URL
 UNISWAP_MAINNET_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3
@@ -43,6 +44,7 @@ SUSHI_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/sushi-v3/v3
 RAMSES_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ramsesexchange/concentrated-liquidity-graph
 ASCENT_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/seme0801/ascent-v3
 FUSIONX_MANTLE_SUBGRAPH_URL: https://graph.fusionx.finance/subgraphs/name/fusionx/exchange-v31
+SYNTHSWAP_BASE_SUBGRAPH_URL: https://api.studio.thegraph.com/query/45189/synthswap-v3-analytics-base/version/latest/
 
 # HypePool Subgraph URL
 UNISWAP_MAINNET_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-mainnet
@@ -66,6 +68,7 @@ SUSHI_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/
 RAMSES_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-ramses-arbitrum
 ASCENT_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-ascent-polygon
 FUSIONX_MANTLE_HP_SUBGRAPH_URL: https://graph.fusionx.finance/subgraphs/name/gamma-hp-fusionx-mantle
+SYNTHSWAP_BASE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-synthswap-base
 
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {

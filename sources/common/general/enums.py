@@ -22,6 +22,7 @@ class Chain(str, Enum):
     FANTOM = ("fantom", 250, "fantom", "Fantom", None, None, "Fantom")
     MOONBEAM = ("moonbeam", 1287, "moonbeam", "Moonbeam", None, None, "Moonbeam")
     MANTLE = ("mantle", 5000, "mantle", "Mantle", None, None, "Mantle")
+    BASE = ("base", 8453, "base", "Base", None, None, "Base")
 
     # extra properties
     id: int
@@ -81,6 +82,7 @@ class Dex(str, Enum):
     BEAMSWAP = "beamswap"
     ASCENT = "ascent"
     FUSIONX = "fusionx"
+    SYNTHSWAP = "synthswap"
 
 
 class Protocol(str, Enum):
@@ -105,6 +107,7 @@ class Protocol(str, Enum):
     SUSHI = ("sushi", None, None, None, "sushi", "Sushi")
     ASCENT = ("ascent", None, None, None, "ascent", "Ascent")
     FUSIONX = ("fusionx", None, None, None, "fusionx", "Fusionx")
+    SYNTHSWAP = ("synthswap", None, None, None, "synthswap", "Synthswap")
 
     # extra properties
     api_url: str

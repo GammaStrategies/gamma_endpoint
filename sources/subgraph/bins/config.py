@@ -23,7 +23,8 @@ DEPLOYMENTS = [
     (Protocol.SUSHI, Chain.ARBITRUM),
     (Protocol.RAMSES, Chain.ARBITRUM),
     (Protocol.ASCENT, Chain.POLYGON),
-    (Protocol.FUSIONX, Chain.MANTLE)
+    (Protocol.FUSIONX, Chain.MANTLE),
+    (Protocol.SYNTHSWAP, Chain.BASE)
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -89,6 +90,9 @@ DEX_SUBGRAPH_URLS = {
     Protocol.FUSIONX: {
         Chain.MANTLE: get_config("FUSIONX_MANTLE_SUBGRAPH_URL"),
     },
+    Protocol.SYNTHSWAP: {
+        Chain.BASE: get_config("SYNTHSWAP_BASE_SUBGRAPH_URL"),
+    },
 }
 
 DEX_HYPEPOOL_SUBGRAPH_URLS = {
@@ -141,6 +145,9 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.FUSIONX: {
         Chain.MANTLE: get_config("FUSIONX_MANTLE_HP_SUBGRAPH_URL"),
     },
+    Protocol.SYNTHSWAP: {
+        Chain.BASE: get_config("SYNTHSWAP_BASE_HP_SUBGRAPH_URL"),
+    },
 }
 
 GAMMA_SUBGRAPH_URLS = {
@@ -192,6 +199,9 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.FUSIONX: {
         Chain.MANTLE: get_config("FUSIONX_MANTLE_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.SYNTHSWAP: {
+        Chain.BASE: get_config("SYNTHSWAP_BASE_GAMMA_SUBGRAPH_URL"),
     },
 }
 
