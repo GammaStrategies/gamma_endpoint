@@ -301,7 +301,7 @@ def build_routers_compatible() -> list:
         subgraph_router_builder(
             dex=Protocol.SYNTHSWAP,
             chain=Chain.BASE,
-            tags=["Synthswap - BASE"],
+            tags=["Synthswap - Base"],
             prefix=f"/{Protocol.SYNTHSWAP.api_url}/{Chain.BASE.api_url}",
         )
     )
