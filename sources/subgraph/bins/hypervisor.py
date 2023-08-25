@@ -157,8 +157,11 @@ class HypervisorData:
         """
         variables = {"pools": pool_addresses}
         pools_response = await self.uniswap_client.query(query_pool, variables)
-        pools_data = pools_response["data"]["pools"]
-        pools = {pool.pop("id"): pool for pool in pools_data}
+        if pools_response.get("data"):
+            pools_data = pools_response["data"]["pools"]
+            pools = {pool.pop("id"): pool for pool in pools_data}
+        else:
+            pools = {}
 
         self.basics_data = basics
         self.pools_data = pools
@@ -394,14 +397,16 @@ class HypervisorInfo(HypervisorData):
         results = {}
         for hypervisor in basics:
             try:
+                pool_id = hypervisor["pool"]["id"]
+                pool = pools.get(pool_id, {})
+
                 hypervisor_id = hypervisor["id"]
                 symbol0 = hypervisor["pool"]["token0"]["symbol"]
                 symbol1 = hypervisor["pool"]["token1"]["symbol"]
                 hypervisor_name = f'{symbol0}-{symbol1}-{hypervisor["pool"]["fee"]}'
-                pool_id = hypervisor["pool"]["id"]
                 decimals0 = hypervisor["pool"]["token0"]["decimals"]
                 decimals1 = hypervisor["pool"]["token1"]["decimals"]
-                tick = int(pools[pool_id]["tick"]) if pools[pool_id]["tick"] else 0
+                tick = int(pool.get("tick", 0))
                 baseLower = int(hypervisor["baseLower"])
                 baseUpper = int(hypervisor["baseUpper"])
                 totalSupply = int(hypervisor["totalSupply"])
@@ -438,14 +443,14 @@ class HypervisorInfo(HypervisorData):
                     "totalSupply": totalSupply,
                     "maxTotalSupply": maxTotalSupply,
                     "capacityUsed": capacityUsed,
-                    "sqrtPrice": pools[pool_id]["sqrtPrice"],
+                    "sqrtPrice": pool["sqrtPrice"] if pool.get("sqrtPrice") else 0,
                     "tick": tick,
                     "baseLower": baseLower,
                     "baseUpper": baseUpper,
                     "inRange": bool(baseLower <= tick <= baseUpper),
-                    "observationIndex": pools[pool_id]["observationIndex"],
-                    "poolTvlUSD": pools[pool_id]["totalValueLockedUSD"],
-                    "poolFeesUSD": pools[pool_id]["feesUSD"],
+                    "observationIndex": pool.get("observationIndex", 0),
+                    "poolTvlUSD": pool.get("totalValueLockedUSD", 0),
+                    "poolFeesUSD": pool.get("feesUSD", 0),
                     "returns": returns.get(hypervisor_id, self.empty_returns()),
                 }
             except Exception as e:
