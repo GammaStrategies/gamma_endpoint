@@ -443,7 +443,7 @@ class HypervisorInfo(HypervisorData):
                     "totalSupply": totalSupply,
                     "maxTotalSupply": maxTotalSupply,
                     "capacityUsed": capacityUsed,
-                    "sqrtPrice": pool["sqrtPrice"] if pool.get("sqrtPrice") else 0,
+                    "sqrtPrice": pool.get("sqrtPrice", "0"),
                     "tick": tick,
                     "baseLower": baseLower,
                     "baseUpper": baseUpper,
