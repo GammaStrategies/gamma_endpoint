@@ -448,9 +448,9 @@ class HypervisorInfo(HypervisorData):
                     "baseLower": baseLower,
                     "baseUpper": baseUpper,
                     "inRange": bool(baseLower <= tick <= baseUpper),
-                    "observationIndex": pool.get("observationIndex", 0),
-                    "poolTvlUSD": pool.get("totalValueLockedUSD", 0),
-                    "poolFeesUSD": pool.get("feesUSD", 0),
+                    "observationIndex": pool.get("observationIndex", "0"),
+                    "poolTvlUSD": pool.get("totalValueLockedUSD", "0"),
+                    "poolFeesUSD": pool.get("feesUSD", "0"),
                     "returns": returns.get(hypervisor_id, self.empty_returns()),
                 }
             except Exception as e:
