@@ -350,7 +350,7 @@ class DexPriceData:
         self._init_queries()
         variables = {"pools": self.pools}
         response = await self.uniswap_client.query(self.pool_query, variables)
-        self.data = response["data"]["pools"]
+        self.data = response.get("data", {}).get("pools", {})
 
 
 class DexPrice:
@@ -442,6 +442,7 @@ async def token_prices(chain: Chain):
                 prices[token] = price
 
     llama_client = LlamaClient(Chain.ETHEREUM)
+    llama_client_op = LlamaClient(Chain.OPTIMISM)
     with contextlib.suppress(Exception):
         if chain == Chain.OPTIMISM:
             ALCX_ADDRESS = "0xdbdb4d16eda451d0503b854cf79d55697f90c8df"
@@ -466,11 +467,18 @@ async def token_prices(chain: Chain):
             )
 
         if chain == Chain.OPTIMISM:
-            OATH_ADDRESS_MAINNET = "0x6f9c26fa731c7ea4139fa669962cf8f1ce6c8b0b"
             OATH_ADDRESS_OPTIMISM = "0x39fde572a18448f8139b7788099f0a0740f51205"
+            OP_ADDRESS_OPTIMISM = "0x4200000000000000000000000000000000000042"
+            MOCK_OPT_ADDRESS_OPTIMISM = "0x601e471de750cdce1d5a2b8e6e671409c8eb2367"
 
-            prices[OATH_ADDRESS_OPTIMISM] = await llama_client.current_token_price(
-                OATH_ADDRESS_MAINNET
+            (
+                prices[OATH_ADDRESS_OPTIMISM],
+                prices[OP_ADDRESS_OPTIMISM],
+            ) = await asyncio.gather(
+                llama_client_op.current_token_price(OATH_ADDRESS_OPTIMISM),
+                llama_client_op.current_token_price(OP_ADDRESS_OPTIMISM),
             )
+
+            prices[MOCK_OPT_ADDRESS_OPTIMISM] = prices[OP_ADDRESS_OPTIMISM]
 
     return prices
