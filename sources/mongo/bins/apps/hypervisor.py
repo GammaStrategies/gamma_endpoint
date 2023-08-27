@@ -88,7 +88,7 @@ async def hypervisors_collected_fees(
 async def hypervisors_rewards_status(network: Chain, protocol: Protocol):
     """Get the rewards status for all hypervisors."""
     query = [
-        {"$match": {"dex": "ramses"}},
+        {"$match": {"dex": protocol.database_name}},
         {"$sort": {"block": -1}},
         {
             "$group": {
