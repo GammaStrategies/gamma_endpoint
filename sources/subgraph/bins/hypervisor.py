@@ -212,11 +212,20 @@ class HypervisorData:
             start_timestamp = 0
             end_timestamp = 0
 
-        # build queries
-        initial_query = """{{
+        # build query
+        query = """
+        query hypes($block: Int!, $paginate: String!){
             uniswapV3Hypervisors(
-                block: {{number: {} }}
-            ) {{
+                first: 1000
+                block: {
+                    number: $block
+                    }
+                orderBy: id
+                orderDirection: asc
+                where: {
+                    id_gt: $paginate
+                }
+            ){
                 grossFeesClaimed0
                 grossFeesClaimed1
                 grossFeesClaimedUSD
@@ -226,49 +235,34 @@ class HypervisorData:
                 tvl0
                 feesReinvested0
                 feesReinvested1
-            }}
-        }}
-        """.format(
-            start_block
-        )
-
-        end_query = """{{
-            uniswapV3Hypervisors(
-                block: {{number: {} }}
-            ) {{
-                grossFeesClaimed0
-                grossFeesClaimed1
-                grossFeesClaimedUSD
-                id
-                symbol
-                pool {{
-                token0 {{
-                    decimals
-                }}
-                token1 {{
-                    decimals
-                }}
-                }}
-            }}
-        }}
-        """.format(
-            end_block
-        )
+                pool{
+                    token0{
+                        decimals
+                        }
+                    token1{
+                        decimals
+                    }
+                }
+            }
+        }
+        """
 
         # retrieve data
         result = {}
         try:
+            # paginate results
             initial_hype_status, end_hype_status = await asyncio.gather(
-                self.gamma_client.query(initial_query),
-                self.gamma_client.query(end_query),
+                self.gamma_client.paginate_query(
+                    query, "id", {"block": start_block, "paginate": ""}
+                ),
+                self.gamma_client.paginate_query(
+                    query, "id", {"block": end_block, "paginate": ""}
+                ),
             )
 
-            initial_hype_status = {
-                hype["id"]: hype
-                for hype in initial_hype_status["data"]["uniswapV3Hypervisors"]
-            }
+            initial_hype_status = {hype["id"]: hype for hype in initial_hype_status}
 
-            for end_hype in end_hype_status["data"]["uniswapV3Hypervisors"]:
+            for end_hype in end_hype_status:
                 # if hype id is not present at initial block, set initials to zero
                 if end_hype["id"] not in initial_hype_status:
                     initial_hype_status[end_hype["id"]] = {
@@ -330,7 +324,7 @@ class HypervisorData:
             if "error" in end_hype_status:
                 raise ValueError(f"{end_hype_status['error']}")
 
-            logger.debug(
+            logger.exception(
                 f" Unable to retrieve collected fees data for hypervisors from subgraph: {e}"
             )
 
