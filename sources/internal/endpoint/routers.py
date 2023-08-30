@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from fastapi import HTTPException, Response, APIRouter, status
+from fastapi import HTTPException, Query, Response, APIRouter, status
 from fastapi_cache.decorator import cache
 
 from endpoint.routers.template import (
@@ -56,8 +56,14 @@ class internal_router_builder_main(router_builder_baseTemplate):
         )
 
         router.add_api_route(
-            path="/{protocol}/{chain}/gross_fees",
+            path="/{chain}/gross_fees",
             endpoint=self.gross_fees,
+            methods=["GET"],
+        )
+
+        router.add_api_route(
+            path="/{chain}/all_fees",
+            endpoint=self.all_chain_usd_fees,
             methods=["GET"],
         )
 
@@ -120,9 +126,9 @@ class internal_router_builder_main(router_builder_baseTemplate):
 
     async def gross_fees(
         self,
-        protocol: Protocol,
         chain: Chain,
         response: Response,
+        protocol: Protocol | None = None,
         start_timestamp: int | None = None,
         end_timestamp: int | None = None,
         start_block: int | None = None,
@@ -139,7 +145,7 @@ class internal_router_builder_main(router_builder_baseTemplate):
 
         """
 
-        if (protocol, chain) not in DEPLOYMENTS:
+        if protocol and (protocol, chain) not in DEPLOYMENTS:
             raise HTTPException(
                 status_code=400, detail=f"{protocol} on {chain} not available."
             )
@@ -152,20 +158,24 @@ class internal_router_builder_main(router_builder_baseTemplate):
             x["address"]: x for x in await get_current_prices(network=chain)
         }
         # get all hypervisors last status from the database
+        query_hype_status = [
+            {"$sort": {"block": -1}},
+            {
+                "$group": {
+                    "_id": "$address",
+                    "data": {"$first": "$$ROOT"},
+                }
+            },
+        ]
+        # filter by protocol
+        if protocol:
+            query_hype_status.insert(0, {"$match": {"dex": protocol.database_name}})
+
         hypervisor_status = {
             x["data"]["address"]: x["data"]
             for x in await local_database_helper(network=chain).get_items_from_database(
                 collection_name="status",
-                aggregate=[
-                    {"$match": {"dex": protocol.database_name}},
-                    {"$sort": {"block": -1}},
-                    {
-                        "$group": {
-                            "_id": "$address",
-                            "data": {"$first": "$$ROOT"},
-                        }
-                    },
-                ],
+                aggregate=query_hype_status,
             )
         }
 
@@ -210,36 +220,59 @@ class internal_router_builder_main(router_builder_baseTemplate):
 
             # calculate protocol fees
             if "globalState" in hype_status["pool"]:
-                protocol_fee_0 = hype_status["pool"]["globalState"][
+                protocol_fee_0_raw = hype_status["pool"]["globalState"][
                     "communityFeeToken0"
                 ]
-                protocol_fee_1 = hype_status["pool"]["globalState"][
+                protocol_fee_1_raw = hype_status["pool"]["globalState"][
                     "communityFeeToken1"
                 ]
             else:
                 # convert from 8 decimals
                 protocol_fee_0_raw = hype_status["pool"]["slot0"]["feeProtocol"] % 16
                 protocol_fee_1_raw = hype_status["pool"]["slot0"]["feeProtocol"] >> 4
-                # convert to percent (0-100)
-                if hype_status["dex"] == Protocol.THENA:
-                    # factory
-                    # https://vscode.blockscan.com/bsc/0x1b9a1120a17617D8eC4dC80B921A9A1C50Caef7d
-                    protocol_fee_0 = ((100 * protocol_fee_0_raw) / 1000) // 1
-                    protocol_fee_1 = ((100 * protocol_fee_1_raw) / 1000) // 1
-                elif hype_status["dex"] == Protocol.RAMSES:
-                    # factory
-                    # https://vscode.blockscan.com/arbitrum-one/0x2d846d6f447185590c7c2eddf5f66e95949e0c66
-                    protocol_fee_0 = (protocol_fee_0_raw * 5 + 50) // 1
-                    protocol_fee_1 = (protocol_fee_1_raw * 5 + 50) // 1
-                elif hype_status["dex"] == Protocol.RETRO:
-                    # factory
-                    # https://vscode.blockscan.com/polygon/0x91e1b99072f238352f59e58de875691e20dc19c1
-                    protocol_fee_0 = ((100 * protocol_fee_0_raw) / 15) // 1
-                    protocol_fee_1 = ((100 * protocol_fee_1_raw) / 15) // 1
-                else:
-                    #
-                    protocol_fee_0 = (100 * protocol_fee_0) // 1
-                    protocol_fee_1 = (100 * protocol_fee_1) // 1
+
+            # convert to percent (0-100)
+            if hype_status["pool"]["dex"] in [
+                Protocol.ALGEBRAv3,
+                Protocol.THENA,
+                Protocol.ZYBERSWAP,
+            ]:
+                # factory
+                # https://vscode.blockscan.com/bsc/0x1b9a1120a17617D8eC4dC80B921A9A1C50Caef7d
+                protocol_fee_0 = (protocol_fee_0_raw / 10) // 1
+                protocol_fee_1 = (protocol_fee_1_raw / 10) // 1
+            elif hype_status["pool"]["dex"] == Protocol.CAMELOT:
+                # factory
+                # https://vscode.blockscan.com/arbitrum-one/0x521aa84ab3fcc4c05cabac24dc3682339887b126
+                protocol_fee_0 = (protocol_fee_0_raw / 10) // 1
+                protocol_fee_1 = (protocol_fee_1_raw / 10) // 1
+            elif hype_status["pool"]["dex"] == Protocol.RAMSES:
+                # factory
+                # https://vscode.blockscan.com/arbitrum-one/0x2d846d6f447185590c7c2eddf5f66e95949e0c66
+                protocol_fee_0 = (protocol_fee_0_raw * 5 + 50) // 1
+                protocol_fee_1 = (protocol_fee_1_raw * 5 + 50) // 1
+            elif hype_status["dex"] == Protocol.RETRO:
+                # factory
+                # https://vscode.blockscan.com/polygon/0x91e1b99072f238352f59e58de875691e20dc19c1
+                protocol_fee_0 = ((100 * protocol_fee_0_raw) / 15) // 1
+                protocol_fee_1 = ((100 * protocol_fee_1_raw) / 15) // 1
+            elif hype_status["dex"] == Protocol.SUSHI:
+                # factory
+                # https://vscode.blockscan.com/arbitrum-one/0xD781F2cdaf16eB422e99C4E455F071F0BB20cf1a
+                protocol_fee_0 = (
+                    (100 / protocol_fee_0_raw) // 1 if protocol_fee_0_raw else 0
+                )
+                protocol_fee_1 = (
+                    (100 / protocol_fee_1_raw) // 1 if protocol_fee_1_raw else 0
+                )
+            else:
+                # https://vscode.blockscan.com/arbitrum-one/0xD781F2cdaf16eB422e99C4E455F071F0BB20cf1a
+                protocol_fee_0 = (
+                    (100 / protocol_fee_0_raw) // 1 if protocol_fee_0_raw else 0
+                )
+                protocol_fee_1 = (
+                    (100 / protocol_fee_1_raw) // 1 if protocol_fee_1_raw else 0
+                )
 
             # calculate collected fees
             collectedFees_0 = (
@@ -256,7 +289,7 @@ class internal_router_builder_main(router_builder_baseTemplate):
 
             if protocol_fee_0 > 100 or protocol_fee_1 > 100:
                 logging.getLogger(__name__).warning(
-                    f"Protocol fee is greater than 100% for hypervisor {hype_summary['address']}"
+                    f"Protocol fee is >100% for hypervisor {hype_summary['address']}"
                 )
 
             # calculate gross fees
@@ -314,5 +347,52 @@ class internal_router_builder_main(router_builder_baseTemplate):
                     usd=grossFees_usd,
                 ),
             )
+
+        return output
+
+    async def all_chain_usd_fees(
+        self,
+        chain: Chain,
+        response: Response,
+        protocol: Protocol | None = None,
+        start_timestamp: int | None = None,
+        end_timestamp: int | None = None,
+        start_block: int | None = None,
+        end_block: int | None = None,
+    ) -> dict:
+        """
+        Returns the total current priced USD fees collected in a period of time for a specific chain
+
+        * When no timeframe is provided, it returns all available data.
+
+        * The **usd** field is calculated using the current (now) price of the token.
+        """
+        if protocol and (protocol, chain) not in DEPLOYMENTS:
+            raise HTTPException(
+                status_code=400, detail=f"{protocol} on {chain} not available."
+            )
+
+        output = {
+            "hypervisors": 0,
+            "deposits": 0,
+            "withdraws": 0,
+            "collectedFees": 0,
+            "calculatedGrossFees": 0,
+        }
+        data = await self.gross_fees(
+            chain=chain,
+            response=response,
+            protocol=protocol,
+            start_timestamp=start_timestamp,
+            end_timestamp=end_timestamp,
+            start_block=start_block,
+            end_block=end_block,
+        )
+        for hypervisor_address, hypervisor_data in data.items():
+            output["hypervisors"] += 1
+            output["deposits"] += hypervisor_data.deposits.usd
+            output["withdraws"] += hypervisor_data.withdraws.usd
+            output["collectedFees"] += hypervisor_data.collectedFees.usd
+            output["calculatedGrossFees"] += hypervisor_data.calculatedGrossFees.usd
 
         return output
