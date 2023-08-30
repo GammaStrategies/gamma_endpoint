@@ -2,6 +2,7 @@ import logging
 
 import numpy as np
 from pandas import DataFrame
+from sources.common.formulas.fees import calculate_gamma_fee
 
 from sources.subgraph.bins.constants import DAY_SECONDS, YEAR_SECONDS
 from sources.subgraph.bins.enums import Chain, Protocol, YieldType
@@ -65,9 +66,17 @@ class FeesYield:
             df_snapshots.fee0_growth * df_snapshots.price_0
             + df_snapshots.fee1_growth * df_snapshots.price_1
         )
-        df_snapshots["period_yield"] = (
-            df_snapshots.fee_growth_usd / df_snapshots.tvl_usd
+
+        # handle divisionByZero errors
+        df_snapshots["period_yield"] = df_snapshots.apply(
+            lambda x: np.nan
+            if x["tvl_usd"] == 0
+            else x["fee_growth_usd"] / x["tvl_usd"],
+            axis=1,
         )
+        # df_snapshots["period_yield"] = (
+        #     df_snapshots.fee_growth_usd / df_snapshots.tvl_usd
+        # )
         df_snapshots["yield_per_day"] = (
             df_snapshots.period_yield * YEAR_SECONDS / df_snapshots.elapsed_time
         )
