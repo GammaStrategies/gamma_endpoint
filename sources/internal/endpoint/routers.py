@@ -218,24 +218,24 @@ class internal_router_builder_main(router_builder_baseTemplate):
                 ]
             else:
                 # convert from 8 decimals
-                protocol_fee_0 = hype_status["pool"]["slot0"]["feeProtocol"] % 16
-                protocol_fee_1 = hype_status["pool"]["slot0"]["feeProtocol"] >> 4
+                protocol_fee_0_raw = hype_status["pool"]["slot0"]["feeProtocol"] % 16
+                protocol_fee_1_raw = hype_status["pool"]["slot0"]["feeProtocol"] >> 4
                 # convert to percent (0-100)
                 if hype_status["dex"] == Protocol.THENA:
                     # factory
                     # https://vscode.blockscan.com/bsc/0x1b9a1120a17617D8eC4dC80B921A9A1C50Caef7d
-                    protocol_fee_0 = ((100 * protocol_fee_0) / 1000) // 1
-                    protocol_fee_1 = ((100 * protocol_fee_1) / 1000) // 1
+                    protocol_fee_0 = ((100 * protocol_fee_0_raw) / 1000) // 1
+                    protocol_fee_1 = ((100 * protocol_fee_1_raw) / 1000) // 1
                 elif hype_status["dex"] == Protocol.RAMSES:
                     # factory
                     # https://vscode.blockscan.com/arbitrum-one/0x2d846d6f447185590c7c2eddf5f66e95949e0c66
-                    protocol_fee_0 = (100 * (protocol_fee_0 * 5 + 50)) // 1
-                    protocol_fee_1 = (100 * (protocol_fee_1 * 5 + 50)) // 1
+                    protocol_fee_0 = (protocol_fee_0_raw * 5 + 50) // 1
+                    protocol_fee_1 = (protocol_fee_1_raw * 5 + 50) // 1
                 elif hype_status["dex"] == Protocol.RETRO:
                     # factory
                     # https://vscode.blockscan.com/polygon/0x91e1b99072f238352f59e58de875691e20dc19c1
-                    protocol_fee_0 = ((100 * protocol_fee_0) / 15) // 1
-                    protocol_fee_1 = ((100 * protocol_fee_1) / 15) // 1
+                    protocol_fee_0 = ((100 * protocol_fee_0_raw) / 15) // 1
+                    protocol_fee_1 = ((100 * protocol_fee_1_raw) / 15) // 1
                 else:
                     #
                     protocol_fee_0 = (100 * protocol_fee_0) // 1
