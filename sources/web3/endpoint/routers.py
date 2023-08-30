@@ -35,7 +35,8 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.RAMSES, Chain.ARBITRUM),
     (Protocol.ASCENT, Chain.POLYGON),
     (Protocol.FUSIONX, Chain.MANTLE),
-    (Protocol.SYNTHSWAP, Chain.BASE)
+    (Protocol.SYNTHSWAP, Chain.BASE),
+    (Protocol.LYNEX, Chain.LINEA)
 ]
 
 

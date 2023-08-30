@@ -66,7 +66,8 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.RAMSES, Chain.ARBITRUM),
     (Protocol.ASCENT, Chain.POLYGON),
     (Protocol.FUSIONX, Chain.MANTLE),
-    (Protocol.SYNTHSWAP, Chain.BASE)
+    (Protocol.SYNTHSWAP, Chain.BASE),
+    (Protocol.LYNEX, Chain.LINEA)
 ]
 
 
@@ -303,6 +304,15 @@ def build_routers_compatible() -> list:
             chain=Chain.BASE,
             tags=["Synthswap - Base"],
             prefix=f"/{Protocol.SYNTHSWAP.api_url}/{Chain.BASE.api_url}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.LYNEX,
+            chain=Chain.LINEA,
+            tags=["Lynex - Linea"],
+            prefix=f"/{Protocol.LYNEX.api_url}/{Chain.LINEA.api_url}",
         )
     )
 

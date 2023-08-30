@@ -24,7 +24,8 @@ DEPLOYMENTS = [
     (Protocol.RAMSES, Chain.ARBITRUM),
     (Protocol.ASCENT, Chain.POLYGON),
     (Protocol.FUSIONX, Chain.MANTLE),
-    (Protocol.SYNTHSWAP, Chain.BASE)
+    (Protocol.SYNTHSWAP, Chain.BASE),
+    (Protocol.LYNEX, Chain.LINEA)
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -93,6 +94,9 @@ DEX_SUBGRAPH_URLS = {
     Protocol.SYNTHSWAP: {
         Chain.BASE: get_config("SYNTHSWAP_BASE_SUBGRAPH_URL"),
     },
+    Protocol.LYNEX: {
+        Chain.LINEA: get_config("LYNEX_LINEA_SUBGRAPH_URL"),
+    },
 }
 
 DEX_HYPEPOOL_SUBGRAPH_URLS = {
@@ -148,6 +152,9 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.SYNTHSWAP: {
         Chain.BASE: get_config("SYNTHSWAP_BASE_HP_SUBGRAPH_URL"),
     },
+    Protocol.LYNEX: {
+        Chain.LINEA: get_config("LYNEX_LINEA_HP_SUBGRAPH_URL"),
+    },
 }
 
 GAMMA_SUBGRAPH_URLS = {
@@ -202,6 +209,9 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.SYNTHSWAP: {
         Chain.BASE: get_config("SYNTHSWAP_BASE_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.LYNEX: {
+        Chain.LINEA: get_config("LYNEX_LINEA_GAMMA_SUBGRAPH_URL"),
     },
 }
 
