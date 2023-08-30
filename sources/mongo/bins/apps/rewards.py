@@ -1,10 +1,6 @@
 import logging
 from sources.common.general.enums import Chain, Protocol
-from sources.mongo.bins.apps.hypervisor import local_database_helper
-
-
-# TODO: restruct global config and local config
-from sources.subgraph.bins.config import MONGO_DB_URL
+from ..helpers import local_database_helper
 
 
 # MultiFeeDistributor

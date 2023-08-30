@@ -2,7 +2,7 @@ import asyncio
 from sources.common.general.enums import Chain, Protocol
 
 # TODO: restruct global config and local config
-from sources.mongo.bins.apps.hypervisor import local_database_helper
+from ..helpers import local_database_helper
 
 
 async def tvl():

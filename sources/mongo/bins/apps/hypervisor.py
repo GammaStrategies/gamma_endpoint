@@ -6,24 +6,7 @@ from sources.common.database.common.collections_common import db_collections_com
 
 from sources.web3.bins.database.db_raw_direct_info import direct_db_hypervisor_info
 
-
-# TODO: restruct global config and local config
-from sources.subgraph.bins.config import MONGO_DB_URL
-
-# General database helpers
-
-
-def local_database_helper(network: Chain):
-    """Create a local database for a hypervisor."""
-    return database_local(
-        mongo_url=MONGO_DB_URL,
-        db_name=f"{network.database_name}_gamma",
-    )
-
-
-def global_database_helper():
-    """Create a global database."""
-    return database_global(mongo_url=MONGO_DB_URL)
+from ..helpers import local_database_helper, global_database_helper
 
 
 # Hypervisors
@@ -153,7 +136,7 @@ async def hypervisor_collected_fees(
         ).query_items_from_database(
             collection_name="operations",
             query=database_local.query_operations_summary(
-                hypervisor_address=hypervisor_address,
+                hypervisor_address=[hypervisor_address],
                 timestamp_ini=start_timestamp,
                 timestamp_end=end_timestamp,
                 block_ini=start_block,
