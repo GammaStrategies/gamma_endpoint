@@ -366,6 +366,8 @@ class internal_router_builder_main(router_builder_baseTemplate):
         * When no timeframe is provided, it returns all available data.
 
         * The **usd** field is calculated using the current (now) price of the token.
+
+        * **collectedFees_perDay** are the daily fees collected in the period.
         """
         if protocol and (protocol, chain) not in DEPLOYMENTS:
             raise HTTPException(
@@ -378,6 +380,7 @@ class internal_router_builder_main(router_builder_baseTemplate):
             "withdraws": 0,
             "collectedFees": 0,
             "calculatedGrossFees": 0,
+            "collectedFees_perDay": 0,
         }
         data = await self.gross_fees(
             chain=chain,
@@ -394,5 +397,10 @@ class internal_router_builder_main(router_builder_baseTemplate):
             output["withdraws"] += hypervisor_data.withdraws.usd
             output["collectedFees"] += hypervisor_data.collectedFees.usd
             output["calculatedGrossFees"] += hypervisor_data.calculatedGrossFees.usd
+            output["collectedFees_perDay"] += (
+                (hypervisor_data.collectedFees.usd / hypervisor_data.days_period)
+                if hypervisor_data.days_period
+                else 0
+            )
 
         return output
