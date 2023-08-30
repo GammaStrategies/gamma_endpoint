@@ -1571,7 +1571,7 @@ class database_local(db_collections_common):
 
     @staticmethod
     def query_operations_summary(
-        hypervisor_address: str | None = None,
+        hypervisor_addresses: list[str] | None = None,
         timestamp_ini: int | None = None,
         timestamp_end: int | None = None,
         block_ini: int | None = None,
@@ -1580,7 +1580,7 @@ class database_local(db_collections_common):
         """_summary_
 
         Args:
-            hypervisor_address (str): _description_
+            hypervisor_addresses (list[str] | None, optional): list of hypervisor addresses
             timestamp_ini (int | None, optional): _description_. Defaults to None.
             timestamp_end (int | None, optional): _description_. Defaults to None.
             block_ini (int | None, optional): _description_. Defaults to None.
@@ -1763,8 +1763,8 @@ class database_local(db_collections_common):
             _and.append({"timestamp": {"$lte": timestamp_end}})
 
         # add hype address
-        if hypervisor_address:
-            _and.append({"address": hypervisor_address})
+        if hypervisor_addresses:
+            _and.append({"address": {"$in": hypervisor_addresses}})
 
         # add to query
         if _and:
