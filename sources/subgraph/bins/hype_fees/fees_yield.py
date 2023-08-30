@@ -42,21 +42,11 @@ class FeesYield:
         if yield_type == YieldType.LP:
             # fee % is 1 / fee or 1/10 if fee > 100
             def fee_func_percentage(fee_rate):
-                return fee_rate / 100
+                return calculate_gamma_fee(fee_rate, self.protocol)
 
-            def fee_func_others(fee_rate):
-                return 1 / fee_rate if fee_rate < 100 else 1 / 10
-
-            fee_func = (
+            df_snapshots["gamma_fee_rate"] = df_snapshots["fee"].apply(
                 fee_func_percentage
-                if (
-                    self.protocol == Protocol.RAMSES
-                    or self.protocol == Protocol.CAMELOT
-                )
-                else fee_func_others
             )
-
-            df_snapshots["gamma_fee_rate"] = df_snapshots["fee"].apply(fee_func)
             df_snapshots["effective_fees_0"] = df_snapshots.total_fees_0 * (
                 1 - df_snapshots.gamma_fee_rate
             )

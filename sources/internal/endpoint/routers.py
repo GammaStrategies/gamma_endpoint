@@ -7,6 +7,7 @@ from endpoint.routers.template import (
     router_builder_generalTemplate,
     router_builder_baseTemplate,
 )
+from sources.common.formulas.fees import convert_feeProtocol
 from sources.internal.bins.internal import (
     InternalFeeReturnsOutput,
     InternalFeeYield,
@@ -232,47 +233,12 @@ class internal_router_builder_main(router_builder_baseTemplate):
                 protocol_fee_1_raw = hype_status["pool"]["slot0"]["feeProtocol"] >> 4
 
             # convert to percent (0-100)
-            if hype_status["pool"]["dex"] in [
-                Protocol.ALGEBRAv3,
-                Protocol.THENA,
-                Protocol.ZYBERSWAP,
-            ]:
-                # factory
-                # https://vscode.blockscan.com/bsc/0x1b9a1120a17617D8eC4dC80B921A9A1C50Caef7d
-                protocol_fee_0 = (protocol_fee_0_raw / 10) // 1
-                protocol_fee_1 = (protocol_fee_1_raw / 10) // 1
-            elif hype_status["pool"]["dex"] == Protocol.CAMELOT:
-                # factory
-                # https://vscode.blockscan.com/arbitrum-one/0x521aa84ab3fcc4c05cabac24dc3682339887b126
-                protocol_fee_0 = (protocol_fee_0_raw / 10) // 1
-                protocol_fee_1 = (protocol_fee_1_raw / 10) // 1
-            elif hype_status["pool"]["dex"] == Protocol.RAMSES:
-                # factory
-                # https://vscode.blockscan.com/arbitrum-one/0x2d846d6f447185590c7c2eddf5f66e95949e0c66
-                protocol_fee_0 = (protocol_fee_0_raw * 5 + 50) // 1
-                protocol_fee_1 = (protocol_fee_1_raw * 5 + 50) // 1
-            elif hype_status["dex"] == Protocol.RETRO:
-                # factory
-                # https://vscode.blockscan.com/polygon/0x91e1b99072f238352f59e58de875691e20dc19c1
-                protocol_fee_0 = ((100 * protocol_fee_0_raw) / 15) // 1
-                protocol_fee_1 = ((100 * protocol_fee_1_raw) / 15) // 1
-            elif hype_status["dex"] == Protocol.SUSHI:
-                # factory
-                # https://vscode.blockscan.com/arbitrum-one/0xD781F2cdaf16eB422e99C4E455F071F0BB20cf1a
-                protocol_fee_0 = (
-                    (100 / protocol_fee_0_raw) // 1 if protocol_fee_0_raw else 0
-                )
-                protocol_fee_1 = (
-                    (100 / protocol_fee_1_raw) // 1 if protocol_fee_1_raw else 0
-                )
-            else:
-                # https://vscode.blockscan.com/arbitrum-one/0xD781F2cdaf16eB422e99C4E455F071F0BB20cf1a
-                protocol_fee_0 = (
-                    (100 / protocol_fee_0_raw) // 1 if protocol_fee_0_raw else 0
-                )
-                protocol_fee_1 = (
-                    (100 / protocol_fee_1_raw) // 1 if protocol_fee_1_raw else 0
-                )
+            protocol_fee_0, protocol_fee_1 = convert_feeProtocol(
+                feeProtocol0=protocol_fee_0_raw,
+                feeProtocol1=protocol_fee_1_raw,
+                hypervisor_protocol=hype_status["dex"],
+                pool_protocol=hype_status["pool"]["dex"],
+            )
 
             # calculate collected fees
             collectedFees_0 = (
