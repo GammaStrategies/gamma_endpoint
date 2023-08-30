@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from fastapi import HTTPException, Response, APIRouter, status
 from fastapi_cache.decorator import cache
 
@@ -6,13 +7,23 @@ from endpoint.routers.template import (
     router_builder_generalTemplate,
     router_builder_baseTemplate,
 )
-from sources.internal.bins.internal import InternalFeeReturnsOutput, InternalFeeYield
+from sources.internal.bins.internal import (
+    InternalFeeReturnsOutput,
+    InternalFeeYield,
+    InternalGrossFeesOutput,
+    InternalTimeframe,
+    InternalTokens,
+)
+from sources.mongo.bins.apps.hypervisor import hypervisors_collected_fees
+from sources.mongo.bins.apps.prices import get_current_prices
+from sources.mongo.bins.helpers import local_database_helper
 
+from sources.common.database.collection_endpoint import database_global, database_local
+from sources.common.database.common.collections_common import db_collections_common
 
 from sources.subgraph.bins.enums import Chain, Protocol
 
 from sources.subgraph.bins.config import DEPLOYMENTS
-from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.hype_fees.fees_yield import fee_returns_all
 
 
@@ -41,6 +52,12 @@ class internal_router_builder_main(router_builder_baseTemplate):
         router.add_api_route(
             path="/{protocol}/{chain}/returns",
             endpoint=self.fee_returns,
+            methods=["GET"],
+        )
+
+        router.add_api_route(
+            path="/{protocol}/{chain}/gross_fees",
+            endpoint=self.gross_fees,
             methods=["GET"],
         )
 
@@ -98,5 +115,204 @@ class internal_router_builder_main(router_builder_baseTemplate):
                         status=f"Total:{status_total}, LP: {status_lp}",
                     ),
                 )
+
+        return output
+
+    async def gross_fees(
+        self,
+        protocol: Protocol,
+        chain: Chain,
+        response: Response,
+        start_timestamp: int | None = None,
+        end_timestamp: int | None = None,
+        start_block: int | None = None,
+        end_block: int | None = None,
+    ) -> dict[str, InternalGrossFeesOutput]:
+        """
+        Calculates the gross fees aquired (not uncollected) in a period of time for a specific protocol and chain using the protocol fee switch.
+
+        * When no timeframe is provided, it returns all available data.
+
+        * The **usd** field is calculated using the current (now) price of the token.
+
+        * **protocolFee_X** is the percentage of fees going to the protocol, from 1 to 100.
+
+        """
+
+        if (protocol, chain) not in DEPLOYMENTS:
+            raise HTTPException(
+                status_code=400, detail=f"{protocol} on {chain} not available."
+            )
+
+        # create result dict
+        output = {}
+
+        # get hypervisors current prices
+        token_prices = {
+            x["address"]: x for x in await get_current_prices(network=chain)
+        }
+        # get all hypervisors last status from the database
+        hypervisor_status = {
+            x["data"]["address"]: x["data"]
+            for x in await local_database_helper(network=chain).get_items_from_database(
+                collection_name="status",
+                aggregate=[
+                    {"$match": {"dex": protocol.database_name}},
+                    {"$sort": {"block": -1}},
+                    {
+                        "$group": {
+                            "_id": "$address",
+                            "data": {"$first": "$$ROOT"},
+                        }
+                    },
+                ],
+            )
+        }
+
+        # get a sumarized data portion for all hypervisors in the database for a period
+        # when no period is specified, it will return all available data
+        for hype_summary in await local_database_helper(
+            network=chain
+        ).query_items_from_database(
+            collection_name="operations",
+            query=database_local.query_operations_summary(
+                hypervisor_addresses=list(hypervisor_status.keys()),
+                timestamp_ini=start_timestamp,
+                timestamp_end=end_timestamp,
+                block_ini=start_block,
+                block_end=end_block,
+            ),
+        ):
+            # convert to float
+            hype_summary = db_collections_common.convert_decimal_to_float(
+                item=db_collections_common.convert_d128_to_decimal(item=hype_summary)
+            )
+
+            # ease hypervisor static data access
+            hype_status = hypervisor_status.get(hype_summary["address"], {})
+            if not hype_status:
+                logging.getLogger(__name__).error(
+                    f"Static data not found for hypervisor {hype_summary['address']}"
+                )
+                continue
+            # ease hypervisor price access
+            token0_price = token_prices.get(
+                hype_status["pool"]["token0"]["address"], {}
+            ).get("price", 0)
+            token1_price = token_prices.get(
+                hype_status["pool"]["token1"]["address"], {}
+            ).get("price", 0)
+            if not token0_price or not token1_price:
+                logging.getLogger(__name__).error(
+                    f"Price not found for token0[{token0_price}] or token1[{token1_price}] of hypervisor {hype_summary['address']}"
+                )
+                continue
+
+            # calculate protocol fees
+            if "globalState" in hype_status["pool"]:
+                protocol_fee_0 = hype_status["pool"]["globalState"][
+                    "communityFeeToken0"
+                ]
+                protocol_fee_1 = hype_status["pool"]["globalState"][
+                    "communityFeeToken1"
+                ]
+            else:
+                # convert from 8 decimals
+                protocol_fee_0 = hype_status["pool"]["slot0"]["feeProtocol"] % 16
+                protocol_fee_1 = hype_status["pool"]["slot0"]["feeProtocol"] >> 4
+                # convert to percent (0-100)
+                if hype_status["dex"] == Protocol.THENA:
+                    # factory
+                    # https://vscode.blockscan.com/bsc/0x1b9a1120a17617D8eC4dC80B921A9A1C50Caef7d
+                    protocol_fee_0 = ((100 * protocol_fee_0) / 1000) // 1
+                    protocol_fee_1 = ((100 * protocol_fee_1) / 1000) // 1
+                elif hype_status["dex"] == Protocol.RAMSES:
+                    # factory
+                    # https://vscode.blockscan.com/arbitrum-one/0x2d846d6f447185590c7c2eddf5f66e95949e0c66
+                    protocol_fee_0 = (100 * (protocol_fee_0 * 5 + 50)) // 1
+                    protocol_fee_1 = (100 * (protocol_fee_1 * 5 + 50)) // 1
+                elif hype_status["dex"] == Protocol.RETRO:
+                    # factory
+                    # https://vscode.blockscan.com/polygon/0x91e1b99072f238352f59e58de875691e20dc19c1
+                    protocol_fee_0 = ((100 * protocol_fee_0) / 15) // 1
+                    protocol_fee_1 = ((100 * protocol_fee_1) / 15) // 1
+                else:
+                    #
+                    protocol_fee_0 = (100 * protocol_fee_0) // 1
+                    protocol_fee_1 = (100 * protocol_fee_1) // 1
+
+            # calculate collected fees
+            collectedFees_0 = (
+                hype_summary["collectedFees_token0"]
+                + hype_summary["zeroBurnFees_token0"]
+            )
+            collectedFees_1 = (
+                hype_summary["collectedFees_token1"]
+                + hype_summary["zeroBurnFees_token1"]
+            )
+            collectedFees_usd = (
+                collectedFees_0 * token0_price + collectedFees_1 * token1_price
+            )
+
+            if protocol_fee_0 > 100 or protocol_fee_1 > 100:
+                logging.getLogger(__name__).warning(
+                    f"Protocol fee is greater than 100% for hypervisor {hype_summary['address']}"
+                )
+
+            # calculate gross fees
+            if protocol_fee_0 < 100:
+                grossFees_0 = collectedFees_0 / (1 - (protocol_fee_0 / 100))
+            else:
+                grossFees_0 = collectedFees_0
+
+            if protocol_fee_1 < 100:
+                grossFees_1 = collectedFees_1 / (1 - (protocol_fee_1 / 100))
+            else:
+                grossFees_1 = collectedFees_1
+
+            grossFees_usd = grossFees_0 * token0_price + grossFees_1 * token1_price
+
+            # days period
+            days_period = (
+                hype_summary["timestamp_end"] - hype_summary["timestamp_ini"]
+            ) / 86400
+
+            # build output
+            output[hype_summary["address"]] = InternalGrossFeesOutput(
+                symbol=hype_status["symbol"],
+                days_period=days_period,
+                block=InternalTimeframe(
+                    ini=hype_summary["block_ini"],
+                    end=hype_summary["block_end"],
+                ),
+                timestamp=InternalTimeframe(
+                    ini=hype_summary["timestamp_ini"],
+                    end=hype_summary["timestamp_end"],
+                ),
+                deposits=InternalTokens(
+                    token0=hype_summary["deposits_token0"],
+                    token1=hype_summary["deposits_token1"],
+                    usd=hype_summary["deposits_token0"] * token0_price
+                    + hype_summary["deposits_token1"] * token1_price,
+                ),
+                withdraws=InternalTokens(
+                    token0=hype_summary["withdraws_token0"],
+                    token1=hype_summary["withdraws_token1"],
+                    usd=hype_summary["withdraws_token0"] * token0_price
+                    + hype_summary["withdraws_token1"] * token1_price,
+                ),
+                collectedFees=InternalTokens(
+                    token0=collectedFees_0,
+                    token1=collectedFees_1,
+                    usd=collectedFees_usd,
+                ),
+                protocolFee_0=protocol_fee_0,
+                protocolFee_1=protocol_fee_1,
+                calculatedGrossFees=InternalTokens(
+                    token0=grossFees_0,
+                    token1=grossFees_1,
+                    usd=grossFees_usd,
+                ),
+            )
 
         return output
