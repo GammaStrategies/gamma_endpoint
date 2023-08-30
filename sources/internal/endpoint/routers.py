@@ -135,7 +135,7 @@ class internal_router_builder_main(router_builder_baseTemplate):
         end_block: int | None = None,
     ) -> dict[str, InternalGrossFeesOutput]:
         """
-        Calculates the gross fees aquired (not uncollected) in a period of time for a specific protocol and chain using the protocol fee switch.
+        Calculates the gross fees aquired (not uncollected) in a period of time for a specific protocol and chain using the protocol fee switch data.
 
         * When no timeframe is provided, it returns all available data.
 
