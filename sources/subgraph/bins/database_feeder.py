@@ -53,6 +53,15 @@ CHAINS_PROTOCOLS = [
     for chain in GAMMA_SUBGRAPH_URLS[protocol].keys()
 ]
 
+# Rewards managed by gamma utilities ( 3rd party rewards not in subgraph)
+PROTOCOL_REWARDS_DATABASE = [
+    Protocol.ZYBERSWAP,
+    Protocol.THENA,
+    Protocol.SUSHI,
+    Protocol.BEAMSWAP,
+    Protocol.RAMSES,
+    Protocol.SYNTHSWAP,
+]
 
 # set cron vars
 EXPR_FORMATS = {
@@ -182,14 +191,7 @@ async def feed_database_allRewards2():
             protocol=protocol,
         )
         for chain, protocol in CHAINS_PROTOCOLS
-        if protocol
-        not in [
-            Protocol.ZYBERSWAP,
-            Protocol.THENA,
-            Protocol.SUSHI,
-            Protocol.BEAMSWAP,
-            Protocol.RAMSES,
-        ]
+        if protocol not in PROTOCOL_REWARDS_DATABASE
     ]
 
     # execute feed
@@ -213,14 +215,7 @@ async def feed_database_allRewards2_externals(current_timestamp: int | None = No
             current_timestamp=current_timestamp,
         )
         for chain, protocol in CHAINS_PROTOCOLS
-        if protocol
-        in [
-            Protocol.ZYBERSWAP,
-            Protocol.THENA,
-            Protocol.SUSHI,
-            Protocol.BEAMSWAP,
-            Protocol.RAMSES,
-        ]
+        if protocol in PROTOCOL_REWARDS_DATABASE
     ]
 
     # execute feed
