@@ -25,7 +25,8 @@ DEPLOYMENTS = [
     (Protocol.ASCENT, Chain.POLYGON),
     (Protocol.FUSIONX, Chain.MANTLE),
     (Protocol.SYNTHSWAP, Chain.BASE),
-    (Protocol.LYNEX, Chain.LINEA)
+    (Protocol.LYNEX, Chain.LINEA),
+    (Protocol.PEGASYS, Chain.ROLLUX)
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -97,6 +98,9 @@ DEX_SUBGRAPH_URLS = {
     Protocol.LYNEX: {
         Chain.LINEA: get_config("LYNEX_LINEA_SUBGRAPH_URL"),
     },
+    Protocol.PEGASYS: {
+        Chain.ROLLUX: get_config("PEGASYS_ROLLUX_SUBGRAPH_URL"),
+    },
 }
 
 DEX_HYPEPOOL_SUBGRAPH_URLS = {
@@ -155,6 +159,9 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.LYNEX: {
         Chain.LINEA: get_config("LYNEX_LINEA_HP_SUBGRAPH_URL"),
     },
+    Protocol.PEGASYS: {
+        Chain.ROLLUX: get_config("PEGASYS_ROLLUX_HP_SUBGRAPH_URL"),
+    },
 }
 
 GAMMA_SUBGRAPH_URLS = {
@@ -212,6 +219,9 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.LYNEX: {
         Chain.LINEA: get_config("LYNEX_LINEA_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.PEGASYS: {
+        Chain.ROLLUX: get_config("PEGASYS_ROLLUX_GAMMA_SUBGRAPH_URL"),
     },
 }
 

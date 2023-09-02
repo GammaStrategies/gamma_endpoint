@@ -22,6 +22,7 @@ ASCENT_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t
 FUSIONX_MANTLE_GAMMA_SUBGRAPH_URL: https://graph.fusionx.finance/subgraphs/name/gamma-fusionx-mantle
 SYNTHSWAP_BASE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-synthswap-base
 LYNEX_LINEA_GAMMA_SUBGRAPH_URL: https://graph-query.linea.build/subgraphs/name/gammastrategies/lynex-linea
+PEGASYS_ROLLUX_GAMMA_SUBGRAPH_URL: https://rollux.graph.pegasys.fi/subgraphs/name/gammastrategies/pegasys-rollux
 
 # DEX Subgraph URL
 UNISWAP_MAINNET_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3
@@ -47,6 +48,7 @@ ASCENT_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/seme0801/as
 FUSIONX_MANTLE_SUBGRAPH_URL: https://graph.fusionx.finance/subgraphs/name/fusionx/exchange-v31
 SYNTHSWAP_BASE_SUBGRAPH_URL: https://api.studio.thegraph.com/query/45189/synthswap-v3-analytics-base/version/latest/
 LYNEX_LINEA_SUBGRAPH_URL: https://graph-query.linea.build/subgraphs/name/cryptoalgebra/analytics
+PEGASYS_ROLLUX_SUBGRAPH_URL: https://rollux.graph.pegasys.fi/subgraphs/name/pollum-io/pegasys-v3
 
 # HypePool Subgraph URL
 UNISWAP_MAINNET_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-mainnet
@@ -72,6 +74,7 @@ ASCENT_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/
 FUSIONX_MANTLE_HP_SUBGRAPH_URL: https://graph.fusionx.finance/subgraphs/name/gamma-hp-fusionx-mantle
 SYNTHSWAP_BASE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-synthswap-base
 LYNEX_LINEA_HP_SUBGRAPH_URL: https://graph-query.linea.build/subgraphs/name/gammastrategies/hype-pool-lynex-linea
+PEGASYS_ROLLUX_HP_SUBGRAPH_URL: https://rollux.graph.pegasys.fi/subgraphs/name/gammastrategies/hype-pool-pegasys-rollux
 
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {
