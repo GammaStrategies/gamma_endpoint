@@ -216,3 +216,13 @@ class LlamaClient:
         response.raise_for_status()
 
         return response.json()["coins"][chain_address]["price"]
+
+    async def current_token_price_multi(self, token_list: list[str]):
+        coins = ",".join([f"{self.chain}:{token}" for token in token_list])
+        endpoint = f"{self.base}/prices/current/{coins}"
+
+        response = await async_client.get(endpoint)
+        
+        response.raise_for_status()
+
+        return response.json()["coins"]

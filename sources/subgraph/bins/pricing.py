@@ -110,6 +110,10 @@ POOLS = {
             "protocol": Protocol.QUICKSWAP,
             "address": "0xf66066175bc4dcbcb7ee6e01becd8489b6eeb344",
         },
+        "WMATIC_RUNY": {
+            "protocol": Protocol.QUICKSWAP,
+            "address": "0x7935aefec4077611ebb088f640de9462d39cc460",
+        },
     },
     Chain.POLYGON_ZKEVM: {
         "WETH_USDC": {
@@ -268,6 +272,11 @@ POOL_PATHS = {
             (POOLS[Chain.POLYGON]["PUSH_WETH"], 1),
             (POOLS[Chain.POLYGON]["USDC_WETH"], 0),
         ],
+        # RUNY
+        "0x578fee9def9a270c20865242cfd4ff86f31d0e5b": [
+            (POOLS[Chain.POLYGON]["WMATIC_RUNY"], 0),
+            (POOLS[Chain.POLYGON]["WMATIC_USDC"], 1),
+        ]
     },
     Chain.POLYGON_ZKEVM: {
         # WMATIC
