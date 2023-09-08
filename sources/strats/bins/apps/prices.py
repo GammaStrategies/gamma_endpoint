@@ -43,7 +43,7 @@ async def get_current_prices(
         # change string network name to Chain object
         try:
             chain = text_to_chain(item["network"])
-            item["network"] = chain.subgraph_name
+            item["network"] = chain.api_url
         except:
             pass
         result.append(item)
@@ -75,7 +75,7 @@ async def get_current_token_addresses(chain: Chain | None = None) -> list[list]:
         # change string network name to Chain object
         try:
             chain = text_to_chain(item["network"])
-            item["network"] = chain.subgraph_name
+            item["network"] = chain.api_url
         except:
             pass
 
