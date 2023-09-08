@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime, timezone
 from sources.common.database.collection_endpoint import database_global
-from sources.common.general.enums import Chain
+from sources.common.general.enums import Chain, text_to_chain
 from sources.subgraph.bins.config import MONGO_DB_URL
 
 
@@ -39,6 +39,13 @@ async def get_current_prices(
             item["seconds_old"] = current_time - item["timestamp"]
         except:
             item["seconds_old"] = None
+
+        # change string network name to Chain object
+        try:
+            chain = text_to_chain(item["network"])
+            item["network"] = chain.subgraph_name
+        except:
+            pass
         result.append(item)
 
     return result
