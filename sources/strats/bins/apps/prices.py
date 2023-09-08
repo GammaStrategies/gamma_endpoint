@@ -72,5 +72,12 @@ async def get_current_token_addresses(chain: Chain | None = None) -> list[list]:
         projection={"_id": False, "id": False},
         batch_size=50000,
     ):
+        # change string network name to Chain object
+        try:
+            chain = text_to_chain(item["network"])
+            item["network"] = chain.subgraph_name
+        except:
+            pass
+
         result.append([item["address"], item["network"]])
     return result
