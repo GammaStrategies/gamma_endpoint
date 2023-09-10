@@ -59,6 +59,7 @@ class HypervisorData:
                         symbol
                         decimals
                     }
+                    sqrtPriceX96
                 }
             }
         }
