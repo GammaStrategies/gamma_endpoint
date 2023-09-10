@@ -80,6 +80,16 @@ async def get_fees(
         )
     }
 
+    # dummy hypervisor to get blockNumberFromTimestamp
+    er2_dumm = build_erc20_helper(chain=chain)
+    # calculate initial block from ini_timestamp
+    start_block = start_block or await er2_dumm.blockNumberFromTimestamp(
+        timestamp=start_timestamp
+    )
+    end_block = end_block or await er2_dumm.blockNumberFromTimestamp(
+        timestamp=end_timestamp
+    )
+
     # get a sumarized data portion for all hypervisors in the database for a period
     # when no period is specified, it will return all available data
     for hype_summary in await local_database_helper(
@@ -100,16 +110,6 @@ async def get_fees(
         )
 
         try:
-            # dummy hypervisor to get blockNumberFromTimestamp
-            er2_dumm = build_erc20_helper(chain=chain)
-            # calculate initial block from ini_timestamp
-            start_block = start_block or await er2_dumm.blockNumberFromTimestamp(
-                timestamp=start_timestamp
-            )
-            end_block = end_block or await er2_dumm.blockNumberFromTimestamp(
-                timestamp=end_timestamp
-            )
-
             hype_status_ini = build_hypervisor(
                 network=chain,
                 dex=protocol.database_name,
