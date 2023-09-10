@@ -412,6 +412,13 @@ class database_local(db_collections_common):
                     },
                     "multi_indexes": [],
                 },
+                "reports": {
+                    "mono_indexes": {
+                        "id": True,
+                        "type": False,
+                    },
+                    "multi_indexes": [],
+                },
             }
 
         super().__init__(
