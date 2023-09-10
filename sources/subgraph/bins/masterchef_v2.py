@@ -132,7 +132,7 @@ class MasterchefV2Info(MasterchefV2Data):
 
         info = {}
 
-        pricing = await token_prices(self.chain)
+        pricing = await token_prices(self.chain, self.protocol)
 
         for masterChef in self.data:
             pool_info = {}

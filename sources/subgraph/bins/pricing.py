@@ -430,7 +430,7 @@ async def gamma_price():
     return dex_pricing.token_prices["0x6bea7cfef803d1e3d5f7c0103f7ded065644e197"]
 
 
-async def token_prices(chain: Chain):
+async def token_prices(chain: Chain, protocol: Protocol):
     """Get token prices"""
     dex_pricing = DexPrice(chain)
     await dex_pricing.get_token_prices()

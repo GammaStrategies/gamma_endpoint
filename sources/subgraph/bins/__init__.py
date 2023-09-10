@@ -222,7 +222,14 @@ class LlamaClient:
         endpoint = f"{self.base}/prices/current/{coins}"
 
         response = await async_client.get(endpoint)
-        
+
         response.raise_for_status()
 
-        return response.json()["coins"]
+        response_coins = response.json()["coins"]
+
+        prices = {
+            coin_identifier.split(":")[1]: data.get("price", 0)
+            for coin_identifier, data in response_coins.items()
+        }
+
+        return prices

@@ -117,6 +117,7 @@ class HypervisorData:
                         symbol
                         decimals
                     }
+                    sqrtPriceX96
                 }
             }
         }
@@ -437,7 +438,7 @@ class HypervisorInfo(HypervisorData):
                     "totalSupply": totalSupply,
                     "maxTotalSupply": maxTotalSupply,
                     "capacityUsed": capacityUsed,
-                    "sqrtPrice": pool.get("sqrtPrice", "0"),
+                    "sqrtPrice": hypervisor["pool"]["sqrtPriceX96"],
                     "tick": tick,
                     "baseLower": baseLower,
                     "baseUpper": baseUpper,

@@ -7,6 +7,7 @@ from sources.subgraph.bins.pricing import token_prices
 class MasterchefData:
     def __init__(self, protocol: Protocol, chain: Chain = Chain.ETHEREUM):
         self.chain = chain
+        self.protocol = protocol
         self.gamma_client = GammaClient(protocol, chain)
         self.data = {}
 
@@ -77,7 +78,7 @@ class MasterchefInfo(MasterchefData):
             await self._get_masterchef_data()
 
         info = {}
-        prices = await token_prices(self.chain)
+        prices = await token_prices(self.chain, self.protocol)
         for masterchef in self.data:
             reward_token_price = prices.get(masterchef["rewardToken"]["id"], 0)
             reward_per_second = (
