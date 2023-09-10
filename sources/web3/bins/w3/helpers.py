@@ -3,6 +3,7 @@ from sources.common.general.enums import Chain, Dex
 
 from sources.web3.bins.w3.objects.protocols import (
     gamma_hypervisor,
+    gamma_hypervisor_ramses,
     gamma_hypervisor_zyberswap,
     gamma_hypervisor_quickswap,
     gamma_hypervisor_thena,
@@ -46,6 +47,13 @@ def build_hypervisor(
             block=block,
             custom_web3Url=custom_web3Url,
         )
+    elif dex == Dex.RAMSES:
+        hypervisor = gamma_hypervisor_ramses(
+            address=hypervisor_address,
+            network=network.database_name,
+            block=block,
+            custom_web3Url=custom_web3Url,
+        )
     else:
         # build hype
         hypervisor = gamma_hypervisor(
@@ -80,3 +88,20 @@ def build_hypervisor_registry(
         )
 
         return registry
+
+
+def build_erc20_helper(chain: Chain, address: str | None = None) -> erc20:
+    """Create a erc20 with the zero address
+
+    Args:
+        chain (Chain):
+        cached (bool, optional): . Defaults to False.
+
+    Returns:
+        bep20 | erc20:
+    """
+
+    return erc20(
+        address=address or "0x0000000000000000000000000000000000000000",
+        network=chain.database_name,
+    )
