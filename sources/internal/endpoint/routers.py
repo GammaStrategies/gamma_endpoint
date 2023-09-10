@@ -69,6 +69,12 @@ class internal_router_builder_main(router_builder_baseTemplate):
             methods=["GET"],
         )
 
+        router.add_api_route(
+            path="/ramses_gross_fees",
+            endpoint=self.get_gross_fees_ramses,
+            methods=["GET"],
+        )
+
         return router
 
     # ROUTE FUNCTIONS
@@ -390,3 +396,40 @@ class internal_router_builder_main(router_builder_baseTemplate):
             )
 
         return output
+
+    async def get_report(
+        self,
+        chain: Chain,
+        response: Response,
+        protocol: Protocol | None = None,
+        start_timestamp: int | None = None,
+        end_timestamp: int | None = None,
+        start_block: int | None = None,
+        end_block: int | None = None,
+    ):
+        find = {"type": "gross_fees"}
+        if protocol:
+            find["protocol"] = protocol.database_name
+        if start_timestamp:
+            find["timeframe.ini.timestamp"] = {"$gte": start_timestamp}
+        if end_timestamp:
+            find["timeframe.end.timestamp"] = {"$lte": end_timestamp}
+        if start_block:
+            find["timeframe.ini.block"] = {"$gte": start_block}
+        if end_block:
+            find["timeframe.end.block"] = {"$lte": end_block}
+
+        # find reports
+        return await local_database_helper(network=chain).get_items_from_database(
+            collection_name="reports",
+            find=find,
+        )
+
+    async def get_gross_fees_ramses(
+        self,
+        response: Response,
+    ):
+        return [
+            x["data"]
+            for x in await self.get_report(chain=Chain.ARBITRUM, response=response)
+        ]
