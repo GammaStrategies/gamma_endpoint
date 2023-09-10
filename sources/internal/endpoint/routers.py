@@ -27,6 +27,7 @@ from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.config import DEPLOYMENTS
 from sources.subgraph.bins.hype_fees.fees_yield import fee_returns_all
 
+from ..bins.fee_internal import get_fees
 
 # Route builders
 
@@ -134,187 +135,206 @@ class internal_router_builder_main(router_builder_baseTemplate):
         end_timestamp: int | None = None,
         start_block: int | None = None,
         end_block: int | None = None,
-    ) -> dict[str, InternalGrossFeesOutput]:
-        """
-        Calculates the gross fees aquired (not uncollected) in a period of time for a specific protocol and chain using the protocol fee switch data.
+    ):
+        return await get_fees(
+            chain=chain,
+            protocol=protocol,
+            start_timestamp=start_timestamp,
+            end_timestamp=end_timestamp,
+            start_block=start_block,
+            end_block=end_block,
+        )
 
-        * When no timeframe is provided, it returns all available data.
+    # async def gross_fees_OLD(
+    #     self,
+    #     chain: Chain,
+    #     response: Response,
+    #     protocol: Protocol | None = None,
+    #     start_timestamp: int | None = None,
+    #     end_timestamp: int | None = None,
+    #     start_block: int | None = None,
+    #     end_block: int | None = None,
+    # ) -> dict[str, InternalGrossFeesOutput]:
+    #     """
+    #     Calculates the gross fees aquired (not uncollected) in a period of time for a specific protocol and chain using the protocol fee switch data.
 
-        * The **usd** field is calculated using the current (now) price of the token.
+    #     * When no timeframe is provided, it returns all available data.
 
-        * **protocolFee_X** is the percentage of fees going to the protocol, from 1 to 100.
+    #     * The **usd** field is calculated using the current (now) price of the token.
 
-        """
+    #     * **protocolFee_X** is the percentage of fees going to the protocol, from 1 to 100.
 
-        if protocol and (protocol, chain) not in DEPLOYMENTS:
-            raise HTTPException(
-                status_code=400, detail=f"{protocol} on {chain} not available."
-            )
+    #     """
 
-        # create result dict
-        output = {}
+    #     if protocol and (protocol, chain) not in DEPLOYMENTS:
+    #         raise HTTPException(
+    #             status_code=400, detail=f"{protocol} on {chain} not available."
+    #         )
 
-        # get hypervisors current prices
-        token_prices = {
-            x["address"]: x for x in await get_current_prices(network=chain)
-        }
-        # get all hypervisors last status from the database
-        query_hype_status = [
-            {"$sort": {"block": -1}},
-            {
-                "$group": {
-                    "_id": "$address",
-                    "data": {"$first": "$$ROOT"},
-                }
-            },
-        ]
-        # filter by protocol
-        if protocol:
-            query_hype_status.insert(0, {"$match": {"dex": protocol.database_name}})
+    #     # create result dict
+    #     output = {}
 
-        hypervisor_status = {
-            x["data"]["address"]: x["data"]
-            for x in await local_database_helper(network=chain).get_items_from_database(
-                collection_name="status",
-                aggregate=query_hype_status,
-            )
-        }
+    #     # get hypervisors current prices
+    #     token_prices = {
+    #         x["address"]: x for x in await get_current_prices(network=chain)
+    #     }
+    #     # get all hypervisors last status from the database
+    #     query_hype_status = [
+    #         {"$sort": {"block": -1}},
+    #         {
+    #             "$group": {
+    #                 "_id": "$address",
+    #                 "data": {"$first": "$$ROOT"},
+    #             }
+    #         },
+    #     ]
+    #     # filter by protocol
+    #     if protocol:
+    #         query_hype_status.insert(0, {"$match": {"dex": protocol.database_name}})
 
-        # get a sumarized data portion for all hypervisors in the database for a period
-        # when no period is specified, it will return all available data
-        for hype_summary in await local_database_helper(
-            network=chain
-        ).query_items_from_database(
-            collection_name="operations",
-            query=database_local.query_operations_summary(
-                hypervisor_addresses=list(hypervisor_status.keys()),
-                timestamp_ini=start_timestamp,
-                timestamp_end=end_timestamp,
-                block_ini=start_block,
-                block_end=end_block,
-            ),
-        ):
-            # convert to float
-            hype_summary = db_collections_common.convert_decimal_to_float(
-                item=db_collections_common.convert_d128_to_decimal(item=hype_summary)
-            )
+    #     hypervisor_status = {
+    #         x["data"]["address"]: x["data"]
+    #         for x in await local_database_helper(network=chain).get_items_from_database(
+    #             collection_name="status",
+    #             aggregate=query_hype_status,
+    #         )
+    #     }
 
-            # ease hypervisor static data access
-            hype_status = hypervisor_status.get(hype_summary["address"], {})
-            if not hype_status:
-                logging.getLogger(__name__).error(
-                    f"Static data not found for hypervisor {hype_summary['address']}"
-                )
-                continue
-            # ease hypervisor price access
-            token0_price = token_prices.get(
-                hype_status["pool"]["token0"]["address"], {}
-            ).get("price", 0)
-            token1_price = token_prices.get(
-                hype_status["pool"]["token1"]["address"], {}
-            ).get("price", 0)
-            if not token0_price or not token1_price:
-                logging.getLogger(__name__).error(
-                    f"Price not found for token0[{token0_price}] or token1[{token1_price}] of hypervisor {hype_summary['address']}"
-                )
-                continue
+    #     # get a sumarized data portion for all hypervisors in the database for a period
+    #     # when no period is specified, it will return all available data
+    #     for hype_summary in await local_database_helper(
+    #         network=chain
+    #     ).query_items_from_database(
+    #         collection_name="operations",
+    #         query=database_local.query_operations_summary(
+    #             hypervisor_addresses=list(hypervisor_status.keys()),
+    #             timestamp_ini=start_timestamp,
+    #             timestamp_end=end_timestamp,
+    #             block_ini=start_block,
+    #             block_end=end_block,
+    #         ),
+    #     ):
+    #         # convert to float
+    #         hype_summary = db_collections_common.convert_decimal_to_float(
+    #             item=db_collections_common.convert_d128_to_decimal(item=hype_summary)
+    #         )
 
-            # calculate protocol fees
-            if "globalState" in hype_status["pool"]:
-                protocol_fee_0_raw = hype_status["pool"]["globalState"][
-                    "communityFeeToken0"
-                ]
-                protocol_fee_1_raw = hype_status["pool"]["globalState"][
-                    "communityFeeToken1"
-                ]
-            else:
-                # convert from 8 decimals
-                protocol_fee_0_raw = hype_status["pool"]["slot0"]["feeProtocol"] % 16
-                protocol_fee_1_raw = hype_status["pool"]["slot0"]["feeProtocol"] >> 4
+    #         # ease hypervisor static data access
+    #         hype_status = hypervisor_status.get(hype_summary["address"], {})
+    #         if not hype_status:
+    #             logging.getLogger(__name__).error(
+    #                 f"Static data not found for hypervisor {hype_summary['address']}"
+    #             )
+    #             continue
+    #         # ease hypervisor price access
+    #         token0_price = token_prices.get(
+    #             hype_status["pool"]["token0"]["address"], {}
+    #         ).get("price", 0)
+    #         token1_price = token_prices.get(
+    #             hype_status["pool"]["token1"]["address"], {}
+    #         ).get("price", 0)
+    #         if not token0_price or not token1_price:
+    #             logging.getLogger(__name__).error(
+    #                 f"Price not found for token0[{token0_price}] or token1[{token1_price}] of hypervisor {hype_summary['address']}"
+    #             )
+    #             continue
 
-            # convert to percent (0-100)
-            protocol_fee_0, protocol_fee_1 = convert_feeProtocol(
-                feeProtocol0=protocol_fee_0_raw,
-                feeProtocol1=protocol_fee_1_raw,
-                hypervisor_protocol=hype_status["dex"],
-                pool_protocol=hype_status["pool"]["dex"],
-            )
+    #         # calculate protocol fees
+    #         if "globalState" in hype_status["pool"]:
+    #             protocol_fee_0_raw = hype_status["pool"]["globalState"][
+    #                 "communityFeeToken0"
+    #             ]
+    #             protocol_fee_1_raw = hype_status["pool"]["globalState"][
+    #                 "communityFeeToken1"
+    #             ]
+    #         else:
+    #             # convert from 8 decimals
+    #             protocol_fee_0_raw = hype_status["pool"]["slot0"]["feeProtocol"] % 16
+    #             protocol_fee_1_raw = hype_status["pool"]["slot0"]["feeProtocol"] >> 4
 
-            # calculate collected fees
-            collectedFees_0 = (
-                hype_summary["collectedFees_token0"]
-                + hype_summary["zeroBurnFees_token0"]
-            )
-            collectedFees_1 = (
-                hype_summary["collectedFees_token1"]
-                + hype_summary["zeroBurnFees_token1"]
-            )
-            collectedFees_usd = (
-                collectedFees_0 * token0_price + collectedFees_1 * token1_price
-            )
+    #         # convert to percent (0-100)
+    #         protocol_fee_0, protocol_fee_1 = convert_feeProtocol(
+    #             feeProtocol0=protocol_fee_0_raw,
+    #             feeProtocol1=protocol_fee_1_raw,
+    #             hypervisor_protocol=hype_status["dex"],
+    #             pool_protocol=hype_status["pool"]["dex"],
+    #         )
 
-            if protocol_fee_0 > 100 or protocol_fee_1 > 100:
-                logging.getLogger(__name__).warning(
-                    f"Protocol fee is >100% for hypervisor {hype_summary['address']}"
-                )
+    #         # calculate collected fees
+    #         collectedFees_0 = (
+    #             hype_summary["collectedFees_token0"]
+    #             + hype_summary["zeroBurnFees_token0"]
+    #         )
+    #         collectedFees_1 = (
+    #             hype_summary["collectedFees_token1"]
+    #             + hype_summary["zeroBurnFees_token1"]
+    #         )
+    #         collectedFees_usd = (
+    #             collectedFees_0 * token0_price + collectedFees_1 * token1_price
+    #         )
 
-            # calculate gross fees
-            if protocol_fee_0 < 100:
-                grossFees_0 = collectedFees_0 / (1 - (protocol_fee_0 / 100))
-            else:
-                grossFees_0 = collectedFees_0
+    #         if protocol_fee_0 > 100 or protocol_fee_1 > 100:
+    #             logging.getLogger(__name__).warning(
+    #                 f"Protocol fee is >100% for hypervisor {hype_summary['address']}"
+    #             )
 
-            if protocol_fee_1 < 100:
-                grossFees_1 = collectedFees_1 / (1 - (protocol_fee_1 / 100))
-            else:
-                grossFees_1 = collectedFees_1
+    #         # calculate gross fees
+    #         if protocol_fee_0 < 100:
+    #             grossFees_0 = collectedFees_0 / (1 - (protocol_fee_0 / 100))
+    #         else:
+    #             grossFees_0 = collectedFees_0
 
-            grossFees_usd = grossFees_0 * token0_price + grossFees_1 * token1_price
+    #         if protocol_fee_1 < 100:
+    #             grossFees_1 = collectedFees_1 / (1 - (protocol_fee_1 / 100))
+    #         else:
+    #             grossFees_1 = collectedFees_1
 
-            # days period
-            days_period = (
-                hype_summary["timestamp_end"] - hype_summary["timestamp_ini"]
-            ) / 86400
+    #         grossFees_usd = grossFees_0 * token0_price + grossFees_1 * token1_price
 
-            # build output
-            output[hype_summary["address"]] = InternalGrossFeesOutput(
-                symbol=hype_status["symbol"],
-                days_period=days_period,
-                block=InternalTimeframe(
-                    ini=hype_summary["block_ini"],
-                    end=hype_summary["block_end"],
-                ),
-                timestamp=InternalTimeframe(
-                    ini=hype_summary["timestamp_ini"],
-                    end=hype_summary["timestamp_end"],
-                ),
-                deposits=InternalTokens(
-                    token0=hype_summary["deposits_token0"],
-                    token1=hype_summary["deposits_token1"],
-                    usd=hype_summary["deposits_token0"] * token0_price
-                    + hype_summary["deposits_token1"] * token1_price,
-                ),
-                withdraws=InternalTokens(
-                    token0=hype_summary["withdraws_token0"],
-                    token1=hype_summary["withdraws_token1"],
-                    usd=hype_summary["withdraws_token0"] * token0_price
-                    + hype_summary["withdraws_token1"] * token1_price,
-                ),
-                collectedFees=InternalTokens(
-                    token0=collectedFees_0,
-                    token1=collectedFees_1,
-                    usd=collectedFees_usd,
-                ),
-                protocolFee_0=protocol_fee_0,
-                protocolFee_1=protocol_fee_1,
-                calculatedGrossFees=InternalTokens(
-                    token0=grossFees_0,
-                    token1=grossFees_1,
-                    usd=grossFees_usd,
-                ),
-            )
+    #         # days period
+    #         days_period = (
+    #             hype_summary["timestamp_end"] - hype_summary["timestamp_ini"]
+    #         ) / 86400
 
-        return output
+    #         # build output
+    #         output[hype_summary["address"]] = InternalGrossFeesOutput(
+    #             symbol=hype_status["symbol"],
+    #             days_period=days_period,
+    #             block=InternalTimeframe(
+    #                 ini=hype_summary["block_ini"],
+    #                 end=hype_summary["block_end"],
+    #             ),
+    #             timestamp=InternalTimeframe(
+    #                 ini=hype_summary["timestamp_ini"],
+    #                 end=hype_summary["timestamp_end"],
+    #             ),
+    #             deposits=InternalTokens(
+    #                 token0=hype_summary["deposits_token0"],
+    #                 token1=hype_summary["deposits_token1"],
+    #                 usd=hype_summary["deposits_token0"] * token0_price
+    #                 + hype_summary["deposits_token1"] * token1_price,
+    #             ),
+    #             withdraws=InternalTokens(
+    #                 token0=hype_summary["withdraws_token0"],
+    #                 token1=hype_summary["withdraws_token1"],
+    #                 usd=hype_summary["withdraws_token0"] * token0_price
+    #                 + hype_summary["withdraws_token1"] * token1_price,
+    #             ),
+    #             collectedFees=InternalTokens(
+    #                 token0=collectedFees_0,
+    #                 token1=collectedFees_1,
+    #                 usd=collectedFees_usd,
+    #             ),
+    #             protocolFee_0=protocol_fee_0,
+    #             protocolFee_1=protocol_fee_1,
+    #             calculatedGrossFees=InternalTokens(
+    #                 token0=grossFees_0,
+    #                 token1=grossFees_1,
+    #                 usd=grossFees_usd,
+    #             ),
+    #         )
+
+    #     return output
 
     async def all_chain_usd_fees(
         self,

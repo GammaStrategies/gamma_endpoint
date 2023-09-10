@@ -8,6 +8,7 @@ from web3 import Web3
 
 from sources.web3.bins.w3.objects.basic import web3wrap, erc20
 from sources.web3.bins.w3.objects.exchanges import (
+    ramses_pool,
     univ3_pool,
     algebrav3_pool,
 )
@@ -863,6 +864,51 @@ class gamma_hypervisor_thena(gamma_hypervisor_algebra):
             abi_filename="albebrav3pool_thena",
             custom_web3Url=self.w3.provider.endpoint_uri,
         )
+
+
+class gamma_hypervisor_ramses(gamma_hypervisor):
+    # SETUP
+    def __init__(
+        self,
+        address: str,
+        network: str,
+        abi_filename: str = "",
+        abi_path: str = "",
+        block: int = 0,
+        timestamp: int = 0,
+        custom_web3: Web3 | None = None,
+        custom_web3Url: str | None = None,
+    ):
+        self._abi_filename = abi_filename or "hypervisor"
+        self._abi_path = abi_path or "sources/common/abis/ramses"
+
+        super().__init__(
+            address=address,
+            network=network,
+            abi_filename=self._abi_filename,
+            abi_path=self._abi_path,
+            block=block,
+            timestamp=timestamp,
+            custom_web3=custom_web3,
+            custom_web3Url=custom_web3Url,
+        )
+
+    # initializers
+    async def init_pool(self):
+        self._pool_address = await self.call_function_autoRpc("pool")
+        self._pool = ramses_pool(
+            address=self._pool_address,
+            network=self._network,
+            block=await self.block,
+            timestamp=await self.timestamp,
+            custom_web3Url=self.w3.provider.endpoint_uri,
+        )
+
+    @property
+    async def pool(self) -> ramses_pool:
+        if not self._pool:
+            await self.init_pool()
+        return self._pool
 
 
 # registries

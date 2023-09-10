@@ -1,7 +1,8 @@
 import asyncio
 from datetime import datetime, timezone
 from sources.common.database.collection_endpoint import database_global
-from sources.common.general.enums import Chain
+from sources.common.general.enums import Chain, text_to_chain
+from sources.strats.bins.enums import convert_chain_name
 from sources.subgraph.bins.config import MONGO_DB_URL
 
 
@@ -39,6 +40,12 @@ async def get_current_prices(
             item["seconds_old"] = current_time - item["timestamp"]
         except:
             item["seconds_old"] = None
+
+        # change string network name to Chain object
+        try:
+            item["network"] = convert_chain_name(item["network"])
+        except:
+            pass
         result.append(item)
 
     return result
@@ -65,5 +72,11 @@ async def get_current_token_addresses(chain: Chain | None = None) -> list[list]:
         projection={"_id": False, "id": False},
         batch_size=50000,
     ):
+        # change string network name to Chain object
+        try:
+            item["network"] = convert_chain_name(item["network"])
+        except:
+            pass
+
         result.append([item["address"], item["network"]])
     return result
