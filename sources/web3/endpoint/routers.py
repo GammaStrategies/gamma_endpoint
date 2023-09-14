@@ -32,6 +32,7 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.SPIRITSWAP, Chain.FANTOM),
     (Protocol.SUSHI, Chain.POLYGON),
     (Protocol.SUSHI, Chain.ARBITRUM),
+    (Protocol.SUSHI, Chain.BASE),
     (Protocol.RAMSES, Chain.ARBITRUM),
     (Protocol.ASCENT, Chain.POLYGON),
     (Protocol.FUSIONX, Chain.MANTLE),

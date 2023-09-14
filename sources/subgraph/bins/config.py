@@ -21,6 +21,7 @@ DEPLOYMENTS = [
     (Protocol.SPIRITSWAP, Chain.FANTOM),
     (Protocol.SUSHI, Chain.POLYGON),
     (Protocol.SUSHI, Chain.ARBITRUM),
+    (Protocol.SUSHI, Chain.BASE),
     (Protocol.RAMSES, Chain.ARBITRUM),
     (Protocol.ASCENT, Chain.POLYGON),
     (Protocol.FUSIONX, Chain.MANTLE),
@@ -82,6 +83,7 @@ DEX_SUBGRAPH_URLS = {
     Protocol.SUSHI: {
         Chain.POLYGON: get_config("SUSHI_POLYGON_SUBGRAPH_URL"),
         Chain.ARBITRUM: get_config("SUSHI_ARBITRUM_SUBGRAPH_URL"),
+        Chain.BASE: get_config("SUSHI_BASE_SUBGRAPH_URL"),
     },
     Protocol.RAMSES: {
         Chain.ARBITRUM: get_config("RAMSES_ARBITRUM_SUBGRAPH_URL"),
@@ -143,6 +145,7 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.SUSHI: {
         Chain.POLYGON: get_config("SUSHI_POLYGON_HP_SUBGRAPH_URL"),
         Chain.ARBITRUM: get_config("SUSHI_ARBITRUM_HP_SUBGRAPH_URL"),
+        Chain.BASE: get_config("SUSHI_BASE_HP_SUBGRAPH_URL"),
     },
     Protocol.RAMSES: {
         Chain.ARBITRUM: get_config("RAMSES_ARBITRUM_HP_SUBGRAPH_URL"),
@@ -204,6 +207,7 @@ GAMMA_SUBGRAPH_URLS = {
     Protocol.SUSHI: {
         Chain.POLYGON: get_config("SUSHI_POLYGON_GAMMA_SUBGRAPH_URL"),
         Chain.ARBITRUM: get_config("SUSHI_ARBITRUM_GAMMA_SUBGRAPH_URL"),
+        Chain.BASE: get_config("SUSHI_BASE_GAMMA_SUBGRAPH_URL"),
     },
     Protocol.RAMSES: {
         Chain.ARBITRUM: get_config("RAMSES_ARBITRUM_GAMMA_SUBGRAPH_URL"),
