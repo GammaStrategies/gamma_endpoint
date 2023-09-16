@@ -436,9 +436,9 @@ async def gamma_price():
 
 async def token_prices(chain: Chain, protocol: Protocol):
     """Get token prices"""
-    # dex_pricing = DexPrice(chain)
-    # await dex_pricing.get_token_prices()
-    # prices = dex_pricing.token_prices
+    dex_pricing = DexPrice(chain)
+    await dex_pricing.get_token_prices()
+    dex_prices = dex_pricing.token_prices
 
     # # Stop gap until refactoring to get multichain prices
     # if chain != Chain.ETHEREUM:
@@ -462,27 +462,22 @@ async def token_prices(chain: Chain, protocol: Protocol):
     prices = await llama_client.current_token_price_multi(token_data.data)
 
     unpriced_tokens = token_data.data - prices.keys()
+    print(f"{protocol} - {chain}")
+    print(unpriced_tokens)
+
+    for token in unpriced_tokens:
+        prices[token] = dex_prices.get(token, 0)
 
     # Use DEX method for unpriced tokens
 
     with contextlib.suppress(Exception):
-        # if chain == Chain.MOONBEAM:
-        #     GLINT_ADDRESS = "0xcd3b51d98478d53f4515a306be565c6eebef1d58"
-        #     prices[GLINT_ADDRESS] = await llama_client.current_token_price(
-        #         GLINT_ADDRESS
-        #     )
-
         if chain == Chain.POLYGON:
-            FIS_ADDRESS_MAINNET = "0xef3a930e1ffffacd2fc13434ac81bd278b0ecc8d"
-            FIS_ADDRESS_POLYGON = "0x7a7b94f18ef6ad056cda648588181cda84800f94"
 
             T_MAINNET = "0xcdf7028ceab81fa0c6971208e83fa7872994bee5"
             T_POLYGON = "0x1d0ab64ed0f1ee4a886462146d26effc6dd00d0b"
 
-            # prices[FIS_ADDRESS_POLYGON], prices[T_POLYGON] = await asyncio.gather(
-            #     llama_client.current_token_price(FIS_ADDRESS_MAINNET),
-            #     llama_client.current_token_price(T_MAINNET),
-            # )
+            llama_client_2 = LlamaClient(Chain.ETHEREUM)
+            prices[T_POLYGON] = await llama_client_2.current_token_price(T_MAINNET)
 
         if chain == Chain.OPTIMISM:
             OP_ADDRESS_OPTIMISM = "0x4200000000000000000000000000000000000042"
@@ -506,12 +501,12 @@ class TokenData(SubgraphData):
         ds = self.client.data_schema
 
         query = DSLQuery(
-            ds.Query.uniswapV3Hypervisors(first=1000).select(
-                ds.UniswapV3Hypervisor.pool.select(
-                    ds.UniswapV3Pool.token0.select(ds.Token.id),
-                    ds.UniswapV3Pool.token1.select(ds.Token.id),
-                )
-            ),
+            # ds.Query.uniswapV3Hypervisors(first=1000).select(
+            #     ds.UniswapV3Hypervisor.pool.select(
+            #         ds.UniswapV3Pool.token0.select(ds.Token.id),
+            #         ds.UniswapV3Pool.token1.select(ds.Token.id),
+            #     )
+            # ),
             ds.Query.masterChefV2Rewarders(first=1000).select(
                 ds.MasterChefV2Rewarder.rewardToken.select(ds.Token.id)
             ),
@@ -521,17 +516,18 @@ class TokenData(SubgraphData):
         self.query_response = response
 
     def _transform_data(self) -> dict:
-        hype_tokens = []
-        for hype in self.query_response["uniswapV3Hypervisors"]:
-            hype_tokens.append(hype["pool"]["token0"]["id"])
-            hype_tokens.append(hype["pool"]["token1"]["id"])
+        # hype_tokens = []
+        # for hype in self.query_response["uniswapV3Hypervisors"]:
+        #     hype_tokens.append(hype["pool"]["token0"]["id"])
+        #     hype_tokens.append(hype["pool"]["token1"]["id"])
 
         mcv2_tokens = [
             rewarder["rewardToken"]["id"]
             for rewarder in self.query_response["masterChefV2Rewarders"]
         ]
 
-        all_tokens = hype_tokens + mcv2_tokens
+        # all_tokens = hype_tokens + mcv2_tokens
+        all_tokens = mcv2_tokens
         all_tokens = list(set(all_tokens))
 
         return all_tokens
