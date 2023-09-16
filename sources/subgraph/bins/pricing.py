@@ -171,7 +171,7 @@ POOLS = {
     },
     Chain.MOONBEAM: {
         "USDC_WGLMR": {
-            "protocol": Protocol.UNISWAP,
+            "protocol": Protocol.STELLASWAP,
             "address": "0xab8c35164a8e3ef302d18da953923ea31f0fe393",
         }
     },
@@ -445,46 +445,38 @@ async def gamma_price():
 async def token_prices(chain: Chain, protocol: Protocol):
     """Get token prices"""
     dex_pricing = DexPrice(chain)
-    await dex_pricing.get_token_prices()
+    token_data = TokenData(chain, protocol)
+    
+    await asyncio.gather(
+        token_data.get_data(), # get list of tokens
+        dex_pricing.get_token_prices()  # Get prices from subgraph
+    )
     dex_prices = dex_pricing.token_prices
 
-    # # Stop gap until refactoring to get multichain prices
-    # if chain != Chain.ETHEREUM:
-    #     dex_pricing_mainnet = DexPrice(Chain.ETHEREUM)
-    #     await dex_pricing_mainnet.get_token_prices()
-
-    #     AXL_MAINNET = "0x467719ad09025fcc6cf6f8311755809d45a5e5f3"
-    #     AXL_POLYGON = "0x6e4e624106cb12e168e6533f8ec7c82263358940"
-
-    #     for token, price in dex_pricing_mainnet.token_prices.items():
-    #         if token not in prices:
-    #             if token == AXL_MAINNET:
-    #                 prices[AXL_POLYGON] = price
-    #             prices[token] = price
-
+    # Get prices from defillama
     llama_client = LlamaClient(chain)
-    # llama_client_op = LlamaClient(Chain.OPTIMISM)
-
-    token_data = TokenData(chain, protocol)
-    await token_data.get_data()
     prices = await llama_client.current_token_price_multi(token_data.data)
 
+    # Find tokens that were not priced by defillama
     unpriced_tokens = token_data.data - prices.keys()
-    print(f"{protocol} - {chain}")
-    print(unpriced_tokens)
 
     for token in unpriced_tokens:
         prices[token] = dex_prices.get(token, 0)
-
-    # Use DEX method for unpriced tokens
 
     with contextlib.suppress(Exception):
         if chain == Chain.POLYGON:
             T_MAINNET = "0xcdf7028ceab81fa0c6971208e83fa7872994bee5"
             T_POLYGON = "0x1d0ab64ed0f1ee4a886462146d26effc6dd00d0b"
 
-            llama_client_2 = LlamaClient(Chain.ETHEREUM)
-            prices[T_POLYGON] = await llama_client_2.current_token_price(T_MAINNET)
+            AXL_MAINNET = "0x467719ad09025fcc6cf6f8311755809d45a5e5f3"
+            AXL_POLYGON = "0x6e4e624106cb12e168e6533f8ec7c82263358940"
+
+            llama_client_mainnet = LlamaClient(Chain.ETHEREUM)
+            prices_mainnet = await llama_client_mainnet.current_token_price_multi(
+                [T_MAINNET, AXL_MAINNET]
+            )
+            prices[T_POLYGON] = prices_mainnet.get(T_MAINNET, 0)
+            prices[AXL_POLYGON] = prices_mainnet.get(AXL_MAINNET, 0)
 
         if chain == Chain.OPTIMISM:
             OP_ADDRESS_OPTIMISM = "0x4200000000000000000000000000000000000042"
@@ -492,7 +484,6 @@ async def token_prices(chain: Chain, protocol: Protocol):
 
             prices[MOCK_OPT_ADDRESS_OPTIMISM] = prices.get(OP_ADDRESS_OPTIMISM, 0)
 
-    print(prices)
     return prices
 
 
@@ -508,12 +499,12 @@ class TokenData(SubgraphData):
         ds = self.client.data_schema
 
         query = DSLQuery(
-            # ds.Query.uniswapV3Hypervisors(first=1000).select(
-            #     ds.UniswapV3Hypervisor.pool.select(
-            #         ds.UniswapV3Pool.token0.select(ds.Token.id),
-            #         ds.UniswapV3Pool.token1.select(ds.Token.id),
-            #     )
-            # ),
+            ds.Query.uniswapV3Hypervisors(first=1000).select(
+                ds.UniswapV3Hypervisor.pool.select(
+                    ds.UniswapV3Pool.token0.select(ds.Token.id),
+                    ds.UniswapV3Pool.token1.select(ds.Token.id),
+                )
+            ),
             ds.Query.masterChefV2Rewarders(first=1000).select(
                 ds.MasterChefV2Rewarder.rewardToken.select(ds.Token.id)
             ),
@@ -523,22 +514,17 @@ class TokenData(SubgraphData):
         self.query_response = response
 
     def _transform_data(self) -> dict:
-        # hype_tokens = []
-        # for hype in self.query_response["uniswapV3Hypervisors"]:
-        #     hype_tokens.append(hype["pool"]["token0"]["id"])
-        #     hype_tokens.append(hype["pool"]["token1"]["id"])
+        hype_tokens = []
+        for hype in self.query_response["uniswapV3Hypervisors"]:
+            hype_tokens.append(hype["pool"]["token0"]["id"])
+            hype_tokens.append(hype["pool"]["token1"]["id"])
 
         mcv2_tokens = [
             rewarder["rewardToken"]["id"]
             for rewarder in self.query_response["masterChefV2Rewarders"]
         ]
 
-        # all_tokens = hype_tokens + mcv2_tokens
-        all_tokens = mcv2_tokens
+        all_tokens = hype_tokens + mcv2_tokens
         all_tokens = list(set(all_tokens))
 
         return all_tokens
-
-
-async def all_token_prices(chain: Chain, protocol: Protocol):
-    pass

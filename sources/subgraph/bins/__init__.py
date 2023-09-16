@@ -172,6 +172,7 @@ class XgammaClient(SubgraphClient):
 
 
 class CoingeckoClient:
+    """Client for interacting with Coingecko API"""
     def __init__(self):
         self.base = "https://api.coingecko.com/api/v3/"
 
@@ -188,8 +189,9 @@ class CoingeckoClient:
 
 
 class LlamaClient:
+    """Client for interacting with DefiLlama API"""
     def __init__(self, chain: Chain):
-        self.base = "https://coins.llama.fi/"
+        self.base = "https://coins.llama.fi"
         self.chain = self._translate_chain_name(chain)
 
     def _translate_chain_name(self, chain):
@@ -197,6 +199,7 @@ class LlamaClient:
         return mapping.get(chain, chain)
 
     async def block_from_timestamp(self, timestamp, return_timestamp=False):
+        """Get closest block number given a unix timestamp"""
         endpoint = f"{self.base}/block/{self.chain}/{timestamp}"
 
         response = await async_client.get(endpoint)
@@ -207,17 +210,11 @@ class LlamaClient:
             return response.json()
         return response.json()["height"]
 
-    async def current_token_price(self, token_address: str):
-        chain_address = f"{self.chain}:{token_address}"
-        endpoint = f"{self.base}/prices/current/{chain_address}"
+    async def current_token_price_multi(self, token_list: list[str]) -> dict:
+        """Requests multiple token current price"""
+        if not token_list:
+            return {}
 
-        response = await async_client.get(endpoint)
-
-        response.raise_for_status()
-
-        return response.json()["coins"][chain_address]["price"]
-
-    async def current_token_price_multi(self, token_list: list[str]):
         coins = ",".join([f"{self.chain}:{token}" for token in token_list])
         endpoint = f"{self.base}/prices/current/{coins}"
 
