@@ -267,19 +267,17 @@ class internal_router_builder_main(router_builder_baseTemplate):
         self,
         chain: Chain,
         response: Response,
-        week_start_timestamp: int | str,
+        week_start_timestamp: int | str = "last",
         protocol: Protocol | None = None,
     ) -> list[dict]:
         """
         Returns the total current priced USD fees collected (not uncollected) in a period of time for a specific chain
         It uses the "gross fees" point above as underlying data.
-        **week_start_timestamp**: 'last' or 'last-2' or timestamp can be provided ( last meaning last week, last-2 meaning 2 weeks ago, etc)
+        **week_start_timestamp**: 'last-2' or timestamp can be provided ( last-2 meaning 3 weeks ago)
 
         * The **usd** field is calculated using the current (now) price of the token.
 
         * **collectedFees_perDay** are the daily fees collected in the period.
-
-
 
         """
         week_in_seconds = 604800
