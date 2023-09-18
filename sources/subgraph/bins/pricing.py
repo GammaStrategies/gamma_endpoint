@@ -12,6 +12,8 @@ from sources.subgraph.bins.utils import sqrtPriceX96_to_priceDecimal
 from sources.subgraph.bins.subgraphs import SubgraphData
 from sources.subgraph.bins.subgraphs.gamma import GammaClient
 
+from sources.mongo.bins.apps.prices import get_current_prices
+
 POOLS = {
     Chain.ETHEREUM: {
         "USDC_WETH": {
@@ -446,22 +448,29 @@ async def token_prices(chain: Chain, protocol: Protocol):
     """Get token prices"""
     dex_pricing = DexPrice(chain)
     token_data = TokenData(chain, protocol)
-    
+
     await asyncio.gather(
-        token_data.get_data(), # get list of tokens
-        dex_pricing.get_token_prices()  # Get prices from subgraph
+        token_data.get_data(),  # get list of tokens
+        dex_pricing.get_token_prices(),  # Get prices from subgraph
     )
     dex_prices = dex_pricing.token_prices
 
-    # Get prices from defillama
+    # Get prices from defillama and database
     llama_client = LlamaClient(chain)
-    prices = await llama_client.current_token_price_multi(token_data.data)
 
-    # Find tokens that were not priced by defillama
+    llama_prices, db_token_prices = await asyncio.gather(
+        llama_client.current_token_price_multi(token_data.data),
+        get_current_prices(chain, token_data.data)
+    )
+
+    # Base case pricing from DB
+    prices = {token["address"]: token["price"] for token in db_token_prices}
+
+    # Find tokens that were not priced in DB
     unpriced_tokens = token_data.data - prices.keys()
 
     for token in unpriced_tokens:
-        prices[token] = dex_prices.get(token, 0)
+        prices[token] = llama_prices.get(token, dex_prices.get(token, 0))
 
     with contextlib.suppress(Exception):
         if chain == Chain.POLYGON:
