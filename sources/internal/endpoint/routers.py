@@ -171,6 +171,8 @@ class internal_router_builder_main(router_builder_baseTemplate):
 
         * **protocolFee_X** is the percentage of fees going to the protocol, from 1 to 100.
 
+        * **collectedFees_perDay** are the daily fees collected in the period.
+
         """
 
         if protocol and (protocol, chain) not in DEPLOYMENTS:
@@ -178,7 +180,7 @@ class internal_router_builder_main(router_builder_baseTemplate):
                 status_code=400, detail=f"{protocol} on {chain} not available."
             )
 
-        return get_gross_fees(
+        return await get_gross_fees(
             chain=chain,
             protocol=protocol,
             start_timestamp=start_timestamp,
@@ -212,7 +214,7 @@ class internal_router_builder_main(router_builder_baseTemplate):
                 status_code=400, detail=f"{protocol} on {chain} not available."
             )
 
-        return get_chain_usd_fees(
+        return await get_chain_usd_fees(
             chain=chain,
             protocol=protocol,
             start_timestamp=start_timestamp,
