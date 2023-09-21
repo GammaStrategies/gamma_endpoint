@@ -260,7 +260,9 @@ class internal_router_builder_main(router_builder_baseTemplate):
         It uses the "gross fees" point above as underlying data.
         **week_start_timestamp**: 'last-2' or timestamp can be provided ( last-2 meaning 3 weeks ago)
 
-        * The **usd** field is calculated using the current (now) price of the token.
+        * weeks start on monday and end on sunday. All dates used are in UTC. ( timestamp converted )
+
+        * all values are using the current (now) usd price of the token.
 
         * **collected fees** are the fees collected on rebalance and zeroBurn events.
 
