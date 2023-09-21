@@ -71,11 +71,26 @@ async def get_fees(
             }
         },
     ]
+    # create a match query part
+    match = {}
     # filter by protocol
     if protocol:
-        query_hype_status.insert(0, {"$match": {"dex": protocol.database_name}})
+        match["dex"] = protocol.database_name
+    # filter by block or timestamp, when supplied
+    if start_block and end_block:
+        match["$and"] = [{"block": {"$gte": start_block}, "block": {"$lte": end_block}}]
+    elif start_timestamp and end_timestamp:
+        match["$and"] = [
+            {
+                "timestamp": {"$gte": start_timestamp},
+                "timestamp": {"$lte": end_timestamp},
+            }
+        ]
+    # add match to query
+    if match:
+        query_hype_status.insert(0, {"$match": match})
 
-    hypervisor_status = {
+    last_hypervisor_status = {
         x["data"]["address"]: x["data"]
         for x in await local_database_helper(network=chain).get_items_from_database(
             collection_name="status",
@@ -106,7 +121,7 @@ async def get_fees(
     ).query_items_from_database(
         collection_name="operations",
         query=database_local.query_operations_summary(
-            hypervisor_addresses=list(hypervisor_status.keys()),
+            hypervisor_addresses=list(last_hypervisor_status.keys()),
             timestamp_ini=start_timestamp,
             timestamp_end=end_timestamp,
             block_ini=start_block,
@@ -135,7 +150,7 @@ async def get_fees(
             end_uncollected_fees = await hype_status_end.get_fees_uncollected()
 
             # ease hypervisor static data access
-            hype_status = hypervisor_status.get(hype_summary["address"], {})
+            hype_status = last_hypervisor_status.get(hype_summary["address"], {})
             if not hype_status:
                 logging.getLogger(__name__).error(
                     f"Static data not found for hypervisor {hype_summary['address']}"
@@ -305,11 +320,27 @@ async def get_gross_fees(
             }
         },
     ]
+    # create a match query part
+    match = {}
     # filter by protocol
     if protocol:
-        query_hype_status.insert(0, {"$match": {"dex": protocol.database_name}})
+        match["dex"] = protocol.database_name
+    # filter by block or timestamp, when supplied
+    if start_block and end_block:
+        match["$and"] = [{"block": {"$gte": start_block}, "block": {"$lte": end_block}}]
+    elif start_timestamp and end_timestamp:
+        match["$and"] = [
+            {
+                "timestamp": {"$gte": start_timestamp},
+                "timestamp": {"$lte": end_timestamp},
+            }
+        ]
+    # add match to query
+    if match:
+        query_hype_status.insert(0, {"$match": match})
 
-    hypervisor_status = {
+    # last known hype status for each hypervisor at the end of the period
+    last_hypervisor_status = {
         x["data"]["address"]: x["data"]
         for x in await local_database_helper(network=chain).get_items_from_database(
             collection_name="status",
@@ -324,20 +355,20 @@ async def get_gross_fees(
     ).query_items_from_database(
         collection_name="operations",
         query=database_local.query_operations_summary(
-            hypervisor_addresses=list(hypervisor_status.keys()),
+            hypervisor_addresses=list(last_hypervisor_status.keys()),
             timestamp_ini=start_timestamp,
             timestamp_end=end_timestamp,
             block_ini=start_block,
             block_end=end_block,
         ),
     ):
-        # convert to float
+        # convert hype to float
         hype_summary = db_collections_common.convert_decimal_to_float(
             item=db_collections_common.convert_d128_to_decimal(item=hype_summary)
         )
 
         # ease hypervisor static data access
-        hype_status = hypervisor_status.get(hype_summary["address"], {})
+        hype_status = last_hypervisor_status.get(hype_summary["address"], {})
         if not hype_status:
             logging.getLogger(__name__).error(
                 f"Static data not found for hypervisor {hype_summary['address']}"
@@ -387,6 +418,18 @@ async def get_gross_fees(
         collectedFees_usd = (
             collectedFees_0 * token0_price + collectedFees_1 * token1_price
         )
+
+        # uncollected fees at the last known database status
+        try:
+            uncollected_0 = float(hype_status["fees_uncollected"]["qtty_token0"]) / (
+                10 ** hype_status["pool"]["token0"]["decimals"]
+            )
+            uncollected_1 = float(hype_status["fees_uncollected"]["qtty_token1"]) / (
+                10 ** hype_status["pool"]["token1"]["decimals"]
+            )
+        except:
+            uncollected_0 = 0
+            uncollected_1 = 0
 
         if protocol_fee_0 > 100 or protocol_fee_1 > 100:
             logging.getLogger(__name__).warning(
@@ -439,6 +482,11 @@ async def get_gross_fees(
                 token0=collectedFees_0,
                 token1=collectedFees_1,
                 usd=collectedFees_usd,
+            ),
+            uncollected=InternalTokens(
+                token0=uncollected_0,
+                token1=uncollected_1,
+                usd=uncollected_0 * token0_price + uncollected_1 * token1_price,
             ),
             protocolFee_0=protocol_fee_0,
             protocolFee_1=protocol_fee_1,

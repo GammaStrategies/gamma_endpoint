@@ -46,6 +46,7 @@ class InternalGrossFeesOutput(BaseModel):
     withdraws: InternalTokens = InternalTokens()
 
     collectedFees: InternalTokens = InternalTokens()
+    uncollected: InternalTokens = InternalTokens()
 
     protocolFee_0: int = 0
     protocolFee_1: int = 0
