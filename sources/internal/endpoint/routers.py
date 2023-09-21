@@ -133,25 +133,6 @@ class internal_router_builder_main(router_builder_baseTemplate):
 
         return output
 
-    # async def gross_fees(
-    #     self,
-    #     chain: Chain,
-    #     response: Response,
-    #     protocol: Protocol | None = None,
-    #     start_timestamp: int | None = None,
-    #     end_timestamp: int | None = None,
-    #     start_block: int | None = None,
-    #     end_block: int | None = None,
-    # ):
-    #     return await get_fees(
-    #         chain=chain,
-    #         protocol=protocol,
-    #         start_timestamp=start_timestamp,
-    #         end_timestamp=end_timestamp,
-    #         start_block=start_block,
-    #         end_block=end_block,
-    #     )
-
     async def gross_fees(
         self,
         chain: Chain,
@@ -171,7 +152,7 @@ class internal_router_builder_main(router_builder_baseTemplate):
 
         * **protocolFee_X** is the percentage of fees going to the protocol, from 1 to 100.
 
-        * **collectedFees_perDay** are the daily fees collected in the period.
+        * **collected fees** are the fees collected on rebalance and zeroBurn events.
 
         """
 
@@ -205,7 +186,9 @@ class internal_router_builder_main(router_builder_baseTemplate):
 
         * When no timeframe is provided, it returns all available data.
 
-        * The **usd** field is calculated using the current (now) price of the token.
+        * all values are using the current (now) usd price of the token.
+
+        * **collected fees** are the fees collected on rebalance and zeroBurn events.
 
         * **collectedFees_perDay** are the daily fees collected in the period.
         """
@@ -278,6 +261,8 @@ class internal_router_builder_main(router_builder_baseTemplate):
         **week_start_timestamp**: 'last-2' or timestamp can be provided ( last-2 meaning 3 weeks ago)
 
         * The **usd** field is calculated using the current (now) price of the token.
+
+        * **collected fees** are the fees collected on rebalance and zeroBurn events.
 
         * **collectedFees_perDay** are the daily fees collected in the period.
 

@@ -47,6 +47,8 @@ async def get_fees(
 
     * **protocolFee_X** is the percentage of fees going to the protocol, from 1 to 100.
 
+    * **collected fees** are the fees collected on rebalance and zeroBurn events.
+
     """
 
     if protocol and (protocol, chain) not in DEPLOYMENTS:
@@ -284,6 +286,8 @@ async def get_gross_fees(
 
     * **protocolFee_X** is the percentage of fees going to the protocol, from 1 to 100.
 
+    * **collected fees** are the fees collected on rebalance and zeroBurn events.
+
     """
 
     # create result dict
@@ -463,6 +467,8 @@ async def get_chain_usd_fees(
     * When no timeframe is provided, it returns all available data.
 
     * The **usd** field is calculated using the current (now) price of the token.
+
+    * **collected fees** are the fees collected on rebalance and zeroBurn events.
 
     * **collectedFees_perDay** are the daily fees collected in the period.
     """
