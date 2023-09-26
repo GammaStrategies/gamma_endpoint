@@ -51,6 +51,7 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.UNISWAP, Chain.OPTIMISM),
     (Protocol.UNISWAP, Chain.CELO),
     (Protocol.UNISWAP, Chain.BSC),
+    (Protocol.UNISWAP, Chain.MOONBEAM),
     (Protocol.QUICKSWAP, Chain.POLYGON),
     (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
     (Protocol.ZYBERSWAP, Chain.ARBITRUM),
@@ -69,7 +70,8 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.FUSIONX, Chain.MANTLE),
     (Protocol.SYNTHSWAP, Chain.BASE),
     (Protocol.LYNEX, Chain.LINEA),
-    (Protocol.PEGASYS, Chain.ROLLUX)
+    (Protocol.PEGASYS, Chain.ROLLUX),
+    (Protocol.BASEX, Chain.BASE)
 ]
 
 
@@ -167,6 +169,14 @@ def build_routers_compatible() -> list:
             chain=Chain.BSC,
             tags=["BSC"],
             prefix=f"/{Chain.BSC.api_url}",
+        )
+    )
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.UNISWAP,
+            chain=Chain.MOONBEAM,
+            tags=["Moonbeam"],
+            prefix=f"/{Chain.MOONBEAM.api_url}",
         )
     )
     routes.append(
@@ -333,6 +343,15 @@ def build_routers_compatible() -> list:
             chain=Chain.ROLLUX,
             tags=["Pegasys - Rollux"],
             prefix=f"/{Protocol.PEGASYS.api_url}/{Chain.ROLLUX.api_url}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.BASEX,
+            chain=Chain.BASE,
+            tags=["BaseX - Base"],
+            prefix=f"/{Protocol.BASEX.api_url}/{Chain.BASE.api_url}",
         )
     )
 

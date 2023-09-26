@@ -24,6 +24,7 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.UNISWAP, Chain.OPTIMISM),
     (Protocol.UNISWAP, Chain.CELO),
     (Protocol.UNISWAP, Chain.BSC),
+    # (Protocol.UNISWAP, Chain.MOONBEAM)
     (Protocol.QUICKSWAP, Chain.POLYGON),
     (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
     (Protocol.ZYBERSWAP, Chain.ARBITRUM),
@@ -42,7 +43,8 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     # (Protocol.FUSIONX, Chain.MANTLE),
     (Protocol.SYNTHSWAP, Chain.BASE),
     # (Protocol.LYNEX, Chain.LINEA),
-    # (Protocol.PEGASYS, Chain.ROLLUX)
+    # (Protocol.PEGASYS, Chain.ROLLUX),
+    # (Protocol.BASEX, Chain.BASE)
 ]
 
 

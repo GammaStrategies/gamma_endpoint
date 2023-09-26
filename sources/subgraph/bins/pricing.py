@@ -178,6 +178,7 @@ POOLS = {
         }
     },
     Chain.FANTOM: {},
+    Chain.BASE: {},
 }
 
 
@@ -332,6 +333,7 @@ POOL_PATHS = {
         ]
     },
     Chain.FANTOM: {},
+    Chain.BASE: {},
 }
 
 

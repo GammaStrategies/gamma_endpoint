@@ -9,6 +9,7 @@ DEPLOYMENTS = [
     (Protocol.UNISWAP, Chain.POLYGON),
     (Protocol.UNISWAP, Chain.BSC),
     (Protocol.UNISWAP, Chain.CELO),
+    (Protocol.UNISWAP, Chain.MOONBEAM),
     (Protocol.QUICKSWAP, Chain.POLYGON),
     (Protocol.ZYBERSWAP, Chain.ARBITRUM),
     (Protocol.THENA, Chain.BSC),
@@ -27,7 +28,8 @@ DEPLOYMENTS = [
     (Protocol.FUSIONX, Chain.MANTLE),
     (Protocol.SYNTHSWAP, Chain.BASE),
     (Protocol.LYNEX, Chain.LINEA),
-    (Protocol.PEGASYS, Chain.ROLLUX)
+    (Protocol.PEGASYS, Chain.ROLLUX),
+    (Protocol.BASEX, Chain.BASE)
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -51,6 +53,7 @@ DEX_SUBGRAPH_URLS = {
         Chain.OPTIMISM: get_config("UNISWAP_OPTIMISM_SUBGRAPH_URL"),
         Chain.CELO: get_config("UNISWAP_CELO_SUBGRAPH_URL"),
         Chain.BSC: get_config("UNISWAP_BSC_SUBGRAPH_URL"),
+        Chain.MOONBEAM: get_config("UNISWAP_MOONBEAM_SUBGRAPH_URL"),
     },
     Protocol.QUICKSWAP: {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_SUBGRAPH_URL"),
@@ -103,6 +106,9 @@ DEX_SUBGRAPH_URLS = {
     Protocol.PEGASYS: {
         Chain.ROLLUX: get_config("PEGASYS_ROLLUX_SUBGRAPH_URL"),
     },
+    Protocol.BASEX: {
+        Chain.BASE: get_config("BASEX_BASE_SUBGRAPH_URL"),
+    },
 }
 
 DEX_HYPEPOOL_SUBGRAPH_URLS = {
@@ -113,6 +119,7 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
         Chain.OPTIMISM: get_config("UNISWAP_OPTIMISM_HP_SUBGRAPH_URL"),
         Chain.CELO: get_config("UNISWAP_CELO_HP_SUBGRAPH_URL"),
         Chain.BSC: get_config("UNISWAP_BSC_HP_SUBGRAPH_URL"),
+        Chain.MOONBEAM: get_config("UNISWAP_MOONBEAM_HP_SUBGRAPH_URL"),
     },
     Protocol.QUICKSWAP: {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_HP_SUBGRAPH_URL"),
@@ -165,6 +172,9 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.PEGASYS: {
         Chain.ROLLUX: get_config("PEGASYS_ROLLUX_HP_SUBGRAPH_URL"),
     },
+    Protocol.BASEX: {
+        Chain.BASE: get_config("BASEX_BASE_HP_SUBGRAPH_URL"),
+    },
 }
 
 GAMMA_SUBGRAPH_URLS = {
@@ -175,6 +185,7 @@ GAMMA_SUBGRAPH_URLS = {
         Chain.OPTIMISM: get_config("UNISWAP_OPTIMISM_GAMMA_SUBGRAPH_URL"),
         Chain.CELO: get_config("UNISWAP_CELO_GAMMA_SUBGRAPH_URL"),
         Chain.BSC: get_config("UNISWAP_BSC_GAMMA_SUBGRAPH_URL"),
+        Chain.MOONBEAM: get_config("UNISWAP_MOONBEAM_GAMMA_SUBGRAPH_URL"),
     },
     Protocol.QUICKSWAP: {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_GAMMA_SUBGRAPH_URL"),
@@ -226,6 +237,9 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.PEGASYS: {
         Chain.ROLLUX: get_config("PEGASYS_ROLLUX_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.BASEX: {
+        Chain.BASE: get_config("BASEX_BASE_GAMMA_SUBGRAPH_URL"),
     },
 }
 

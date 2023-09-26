@@ -1,5 +1,7 @@
+import logging
 import asyncio
 
+from gql.transport.exceptions import TransportQueryError
 from pydantic import BaseModel
 
 # from fastapi import Response, status
@@ -12,6 +14,9 @@ from sources.subgraph.bins.dex_pools.schema import DexPool
 from sources.subgraph.bins.dex_pools.data import PoolData
 from sources.subgraph.bins.pricing import token_prices
 from sources.subgraph.bins.utils import timestamp_to_date
+
+
+logger = logging.getLogger(__name__)
 
 
 class AllDataReturnsYield(BaseModel):
@@ -74,12 +79,18 @@ class AllData:
         pool_data = PoolData(self.chain, self.protocol)
 
         await hype_data.get_data()
+        self.hype_data = hype_data.data
 
         pools = [hype.pool for hype in hype_data.data.values()]
-        await pool_data.get_data(pools=pools)
-
-        self.hype_data = hype_data.data
-        self.pool_data = pool_data.data
+        try:
+            await pool_data.get_data(pools=pools)
+        except TransportQueryError:
+            self.pool_data = {}
+            logger.warning(
+                "Failed to get Pool Data for %s - %s", self.protocol.value, self.chain.value
+            )
+        else:
+            self.pool_data = pool_data.data
 
     async def get_data(self):
         self.prices, fee_yield, _ = await asyncio.gather(
