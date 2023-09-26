@@ -1,7 +1,7 @@
 import logging
 import asyncio
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from sources.common.database.collection_endpoint import database_local
 from sources.common.general.enums import Period
 from sources.subgraph.bins.hypervisor import HypervisorInfo, HypervisorData
@@ -1462,6 +1462,9 @@ class db_allRewards2_manager(db_collection_manager):
                 f" {chain}'s {protocol} has no Masterchef v2 implemented "
             ) from e
 
+        if not data:
+            raise ValueError(f" {chain}'s {protocol} has no Masterchef v2 info ")
+
         # add id and datetime to data
         data["datetime"] = datetime.now(timezone.utc)
         # get timestamp without decimals
@@ -1626,6 +1629,11 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
             if data := await self.create_data(
                 chain=chain, protocol=protocol, current_timestamp=current_timestamp
             ):
+                # merge with existing rewards at same id
+                data = await self.merge_with_existing(
+                    chain=chain, protocol=protocol, data=data
+                )
+
                 await self.save_item_to_database(
                     data=data,
                     collection_name=self.db_collection_name,
@@ -1660,7 +1668,9 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
 
             # get data from local database rewards_status ( web3 database)
             rewards_status = await local_db_helper.query_items_from_database(
-                query=self.query_rewards(timestamp_end=current_timestamp),
+                query=self.query_rewards(
+                    timestamp_end=current_timestamp, protocol=protocol
+                ),
                 collection_name="rewards_status",
             )
 
@@ -1724,6 +1734,10 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
                     not in data[reward["rewarder_registry"]]["pools"][
                         reward["hypervisor_address"]
                     ]["rewarders"]
+                    or data[reward["rewarder_registry"]]["pools"][
+                        reward["hypervisor_address"]
+                    ]["rewarders"][reward["rewarder_address"]]["rewardPerSecond"]
+                    == 0.0
                 ):
                     data[reward["rewarder_registry"]]["pools"][
                         reward["hypervisor_address"]
@@ -1731,7 +1745,7 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
                         "rewardToken": reward["rewardToken"],
                         "rewardTokenDecimals": reward["rewardToken_decimals"],
                         "rewardTokenSymbol": reward["rewardToken_symbol"],
-                        "rewardPerSecond": int(reward["rewards_perSecond"])
+                        "rewardPerSecond": float(reward["rewards_perSecond"])
                         / (10 ** reward["rewardToken_decimals"]),
                         "allocPoint": 0,
                         "apr": reward["apr"],
@@ -1771,8 +1785,59 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
         # return
         return data
 
+    async def merge_with_existing(
+        self, chain: Chain, protocol: Protocol, data: dict
+    ) -> dict:
+        #  get same id from database
+        if existing_data := await self.get_items_from_database(
+            collection_name="allRewards2",
+            find={
+                "chain": chain,
+                "protocol": protocol,
+                "datetime": {
+                    "$lte": data["datetime"],
+                    "$gte": data["datetime"] - timedelta(hours=1),
+                },
+            },
+            sort=[("datetime", -1)],
+        ):
+            # pick the first one ( closest to datetime)
+            existing_data = existing_data[0]
+            # log time difference
+            # logger.debug(
+            #     f" {chain}'s {protocol} has existing rewards with a diff of {(data['datetime']-existing_data['datetime']).total_seconds()/60} min."
+            # )
+
+            for key, value in data.items():
+                if key not in [
+                    "id",
+                    "datetime",
+                    "chain",
+                    "protocol",
+                    "block",
+                ] and key.startswith("0x"):
+                    if key not in existing_data:
+                        existing_data[key] = data[key]
+                        logger.debug(
+                            f" Merged {chain}'s {protocol} 3rd party rewards with existing ones at {key}"
+                        )
+                    else:
+                        logger.debug(
+                            f" Found error while merging rewards. {chain}'s {protocol} has same rewarder address {key}. May be already merged in the past."
+                        )
+                        # existing_data[key] = data[key]
+        else:
+            logger.debug(
+                f" {chain}'s {protocol} has no existing rewards close to {data['datetime']}"
+            )
+            existing_data = data
+
+        return existing_data
+
     @staticmethod
-    def query_rewards(timestamp_end: int | None = None) -> list[dict]:
+    def query_rewards(
+        timestamp_end: int | None = None, protocol: Protocol | None = None
+    ) -> list[dict]:
         result = [
             {"$sort": {"block": -1}},
             {
@@ -1802,8 +1867,13 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
             {"$unset": ["_id"]},
         ]
 
+        _match = {}
         if timestamp_end:
-            result.insert(0, {"$match": {"timestamp": {"$lte": timestamp_end}}})
+            _match["timestamp"] = {"$lte": timestamp_end}
+        if protocol:
+            _match["dex"] = protocol.database_name
+        if _match:
+            result.insert(0, {"$match": _match})
 
         return result
 

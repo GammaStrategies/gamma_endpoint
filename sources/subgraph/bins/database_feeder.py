@@ -19,7 +19,7 @@ sys.path.append(PARENT_FOLDER)
 ########################################
 
 from sources.subgraph.bins import utils
-from sources.common.general.enums import Period
+from sources.common.general.enums import Chain, Period
 
 from sources.subgraph.bins.enums import Protocol
 from sources.subgraph.bins.config import (
@@ -54,14 +54,33 @@ CHAINS_PROTOCOLS = [
 ]
 
 # Rewards managed by gamma utilities ( 3rd party rewards not in subgraph)
-PROTOCOL_REWARDS_DATABASE = [
-    Protocol.ZYBERSWAP,
-    Protocol.THENA,
-    Protocol.SUSHI,
-    Protocol.BEAMSWAP,
-    Protocol.RAMSES,
-    Protocol.SYNTHSWAP,
-]
+# PROTOCOL_REWARDS_DATABASE = [
+#     Protocol.ZYBERSWAP,
+#     Protocol.THENA,
+#     Protocol.SUSHI,
+#     Protocol.BEAMSWAP,
+#     Protocol.RAMSES,
+#     Protocol.SYNTHSWAP,
+# ]
+PROTOCOL_CHAIN_REWARDS_DATABASE = {
+    Protocol.UNISWAP: [Chain.ARBITRUM],
+    Protocol.QUICKSWAP: [],
+    Protocol.ZYBERSWAP: [Chain.ARBITRUM],
+    Protocol.THENA: [Chain.BSC],
+    Protocol.CAMELOT: [],
+    Protocol.GLACIER: [],
+    Protocol.RETRO: [],
+    Protocol.STELLASWAP: [],
+    Protocol.BEAMSWAP: [Chain.MOONBEAM],
+    Protocol.SPIRITSWAP: [],
+    Protocol.SUSHI: [Chain.POLYGON, Chain.ARBITRUM, Chain.BASE],
+    Protocol.RAMSES: [Chain.ARBITRUM],
+    Protocol.ASCENT: [],
+    Protocol.FUSIONX: [],
+    Protocol.SYNTHSWAP: [Chain.BASE],
+    Protocol.LYNEX: [],
+    Protocol.PEGASYS: [],
+}
 
 # set cron vars
 EXPR_FORMATS = {
@@ -191,7 +210,7 @@ async def feed_database_allRewards2():
             protocol=protocol,
         )
         for chain, protocol in CHAINS_PROTOCOLS
-        if protocol not in PROTOCOL_REWARDS_DATABASE
+        # if chain not in PROTOCOL_CHAIN_REWARDS_DATABASE.get(protocol, [])
     ]
 
     # execute feed
@@ -215,7 +234,7 @@ async def feed_database_allRewards2_externals(current_timestamp: int | None = No
             current_timestamp=current_timestamp,
         )
         for chain, protocol in CHAINS_PROTOCOLS
-        if protocol in PROTOCOL_REWARDS_DATABASE
+        if chain in PROTOCOL_CHAIN_REWARDS_DATABASE.get(protocol, [])
     ]
 
     # execute feed
