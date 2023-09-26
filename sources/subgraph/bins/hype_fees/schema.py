@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field, InitVar
 
 from sources.subgraph.bins.constants import X128
-from sources.subgraph.bins.schema import ValueWithDecimal
+from sources.subgraph.bins.schema import ValueWithDecimal, TokenPair
 
 
 @dataclass
@@ -12,21 +12,6 @@ class Time:
     def __post_init__(self):
         self.block = int(self.block)
         self.timestamp = int(self.timestamp)
-
-
-@dataclass
-class _TokenPair:
-    value0: ValueWithDecimal = field(init=False)
-    value1: ValueWithDecimal = field(init=False)
-    raw0: InitVar[int]
-    raw1: InitVar[int]
-    decimals0: InitVar[int]
-    decimals1: InitVar[int]
-
-    def __post_init__(self, raw0: int, raw1: int, decimals0: int, decimals1: int):
-        self.value0 = ValueWithDecimal(raw=raw0, decimals=decimals0)
-        self.value1 = ValueWithDecimal(raw=raw1, decimals=decimals1)
-
 
 @dataclass
 class _TokenPairInt:
@@ -81,7 +66,7 @@ class _TickData:
 @dataclass
 class _PositionData:
     liquidity: int
-    tokens_owed: _TokenPair = field(init=False)
+    tokens_owed: TokenPair = field(init=False)
     fee_growth_inside: _TokenPairInt = field(init=False)
     tick_lower: _TickData = field(init=False)
     tick_upper: _TickData = field(init=False)
@@ -114,7 +99,7 @@ class _PositionData:
         decimals1: int,
     ):
         self.liquidity = int(self.liquidity)
-        self.tokens_owed = _TokenPair(
+        self.tokens_owed = TokenPair(
             raw0=tokens_owed0,
             raw1=tokens_owed1,
             decimals0=decimals0,
@@ -146,7 +131,7 @@ class FeesData:
     fee: int
     price: _TokenPairDecimals = field(init=False)
     decimals: _TokenPairInt = field(init=False)
-    tvl: _TokenPair = field(init=False)
+    tvl: TokenPair = field(init=False)
     tvl_usd: float
     fee_growth_global: _TokenPairInt = field(init=False)
     base_position: _PositionData = field(init=False)
@@ -228,7 +213,7 @@ class FeesData:
 
         self.price = _TokenPairDecimals(value0=price0, value1=price1)
         self.decimals = _TokenPairInt(value0=decimals0, value1=decimals1)
-        self.tvl = _TokenPair(
+        self.tvl = TokenPair(
             raw0=tvl0, raw1=tvl1, decimals0=decimals0, decimals1=decimals1
         )
         self.fee_growth_global = _TokenPairInt(
@@ -271,7 +256,7 @@ class FeesData:
             )
 
     def update_tvl(self, tvl0: int, tvl1: int, tvl_usd: int) -> None:
-        self.tvl = self.tvl = _TokenPair(
+        self.tvl = self.tvl = TokenPair(
             raw0=tvl0,
             raw1=tvl1,
             decimals0=self.decimals.value0,
@@ -289,7 +274,7 @@ class FeesDataRange:
 @dataclass
 class _FeeAmounts:
     amount: _TokenPairDecimals = field(init=False)
-    amount_x128: _TokenPair = field(init=False)
+    amount_x128: TokenPair = field(init=False)
     decimals: _TokenPairInt = field(init=False)
     usd: _TokenPairDecimals = field(init=False)
     amount0_x128: InitVar[int]
@@ -308,7 +293,7 @@ class _FeeAmounts:
         price0: float,
         price1: float,
     ) -> None:
-        self.amount_x128 = _TokenPair(
+        self.amount_x128 = TokenPair(
             raw0=amount0_x128,
             raw1=amount1_x128,
             decimals0=decimals0,

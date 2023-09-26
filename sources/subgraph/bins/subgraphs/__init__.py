@@ -87,14 +87,14 @@ class SubgraphData(ABC):
         """
         self.query_response = query_response
 
-    async def get_data(self, run_query: bool = True) -> None:
+    async def get_data(self, run_query: bool = True, **kwargs) -> None:
         """Get data, transforms it and stores it in self.data.
 
         Args:
             run_query: Defaults to True, set to False if data is already loaded
         """
         if run_query:
-            await self._query_data()
+            await self._query_data(**kwargs)
 
         self.data = self._transform_data()
 

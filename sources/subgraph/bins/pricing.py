@@ -444,7 +444,7 @@ async def gamma_price():
     return dex_pricing.token_prices["0x6bea7cfef803d1e3d5f7c0103f7ded065644e197"]
 
 
-async def token_prices(chain: Chain, protocol: Protocol):
+async def token_prices(chain: Chain, protocol: Protocol) -> dict:
     """Get token prices"""
     dex_pricing = DexPrice(chain)
     token_data = TokenData(chain, protocol)

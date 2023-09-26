@@ -1,8 +1,9 @@
 import logging
 
 from sources.subgraph.bins.enums import Chain, PositionType, Protocol
+from sources.subgraph.bins.schema import TokenPair
 from sources.subgraph.bins.hype_fees.data import FeeGrowthData
-from sources.subgraph.bins.hype_fees.schema import FeesData, UncollectedFees, _TokenPair
+from sources.subgraph.bins.hype_fees.schema import FeesData, UncollectedFees
 from sources.subgraph.bins.utils import sub_in_256
 
 logger = logging.getLogger(__name__)
@@ -21,7 +22,7 @@ class Fees:
         try:
             base_fees_x128 = self._calc_position_fees(PositionType.BASE)
         except (IndexError, TypeError):
-            base_fees_x128 = _TokenPair(0, 0, 0, 0)
+            base_fees_x128 = TokenPair(0, 0, 0, 0)
             logger.warning(
                 f"Base fees set to 0, missing data for hype: {self.data.hypervisor}, "
                 f"ticks: ({self.data.base_position.tick_lower.tick_index}, "
@@ -31,7 +32,7 @@ class Fees:
         try:
             limit_fees_x128 = self._calc_position_fees(PositionType.LIMIT)
         except (IndexError, TypeError):
-            limit_fees_x128 = _TokenPair(0, 0, 0, 0)
+            limit_fees_x128 = TokenPair(0, 0, 0, 0)
             logger.warning(
                 f"Limit fees set to 0, missing data for hype: {self.data.hypervisor}, "
                 f"ticks: ({self.data.limit_position.tick_lower.tick_index}, "
@@ -53,7 +54,7 @@ class Fees:
             price1=self.data.price.value1,
         )
 
-    def _calc_position_fees(self, position_type: PositionType) -> _TokenPair:
+    def _calc_position_fees(self, position_type: PositionType) -> TokenPair:
         if position_type == PositionType.BASE:
             position = self.data.base_position
         elif position_type == PositionType.LIMIT:
@@ -102,7 +103,7 @@ class Fees:
             sub_in_256(fees_accum_now_1, position.fee_growth_inside.value1)
         )
 
-        return _TokenPair(
+        return TokenPair(
             raw0=uncollected_fees_0,
             raw1=uncollected_fees_1,
             decimals0=self.data.decimals.value0,

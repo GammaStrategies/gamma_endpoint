@@ -19,6 +19,8 @@ from sources.subgraph.bins.hype_fees.impermanent_divergence import (
 from sources.subgraph.bins.hypervisor import HypervisorInfo, HypervisorData
 from sources.subgraph.bins.toplevel import TopLevelData
 
+from sources.subgraph.bins.common.hypervisors.all_data import AllData as HypeAllData
+
 logger = logging.getLogger(__name__)
 
 
@@ -30,8 +32,8 @@ class AllData(ExecutionOrderWrapper):
         return result
 
     async def _subgraph(self):
-        hypervisor_info = HypervisorInfo(self.protocol, self.chain)
-        return await hypervisor_info.all_data()
+        hype_all_data = HypeAllData(chain=self.chain, protocol=self.protocol)
+        return await hype_all_data.output()
 
 
 class FeeReturns(ExecutionOrderWrapper):
