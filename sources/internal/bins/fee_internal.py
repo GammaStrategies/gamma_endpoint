@@ -311,12 +311,13 @@ async def get_gross_fees(
     # get hypervisors current prices
     token_prices = {x["address"]: x for x in await get_current_prices(network=chain)}
     # get all hypervisors last status from the database
-    query_hype_status = [
+    query_last_hype_status = [
         {"$sort": {"block": -1}},
         {
             "$group": {
                 "_id": "$address",
-                "data": {"$first": "$$ROOT"},
+                "last": {"$first": "$$ROOT"},
+                "first": {"$last": "$$ROOT"},
             }
         },
     ]
@@ -337,16 +338,17 @@ async def get_gross_fees(
         ]
     # add match to query
     if match:
-        query_hype_status.insert(0, {"$match": match})
+        query_last_hype_status.insert(0, {"$match": match})
 
     # last known hype status for each hypervisor at the end of the period
-    last_hypervisor_status = {
-        x["data"]["address"]: x["data"]
-        for x in await local_database_helper(network=chain).get_items_from_database(
-            collection_name="status",
-            aggregate=query_hype_status,
-        )
-    }
+    last_hypervisor_status = {}
+    first_hypervisor_status = {}
+    for status in await local_database_helper(network=chain).get_items_from_database(
+        collection_name="status",
+        aggregate=query_last_hype_status,
+    ):
+        last_hypervisor_status[status["address"]] = status["last"]
+        first_hypervisor_status[status["address"]] = status["first"]
 
     # get a sumarized data portion for all hypervisors in the database for a period
     # when no period is specified, it will return all available data
@@ -498,6 +500,10 @@ async def get_gross_fees(
         )
 
     return output
+
+
+def calculate_pool_fees():
+    pass
 
 
 async def get_chain_usd_fees(
