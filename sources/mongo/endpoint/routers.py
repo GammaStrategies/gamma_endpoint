@@ -351,11 +351,17 @@ class mongo_router_builder(router_builder_baseTemplate):
                     network=self.chain, token_addresses=None, block=block
                 )
             #    return "Please provide a list of token addresses or a block number"
-        return await prices.get_prices(
-            token_addresses=[x.lower().strip() for x in token_addresses],
-            network=self.chain,
-            block=block,
-        )
+        if block is None:
+            return await prices.get_current_prices(
+                token_addresses=[x.lower().strip() for x in token_addresses],
+                network=self.chain,
+            )
+        else:
+            return await prices.get_prices(
+                token_addresses=[x.lower().strip() for x in token_addresses],
+                network=self.chain,
+                block=block,
+            )
 
     # Hypervisors
     @cache(expire=DB_CACHE_TIMEOUT)
