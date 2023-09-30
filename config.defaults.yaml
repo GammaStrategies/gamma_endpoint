@@ -21,7 +21,7 @@ SUSHI_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t
 SUSHI_BASE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-sushi-base
 RAMSES_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-ramses-arbitrum
 ASCENT_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-ascent-polygon
-FUSIONX_MANTLE_GAMMA_SUBGRAPH_URL: https://graph.fusionx.finance/subgraphs/name/gamma-fusionx-mantle
+FUSIONX_MANTLE_GAMMA_SUBGRAPH_URL: https://graphv3.fusionx.finance/subgraphs/name/gamma-fusionx-mantle
 SYNTHSWAP_BASE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-synthswap-base
 LYNEX_LINEA_GAMMA_SUBGRAPH_URL: https://graph-query.linea.build/subgraphs/name/gammastrategies/lynex-linea
 PEGASYS_ROLLUX_GAMMA_SUBGRAPH_URL: https://rollux.graph.pegasys.fi/subgraphs/name/gammastrategies/pegasys-rollux
@@ -50,7 +50,7 @@ SUSHI_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/sushi-v3/v3
 SUSHI_BASE_SUBGRAPH_URL: https://api.studio.thegraph.com/query/32073/v3-base/version/latest
 RAMSES_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ramsesexchange/concentrated-liquidity-graph
 ASCENT_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/seme0801/ascent-v3
-FUSIONX_MANTLE_SUBGRAPH_URL: https://graph.fusionx.finance/subgraphs/name/fusionx/exchange-v31
+FUSIONX_MANTLE_SUBGRAPH_URL: https://graphv3.fusionx.finance/subgraphs/name/fusionx/exchange-v3
 SYNTHSWAP_BASE_SUBGRAPH_URL: https://api.studio.thegraph.com/query/45189/synthswap-v3-analytics-base/version/latest/
 LYNEX_LINEA_SUBGRAPH_URL: https://graph-query.linea.build/subgraphs/name/cryptoalgebra/analytics
 PEGASYS_ROLLUX_SUBGRAPH_URL: https://rollux.graph.pegasys.fi/subgraphs/name/pollum-io/pegasys-v3
@@ -79,7 +79,7 @@ SUSHI_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/
 SUSHI_BASE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-sushi-base
 RAMSES_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-ramses-arbitrum
 ASCENT_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-ascent-polygon
-FUSIONX_MANTLE_HP_SUBGRAPH_URL: https://graph.fusionx.finance/subgraphs/name/gamma-hp-fusionx-mantle
+FUSIONX_MANTLE_HP_SUBGRAPH_URL: https://graphv3.fusionx.finance/subgraphs/name/gamma-hp-fusionx-mantle
 SYNTHSWAP_BASE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-synthswap-base
 LYNEX_LINEA_HP_SUBGRAPH_URL: https://graph-query.linea.build/subgraphs/name/gammastrategies/hype-pool-lynex-linea
 PEGASYS_ROLLUX_HP_SUBGRAPH_URL: https://rollux.graph.pegasys.fi/subgraphs/name/gammastrategies/hype-pool-pegasys-rollux
