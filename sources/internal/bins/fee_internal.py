@@ -347,8 +347,8 @@ async def get_gross_fees(
         collection_name="status",
         aggregate=query_last_hype_status,
     ):
-        last_hypervisor_status[status["address"]] = status["last"]
-        first_hypervisor_status[status["address"]] = status["first"]
+        last_hypervisor_status[status["_id"]] = status["last"]
+        first_hypervisor_status[status["_id"]] = status["first"]
 
     # get a sumarized data portion for all hypervisors in the database for a period
     # when no period is specified, it will return all available data
