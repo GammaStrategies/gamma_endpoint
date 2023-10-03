@@ -6,8 +6,10 @@ from fastapi import HTTPException
 
 
 from sources.common.formulas.fees import convert_feeProtocol
+from sources.common.general.enums import text_to_protocol
 from sources.internal.bins.internal import (
     InternalGrossFeesOutput,
+    InternalKpi,
     InternalTimeframe,
     InternalTokens,
 )
@@ -303,6 +305,13 @@ async def get_gross_fees(
 
     * **collected fees** are the fees collected on rebalance and zeroBurn events.
 
+    * **measurements** are the KPIs used to measure the success of the hypervisor in the period.
+        gamma_vs_pool_liquidity_ini: percentage of liquidity gamma has in the pool at the start of the period
+        gamma_vs_pool_liquidity_end: percentage of liquidity gamma has in the pool at the end of the period
+        feeTier: percentage of fee the pool is charging on swaps
+        gamma_vs_pool_fees_0: percentage of fees gamma has collected in the period, compared to the maximum fees the pool could have collected
+        gamma_vs_pool_fees_1: percentage of fees gamma has collected in the period, compared to the maximum fees the pool could have collected
+
     """
 
     # create result dict
@@ -371,6 +380,7 @@ async def get_gross_fees(
 
         # ease hypervisor static data access
         hype_status = last_hypervisor_status.get(hype_summary["address"], {})
+        hype_status_ini = first_hypervisor_status.get(hype_summary["address"], {})
         if not hype_status:
             logging.getLogger(__name__).error(
                 f"Static data not found for hypervisor {hype_summary['address']}"
@@ -408,6 +418,14 @@ async def get_gross_fees(
             feeProtocol1=protocol_fee_1_raw,
             hypervisor_protocol=hype_status["dex"],
             pool_protocol=hype_status["pool"]["dex"],
+        )
+
+        # get pool fee tier
+        pool_fee_tier = calculate_pool_fees(hype_status)
+
+        # get gamma liquidity percentage
+        gamma_liquidity_ini, gamma_liquidity_end = calculate_total_liquidity(
+            hype_status_ini, hype_status
         )
 
         # calculate collected fees
@@ -450,6 +468,37 @@ async def get_gross_fees(
             grossFees_1 = collectedFees_1
 
         grossFees_usd = grossFees_0 * token0_price + grossFees_1 * token1_price
+
+        # measure max fees for a fullPeriodLocal range position
+        (
+            alwaysInPosition_max_fees_0,
+            alwaysInPosition_max_fees_1,
+        ) = calculate_alwaysAquiringFeesPosition_max_pool_fees(
+            hypervisor_status_ini=hype_status_ini,
+            hypervisor_status_end=hype_status,
+            inDecimal=True,
+        )
+        # measure fee collection success
+        gamma_vs_alwaysInPosition_fees_0 = (
+            collectedFees_0 / alwaysInPosition_max_fees_0
+            if alwaysInPosition_max_fees_0
+            else 0
+        )
+        gamma_vs_alwaysInPosition_fees_1 = (
+            collectedFees_1 / alwaysInPosition_max_fees_1
+            if alwaysInPosition_max_fees_1
+            else 0
+        )
+        # transform to usd
+        alwaysInPosition_fees_usd = (
+            alwaysInPosition_max_fees_0 * token0_price
+            + alwaysInPosition_max_fees_1 * token1_price
+        )
+        gamma_vs_alwaysInPosition_fees_usd = (
+            collectedFees_usd / alwaysInPosition_fees_usd
+            if alwaysInPosition_fees_usd
+            else 0
+        )
 
         # days period
         days_period = (
@@ -497,13 +546,179 @@ async def get_gross_fees(
                 token1=grossFees_1,
                 usd=grossFees_usd,
             ),
+            measurements=InternalKpi(
+                gamma_vs_pool_liquidity_ini=gamma_liquidity_ini,
+                gamma_vs_pool_liquidity_end=gamma_liquidity_end,
+                feeTier=pool_fee_tier,
+                eVolume=grossFees_usd / pool_fee_tier,
+                gamma_vs_alwaysInPosition_fees_0=gamma_vs_alwaysInPosition_fees_0,
+                gamma_vs_alwaysInPosition_fees_1=gamma_vs_alwaysInPosition_fees_1,
+                gamma_vs_alwaysInPosition_fees_usd=gamma_vs_alwaysInPosition_fees_usd,
+            ),
         )
 
     return output
 
 
-def calculate_pool_fees():
-    pass
+def calculate_pool_fees(hypervisor_status: dict) -> float:
+    """Calculate the fee charged by the pool on every swap
+
+    Args:
+        hypervisor_status (dict): hypervisor status
+
+    Returns:
+        float: percentage of fees the pool is charging
+    """
+    protocol = text_to_protocol(hypervisor_status["pool"]["dex"])
+    fee_tier = 0
+
+    if protocol == Protocol.CAMELOT:
+        try:
+            # Camelot:  (pool.globalState().feeZto + pool.globalState().feeOtz)/2
+            fee_tier = (
+                int(hypervisor_status["pool"]["globalState"]["feeZto"])
+                + int(hypervisor_status["pool"]["globalState"]["feeOtz"])
+            ) / 2
+        except Exception as e:
+            logging.getLogger(__name__).exception(f" {e}")
+    elif protocol == Protocol.RAMSES:
+        # Ramses:  pool.currentFee()
+        try:
+            # 'currentFee' in here is actualy the 'fee' field
+            fee_tier = int(hypervisor_status["pool"]["fee"])
+        except Exception as e:
+            logging.getLogger(__name__).exception(f" {e}")
+
+    elif protocol == Protocol.QUICKSWAP:
+        # QuickSwap + StellaSwap (Algebra V1):  pool.globalState().fee
+        try:
+            fee_tier = int(hypervisor_status["pool"]["globalState"]["fee"])
+        except Exception as e:
+            logging.getLogger(__name__).exception(f" {e}")
+    else:
+        # Uniswap: pool.fee()
+        try:
+            fee_tier = int(hypervisor_status["pool"]["fee"])
+        except Exception as e:
+            logging.getLogger(__name__).exception(f" {e}")
+
+    return fee_tier / 1000000
+
+
+def calculate_alwaysAquiringFeesPosition_max_pool_fees(
+    hypervisor_status_ini: dict, hypervisor_status_end: dict, inDecimal: bool = False
+) -> tuple[float, float]:
+    """This will calculate the maximum fees collected in the period defined, for a position that is always aquiring fees.
+        considerations:
+            The position has been bound to the min-max tick the pool has been during the period
+            The position's liquidity is fixed to the end position.
+
+            Take into consideration that this is not the actual fees collected by the position but a theoretical view on a specific conditions.
+
+    Args:
+        hypervisor_status_ini (dict):
+        hypervisor_status_end (dict):
+        inDecimal (bool, optional): . Defaults to False.
+
+    Returns:
+        tuple[float, float]:
+    """
+
+    # feeGrowthGlobal period growth per liquidity
+    feeGrowthGlobal0X128_growth = int(
+        hypervisor_status_end["pool"]["feeGrowthGlobal0X128"]
+    ) - int(hypervisor_status_ini["pool"]["feeGrowthGlobal0X128"])
+    feeGrowthGlobal1X128_growth = int(
+        hypervisor_status_end["pool"]["feeGrowthGlobal1X128"]
+    ) - int(hypervisor_status_ini["pool"]["feeGrowthGlobal1X128"])
+
+    # position liquidity at the end of the period
+    liquidity_ini = calculate_inRange_liquidity(hypervisor_status_ini)
+    liquidity_end = calculate_inRange_liquidity(hypervisor_status_end)
+
+    pool_liquidity_variation = int(hypervisor_status_end["pool"]["liquidity"]) - int(
+        hypervisor_status_ini["pool"]["liquidity"]
+    )
+
+    # maximum fees that can be possibly collected in the period by an always aquiring fee position
+    max_fees_0 = (liquidity_end * feeGrowthGlobal0X128_growth) // (2**128)
+    max_fees_1 = (liquidity_end * feeGrowthGlobal1X128_growth) // (2**128)
+
+    if inDecimal:
+        max_fees_0 /= 10 ** hypervisor_status_end["pool"]["token0"]["decimals"]
+        max_fees_1 /= 10 ** hypervisor_status_end["pool"]["token1"]["decimals"]
+
+    return max_fees_0, max_fees_1
+
+
+def calculate_total_liquidity(
+    hypervisor_status_ini: dict, hypervisor_status_end: dict
+) -> tuple[float, float]:
+    """Percentage of liquidity gamma has in the pool
+
+    Args:
+        hypervisor_status_ini (dict):  initial hypervisor status
+        hypervisor_status_end (dict):  end hypervisor status
+
+    Returns:
+        tuple[float,float]:  initial_percentage, end_percentage
+    """
+
+    liquidity_ini = calculate_inRange_liquidity(hypervisor_status_ini)
+    liquidity_end = calculate_inRange_liquidity(hypervisor_status_end)
+
+    initial_percentage = (
+        liquidity_ini / int(hypervisor_status_ini["pool"]["liquidity"])
+        if int(hypervisor_status_ini["pool"]["liquidity"])
+        else 0
+    )
+    end_percentage = (
+        liquidity_end / int(hypervisor_status_end["pool"]["liquidity"])
+        if int(hypervisor_status_end["pool"]["liquidity"])
+        else 0
+    )
+
+    if end_percentage > 1:
+        logging.getLogger(__name__).warning(
+            f" liquidity percentage > 1 on {hypervisor_status_end['dex']}  {hypervisor_status_end['address']} hype block {hypervisor_status_end['block']}"
+        )
+    if initial_percentage > 1:
+        logging.getLogger(__name__).warning(
+            f" liquidity percentage > 1 on {hypervisor_status_ini['dex']}  {hypervisor_status_ini['address']} hype block {hypervisor_status_ini['block']}"
+        )
+    return initial_percentage, end_percentage
+
+
+def calculate_inRange_liquidity(hypervisor_status: dict) -> int:
+    """Calculate the liquidity in range of a hypervisor
+
+    Args:
+        hypervisor_status (dict):  hypervisor status
+
+    Returns:
+        int: liquidity in range
+    """
+
+    current_tick = (
+        int(hypervisor_status["pool"]["slot0"]["tick"])
+        if "slot0" in hypervisor_status["pool"]
+        else int(hypervisor_status["pool"]["globalState"]["tick"])
+    )
+
+    liquidity = 0
+    # check what to add as liquidity ( inRange only )
+    if (
+        int(hypervisor_status["limitUpper"]) >= current_tick
+        and int(hypervisor_status["limitLower"]) <= current_tick
+    ):
+        liquidity += int(hypervisor_status["limitPosition"]["liquidity"])
+    if (
+        int(hypervisor_status["baseUpper"]) >= current_tick
+        and int(hypervisor_status["baseLower"]) <= current_tick
+    ):
+        liquidity += int(hypervisor_status["basePosition"]["liquidity"])
+
+    return liquidity
 
 
 async def get_chain_usd_fees(

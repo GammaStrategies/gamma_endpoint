@@ -153,7 +153,15 @@ class internal_router_builder_main(router_builder_baseTemplate):
         * **protocolFee_X** is the percentage of fees going to the protocol, from 1 to 100.
 
         * **collected fees** are the fees collected on rebalance and zeroBurn events.
+            * *alwaysInPosition* is the definition of a position that has been in range for the whole period.
 
+            * gamma_vs_pool_liquidity_ini: percentage of liquidity gamma has in the pool at the start of the period
+            * gamma_vs_pool_liquidity_end: percentage of liquidity gamma has in the pool at the end of the period
+            * feeTier: percentage of fee the pool is charging on swaps
+            * eVolume: estimated volume in usd ( feeTier/calculated gross fees,  using the current price of the token)
+            * gamma_vs_alwaysInPosition_fees_0: percentage of fees gamma has collected in the period, compared to the maximum fees the *alwaysInPosition* could have collected
+            * gamma_vs_alwaysInPosition_fees_1: percentage of fees gamma has collected in the period, compared to the maximum fees the *alwaysInPosition* could have collected
+            * gamma_vs_alwaysInPosition_fees_usd: percentage of fees gamma has collected in the period, compared to the maximum fees the *alwaysInPosition* could have collected. Converted to USD using the current (now) price of the token.
         """
 
         if protocol and (protocol, chain) not in DEPLOYMENTS:
