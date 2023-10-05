@@ -5,6 +5,7 @@ from sources.subgraph.bins.hypervisors.schema import Hypervisor
 from sources.subgraph.bins.subgraphs import SubgraphData
 from sources.subgraph.bins.subgraphs.gamma import GammaClient
 
+
 class HypervisorAllData(SubgraphData):
     """Class to get xGamma staking relateed data"""
 

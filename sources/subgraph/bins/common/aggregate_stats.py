@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 
-from sources.subgraph.bins.database.managers import db_aggregateStats_manager
 from sources.subgraph.bins.common import ExecutionOrderWrapper
 from sources.subgraph.bins.config import MONGO_DB_URL
+from sources.subgraph.bins.database.managers import db_aggregateStats_manager
 from sources.subgraph.bins.toplevel import TopLevelData
 
 

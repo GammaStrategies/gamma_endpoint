@@ -9,7 +9,6 @@ from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.hype_fees.fees_yield import fee_returns_all
 from sources.subgraph.bins.utils import filter_address_by_chain, timestamp_to_date
 
-
 logger = logging.getLogger(__name__)
 
 

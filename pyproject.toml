@@ -34,6 +34,8 @@ black = "^23.1.0"
 flake8 = "^6.0.0"
 pylint = "^2.17.1"
 isort = "^5.12.0"
+lsprotocol = "^2023.0.0b1"
+pygls = "^1.1.0"
 
 [build-system]
 requires = ["poetry-core"]

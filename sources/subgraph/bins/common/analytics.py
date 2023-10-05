@@ -1,12 +1,13 @@
 from datetime import datetime, timedelta
+
 from fastapi import Response, status
 
-from sources.subgraph.bins.enums import Chain, Protocol
-from sources.subgraph.bins.database.managers import (
-    db_returns_manager,
-    db_allRewards2_manager,
-)
 from sources.subgraph.bins.config import MASTERCHEF_ADDRESSES, MONGO_DB_URL
+from sources.subgraph.bins.database.managers import (
+    db_allRewards2_manager,
+    db_returns_manager,
+)
+from sources.subgraph.bins.enums import Chain, Protocol
 
 
 class HypervisorAnalytics:

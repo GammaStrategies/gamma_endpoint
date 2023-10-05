@@ -6,13 +6,12 @@ from collections import defaultdict
 
 from gql.dsl import DSLQuery
 
+from sources.mongo.bins.apps.prices import get_current_prices
 from sources.subgraph.bins import LlamaClient, UniswapV3Client
 from sources.subgraph.bins.enums import Chain, Protocol
-from sources.subgraph.bins.utils import sqrtPriceX96_to_priceDecimal
 from sources.subgraph.bins.subgraphs import SubgraphData
 from sources.subgraph.bins.subgraphs.gamma import GammaClient
-
-from sources.mongo.bins.apps.prices import get_current_prices
+from sources.subgraph.bins.utils import sqrtPriceX96_to_priceDecimal
 
 POOLS = {
     Chain.ETHEREUM: {

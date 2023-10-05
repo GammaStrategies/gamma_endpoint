@@ -1,4 +1,5 @@
-from dataclasses import dataclass, field, InitVar
+from dataclasses import InitVar, dataclass, field
+
 from sources.subgraph.bins.schema import TokenPair
 
 

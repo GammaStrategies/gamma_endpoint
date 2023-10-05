@@ -1,12 +1,10 @@
-from sources.subgraph.bins.accounts import AccountInfo
-from sources.subgraph.bins.enums import Chain, Protocol
-from sources.subgraph.bins.users import UserInfo
 from fastapi import Response
 
-from sources.common.database.collection_endpoint import (
-    database_local,
-)
+from sources.common.database.collection_endpoint import database_local
+from sources.subgraph.bins.accounts import AccountInfo
 from sources.subgraph.bins.config import MONGO_DB_URL
+from sources.subgraph.bins.enums import Chain, Protocol
+from sources.subgraph.bins.users import UserInfo
 
 
 async def user_data(protocol: Protocol, chain: Chain, address: str):

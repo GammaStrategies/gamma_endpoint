@@ -1,11 +1,10 @@
 import logging
 
-from sources.subgraph.bins.database.managers import db_allRewards2_manager
 from sources.subgraph.bins.common import ExecutionOrderWrapper
 from sources.subgraph.bins.config import MONGO_DB_URL
+from sources.subgraph.bins.database.managers import db_allRewards2_manager
 from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.masterchef_v2 import MasterchefV2Info, UserRewardsV2
-
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,6 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 from sources.subgraph.bins import GammaClient
 from sources.subgraph.bins.enums import Chain, Protocol
 

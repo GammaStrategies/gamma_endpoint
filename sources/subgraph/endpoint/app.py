@@ -1,10 +1,9 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.inmemory import InMemoryBackend
 
-from fastapi.middleware.cors import CORSMiddleware
 from endpoint.config.cache import CHARTS_CACHE_TIMEOUT
-
 from sources.subgraph.endpoint.routers import build_routers, build_routers_compatible
 
 

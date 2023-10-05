@@ -1,9 +1,9 @@
 import logging
 
 from sources.subgraph.bins.enums import Chain, PositionType, Protocol
-from sources.subgraph.bins.schema import TokenPair
 from sources.subgraph.bins.hype_fees.data import FeeGrowthData
 from sources.subgraph.bins.hype_fees.schema import FeesData, UncollectedFees
+from sources.subgraph.bins.schema import TokenPair
 from sources.subgraph.bins.utils import sub_in_256
 
 logger = logging.getLogger(__name__)

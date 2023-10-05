@@ -1,7 +1,6 @@
 from sources.common.general.config import get_config
 from sources.subgraph.bins.enums import Chain, Protocol, QueryType
 
-
 DEPLOYMENTS = [
     (Protocol.UNISWAP, Chain.ETHEREUM),
     (Protocol.UNISWAP, Chain.ARBITRUM),

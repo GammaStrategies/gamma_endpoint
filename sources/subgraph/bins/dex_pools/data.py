@@ -1,7 +1,7 @@
 from gql.dsl import DSLQuery
 
-from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.dex_pools.schema import DexPool
+from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.subgraphs import SubgraphData
 from sources.subgraph.bins.subgraphs.uniswap_v3 import UniswapClient
 

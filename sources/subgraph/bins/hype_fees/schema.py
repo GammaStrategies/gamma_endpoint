@@ -1,7 +1,7 @@
-from dataclasses import dataclass, field, InitVar
+from dataclasses import InitVar, dataclass, field
 
 from sources.subgraph.bins.constants import X128
-from sources.subgraph.bins.schema import ValueWithDecimal, TokenPair
+from sources.subgraph.bins.schema import TokenPair, ValueWithDecimal
 
 
 @dataclass

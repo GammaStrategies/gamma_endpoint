@@ -1,8 +1,8 @@
 """Hype Pool Subgraph for getting fee data"""
 from gql.dsl import DSLFragment
 
-from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.config import DEX_HYPEPOOL_SUBGRAPH_URLS
+from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.subgraphs import SubgraphClient, fragment
 
 

@@ -1,15 +1,15 @@
 #
 #   Script to update mongoDb with periodic data
 #
-import os
-import sys
+import asyncio
 import getopt
 import logging
-import asyncio
-from aiocron import crontab
-
-from croniter import croniter
+import os
+import sys
 from datetime import datetime, timezone
+
+from aiocron import crontab
+from croniter import croniter
 
 ########################################
 # append parent directory pth
@@ -18,24 +18,22 @@ PARENT_FOLDER = os.path.dirname(os.path.dirname(os.path.dirname(CURRENT_FOLDER))
 sys.path.append(PARENT_FOLDER)
 ########################################
 
-from sources.subgraph.bins import utils
 from sources.common.general.enums import Chain, Period
-
-from sources.subgraph.bins.enums import Protocol
+from sources.subgraph.bins import utils
 from sources.subgraph.bins.config import (
-    MONGO_DB_URL,
-    GAMMA_SUBGRAPH_URLS,
     EXCLUDED_HYPERVISORS,
+    GAMMA_SUBGRAPH_URLS,
+    MONGO_DB_URL,
 )
-
 from sources.subgraph.bins.database.managers import (
+    db_aggregateStats_manager,
+    db_allData_manager,
+    db_allRewards2_external_manager,
+    db_allRewards2_manager,
     db_returns_manager,
     db_static_manager,
-    db_allData_manager,
-    db_allRewards2_manager,
-    db_allRewards2_external_manager,
-    db_aggregateStats_manager,
 )
+from sources.subgraph.bins.enums import Protocol
 
 logging.basicConfig(
     format="[%(asctime)s:%(levelname)s:%(name)s]:%(message)s",

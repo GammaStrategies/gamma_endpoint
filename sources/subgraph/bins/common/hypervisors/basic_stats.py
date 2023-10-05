@@ -1,8 +1,9 @@
 from datetime import date
-from pydantic import BaseModel
-from fastapi import Response, status
-from sources.subgraph.bins.enums import Chain, Protocol
 
+from fastapi import Response, status
+from pydantic import BaseModel
+
+from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.hypervisor import HypervisorInfo
 
 

@@ -2,8 +2,8 @@ import logging
 
 import numpy as np
 from pandas import DataFrame
-from sources.common.formulas.fees import calculate_gamma_fee
 
+from sources.common.formulas.fees import calculate_gamma_fee
 from sources.subgraph.bins.constants import DAY_SECONDS, YEAR_SECONDS
 from sources.subgraph.bins.enums import Chain, Protocol, YieldType
 from sources.subgraph.bins.hype_fees.data import FeeGrowthSnapshotData

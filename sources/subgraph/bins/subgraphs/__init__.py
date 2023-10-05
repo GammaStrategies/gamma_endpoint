@@ -5,7 +5,8 @@ from typing import Any
 
 from gql import Client as GqlClient
 from gql.dsl import DSLFragment, DSLQuery, DSLSchema, dsl_gql
-from gql.transport.aiohttp import AIOHTTPTransport, log as requests_logger
+from gql.transport.aiohttp import AIOHTTPTransport
+from gql.transport.aiohttp import log as requests_logger
 
 from sources.subgraph.bins.config import GQL_CLIENT_TIMEOUT
 

@@ -1,5 +1,5 @@
-from sources.subgraph.bins.masterchef import MasterchefInfo, UserRewards
 from sources.subgraph.bins.enums import Chain, Protocol
+from sources.subgraph.bins.masterchef import MasterchefInfo, UserRewards
 
 
 async def info(protocol: Protocol, chain: Chain):
