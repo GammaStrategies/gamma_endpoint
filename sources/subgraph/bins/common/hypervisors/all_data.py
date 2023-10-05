@@ -20,20 +20,8 @@ from sources.subgraph.bins.utils import timestamp_to_date
 logger = logging.getLogger(__name__)
 
 
-class AllDataReturnsYield(BaseModel):
-    feeApr: float
-    feeApy: float
-
-
-class AllDataReturns(BaseModel):
-    daily: AllDataReturnsYield
-    weekly: AllDataReturnsYield
-    monthly: AllDataReturnsYield
-    allTime: AllDataReturnsYield
-    status: str
-
-
-class AllDataOutput(BaseModel):
+class HypervisorBasicInfoOutput(BaseModel):
+    """Output schema for Hypervisor Basic Stats"""
     createDate: str
     poolAddress: str
     name: str
@@ -41,8 +29,8 @@ class AllDataOutput(BaseModel):
     token1: str
     decimals0: int
     decimals1: int
-    depositCap0: int
-    depositCap1: int
+    depositCap0: float
+    depositCap1: float
     grossFeesClaimed0: float
     grossFeesClaimed1: float
     grossFeesClaimedUSD: str
@@ -60,9 +48,25 @@ class AllDataOutput(BaseModel):
     baseLower: int
     baseUpper: int
     inRange: bool
-    observationIndex: str
+    observationIndex: int
     poolTvlUSD: str
     poolFeesUSD: str
+
+
+class AllDataReturnsYield(BaseModel):
+    feeApr: float
+    feeApy: float
+
+
+class AllDataReturns(BaseModel):
+    daily: AllDataReturnsYield
+    weekly: AllDataReturnsYield
+    monthly: AllDataReturnsYield
+    allTime: AllDataReturnsYield
+    status: str
+
+
+class AllDataOutput(HypervisorBasicInfoOutput):
     returns: AllDataReturns
 
 
@@ -71,6 +75,7 @@ class AllData:
         self.hype_data: dict[str, Hypervisor]
         self.pool_data: dict[str, DexPool]
         self.fee_yield: dict[str, dict]
+        self.hypervisors: list[str] | None  = None
         self.prices: dict
         self.chain = chain
         self.protocol = protocol
@@ -79,7 +84,7 @@ class AllData:
         hype_data = HypervisorAllData(self.chain, self.protocol)
         pool_data = PoolData(self.chain, self.protocol)
 
-        await hype_data.get_data()
+        await hype_data.get_data(hypervisors=self.hypervisors)
         self.hype_data = hype_data.data
 
         pools = [hype.pool for hype in hype_data.data.values()]
@@ -100,7 +105,7 @@ class AllData:
                 protocol=self.protocol,
                 chain=self.chain,
                 days=1,
-                hypervisors=None,
+                hypervisors=self.hypervisors,
                 current_timestamp=None,
             ),
             self._get_subgraph_data(),
@@ -108,10 +113,11 @@ class AllData:
 
         self.fee_yield = fee_yield["lp"]
 
-    async def output(self):
+
+    async def _process(self):
         await self.get_data()
 
-        all_data = {}
+        all_hypes = {}
         for hype_address, hype in self.hype_data.items():
             pool = self.pool_data.get(hype.pool)
             tick = pool.tick if pool else 0
@@ -133,7 +139,7 @@ class AllData:
                 ),
             )
 
-            all_data[hype_address] = AllDataOutput(
+            all_hypes[hype_address] = AllDataOutput(
                 createDate=timestamp_to_date(hype.created, "%d %b, %Y"),
                 poolAddress=hype.pool,
                 name=f"{hype.token_0.symbol}-{hype.token_1.symbol}-{hype.pool_fee}",
@@ -168,4 +174,45 @@ class AllData:
                 returns=returns,
             )
 
-        return all_data
+        return all_hypes
+
+    async def all_data(self):
+        return await self._process()
+
+    async def basic_stats(self, hypervisor: str):
+        self.hypervisors = [hypervisor]
+        hypervisors_data = await self._process()
+
+        hype = hypervisors_data[hypervisor]
+
+        return HypervisorBasicInfoOutput(
+            createDate=hype.createDate,
+            poolAddress=hype.poolAddress,
+            name=hype.name,
+            token0=hype.token0,
+            token1=hype.token1,
+            decimals0=hype.decimals0,
+            decimals1=hype.decimals1,
+            depositCap0=hype.depositCap0,
+            depositCap1=hype.depositCap1,
+            grossFeesClaimed0=hype.grossFeesClaimed0,
+            grossFeesClaimed1=hype.grossFeesClaimed1,
+            grossFeesClaimedUSD=hype.grossFeesClaimedUSD,
+            feesReinvested0=hype.feesReinvested0,
+            feesReinvested1=hype.feesReinvested1,
+            feesReinvestedUSD=hype.feesReinvestedUSD,
+            tvl0=hype.tvl0,
+            tvl1=hype.tvl1,
+            tvlUSD=hype.tvlUSD,
+            totalSupply=hype.totalSupply,
+            maxTotalSupply=hype.maxTotalSupply,
+            capacityUsed=hype.capacityUsed,
+            sqrtPrice=hype.sqrtPrice,
+            tick=hype.tick,
+            baseLower=hype.baseLower,
+            baseUpper=hype.baseUpper,
+            inRange=hype.inRange,
+            observationIndex=hype.observationIndex,
+            poolTvlUSD=hype.poolTvlUSD,
+            poolFeesUSD=hype.poolFeesUSD
+        )

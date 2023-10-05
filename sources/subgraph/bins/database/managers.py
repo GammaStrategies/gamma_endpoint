@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from sources.common.database.collection_endpoint import database_local
 from sources.common.database.common.collections_common import db_collections_common
 from sources.common.general.enums import Period
+from sources.subgraph.bins.common.hypervisors.all_data import AllData as HypeAllData
 from sources.subgraph.bins.config import MASTERCHEF_ADDRESSES
 from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.hype_fees.data import FeeGrowthSnapshotData
@@ -13,7 +14,7 @@ from sources.subgraph.bins.hype_fees.fees_yield import FeesYield
 from sources.subgraph.bins.hype_fees.impermanent_divergence import (
     impermanent_divergence_all,
 )
-from sources.subgraph.bins.hypervisor import HypervisorData, HypervisorInfo
+from sources.subgraph.bins.hypervisor import HypervisorData
 from sources.subgraph.bins.masterchef_v2 import MasterchefV2Info
 from sources.subgraph.bins.toplevel import TopLevelData
 
@@ -1368,14 +1369,16 @@ class db_allData_manager(db_collection_manager):
             dict: <hypervisor_id>:<db_data_models.hypervisor_static>
         """
         # define result var
-        result = {}
-        hypervisor_info = HypervisorInfo(protocol=protocol, chain=chain)
-        allData = await hypervisor_info.all_data()
+        hype_all_data = HypeAllData(chain=chain, protocol=protocol)
+        allData = await hype_all_data.all_data()
+        # Convert pydantic model to dict
+        allData = {hype_address: hype_model.dict() for hype_address, hype_model in allData.items()}
 
         # types conversion
         for hyp_id, hypervisor in allData.items():
             hypervisor["totalSupply"] = str(hypervisor["totalSupply"])
             hypervisor["maxTotalSupply"] = str(hypervisor["maxTotalSupply"])
+            hypervisor["observationIndex"] = str(hypervisor["observationIndex"])
             # hypervisor["id"] = hyp_id
 
         # add id and datetime to data

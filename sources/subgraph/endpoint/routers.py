@@ -27,6 +27,9 @@ from sources.subgraph.bins.common import (
     subgraph_status,
     users,
 )
+from sources.subgraph.bins.common.hypervisor import (
+    hypervisor_basic_stats as basic_stats_output,
+)
 from sources.subgraph.bins.config import (
     DEFAULT_TIMEZONE,
     DEPLOYMENTS,
@@ -476,7 +479,7 @@ class subgraph_router_builder(router_builder_generalTemplate):
         )
 
     async def hypervisor_basic_stats(self, hypervisor_address: str, response: Response):
-        return await hypervisor.hypervisor_basic_stats(
+        return await basic_stats_output(
             self.dex, self.chain, hypervisor_address, response
         )
 

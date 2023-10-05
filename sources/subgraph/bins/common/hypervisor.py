@@ -3,6 +3,7 @@ import logging
 from datetime import datetime, timedelta
 
 from fastapi import Response, status
+from gql.transport.exceptions import TransportQueryError
 
 from sources.subgraph.bins.common import ExecutionOrderWrapper
 from sources.subgraph.bins.common.hypervisors.all_data import AllData as HypeAllData
@@ -17,7 +18,7 @@ from sources.subgraph.bins.hype_fees.fees_yield import fee_returns_all
 from sources.subgraph.bins.hype_fees.impermanent_divergence import (
     impermanent_divergence_all,
 )
-from sources.subgraph.bins.hypervisor import HypervisorData, HypervisorInfo
+from sources.subgraph.bins.hypervisor import HypervisorData
 from sources.subgraph.bins.toplevel import TopLevelData
 
 logger = logging.getLogger(__name__)
@@ -32,7 +33,7 @@ class AllData(ExecutionOrderWrapper):
 
     async def _subgraph(self):
         hype_all_data = HypeAllData(chain=self.chain, protocol=self.protocol)
-        return await hype_all_data.output()
+        return await hype_all_data.all_data()
 
 
 class FeeReturns(ExecutionOrderWrapper):
@@ -209,13 +210,12 @@ class ImpermanentDivergence(ExecutionOrderWrapper):
 async def hypervisor_basic_stats(
     protocol: Protocol, chain: Chain, hypervisor_address: str, response: Response
 ):
-    hypervisor_info = HypervisorInfo(protocol, chain)
-    basic_stats = await hypervisor_info.basic_stats(hypervisor_address)
-
-    if basic_stats:
-        return basic_stats
-    response.status_code = status.HTTP_400_BAD_REQUEST
-    return "Invalid hypervisor address or not enough data"
+    all_data = HypeAllData(chain=chain, protocol=protocol)
+    try:
+        return await all_data.basic_stats(hypervisor_address)
+    except (KeyError, TransportQueryError):
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return "Invalid hypervisor address or not enough data"
 
 
 async def recent_fees(protocol: Protocol, chain: Chain, hours: int = 24):
