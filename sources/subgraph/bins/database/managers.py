@@ -1378,7 +1378,6 @@ class db_allData_manager(db_collection_manager):
         for hyp_id, hypervisor in allData.items():
             hypervisor["totalSupply"] = str(hypervisor["totalSupply"])
             hypervisor["maxTotalSupply"] = str(hypervisor["maxTotalSupply"])
-            hypervisor["observationIndex"] = str(hypervisor["observationIndex"])
             # hypervisor["id"] = hyp_id
 
         # add id and datetime to data

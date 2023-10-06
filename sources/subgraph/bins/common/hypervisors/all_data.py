@@ -48,7 +48,7 @@ class HypervisorBasicInfoOutput(BaseModel):
     baseLower: int
     baseUpper: int
     inRange: bool
-    observationIndex: int
+    observationIndex: str
     poolTvlUSD: str
     poolFeesUSD: str
 
