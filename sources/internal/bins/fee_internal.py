@@ -296,22 +296,6 @@ async def get_gross_fees(
 ) -> dict[str, InternalGrossFeesOutput]:
     """
     Calculates the gross fees aquired (not uncollected) in a period of time for a specific protocol and chain using the protocol fee switch data.
-
-    * When no timeframe is provided, it returns all available data.
-
-    * The **usd** field is calculated using the current (now) price of the token.
-
-    * **protocolFee_X** is the percentage of fees going to the protocol, from 1 to 100.
-
-    * **collected fees** are the fees collected on rebalance and zeroBurn events.
-
-    * **measurements** are the KPIs used to measure the success of the hypervisor in the period.
-        gamma_vs_pool_liquidity_ini: percentage of liquidity gamma has in the pool at the start of the period
-        gamma_vs_pool_liquidity_end: percentage of liquidity gamma has in the pool at the end of the period
-        feeTier: percentage of fee the pool is charging on swaps
-        gamma_vs_pool_fees_0: percentage of fees gamma has collected in the period, compared to the maximum fees the pool could have collected
-        gamma_vs_pool_fees_1: percentage of fees gamma has collected in the period, compared to the maximum fees the pool could have collected
-
     """
 
     # create result dict
@@ -359,6 +343,10 @@ async def get_gross_fees(
         last_hypervisor_status[status["_id"]] = status["last"]
         first_hypervisor_status[status["_id"]] = status["first"]
 
+    # when no hypes are found, return empty output
+    if not last_hypervisor_status:
+        return output
+
     # get a sumarized data portion for all hypervisors in the database for a period
     # when no period is specified, it will return all available data
     for hype_summary in await local_database_helper(
@@ -378,12 +366,12 @@ async def get_gross_fees(
             item=db_collections_common.convert_d128_to_decimal(item=hype_summary)
         )
 
-        # ease hypervisor static data access
+        # ease hypervisor status data access
         hype_status = last_hypervisor_status.get(hype_summary["address"], {})
         hype_status_ini = first_hypervisor_status.get(hype_summary["address"], {})
         if not hype_status:
             logging.getLogger(__name__).error(
-                f"Static data not found for hypervisor {hype_summary['address']}"
+                f"Last hype status data not found for {chain.fantasy_name}'s {protocol.fantasy_name} hypervisor {hype_summary['address']}"
             )
             continue
         # ease hypervisor price access
@@ -469,37 +457,6 @@ async def get_gross_fees(
 
         grossFees_usd = grossFees_0 * token0_price + grossFees_1 * token1_price
 
-        # measure max fees for a fullPeriodLocal range position
-        (
-            alwaysInPosition_max_fees_0,
-            alwaysInPosition_max_fees_1,
-        ) = calculate_alwaysAquiringFeesPosition_max_pool_fees(
-            hypervisor_status_ini=hype_status_ini,
-            hypervisor_status_end=hype_status,
-            inDecimal=True,
-        )
-        # measure fee collection success
-        gamma_vs_alwaysInPosition_fees_0 = (
-            collectedFees_0 / alwaysInPosition_max_fees_0
-            if alwaysInPosition_max_fees_0
-            else 0
-        )
-        gamma_vs_alwaysInPosition_fees_1 = (
-            collectedFees_1 / alwaysInPosition_max_fees_1
-            if alwaysInPosition_max_fees_1
-            else 0
-        )
-        # transform to usd
-        alwaysInPosition_fees_usd = (
-            alwaysInPosition_max_fees_0 * token0_price
-            + alwaysInPosition_max_fees_1 * token1_price
-        )
-        gamma_vs_alwaysInPosition_fees_usd = (
-            collectedFees_usd / alwaysInPosition_fees_usd
-            if alwaysInPosition_fees_usd
-            else 0
-        )
-
         # days period
         days_period = (
             hype_summary["timestamp_end"] - hype_summary["timestamp_ini"]
@@ -551,9 +508,6 @@ async def get_gross_fees(
                 gamma_vs_pool_liquidity_end=gamma_liquidity_end,
                 feeTier=pool_fee_tier,
                 eVolume=grossFees_usd / pool_fee_tier,
-                gamma_vs_alwaysInPosition_fees_0=gamma_vs_alwaysInPosition_fees_0,
-                gamma_vs_alwaysInPosition_fees_1=gamma_vs_alwaysInPosition_fees_1,
-                gamma_vs_alwaysInPosition_fees_usd=gamma_vs_alwaysInPosition_fees_usd,
             ),
         )
 
@@ -633,12 +587,12 @@ def calculate_alwaysAquiringFeesPosition_max_pool_fees(
     ) - int(hypervisor_status_ini["pool"]["feeGrowthGlobal1X128"])
 
     # position liquidity at the end of the period
-    liquidity_ini = calculate_inRange_liquidity(hypervisor_status_ini)
+    # liquidity_ini = calculate_inRange_liquidity(hypervisor_status_ini)
     liquidity_end = calculate_inRange_liquidity(hypervisor_status_end)
 
-    pool_liquidity_variation = int(hypervisor_status_end["pool"]["liquidity"]) - int(
-        hypervisor_status_ini["pool"]["liquidity"]
-    )
+    # pool_liquidity_variation = int(hypervisor_status_end["pool"]["liquidity"]) - int(
+    #     hypervisor_status_ini["pool"]["liquidity"]
+    # )
 
     # maximum fees that can be possibly collected in the period by an always aquiring fee position
     max_fees_0 = (liquidity_end * feeGrowthGlobal0X128_growth) // (2**128)
@@ -708,13 +662,13 @@ def calculate_inRange_liquidity(hypervisor_status: dict) -> int:
     liquidity = 0
     # check what to add as liquidity ( inRange only )
     if (
-        int(hypervisor_status["limitUpper"]) >= current_tick
-        and int(hypervisor_status["limitLower"]) <= current_tick
+        float(hypervisor_status["limitUpper"]) >= current_tick
+        and float(hypervisor_status["limitLower"]) <= current_tick
     ):
         liquidity += int(hypervisor_status["limitPosition"]["liquidity"])
     if (
-        int(hypervisor_status["baseUpper"]) >= current_tick
-        and int(hypervisor_status["baseLower"]) <= current_tick
+        float(hypervisor_status["baseUpper"]) >= current_tick
+        and float(hypervisor_status["baseLower"]) <= current_tick
     ):
         liquidity += int(hypervisor_status["basePosition"]["liquidity"])
 
@@ -740,6 +694,8 @@ async def get_chain_usd_fees(
     * **collected fees** are the fees collected on rebalance and zeroBurn events.
 
     * **collectedFees_perDay** are the daily fees collected in the period.
+
+    * **eVolume** is the estimated volume of the pool in the period, calculated using the collectedFees_perDay and the feeTier.
     """
 
     # prepare output structure
@@ -750,6 +706,7 @@ async def get_chain_usd_fees(
         "collectedFees": 0,
         "calculatedGrossFees": 0,
         "collectedFees_perDay": 0,
+        "eVolume": 0,
     }
 
     if start_block and end_block:
@@ -780,5 +737,6 @@ async def get_chain_usd_fees(
             if hypervisor_data.days_period
             else 0
         )
+        output["eVolume"] += hypervisor_data.measurements.eVolume
 
     return output

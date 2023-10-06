@@ -40,10 +40,6 @@ class InternalKpi(BaseModel):
     feeTier: float = 0  # percentage
     eVolume: float = 0  # estimated volume in usd
 
-    gamma_vs_alwaysInPosition_fees_0: float = 0
-    gamma_vs_alwaysInPosition_fees_1: float = 0
-    gamma_vs_alwaysInPosition_fees_usd: float = 0
-
 
 class InternalGrossFeesOutput(BaseModel):
     """Output model for internal gross fees qtty in a period"""

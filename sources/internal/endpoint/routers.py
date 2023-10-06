@@ -65,13 +65,13 @@ class internal_router_builder_main(router_builder_baseTemplate):
         )
 
         router.add_api_route(
-            path="/{chain}/all_fees",
+            path="/all_fees",
             endpoint=self.all_chain_usd_fees,
             methods=["GET"],
         )
 
         router.add_api_route(
-            path="/{chain}/weekly_fees",
+            path="/weekly_fees",
             endpoint=self.weekly_chain_usd_fees,
             methods=["GET"],
         )
@@ -159,9 +159,6 @@ class internal_router_builder_main(router_builder_baseTemplate):
             * gamma_vs_pool_liquidity_end: percentage of liquidity gamma has in the pool at the end of the period
             * feeTier: percentage of fee the pool is charging on swaps
             * eVolume: estimated volume in usd ( feeTier/calculated gross fees,  using the current price of the token)
-            * gamma_vs_alwaysInPosition_fees_0: percentage of fees gamma has collected in the period, compared to the maximum fees the *alwaysInPosition* could have collected
-            * gamma_vs_alwaysInPosition_fees_1: percentage of fees gamma has collected in the period, compared to the maximum fees the *alwaysInPosition* could have collected
-            * gamma_vs_alwaysInPosition_fees_usd: percentage of fees gamma has collected in the period, compared to the maximum fees the *alwaysInPosition* could have collected. Converted to USD using the current (now) price of the token.
         """
 
         if protocol and (protocol, chain) not in DEPLOYMENTS:
@@ -180,8 +177,8 @@ class internal_router_builder_main(router_builder_baseTemplate):
 
     async def all_chain_usd_fees(
         self,
-        chain: Chain,
         response: Response,
+        chain: Chain | None = None,
         protocol: Protocol | None = None,
         start_timestamp: int | None = None,
         end_timestamp: int | None = None,
@@ -205,14 +202,39 @@ class internal_router_builder_main(router_builder_baseTemplate):
                 status_code=400, detail=f"{protocol} on {chain} not available."
             )
 
-        return await get_chain_usd_fees(
-            chain=chain,
-            protocol=protocol,
-            start_timestamp=start_timestamp,
-            end_timestamp=end_timestamp,
-            start_block=start_block,
-            end_block=end_block,
-        )
+        if not chain:
+            output = {}
+            requests = [
+                get_chain_usd_fees(
+                    chain=cha,
+                    protocol=None,
+                    start_timestamp=start_timestamp,
+                    end_timestamp=end_timestamp,
+                    start_block=start_block,
+                    end_block=end_block,
+                )
+                for cha in Chain
+            ]
+
+            items = await asyncio.gather(*requests)
+            for item in items:
+                for k, v in item.items():
+                    if not k in output:
+                        output[k] = v
+                    elif k not in ["weeknum", "timestamp"]:
+                        output[k] += v
+
+            return output
+
+        else:
+            return await get_chain_usd_fees(
+                chain=chain,
+                protocol=protocol,
+                start_timestamp=start_timestamp,
+                end_timestamp=end_timestamp,
+                start_block=start_block,
+                end_block=end_block,
+            )
 
     # async def get_report(
     #     self,
@@ -258,8 +280,8 @@ class internal_router_builder_main(router_builder_baseTemplate):
 
     async def weekly_chain_usd_fees(
         self,
-        chain: Chain,
         response: Response,
+        chain: Chain | None = None,
         week_start_timestamp: int | str = "last",
         protocol: Protocol | None = None,
     ) -> list[dict]:
@@ -329,16 +351,54 @@ class internal_router_builder_main(router_builder_baseTemplate):
             for week in range(weeks)
         ]
 
-        # build output structure for each week
-        requests = [
-            get_chain_usd_fees(
-                chain=chain,
-                protocol=protocol,
-                start_timestamp=st,
-                end_timestamp=et,
-                weeknum=weeknum + 1,
-            )
-            for weeknum, st, et in week_timestamps
-        ]
+        # build requests
+        requests = []
+        if not chain:
+            requests = [
+                get_chain_usd_fees(
+                    chain=cha,
+                    protocol=None,
+                    start_timestamp=st,
+                    end_timestamp=et,
+                    weeknum=weeknum + 1,
+                )
+                for weeknum, st, et in week_timestamps
+                for cha in Chain
+            ]
+        else:
+            # build output structure for each week
+            requests = [
+                get_chain_usd_fees(
+                    chain=chain,
+                    protocol=protocol,
+                    start_timestamp=st,
+                    end_timestamp=et,
+                    weeknum=weeknum + 1,
+                )
+                for weeknum, st, et in week_timestamps
+            ]
 
-        return await asyncio.gather(*requests)
+        # get all data
+        result = await asyncio.gather(*requests)
+
+        # build output structure for each week
+        if not chain:
+            output = {}
+            for item_output in result:
+                # sum values from the same weeknumk
+                if not item_output["weeknum"] in output:
+                    output[item_output["weeknum"]] = {}
+                for k, v in item_output.items():
+                    if not k in output[item_output["weeknum"]]:
+                        output[item_output["weeknum"]][k] = v
+                    elif k not in ["weeknum", "timestamp"]:
+                        output[item_output["weeknum"]][k] += v
+
+            # build output structure for each week. Convert eack key value to item
+            output = list(output.values())
+
+        else:
+            output = result
+
+        # return output
+        return output
