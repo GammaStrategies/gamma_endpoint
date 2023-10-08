@@ -139,6 +139,18 @@ class AllData:
                 ),
             )
 
+            # Override TVL USD if necessary with api pricing
+            tvl0 = hype.tvl.value0.adjusted
+            tvl1 = hype.tvl.value1.adjusted
+
+            if hype.tvl_usd == 0 and (tvl0 > 0 or tvl1 >0):
+                tvl_usd = (
+                    tvl0 * self.prices.get(hype.token_0.address, 0)
+                    + tvl1 * self.prices.get(hype.token_1.address, 0)
+                )
+            else:
+                tvl_usd = hype.tvl_usd
+
             all_hypes[hype_address] = AllDataOutput(
                 createDate=timestamp_to_date(hype.created, "%d %b, %Y"),
                 poolAddress=hype.pool,
@@ -157,7 +169,7 @@ class AllData:
                 feesReinvestedUSD=hype.fees_reinvested_usd,
                 tvl0=hype.tvl.value0.adjusted,
                 tvl1=hype.tvl.value1.adjusted,
-                tvlUSD=hype.tvl_usd,
+                tvlUSD=tvl_usd,
                 totalSupply=hype.total_supply,
                 maxTotalSupply=hype.max_total_supply,
                 capacityUsed=hype.total_supply / hype.max_total_supply
