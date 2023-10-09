@@ -32,6 +32,19 @@ class MasterchefV2Data:
                         id
                         symbol
                         pricePerShare
+                        tvl0
+                        tvl1
+                        totalSupply
+                        pool {
+                            token0 {
+                                id 
+                                decimals
+                            }
+                            token1 {
+                                id 
+                                decimals
+                            }
+                        }
                     }
                     rewarders {
                         allocPoint
@@ -141,9 +154,21 @@ class MasterchefV2Info(MasterchefV2Data):
                 reward_per_second_usdc = 0
                 rewarder_info = {}
                 staked_lp_amount = int(pool["totalStaked"])
-                staked_lp_usdc = staked_lp_amount * float(
-                    pool["hypervisor"]["pricePerShare"]
-                )
+
+                if staked_lp_amount > 0 and float(pool["hypervisor"]["pricePerShare"]) == 0:
+                    tvl0 = int(pool["hypervisor"]["tvl0"]) / 10 ** int(pool["hypervisor"]["pool"]["token0"]["decimals"])
+                    tvl1 = int(pool["hypervisor"]["tvl1"]) / 10 ** int(pool["hypervisor"]["pool"]["token1"]["decimals"])
+                    totalSupply = int(pool["hypervisor"]["totalSupply"])
+
+                    price_per_share = (
+                        tvl0 * pricing.get(pool["hypervisor"]["pool"]["token0"]["id"], 0)
+                        + tvl1 * pricing.get(pool["hypervisor"]["pool"]["token1"]["id"], 0)
+                    ) / totalSupply
+                else:
+                    price_per_share = float(pool["hypervisor"]["pricePerShare"])
+
+                staked_lp_usdc = staked_lp_amount * price_per_share
+
                 for rewarder_pool in pool["rewarders"]:
                     reward_token = rewarder_pool["rewarder"]["rewardToken"]["id"]
                     reward_token_symbol = rewarder_pool["rewarder"]["rewardToken"][
