@@ -387,6 +387,12 @@ async def get_gross_fees(
             )
             continue
 
+        # check for price outliers
+        if token0_price > 1000000 or token1_price > 1000000:
+            logging.getLogger(__name__).error(
+                f" Price outlier detected for hypervisor {hype_summary['address']}: token0[{token0_price}] token1[{token1_price}]"
+            )
+
         # calculate protocol fees
         if "globalState" in hype_status["pool"]:
             protocol_fee_0_raw = hype_status["pool"]["globalState"][
@@ -727,6 +733,12 @@ async def get_chain_usd_fees(
         end_block=end_block,
     )
     for hypervisor_address, hypervisor_data in data.items():
+        # discard outliers
+        if hypervisor_data.calculatedGrossFees.usd > 10**10:
+            logging.getLogger(__name__).warning(
+                f" {hypervisor_address} has an outlier calculatedGrossFees.usd of {hypervisor_data.calculatedGrossFees.usd}"
+            )
+            # continue
         output["hypervisors"] += 1
         output["deposits"] += hypervisor_data.deposits.usd
         output["withdraws"] += hypervisor_data.withdraws.usd
