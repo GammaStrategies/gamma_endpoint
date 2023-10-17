@@ -151,7 +151,12 @@ POOLS = {
         },
     },
     Chain.BSC: {},
-    Chain.AVALANCHE: {},
+    Chain.AVALANCHE: {
+        "GLCR_USDC" : {
+            "protocol": Protocol.GLACIER,
+            "address": "0x5de8128b5f49ed6bdac9fa9b8661e9d3bb9334da"
+        }
+    },
     Chain.ARBITRUM: {
         "DAI_USDC": {
             "protocol": Protocol.UNISWAP,
@@ -178,6 +183,7 @@ POOLS = {
     },
     Chain.FANTOM: {},
     Chain.BASE: {},
+    Chain.ROLLUX: {}
 }
 
 
@@ -309,7 +315,12 @@ POOL_PATHS = {
         ],
     },
     Chain.BSC: {},
-    Chain.AVALANCHE: {},
+    Chain.AVALANCHE: {
+        # GLCR
+        "0x3712871408a829c5cd4e86da1f4ce727efcd28f6": [
+            (POOLS[Chain.AVALANCHE]["GLCR_USDC"], 1),
+        ],
+    },
     Chain.ARBITRUM: {
         # DAI
         "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1": [
@@ -333,6 +344,7 @@ POOL_PATHS = {
     },
     Chain.FANTOM: {},
     Chain.BASE: {},
+    Chain.ROLLUX: {}
 }
 
 
