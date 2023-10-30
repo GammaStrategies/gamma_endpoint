@@ -28,7 +28,8 @@ DEPLOYMENTS = [
     (Protocol.SYNTHSWAP, Chain.BASE),
     (Protocol.LYNEX, Chain.LINEA),
     (Protocol.PEGASYS, Chain.ROLLUX),
-    (Protocol.BASEX, Chain.BASE)
+    (Protocol.BASEX, Chain.BASE),
+    (Protocol.PANCAKESWAP, Chain.ARBITRUM)
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -108,6 +109,9 @@ DEX_SUBGRAPH_URLS = {
     Protocol.BASEX: {
         Chain.BASE: get_config("BASEX_BASE_SUBGRAPH_URL"),
     },
+    Protocol.PANCAKESWAP: {
+        Chain.ARBITRUM: get_config("PANCAKESWAP_ARBITRUM_SUBGRAPH_URL"),
+    },
 }
 
 DEX_HYPEPOOL_SUBGRAPH_URLS = {
@@ -174,6 +178,9 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.BASEX: {
         Chain.BASE: get_config("BASEX_BASE_HP_SUBGRAPH_URL"),
     },
+    Protocol.PANCAKESWAP: {
+        Chain.ARBITRUM: get_config("PANCAKESWAP_ARBITRUM_HP_SUBGRAPH_URL"),
+    },
 }
 
 GAMMA_SUBGRAPH_URLS = {
@@ -239,6 +246,9 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.BASEX: {
         Chain.BASE: get_config("BASEX_BASE_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.PANCAKESWAP: {
+        Chain.ARBITRUM: get_config("PANCAKESWAP_ARBITRUM_GAMMA_SUBGRAPH_URL"),
     },
 }
 

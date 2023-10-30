@@ -45,6 +45,7 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.LYNEX, Chain.LINEA),
     # (Protocol.PEGASYS, Chain.ROLLUX),
     # (Protocol.BASEX, Chain.BASE)
+    # (Protocol.PANCAKESWAP, Chain.ARBITRUM)
 ]
 
 

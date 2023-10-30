@@ -88,6 +88,7 @@ class Dex(str, Enum):
     LYNEX = "lynex"
     PEGASYS = "pegasys"
     BASEX = "basex"
+    PANCAKESWAP = "pancakeswap"
 
 
 class Protocol(str, Enum):
@@ -116,6 +117,7 @@ class Protocol(str, Enum):
     LYNEX = ("lynex", None, None, None, "lynex", "Lynex")
     PEGASYS = ("pegasys", None, None, None, "pegasys", "Pegasys")
     BASEX = ("basex", None, None, None, "basex", "BaseX")
+    PANCAKESWAP = ("pancakeswap", None, None, None, "pancakeswap", "Pancakeswap")
 
     # extra properties
     api_url: str
