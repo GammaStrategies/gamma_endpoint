@@ -326,8 +326,10 @@ async def get_gross_fees(
         match["$and"] = [
             {
                 "timestamp": {"$gte": start_timestamp},
+            },
+            {
                 "timestamp": {"$lte": end_timestamp},
-            }
+            },
         ]
     # add match to query
     if match:
@@ -752,3 +754,6 @@ async def get_chain_usd_fees(
         output["eVolume"] += hypervisor_data.measurements.eVolume
 
     return output
+
+
+# frontend
