@@ -4,6 +4,9 @@ import logging
 from fastapi import HTTPException, Query, Response, APIRouter, status
 from fastapi_cache.decorator import cache
 
+from endpoint.config.cache import (
+    DAILY_CACHE_TIMEOUT,
+)
 from endpoint.routers.template import (
     router_builder_generalTemplate,
     router_builder_baseTemplate,
@@ -44,6 +47,7 @@ class frontend_router_builder_main(router_builder_baseTemplate):
         return router
 
     # ROUTE FUNCTIONS
+    @cache(expire=DAILY_CACHE_TIMEOUT)
     async def revenue_status(
         self,
         response: Response,
