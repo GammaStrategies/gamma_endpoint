@@ -23,7 +23,9 @@ def build_routers() -> list:
     routes = []
 
     routes.append(
-        frontend_router_builder_main(tags=["Frontend endpoints"], prefix="/frontend")
+        frontend_revenueStatus_router_builder_main(
+            tags=["Revenue status"], prefix="/frontend"
+        )
     )
 
     return routes
@@ -32,14 +34,14 @@ def build_routers() -> list:
 # Route underlying functions
 
 
-class frontend_router_builder_main(router_builder_baseTemplate):
+class frontend_revenueStatus_router_builder_main(router_builder_baseTemplate):
     # ROUTEs BUILD FUNCTIONS
     def router(self) -> APIRouter:
         router = APIRouter(prefix=self.prefix)
 
         #
         router.add_api_route(
-            path="/revenue_status",
+            path="/revenue_status/main_charts",
             endpoint=self.revenue_status,
             methods=["GET"],
         )
