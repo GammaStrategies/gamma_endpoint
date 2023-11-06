@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import logging
 from fastapi import HTTPException, Query, Response, APIRouter, status
 from fastapi_cache.decorator import cache
+from endpoint.config.cache import DB_CACHE_TIMEOUT
 
 from endpoint.routers.template import (
     router_builder_generalTemplate,
@@ -28,7 +29,12 @@ from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.config import DEPLOYMENTS
 from sources.subgraph.bins.hype_fees.fees_yield import fee_returns_all
 
-from ..bins.fee_internal import get_chain_usd_fees, get_fees, get_gross_fees
+from ..bins.fee_internal import (
+    get_chain_usd_fees,
+    get_fees,
+    get_gross_fees,
+    get_revenue_operations,
+)
 
 # Route builders
 
@@ -73,6 +79,12 @@ class internal_router_builder_main(router_builder_baseTemplate):
         router.add_api_route(
             path="/weekly_fees",
             endpoint=self.weekly_chain_usd_fees,
+            methods=["GET"],
+        )
+
+        router.add_api_route(
+            path="/{chain}/revenue",
+            endpoint=self.get_revenue,
             methods=["GET"],
         )
 
@@ -402,3 +414,27 @@ class internal_router_builder_main(router_builder_baseTemplate):
 
         # return output
         return output
+
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def get_revenue(
+        self,
+        response: Response,
+        chain: Chain,
+        protocol: Protocol | None = None,
+        ini_timestamp: int | None = None,
+        end_timestamp: int | None = None,
+        yearly: bool = False,
+    ) -> list[dict]:
+        """Returns Gamma's revenue in a period of time for a specific protocol and chain
+
+        * **ini_timestamp** will limit the data returned from this value
+        * **end_timestamp** will limit the data returned to this value
+        * **yearly** will group the data by year
+        """
+        return await get_revenue_operations(
+            chain=chain,
+            protocol=protocol,
+            ini_timestamp=ini_timestamp,
+            end_timestamp=end_timestamp,
+            yearly=yearly,
+        )

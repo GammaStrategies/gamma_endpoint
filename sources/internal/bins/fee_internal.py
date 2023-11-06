@@ -757,3 +757,182 @@ async def get_chain_usd_fees(
 
 
 # frontend
+
+
+async def get_revenue_operations(
+    chain: Chain,
+    protocol: Protocol,
+    ini_timestamp: int | None = None,
+    end_timestamp: int | None = None,
+    yearly: bool = False,
+) -> list:
+    """Return the revenue operations for a specific protocol and chain by month and year, if requested.
+
+    Args:
+        chain (Chain):
+        protocol (Protocol):
+        ini_timestamp (int | None, optional): limit data from  . Defaults to None.
+        end_timestamp (int | None, optional): limit data to . Defaults to None.
+        yearly (bool, optional): group results by year. Defaults to False.
+
+    Returns:
+        list:
+    """
+
+    # build first match
+    _match = {
+        "dex": {"$exists": True},
+        "$or": [
+            {"src": {"$ne": "0x0000000000000000000000000000000000000000"}},
+            {"user": {"$exists": True}},
+        ],
+    }
+    # apply filter s
+    if protocol:
+        _match["dex"] = protocol.database_name
+    if ini_timestamp and end_timestamp:
+        _match["$and"] = [
+            {"timestamp": {"$gte": ini_timestamp}},
+            {"timestamp": {"$lte": end_timestamp}},
+        ]
+    elif ini_timestamp:
+        _match["timestamp"] = {"$gte": ini_timestamp}
+    elif end_timestamp:
+        _match["timestamp"] = {"$lte": end_timestamp}
+
+    # build query
+    _query = [
+        {"$match": _match},
+        {
+            "$project": {
+                "_id": 0,
+                "year": "$year",
+                "month": "$month",
+                "dex": "$dex",
+                "hypervisor": {"$cond": ["$user", 0, "$src"]},
+                "token": {"$cond": ["$token", "$token", "$address"]},
+                "token_symbol": "$symbol",
+                "timestamp": "$timestamp",
+                "usd_value": "$usd_value",
+            }
+        },
+        {
+            "$group": {
+                "_id": {
+                    "year": "$year",
+                    "month": "$month",
+                    "token": "$address",
+                    "hypervisor": "$hypervisor",
+                    "dex": "$dex",
+                },
+                "token_symbol": {"$first": "$token_symbol"},
+                "total_usd": {"$sum": "$usd_value"},
+            }
+        },
+        {
+            "$lookup": {
+                "from": "static",
+                "let": {"op_address": "$_id.hypervisor"},
+                "pipeline": [
+                    {"$match": {"$expr": {"$eq": ["$address", "$$op_address"]}}},
+                    {"$limit": 1},
+                    {
+                        "$project": {
+                            "address": "$address",
+                            "symbol": "$symbol",
+                            "pool": {
+                                "address": "$pool.address",
+                                "token0": "$pool.token0.address",
+                                "token1": "$pool.token1.address",
+                                "dex": "$pool.dex",
+                            },
+                            "dex": "$dex",
+                        }
+                    },
+                    {"$unset": ["_id"]},
+                ],
+                "as": "static",
+            }
+        },
+        {"$unwind": {"path": "$static", "preserveNullAndEmptyArrays": True}},
+        {"$sort": {"_id.year": 1, "_id.month": 1, "total_usd": -1}},
+        {
+            "$group": {
+                "_id": {
+                    "year": "$_id.year",
+                    "month": "$_id.month",
+                    "dex": "$_id.dex",
+                    "hypervisor_symbol": "$static.symbol",
+                },
+                "total_usd": {"$sum": "$total_usd"},
+                "items": {
+                    "$push": {
+                        "token": "$_id.token",
+                        "hypervisor": "$_id.hypervisor",
+                        "token_symbol": "$token_symbol",
+                        "total_usd": "$total_usd",
+                        "pool": "$static.pool.address",
+                    }
+                },
+            }
+        },
+        {"$sort": {"_id.year": 1, "_id.month": 1, "total_usd": -1}},
+        {
+            "$group": {
+                "_id": {"year": "$_id.year", "month": "$_id.month", "dex": "$_id.dex"},
+                "total_usd": {"$sum": "$total_usd"},
+                "items": {
+                    "$push": {
+                        "hypervisor_symbol": "$_id.hypervisor_symbol",
+                        "total_usd": "$total_usd",
+                        "items": "$items",
+                    }
+                },
+            }
+        },
+        {"$sort": {"_id.year": 1, "_id.month": 1, "total_usd": -1}},
+        {
+            "$group": {
+                "_id": {"year": "$_id.year", "month": "$_id.month"},
+                "total_usd": {"$sum": "$total_usd"},
+                "items": {
+                    "$push": {
+                        "dex": "$_id.dex",
+                        "total_usd": "$total_usd",
+                        "items": "$items",
+                    }
+                },
+            }
+        },
+        {"$sort": {"_id.year": 1, "_id.month": 1}},
+        {
+            "$project": {
+                "_id": 0,
+                "year": "$_id.year",
+                "month": "$_id.month",
+                "total_usd": "$total_usd",
+                "items": "$items",
+            }
+        },
+    ]
+
+    # group by year, if requested
+    if yearly:
+        _query.append(
+            {
+                "$group": {
+                    "_id": "$year",
+                    "total_usd": {"$sum": "$total_usd"},
+                    "items": {
+                        "$push": {
+                            "month": "$month",
+                            "total_usd": "$total_usd",
+                            "items": "$items",
+                        }
+                    },
+                }
+            }
+        )
+    return await local_database_helper(network=chain).query_items_from_database(
+        collection_name="revenue_operations", query=_query
+    )
