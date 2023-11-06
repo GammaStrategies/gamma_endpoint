@@ -53,7 +53,6 @@ def query_frontend_revenue_stats_by_monthDex(
     return [
         {"$match": _match},
         {"$sort": {"timestamp": 1, "total_revenue": -1}},
-        {"$unset": ["_id", "id"]},
         {
             "$group": {
                 "_id": "$timestamp",
@@ -64,7 +63,18 @@ def query_frontend_revenue_stats_by_monthDex(
                 "total_revenue": {"$sum": "$total_revenue"},
                 "total_fees": {"$sum": "$total_fees"},
                 "total_volume": {"$sum": "$total_volume"},
-                "items": {"$push": "$$ROOT"},
+                "items": {
+                    "$push": {
+                        "chain": "$chain",
+                        "protocol": "$protocol",
+                        "chain_id": "$chain_id",
+                        "timestamp": "$timestamp",
+                        "total_revenue": "$total_revenue",
+                        "total_fees": "$total_fees",
+                        "total_volume": "$total_volume",
+                        "exchange": "$exchange",
+                    }
+                },
             }
         },
         {
