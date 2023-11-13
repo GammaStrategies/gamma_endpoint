@@ -127,6 +127,15 @@ class TopLevelData:
                     )
                 )
 
+            if self.chain == Chain.BSC and self.protocol == Protocol.THENA and hypervisor["id"] == "0x01dd2d28eeb95d740acb5344b1e2c99b61cc3e64":
+                hypervisor["grossFeesClaimedUSD"] = str(
+                    max(
+                        float(hypervisor["grossFeesClaimedUSD"])
+                        - 707293639.8442053,
+                        0,
+                    )
+                )
+
             hypervisor_tvl = float(hypervisor["tvlUSD"])
             if (hypervisor_tvl not in self.excluded_hypervisors) and (
                 hypervisor_tvl < TVL_MAX
