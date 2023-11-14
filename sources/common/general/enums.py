@@ -25,6 +25,7 @@ class Chain(str, Enum):
     BASE = ("base", 8453, "base", "Base", None, None, "Base")
     LINEA = ("linea", 59144, "linea", "Linea", None, None, "Linea")
     ROLLUX = ("rollux", 570, "rollux", "Rollux", None, None, "Rollux")
+    MANTA = ("manta", 169, "manta", "Manta", None, None, "Manta")
 
     # extra properties
     id: int
@@ -89,6 +90,7 @@ class Dex(str, Enum):
     PEGASYS = "pegasys"
     BASEX = "basex"
     PANCAKESWAP = "pancakeswap"
+    APERTURE = "aperture"
 
 
 class Protocol(str, Enum):
@@ -118,6 +120,7 @@ class Protocol(str, Enum):
     PEGASYS = ("pegasys", None, None, None, "pegasys", "Pegasys")
     BASEX = ("basex", None, None, None, "basex", "BaseX")
     PANCAKESWAP = ("pancakeswap", None, None, None, "pancakeswap", "Pancakeswap")
+    APERTURE = ("aperture", None, None, None, "aperture", "Aperture")
 
     # extra properties
     api_url: str

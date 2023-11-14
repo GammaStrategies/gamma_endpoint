@@ -399,7 +399,7 @@ class DexPrice:
 
     async def _get_data(self):
         pools_by_protocol = defaultdict(list)
-        for pool in POOLS[self.chain].values():
+        for pool in POOLS.get(self.chain, {}).values():
             pools_by_protocol[pool["protocol"]].append(pool["address"])
 
         dex_clients = [
@@ -422,7 +422,7 @@ class DexPrice:
         """Get all defined token prices for the chain"""
         await self._get_data()
         token_pricing = {}
-        for token, path in POOL_PATHS[self.chain].items():
+        for token, path in POOL_PATHS.get(self.chain, {}).items():
             price = 1
             for pool in path:
                 pool_address = pool[0]["address"]

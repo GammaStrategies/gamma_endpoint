@@ -75,7 +75,8 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.LYNEX, Chain.LINEA),
     (Protocol.PEGASYS, Chain.ROLLUX),
     (Protocol.BASEX, Chain.BASE),
-    (Protocol.PANCAKESWAP, Chain.ARBITRUM)
+    (Protocol.PANCAKESWAP, Chain.ARBITRUM),
+    (Protocol.APERTURE, Chain.MANTA)
 ]
 
 
@@ -365,6 +366,15 @@ def build_routers_compatible() -> list:
             chain=Chain.ARBITRUM,
             tags=["Pancakeswap - Arbitrum"],
             prefix=f"/{Protocol.PANCAKESWAP.api_url}/{Chain.ARBITRUM.api_url}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.APERTURE,
+            chain=Chain.MANTA,
+            tags=["Aperture - Manta"],
+            prefix=f"/{Protocol.APERTURE.api_url}/{Chain.MANTA.api_url}",
         )
     )
 

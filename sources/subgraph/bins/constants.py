@@ -27,5 +27,6 @@ BLOCK_TIME_SECONDS = {
     Chain.MANTLE: 10,
     Chain.BASE: 2,
     Chain.LINEA: 12,
-    Chain.ROLLUX: 2
+    Chain.ROLLUX: 2,
+    Chain.MANTA: 12
 }
