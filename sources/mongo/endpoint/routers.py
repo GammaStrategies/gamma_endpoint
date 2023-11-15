@@ -43,10 +43,10 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.FUSIONX, Chain.MANTLE),
     (Protocol.SYNTHSWAP, Chain.BASE),
     (Protocol.LYNEX, Chain.LINEA),
-    # (Protocol.PEGASYS, Chain.ROLLUX),
-    # (Protocol.BASEX, Chain.BASE),
-    # (Protocol.PANCAKESWAP, Chain.ARBITRUM),
-    # (Protocol.APERTURE, Chain.MANTA)
+    (Protocol.PEGASYS, Chain.ROLLUX),
+    (Protocol.BASEX, Chain.BASE),
+    (Protocol.PANCAKESWAP, Chain.ARBITRUM),
+    (Protocol.APERTURE, Chain.MANTA),
 ]
 
 

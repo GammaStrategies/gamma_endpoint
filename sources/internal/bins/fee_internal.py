@@ -293,6 +293,7 @@ async def get_gross_fees(
     end_timestamp: int | None = None,
     start_block: int | None = None,
     end_block: int | None = None,
+    hypervisor_addresses: list[str] | None = None,
 ) -> dict[str, InternalGrossFeesOutput]:
     """
     Calculates the gross fees aquired (not uncollected) in a period of time for a specific protocol and chain using the protocol fee switch data.
@@ -316,9 +317,13 @@ async def get_gross_fees(
     ]
     # create a match query part
     match = {}
-    # filter by protocol
-    if protocol:
+
+    # filter by hypervisor addresses or by protocol
+    if hypervisor_addresses:
+        match["address"] = {"$in": hypervisor_addresses}
+    elif protocol:
         match["dex"] = protocol.database_name
+
     # filter by block or timestamp, when supplied
     if start_block and end_block:
         match["$and"] = [{"block": {"$gte": start_block}, "block": {"$lte": end_block}}]
