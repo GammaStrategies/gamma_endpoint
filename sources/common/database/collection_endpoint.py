@@ -1682,10 +1682,10 @@ class database_local(db_collections_common):
                 "$group": {
                     "_id": "$address",
                     "address": {"$first": "$address"},
-                    "block_ini": {"$first": "$block"},
-                    "block_end": {"$last": "$block"},
-                    "timestamp_ini": {"$first": "$timestamp"},
-                    "timestamp_end": {"$last": "$timestamp"},
+                    "block_ini": {"$min": "$block"},
+                    "block_end": {"$max": "$block"},
+                    "timestamp_ini": {"$min": "$timestamp"},
+                    "timestamp_end": {"$max": "$timestamp"},
                     "deposits_token0": {
                         "$sum": {
                             "$divide": [
