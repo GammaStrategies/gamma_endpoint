@@ -1,9 +1,11 @@
 import json
 import logging
+import sys
 import time
 from fastapi import Request, Response
 
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_cache import FastAPICache
 from starlette.middleware import Middleware
 from endpoint.config.middleware import BaseMiddleware
 
@@ -92,25 +94,32 @@ app.mount(
 )
 
 
-# to be able to auto test all endpoint urls
-@app.get("/url-list", include_in_schema=False)
-def get_all_urls():
-    url_list = []
+if hasattr(sys, "gettrace") and sys.gettrace() is not None:
+    # to be able to auto test all endpoint urls
+    @app.get("/url-list", include_in_schema=False)
+    def get_all_urls():
+        url_list = []
 
-    def add_urls(original_list: list, routes, parent_path: str | None = None):
-        for route in routes:
-            if subroutes := getattr(route, "routes", None):
+        def add_urls(original_list: list, routes, parent_path: str | None = None):
+            for route in routes:
+                if subroutes := getattr(route, "routes", None):
+                    if parent_path:
+                        add_urls(
+                            original_list, route.routes, f"{parent_path}{route.path}"
+                        )
+                    else:
+                        add_urls(original_list, route.routes, route.path)
+
                 if parent_path:
-                    add_urls(original_list, route.routes, f"{parent_path}{route.path}")
+                    original_list.append(
+                        {"path": f"{parent_path}{route.path}", "name": route.name}
+                    )
                 else:
-                    add_urls(original_list, route.routes, route.path)
+                    original_list.append({"path": route.path, "name": route.name})
 
-            if parent_path:
-                original_list.append(
-                    {"path": f"{parent_path}{route.path}", "name": route.name}
-                )
-            else:
-                original_list.append({"path": route.path, "name": route.name})
+        add_urls(url_list, app.routes)
+        return url_list
 
-    add_urls(url_list, app.routes)
-    return url_list
+    @app.get("/clear-cache", include_in_schema=False)
+    async def clear_cache():
+        await FastAPICache.clear()
