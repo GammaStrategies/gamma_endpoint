@@ -455,11 +455,14 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
             None,
             description="will limit the data returned to this value. When no value is provided, last available timestamp data will be used.",
         ),
+        hypervisors: typing.List[str] = Query(
+            None, description="List of hypervisor addresses to filter"
+        ),
     ) -> dict:
         """Returns the average TVL for a given period of time, using the current price of the token.
         * **average TVL** = (sum of TVL) / (number of TVL in the period)
 
-        IMPORTANT CONSIDERATION: This is using database snapshots to get the TVL at current prices. If a hypervisor has not been firing any event (withraw, rebalance, deposit, zeroBurn...) in the period, it will not be included in the average TVL calculation.
+        **IMPORTANT CONSIDERATION**: It uses database snapshots so the inactive hypervisors ( without any event [withraw, rebalance, deposit, zeroBurn...] within the period) will not be included in the average TVL calculation.
 
         """
 
@@ -472,6 +475,8 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
                 detail=f"ini_timestamp cannot be greater than 120 days ago.",
             )
 
+        hypervisors = filter_addresses(hypervisors)
+
         # set ini timestamp to 7 days ago if not provided
         return await get_average_tvl(
             chain=chain,
@@ -479,6 +484,7 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
             ini_timestamp=ini_timestamp
             or int(datetime.now(timezone.utc).timestamp() - (86400 * 7)),
             end_timestamp=end_timestamp,
+            hypervisors=hypervisors,
         )
 
     @cache(expire=DB_CACHE_TIMEOUT)
@@ -518,12 +524,7 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
             )
 
         # remove any empty or 'string' hypervisors
-        if hypervisors:
-            hypervisors = [
-                h.lower()
-                for h in hypervisors
-                if h and h.startswith("0x") and len(h) == 42 and h[2:].isalnum()
-            ]
+        hypervisors = filter_addresses(hypervisors)
 
         # set ini timestamp to 7 days ago if not provided
         return await get_transactions(
@@ -567,12 +568,7 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
         All usd values are calculated using the current price of the token.
         """
         # remove any empty or 'string' hypervisors
-        if hypervisors:
-            hypervisors = [
-                h.lower()
-                for h in hypervisors
-                if h and h.startswith("0x") and len(h) == 42 and h[2:].isalnum()
-            ]
+        hypervisors = filter_addresses(hypervisors)
 
         return await get_transactions_summary(
             chain=chain,
@@ -582,3 +578,14 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
             end_timestamp=end_timestamp,
             hypervisors=hypervisors,
         )
+
+
+def filter_addresses(addresses: list[str]) -> list[str] | None:
+    # remove any non address str
+    if addresses:
+        return [
+            h.lower()
+            for h in addresses
+            if h and h.startswith("0x") and len(h) == 42 and h[2:].isalnum()
+        ]
+    return None

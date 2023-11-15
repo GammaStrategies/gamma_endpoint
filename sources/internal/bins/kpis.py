@@ -32,6 +32,7 @@ async def get_average_tvl(
     protocol: Protocol | None = None,
     ini_timestamp: int | None = None,
     end_timestamp: int | None = None,
+    hypervisors: list[str] | None = None,
 ) -> dict:
     # define chains
     if chain:
@@ -41,7 +42,10 @@ async def get_average_tvl(
 
     # build hypervisor data query
     _query = _query_average_tvl_static(
-        protocol=protocol, ini_timestamp=ini_timestamp, end_timestamp=end_timestamp
+        protocol=protocol,
+        ini_timestamp=ini_timestamp,
+        end_timestamp=end_timestamp,
+        hypervisors=hypervisors,
     )
     # build output
     output = {
@@ -314,6 +318,7 @@ def _query_average_tvl_static(
     protocol: Protocol | None = None,
     ini_timestamp: int | None = None,
     end_timestamp: int | None = None,
+    hypervisors: list[str] | None = None,
 ) -> list[dict]:
     """Database query to get average tvl, gathere from hypervisor's totalAmounts.
     Args:
@@ -398,8 +403,10 @@ def _query_average_tvl_static(
         {"$unwind": "$tvl"},
     ]
 
-    # add static filters
-    if protocol:
+    # static filters
+    if hypervisors:
+        query.insert(0, {"$match": {"address": {"$in": hypervisors}}})
+    elif protocol:
         query.insert(0, {"$match": {"protocol": protocol.database_name}})
 
     return query
