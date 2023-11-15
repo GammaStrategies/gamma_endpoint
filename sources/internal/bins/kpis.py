@@ -150,7 +150,7 @@ async def get_transactions(
         chain_output = {
             "chain_id": chain.id,
             "chain": chain.fantasy_name,
-            "tvl_variance_usd": 0,
+            "tvl_variation_usd": 0,
             "withdraws_usd": 0,
             "withdraws_qtty": 0,
             "deposits_usd": 0,
@@ -178,7 +178,7 @@ async def get_transactions(
             hypervisor_output = {
                 "address": itm["address"],
                 "symbol": itm["symbol"],
-                "tvl_variance_usd": 0,
+                "tvl_variation_usd": 0,
                 "withdraws_usd": 0,
                 "withdraws_qtty": 0,
                 "deposits_usd": 0,
@@ -211,23 +211,23 @@ async def get_transactions(
                     )
 
                     if operation["_id"] == "withdraw":
-                        hypervisor_output["tvl_variance_usd"] -= _usd
+                        hypervisor_output["tvl_variation_usd"] -= _usd
                         hypervisor_output["withdraws_usd"] += _usd
                         hypervisor_output["withdraws_qtty"] += operation["counter"]
                         hypervisor_output["withdraws_shares"] += operation["shares"]
                     elif operation["_id"] == "deposit":
-                        hypervisor_output["tvl_variance_usd"] += _usd
+                        hypervisor_output["tvl_variation_usd"] += _usd
                         hypervisor_output["deposits_usd"] += _usd
                         hypervisor_output["deposits_qtty"] += operation["counter"]
                         hypervisor_output["deposits_shares"] += operation["shares"]
                     elif operation["_id"] == "approve":
                         hypervisor_output["approvals_qtty"] += operation["counter"]
                     elif operation["_id"] == "zeroBurn":
-                        hypervisor_output["tvl_variance_usd"] += _usd
+                        hypervisor_output["tvl_variation_usd"] += _usd
                         hypervisor_output["zeroBurns_usd"] += _usd
                         hypervisor_output["zeroBurns_qtty"] += operation["counter"]
                     elif operation["_id"] == "rebalance":
-                        hypervisor_output["tvl_variance_usd"] += _usd
+                        hypervisor_output["tvl_variation_usd"] += _usd
                         hypervisor_output["rebalances_usd"] += _usd
                         hypervisor_output["rebalances_qtty"] += operation["counter"]
                     elif operation["_id"] == "transfer":
@@ -274,7 +274,7 @@ async def get_transactions_summary(
             end_timestamp or datetime.now(timezone.utc).timestamp() - ini_timestamp
         )
         / 86400,
-        "tvl_variance_usd": 0,
+        "tvl_variation_usd": 0,
         "new_users_usd": 0,
         "fees_usd": 0,
         "gross_fees_usd": 0,
@@ -294,9 +294,9 @@ async def get_transactions_summary(
     for hype_address, hype_data in gFess.items():
         new_users_usd = hype_data.deposits.usd - hype_data.withdraws.usd
         fees_usd = hype_data.collectedFees.usd + hype_data.uncollected.usd
-        tvl_variance_usd = new_users_usd + fees_usd
+        tvl_variation_usd = new_users_usd + fees_usd
 
-        output["tvl_variance_usd"] += tvl_variance_usd
+        output["tvl_variation_usd"] += tvl_variation_usd
         output["new_users_usd"] += new_users_usd
         output["fees_usd"] += fees_usd
         output["gross_fees_usd"] += hype_data.calculatedGrossFees.usd

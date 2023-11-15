@@ -556,7 +556,7 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
         ),
     ):
         """Returns a transactions summary:
-        * **tvl_variance_usd** is deposits - withdraws + collected and uncollected fees
+        * **tvl_variation_usd** is deposits - withdraws + collected and uncollected fees
         * **new_users_usd** is deposits - withdraws
         * **fees_usd** is collected + uncollected fees
         * **gross_fees_usd** is fees_usd / (1 - protocolFee)
