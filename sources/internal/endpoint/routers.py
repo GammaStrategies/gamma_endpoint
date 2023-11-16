@@ -11,6 +11,7 @@ from endpoint.routers.template import (
     router_builder_baseTemplate,
 )
 from sources.common.formulas.fees import convert_feeProtocol
+from sources.common.general.utils import filter_addresses
 from sources.internal.bins.internal import (
     InternalFeeReturnsOutput,
     InternalFeeYield,
@@ -578,14 +579,3 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
             end_timestamp=end_timestamp,
             hypervisors=hypervisors,
         )
-
-
-def filter_addresses(addresses: list[str]) -> list[str] | None:
-    # remove any non address str
-    if addresses:
-        return [
-            h.lower()
-            for h in addresses
-            if h and h.startswith("0x") and len(h) == 42 and h[2:].isalnum()
-        ]
-    return None

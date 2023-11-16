@@ -6,11 +6,13 @@ from fastapi_cache.decorator import cache
 
 from endpoint.config.cache import (
     DAILY_CACHE_TIMEOUT,
+    DB_CACHE_TIMEOUT,
 )
 from endpoint.routers.template import (
     router_builder_generalTemplate,
     router_builder_baseTemplate,
 )
+from sources.common.general.utils import filter_addresses
 from sources.frontend.bins.revenue_stats import get_revenue_stats
 
 from sources.subgraph.bins.enums import Chain, Protocol
