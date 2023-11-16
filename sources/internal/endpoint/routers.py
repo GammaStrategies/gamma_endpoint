@@ -467,14 +467,14 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
 
         """
 
-        # do not allow ini_timestamp to be greater than 120 days ago
-        if ini_timestamp and (
-            datetime.now(timezone.utc).timestamp() - ini_timestamp > 86400 * 120
-        ):
-            raise HTTPException(
-                status_code=400,
-                detail=f"ini_timestamp cannot be greater than 120 days ago.",
-            )
+        # # do not allow ini_timestamp to be greater than 120 days ago
+        # if ini_timestamp and (
+        #     datetime.now(timezone.utc).timestamp() - ini_timestamp > 86400 * 120
+        # ):
+        #     raise HTTPException(
+        #         status_code=400,
+        #         detail=f"ini_timestamp cannot be greater than 120 days ago.",
+        #     )
 
         hypervisors = filter_addresses(hypervisors)
 
