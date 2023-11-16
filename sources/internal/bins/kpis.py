@@ -139,7 +139,7 @@ async def get_transactions(
     )
 
     days = (
-        end_timestamp or datetime.now(timezone.utc).timestamp() - ini_timestamp
+        (end_timestamp or datetime.now(timezone.utc).timestamp()) - ini_timestamp
     ) / 86400
 
     # build output
@@ -275,7 +275,7 @@ async def get_transactions_summary(
         "ini_timestamp": ini_timestamp,
         "end_timestamp": end_timestamp,
         "days_period": (
-            end_timestamp or datetime.now(timezone.utc).timestamp() - ini_timestamp
+            (end_timestamp or datetime.now(timezone.utc).timestamp()) - ini_timestamp
         )
         / 86400,
         "tvl_variation_usd": 0,
