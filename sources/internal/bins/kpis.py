@@ -407,7 +407,7 @@ def _query_average_tvl_static(
     if hypervisors:
         query.insert(0, {"$match": {"address": {"$in": hypervisors}}})
     elif protocol:
-        query.insert(0, {"$match": {"protocol": protocol.database_name}})
+        query.insert(0, {"$match": {"dex": protocol.database_name}})
 
     return query
 
@@ -486,6 +486,6 @@ def _query_transactions_operations(
         hypervisors = [hype.lower() for hype in hypervisors]
         query.insert(0, {"$match": {"address": {"$in": hypervisors}}})
     elif protocol:
-        query.insert(0, {"$match": {"protocol": protocol.database_name}})
+        query.insert(0, {"$match": {"dex": protocol.database_name}})
 
     return query
