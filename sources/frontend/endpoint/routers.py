@@ -13,6 +13,7 @@ from endpoint.routers.template import (
     router_builder_baseTemplate,
 )
 from sources.common.general.utils import filter_addresses
+from sources.frontend.bins.analytics import get_positions_analysis
 from sources.frontend.bins.revenue_stats import get_revenue_stats
 
 from sources.subgraph.bins.enums import Chain, Protocol
@@ -25,10 +26,9 @@ def build_routers() -> list:
     routes = []
 
     routes.append(
-        frontend_revenueStatus_router_builder_main(
-            tags=["Revenue status"], prefix="/frontend"
-        )
+        frontend_revenueStatus_router_builder_main(tags=["Revenue status"], prefix="")
     )
+    routes.append(frontend_analytics_router_builder_main(tags=["Analytics"], prefix=""))
 
     return routes
 
@@ -76,4 +76,65 @@ class frontend_revenueStatus_router_builder_main(router_builder_baseTemplate):
 
         return await get_revenue_stats(
             chain=chain, protocol=protocol, yearly=yearly, ini_timestamp=from_timestamp
+        )
+
+
+class frontend_analytics_router_builder_main(router_builder_baseTemplate):
+    # ROUTEs BUILD FUNCTIONS
+    def router(self) -> APIRouter:
+        router = APIRouter(prefix=self.prefix)
+
+        #
+        router.add_api_route(
+            path="/{chain}/{hypervisor_address}/analytics/positions",
+            endpoint=self.positions_status,
+            methods=["GET"],
+        )
+
+        return router
+
+    # ROUTE FUNCTIONS
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def positions_status(
+        self,
+        response: Response,
+        chain: Chain,
+        hypervisor_address: str = Query(..., description=" hypervisor address"),
+        from_timestamp: int
+        | None = Query(
+            None,
+            description=" limit the data returned from this value. When not set, it will return the last 14 days.",
+        ),
+        to_timestamp: int
+        | None = Query(None, description=" limit the data returned to this value"),
+    ) -> list[dict]:
+        """Returns data regarding the base and limit positions of a given hypervisor for a given period of time.
+
+        * **symbol**: hypervisor symbol
+        * **timestamp**: unix timestamp
+        * **block**:  block number
+        * **currentTick**: pool tick
+        * **baseUpper**: base position upper tick
+        * **baseLower**:  base position lower tick
+        * **baseLiquidity_usd**:  base position liquidity in USD, using current token prices
+        * **limitUpper**: limit position upper tick
+        * **limitLower**:  limit position lower tick
+        * **limitLiquidity_usd**: limit position liquidity in USD, using current token prices
+
+        """
+
+        if not from_timestamp:
+            # set from_timestamp to 14 days ago
+            from_timestamp = int(
+                datetime.now(tz=timezone.utc).timestamp() - (14 * 24 * 60 * 60)
+            )
+
+        # make sure address is valid
+        hypervisor_address = filter_addresses([hypervisor_address])[0]
+        # return result
+        return await get_positions_analysis(
+            chain=chain,
+            hypervisor_address=hypervisor_address,
+            ini_timestamp=from_timestamp,
+            end_timestamp=to_timestamp,
         )
