@@ -27,7 +27,7 @@ LYNEX_LINEA_GAMMA_SUBGRAPH_URL: https://graph-query.linea.build/subgraphs/name/g
 PEGASYS_ROLLUX_GAMMA_SUBGRAPH_URL: https://rollux.graph.pegasys.fi/subgraphs/name/gammastrategies/pegasys-rollux
 BASEX_BASE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-basex-base
 PANCAKESWAP_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-pancakeswap-arbitrum
-APERTURE_MANTA_GAMMA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-aperture-manta/v0.1.0/gn
+APERTURE_MANTA_GAMMA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-aperture-manta/v0.2.0/gn
 
 # DEX Subgraph URL
 UNISWAP_MAINNET_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3
@@ -89,7 +89,7 @@ LYNEX_LINEA_HP_SUBGRAPH_URL: https://graph-query.linea.build/subgraphs/name/gamm
 PEGASYS_ROLLUX_HP_SUBGRAPH_URL: https://rollux.graph.pegasys.fi/subgraphs/name/gammastrategies/hype-pool-pegasys-rollux
 BASEX_BASE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-basex-base
 PANCAKESWAP_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-pancakeswap-arbitrum
-APERTURE_MANTA_HP_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-aperture-manta/v0.1.0/gn
+APERTURE_MANTA_HP_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-aperture-manta/v0.2.0/gn
 
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {
