@@ -1372,7 +1372,10 @@ class db_allData_manager(db_collection_manager):
         hype_all_data = HypeAllData(chain=chain, protocol=protocol)
         allData = await hype_all_data.all_data()
         # Convert pydantic model to dict
-        allData = {hype_address: hype_model.dict() for hype_address, hype_model in allData.items()}
+        allData = {
+            hype_address: hype_model.dict()
+            for hype_address, hype_model in allData.items()
+        }
 
         # types conversion
         for hyp_id, hypervisor in allData.items():
@@ -1667,8 +1670,8 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
             )
 
             # get data from local database rewards_status ( web3 database)
-            rewards_status = await local_db_helper.query_items_from_database(
-                query=self.query_rewards(
+            rewards_status = await local_db_helper.get_items_from_database(
+                aggregate=self.query_rewards(
                     timestamp_end=current_timestamp, protocol=protocol
                 ),
                 collection_name="rewards_status",
@@ -1778,6 +1781,9 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
             ) from e
 
         except Exception as e:
+            logger.exception(
+                f" {chain}'s {protocol} error creating external AllRewards2 "
+            )
             raise ValueError(
                 f" {chain}'s {protocol} has no external rewards implemented "
             ) from e
@@ -1836,7 +1842,8 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
 
     @staticmethod
     def query_rewards(
-        timestamp_end: int | None = None, protocol: Protocol | None = None
+        timestamp_end: int | None = None,
+        protocol: Protocol | None = None,
     ) -> list[dict]:
         result = [
             {"$sort": {"block": -1}},
@@ -1844,7 +1851,21 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
                 "$group": {
                     "_id": "$hypervisor_address",
                     "last_block": {"$first": "$block"},
-                    "reward_data": {"$push": "$$ROOT"},
+                    "reward_data": {
+                        "$push": {
+                            "block": "$block",
+                            "timestamp": "$timestamp",
+                            "apr": "$apr",
+                            "rewarder_address": "$rewarder_address",
+                            "rewarder_registry": "$rewarder_registry",
+                            "rewardToken": "$rewardToken",
+                            "rewardToken_decimals": "$rewardToken_decimals",
+                            "rewardToken_symbol": "$rewardToken_symbol",
+                            "rewards_perSecond": "$rewards_perSecond",
+                            "total_hypervisorToken_qtty": "$total_hypervisorToken_qtty",
+                            "hypervisor_share_price_usd": "$hypervisor_share_price_usd",
+                        }
+                    },
                 }
             },
             {"$unwind": "$reward_data"},
@@ -1858,11 +1879,12 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
                                 "$reward_data",
                                 "$$REMOVE",
                             ]
-                        },
+                        }
                     },
                 }
             },
             {"$unwind": "$reward_data"},
+            {"$addFields": {"reward_data.hypervisor_address": "$_id"}},
             {"$replaceRoot": {"newRoot": "$reward_data"}},
             {"$unset": ["_id"]},
         ]
