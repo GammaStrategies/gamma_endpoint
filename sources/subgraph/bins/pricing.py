@@ -174,6 +174,10 @@ POOLS = {
             "protocol": Protocol.UNISWAP,
             "address": "0xcda53b1f66614552f834ceef361a8d12a0b8dad8",
         },
+        "CAKE_WETH": {
+            "protocol": Protocol.PANCAKESWAP,
+            "address": "0xf5fac36c2429e1cf84d4abacdb18477ef32589c9",
+        },
     },
     Chain.MOONBEAM: {
         "USDC_WGLMR": {
@@ -334,6 +338,11 @@ POOL_PATHS = {
         # ARB
         "0x912ce59144191c1204e64559fe8253a0e49e6548": [
             (POOLS[Chain.ARBITRUM]["ARB_USDC"], 1),
+        ],
+        # Cake
+        "0x1b896893dfc86bb67cf57767298b9073d2c1ba2c": [
+            (POOLS[Chain.ARBITRUM]["CAKE_WETH"], 1),
+            (POOLS[Chain.ARBITRUM]["WETH_USDC"], 1),
         ],
     },
     Chain.MOONBEAM: {
