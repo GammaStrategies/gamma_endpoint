@@ -23,6 +23,7 @@ from sources.internal.bins.kpis import (
     get_average_tvl,
     get_transactions,
     get_transactions_summary,
+    get_users_activity,
 )
 from sources.mongo.bins.apps.hypervisor import hypervisors_collected_fees
 from sources.mongo.bins.apps.prices import get_current_prices
@@ -437,6 +438,12 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
             methods=["GET"],
         )
 
+        router.add_api_route(
+            path="/user_activity",
+            endpoint=self.users_activity,
+            methods=["GET"],
+        )
+
         return router
 
     # ROUTE FUNCTIONS
@@ -576,6 +583,33 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
             protocol=protocol,
             ini_timestamp=ini_timestamp
             or int(datetime.now(timezone.utc).timestamp() - (86400 * 7)),
+            end_timestamp=end_timestamp,
+            hypervisors=hypervisors,
+        )
+
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def users_activity(
+        self,
+        response: Response,
+        chain: Chain | None = None,
+        ini_timestamp: int
+        | None = Query(
+            None,
+            description="will limit the data returned from this value. When no value is provided, -7 days will be used",
+        ),
+        end_timestamp: int
+        | None = Query(
+            None,
+            description="will limit the data returned to this value. When no value is provided, last available timestamp data will be used.",
+        ),
+        hypervisors: typing.List[str] = Query(
+            None, description="List of hypervisor addresses to filter"
+        ),
+    ):
+        """Returns a list of unique users activity, measured as deposits and withdraws."""
+        return await get_users_activity(
+            chain=chain,
+            ini_timestamp=ini_timestamp,
             end_timestamp=end_timestamp,
             hypervisors=hypervisors,
         )

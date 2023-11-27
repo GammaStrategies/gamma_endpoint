@@ -310,6 +310,49 @@ async def get_transactions_summary(
     return output
 
 
+async def get_users_activity(
+    chain: Chain | None = None,
+    ini_timestamp: int | None = None,
+    end_timestamp: int | None = None,
+    hypervisors: list[str] | None = None,
+) -> dict:
+    """User activity is defined by deposits and withdraws.
+
+    Args:
+        chain (Chain | None, optional): . Defaults to None.
+        ini_timestamp (int | None, optional): . Defaults to None.
+        end_timestamp (int | None, optional): . Defaults to None.
+        hypervisors (list[str] | None, optional): list of hypervisor addresses to filter. Defaults to None.
+
+    Returns:
+        dict: { "total_users": int, "addresses": { "address": int, ... } }
+    """
+    _query = _query_users_activity(
+        ini_timestamp=ini_timestamp,
+        end_timestamp=end_timestamp,
+        hypervisors=hypervisors,
+    )
+    chains = [chain] if chain else list(set([cha for pro, cha in DEPLOYMENTS]))
+
+    output = {"total_users": 0, "addresses": {}}
+    for chain_result in await asyncio.gather(
+        *[
+            local_database_helper(network=chain).get_items_from_database(
+                collection_name="operations", aggregate=_query
+            )
+            for chain in chains
+        ]
+    ):
+        for user in chain_result:
+            if user["user"] not in output["addresses"]:
+                output["addresses"][user["user"]] = user["activity_count"]
+                output["total_users"] += 1
+            else:
+                output["addresses"][user["user"]] += user["activity_count"]
+
+    return output
+
+
 # HELPERS
 
 
@@ -417,7 +460,7 @@ def _query_transactions_operations(
     ini_timestamp: int | None = None,
     end_timestamp: int | None = None,
     hypervisors: list[str] | None = None,
-):
+) -> list[dict]:
     _operations_and_expr = {
         "$and": [
             {"$eq": ["$address", "$$op_address"]},
@@ -489,3 +532,45 @@ def _query_transactions_operations(
         query.insert(0, {"$match": {"dex": protocol.database_name}})
 
     return query
+
+
+def _query_users_activity(
+    ini_timestamp: int | None = None,
+    end_timestamp: int | None = None,
+    hypervisors: list[str] | None = None,
+) -> list[dict]:
+    """Using deposits and withdraws to define user activity.
+
+    Args:
+        ini_timestamp (int | None, optional): . Defaults to None.
+        end_timestamp (int | None, optional): . Defaults to None.
+        hypervisors (list[str] | None, optional): addresses. Defaults to None.
+
+    Returns:
+        list[dict]: query to get user activity
+    """
+    # build match
+    _match = {"topic": {"$in": ["deposit", "withdraw"]}}
+    # add and filters
+    _and = []
+    if ini_timestamp:
+        _and.append({"timestamp": {"$gte": ini_timestamp}})
+    if end_timestamp:
+        _and.append({"timestamp": {"$lte": end_timestamp}})
+    if hypervisors:
+        _and.append({"address": {"$in": hypervisors}})
+
+    if _and:
+        _match["$and"] = _and
+
+    # build query
+    return [
+        {"$match": _match},
+        {
+            "$addFields": {
+                "user": {"$cond": [{"$eq": ["$topic", "deposit"]}, "$sender", "$to"]}
+            }
+        },
+        {"$group": {"_id": "$user", "activity_count": {"$sum": 1}}},
+        {"$project": {"_id": 0, "user": "$_id", "activity_count": "$activity_count"}},
+    ]
