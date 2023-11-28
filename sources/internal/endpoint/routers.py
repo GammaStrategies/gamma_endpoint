@@ -25,6 +25,7 @@ from sources.internal.bins.kpis import (
     get_transactions_summary,
     get_users_activity,
 )
+from sources.internal.bins.reports import report_galaxe
 from sources.mongo.bins.apps.hypervisor import hypervisors_collected_fees
 from sources.mongo.bins.apps.prices import get_current_prices
 from sources.mongo.bins.helpers import local_database_helper
@@ -50,11 +51,18 @@ from ..bins.fee_internal import (
 def build_routers() -> list:
     routes = []
 
+    # MAIN
     routes.append(
         internal_router_builder_main(tags=["Internal endpoints"], prefix="/internal")
     )
 
+    # KPIs
     routes.append(internal_router_builder_KPIs(tags=["KPIs"], prefix="/internal/kpi"))
+
+    # REPORTS
+    routes.append(
+        internal_router_builder_reports(tags=["Reports"], prefix="/internal/reports")
+    )
 
     return routes
 
@@ -613,3 +621,59 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
             end_timestamp=end_timestamp,
             hypervisors=hypervisors,
         )
+
+
+class internal_router_builder_reports(router_builder_baseTemplate):
+    # ROUTEs BUILD FUNCTIONS
+    def router(self) -> APIRouter:
+        router = APIRouter(prefix=self.prefix)
+
+        #
+        router.add_api_route(
+            path="/galxe_report",
+            endpoint=self.galxe_report,
+            methods=["GET"],
+        )
+        #
+
+        return router
+
+    # ROUTE FUNCTIONS
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def galxe_report(
+        self,
+        response: Response,
+    ) -> dict:
+        """Returns unique list of user addresses that deposited at least $100 USD or more in a list of predefined pools between start and end time:
+        * **Start time**:  November 28th, 17:00 UTC
+        * **End time**:  February 19th, 17:00 UTC
+        * **Pools**:
+            * ARBITRUM:
+                0xd7Ef5Ac7fd4AAA7994F3bc1D273eAb1d1013530E
+                0x29237292F15BC3615BFCc0D958C265Aa64527FB2
+                0x9330e26b5Fc0b7c417C6bD901528d5c65BE5cdf2
+                0x863cb3E55526Fa2F7e6b04ecf21Ea39143AC8056
+                0xF3557102C0cCBE07EE237B6eE70984f313886432
+                0x610C18bA42FBCE096CD9A894a1025EA0B69B581a
+                0x6F8401bd348B3f8cDabc8C81dbD0Ac255abCB4e5
+                0x97D81162B96D57476CcF170595a39c1DC76676c9
+                0x9bdb8335619bA4E20Bea1321f8E32f45fD6e6e22
+                0x4D519650E86bc7fCab036314a160653FBcfE05C4
+                0x524D49847E644eD908d65396166EaCeF5C2D2a41
+                0x8909ae223c31F35763c60f06B358F7963687f3eB
+                0x81639d88451c96b8eff9fa5206Da2F1147Bc3067
+                0x3d66F6FfF1F0FcD6dCD6F58398005Dc8c6a55C14
+                0x5F4cED6237BBB278b693a2b46d3ef1f45ba27ea9
+                0x95375694685E39997828Ed5B17f30f0A3eD90537
+                0x9F0166a37A511d2D6647864Dd0abDc1Ef6699a0C
+                0x1f70F9c577bB91f1445C7144Fe66D15F7041fd10
+                0xf8b645c32F660f5c997ED250f264cA4a0E7A5967
+                0xfA392dbefd2d5ec891eF5aEB87397A89843a8260
+                0xF66DA0f517c6f5431c77f4d0525EbC4b3bb40578
+                0x08A61A58ab10db054fBbE57996e89A69DdEba2F3
+                0xdaB1dA56965B1aaaBE38774E8B74C3Ade8fc439E
+                0x2FD6FD1E3f1fE24cC1422D22e62884A4528d1A24
+
+        """
+
+        return await report_galaxe()
