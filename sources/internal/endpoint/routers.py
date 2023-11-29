@@ -643,9 +643,12 @@ class internal_router_builder_reports(router_builder_baseTemplate):
     async def galxe_report(
         self,
         response: Response,
+        usd_threshold: int = Query(
+            100, description="Minimum USD value deposited in the period."
+        ),
     ) -> dict:
         """Returns unique list of user addresses that deposited at least $100 USD or more in a list of predefined pools between start and end time:
-        * **Start time**:  November 28th, 17:00 UTC
+        * **Start time**:  November 20th, 17:00 UTC
         * **End time**:  February 19th, 17:00 UTC
         * **Pools**:
             * ARBITRUM:
@@ -676,4 +679,4 @@ class internal_router_builder_reports(router_builder_baseTemplate):
 
         """
 
-        return await report_galaxe()
+        return await report_galaxe(usd_threshold)
