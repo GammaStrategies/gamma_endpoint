@@ -30,7 +30,9 @@ DEPLOYMENTS = [
     (Protocol.PEGASYS, Chain.ROLLUX),
     (Protocol.BASEX, Chain.BASE),
     (Protocol.PANCAKESWAP, Chain.ARBITRUM),
-    (Protocol.APERTURE, Chain.MANTA)
+    (Protocol.APERTURE, Chain.MANTA),
+    (Protocol.QUICKSWAP, Chain.MANTA),
+    (Protocol.HERCULES, Chain.METIS),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -116,6 +118,12 @@ DEX_SUBGRAPH_URLS = {
     Protocol.APERTURE: {
         Chain.MANTA: get_config("APERTURE_MANTA_SUBGRAPH_URL"),
     },
+    Protocol.QUICKSWAP: {
+        Chain.MANTA: get_config("QUICKSWAP_MANTA_SUBGRAPH_URL"),
+    },
+    Protocol.HERCULES: {
+        Chain.METIS: get_config("HERCULES_METIS_SUBGRAPH_URL"),
+    },
 }
 
 DEX_HYPEPOOL_SUBGRAPH_URLS = {
@@ -188,6 +196,12 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.APERTURE: {
         Chain.MANTA: get_config("APERTURE_MANTA_HP_SUBGRAPH_URL"),
     },
+    Protocol.QUICKSWAP: {
+        Chain.MANTA: get_config("QUICKSWAP_MANTA_HP_SUBGRAPH_URL"),
+    },
+    Protocol.HERCULES: {
+        Chain.METIS: get_config("HERCULES_METIS_HP_SUBGRAPH_URL"),
+    },
 }
 
 GAMMA_SUBGRAPH_URLS = {
@@ -259,6 +273,12 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.APERTURE: {
         Chain.MANTA: get_config("APERTURE_MANTA_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.QUICKSWAP: {
+        Chain.MANTA: get_config("QUICKSWAP_MANTA_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.HERCULES: {
+        Chain.METIS: get_config("HERCULES_METIS_GAMMA_SUBGRAPH_URL"),
     },
 }
 

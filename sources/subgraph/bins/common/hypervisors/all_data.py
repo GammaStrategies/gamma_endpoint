@@ -1,6 +1,7 @@
 import asyncio
 import logging
 
+from aiohttp.client_exceptions import InvalidURL
 from gql.transport.exceptions import TransportQueryError
 from pydantic import BaseModel
 
@@ -90,7 +91,7 @@ class AllData:
         pools = [hype.pool for hype in hype_data.data.values()]
         try:
             await pool_data.get_data(pools=pools)
-        except TransportQueryError:
+        except (InvalidURL, TransportQueryError):
             self.pool_data = {}
             logger.warning(
                 "Failed to get Pool Data for %s - %s", self.protocol.value, self.chain.value

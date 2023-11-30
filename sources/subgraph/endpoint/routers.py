@@ -76,7 +76,9 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.PEGASYS, Chain.ROLLUX),
     (Protocol.BASEX, Chain.BASE),
     (Protocol.PANCAKESWAP, Chain.ARBITRUM),
-    (Protocol.APERTURE, Chain.MANTA)
+    (Protocol.APERTURE, Chain.MANTA),
+    (Protocol.QUICKSWAP, Chain.MANTA),
+    (Protocol.HERCULES, Chain.METIS),
 ]
 
 
@@ -375,6 +377,24 @@ def build_routers_compatible() -> list:
             chain=Chain.MANTA,
             tags=["Aperture - Manta"],
             prefix=f"/{Protocol.APERTURE.api_url}/{Chain.MANTA.api_url}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.QUICKSWAP,
+            chain=Chain.MANTA,
+            tags=["Quickswap - Manta"],
+            prefix=f"/{Protocol.QUICKSWAP.api_url}/{Chain.MANTA.api_url}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.HERCULES,
+            chain=Chain.METIS,
+            tags=["Hercules - Metis"],
+            prefix=f"/{Protocol.HERCULES.api_url}/{Chain.METIS.api_url}",
         )
     )
 
