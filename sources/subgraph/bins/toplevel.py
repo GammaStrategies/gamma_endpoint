@@ -131,7 +131,15 @@ class TopLevelData:
                 hypervisor["grossFeesClaimedUSD"] = str(
                     max(
                         float(hypervisor["grossFeesClaimedUSD"])
-                        - 707293639.8442053,
+                        - 707293639.8442053 - 180446479065422783579566400230944600000 + 348.2528026369851712613650107144147,
+                        0,
+                    )
+                )
+            if self.chain == Chain.BSC and self.protocol == Protocol.THENA and hypervisor["id"] == "0x99f5fd4588401e482d577a775b645c86678e308d":
+                hypervisor["grossFeesClaimedUSD"] = str(
+                    max(
+                        float(hypervisor["grossFeesClaimedUSD"])
+                        - 180446479065422783579566400230944600000 + 348.2528026369851712613650107144147,
                         0,
                     )
                 )

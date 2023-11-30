@@ -61,6 +61,7 @@ DEX_SUBGRAPH_URLS = {
     Protocol.QUICKSWAP: {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_SUBGRAPH_URL"),
         Chain.POLYGON_ZKEVM: get_config("QUICKSWAP_POLYGON_ZKEVM_SUBGRAPH_URL"),
+        Chain.MANTA: get_config("QUICKSWAP_MANTA_SUBGRAPH_URL"),
     },
     Protocol.ZYBERSWAP: {
         Chain.ARBITRUM: get_config("ZYBERSWAP_ARBITRUM_SUBGRAPH_URL"),
@@ -118,9 +119,6 @@ DEX_SUBGRAPH_URLS = {
     Protocol.APERTURE: {
         Chain.MANTA: get_config("APERTURE_MANTA_SUBGRAPH_URL"),
     },
-    Protocol.QUICKSWAP: {
-        Chain.MANTA: get_config("QUICKSWAP_MANTA_SUBGRAPH_URL"),
-    },
     Protocol.HERCULES: {
         Chain.METIS: get_config("HERCULES_METIS_SUBGRAPH_URL"),
     },
@@ -139,6 +137,7 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.QUICKSWAP: {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_HP_SUBGRAPH_URL"),
         Chain.POLYGON_ZKEVM: get_config("QUICKSWAP_POLYGON_ZKEVM_HP_SUBGRAPH_URL"),
+        Chain.MANTA: get_config("QUICKSWAP_MANTA_HP_SUBGRAPH_URL"),
     },
     Protocol.ZYBERSWAP: {
         Chain.ARBITRUM: get_config("ZYBERSWAP_ARBITRUM_HP_SUBGRAPH_URL"),
@@ -196,9 +195,6 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.APERTURE: {
         Chain.MANTA: get_config("APERTURE_MANTA_HP_SUBGRAPH_URL"),
     },
-    Protocol.QUICKSWAP: {
-        Chain.MANTA: get_config("QUICKSWAP_MANTA_HP_SUBGRAPH_URL"),
-    },
     Protocol.HERCULES: {
         Chain.METIS: get_config("HERCULES_METIS_HP_SUBGRAPH_URL"),
     },
@@ -217,6 +213,7 @@ GAMMA_SUBGRAPH_URLS = {
     Protocol.QUICKSWAP: {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_GAMMA_SUBGRAPH_URL"),
         Chain.POLYGON_ZKEVM: get_config("QUICKSWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH_URL"),
+        Chain.MANTA: get_config("QUICKSWAP_MANTA_GAMMA_SUBGRAPH_URL"),
     },
     Protocol.ZYBERSWAP: {
         Chain.ARBITRUM: get_config("ZYBERSWAP_ARBITRUM_GAMMA_SUBGRAPH_URL"),
@@ -273,9 +270,6 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.APERTURE: {
         Chain.MANTA: get_config("APERTURE_MANTA_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.QUICKSWAP: {
-        Chain.MANTA: get_config("QUICKSWAP_MANTA_GAMMA_SUBGRAPH_URL"),
     },
     Protocol.HERCULES: {
         Chain.METIS: get_config("HERCULES_METIS_GAMMA_SUBGRAPH_URL"),
