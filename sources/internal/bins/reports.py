@@ -2,7 +2,17 @@ from sources.subgraph.bins.enums import Chain, Protocol
 from sources.mongo.bins.helpers import local_database_helper
 
 
-async def report_galaxe(usd_threshold: int = 100):
+async def report_galaxe(
+    net_position_usd_threshold: int | None = None,
+    deposits_usd_threshold: int | None = None,
+):
+    """Custom report for Galaxe
+
+    Args:
+        net_position_usd_threshold (int | None, optional): _description_. Defaults to None.
+        deposits_usd_threshold (int | None, optional): _description_. Defaults to None.
+
+    """
     full_report = await local_database_helper(
         network=Chain.ARBITRUM
     ).get_items_from_database(
@@ -15,7 +25,15 @@ async def report_galaxe(usd_threshold: int = 100):
 
     result = {"user_addresses": [], "details": {}}
     for user, user_details in full_report.items():
-        if user_details["total_net_position"]["usd"] >= usd_threshold:
+        if net_position_usd_threshold is not None:
+            if user_details["total_net_position"]["usd"] >= net_position_usd_threshold:
+                result["user_addresses"].append(user)
+                result["details"][user] = user_details
+        elif deposits_usd_threshold is not None:
+            if user_details["total_deposits"]["usd"] >= deposits_usd_threshold:
+                result["user_addresses"].append(user)
+                result["details"][user] = user_details
+        else:
             result["user_addresses"].append(user)
             result["details"][user] = user_details
 

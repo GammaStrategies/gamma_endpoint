@@ -643,11 +643,17 @@ class internal_router_builder_reports(router_builder_baseTemplate):
     async def galxe_report(
         self,
         response: Response,
-        usd_threshold: int = Query(
-            100, description="Minimum USD value deposited in the period."
+        net_position_usd_threshold: int
+        | None = Query(
+            None,
+            description="Minimum USD net value during the whole period (deposits-withdraws).",
+        ),
+        deposits_usd_threshold: int
+        | None = Query(
+            100, description="Minimum USD deposits value during the whole period."
         ),
     ) -> dict:
-        """Returns unique list of user addresses that deposited at least $100 USD or more in a list of predefined pools between start and end time:
+        """Returns unique list of user addresses complying with the parameters defined (net position | deposits) and within a list of predefined pools between start and end time:
         * **Start time**:  November 20th, 17:00 UTC
         * **End time**:  February 19th, 17:00 UTC
         * **Pools**:
@@ -677,6 +683,8 @@ class internal_router_builder_reports(router_builder_baseTemplate):
                 0xdaB1dA56965B1aaaBE38774E8B74C3Ade8fc439E
                 0x2FD6FD1E3f1fE24cC1422D22e62884A4528d1A24
 
+
+        All usd values are calculated using prices at operation block ( at the time the operation happened).
         """
 
-        return await report_galaxe(usd_threshold)
+        return await report_galaxe(net_position_usd_threshold, deposits_usd_threshold)
