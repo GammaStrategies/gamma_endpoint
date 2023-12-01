@@ -3,6 +3,7 @@ from sources.mongo.bins.helpers import local_database_helper
 
 
 async def report_galaxe(
+    user_address: str | None = None,
     net_position_usd_threshold: int | None = None,
     deposits_usd_threshold: int | None = None,
 ):
@@ -25,6 +26,10 @@ async def report_galaxe(
 
     result = {"user_addresses": [], "details": {}}
     for user, user_details in full_report.items():
+        if user_address is not None:
+            if user_address != user:
+                continue
+
         if net_position_usd_threshold is not None:
             if user_details["total_net_position"]["usd"] >= net_position_usd_threshold:
                 result["user_addresses"].append(user)

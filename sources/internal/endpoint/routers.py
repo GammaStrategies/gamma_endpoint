@@ -643,6 +643,8 @@ class internal_router_builder_reports(router_builder_baseTemplate):
     async def galxe_report(
         self,
         response: Response,
+        user_address: str
+        | None = Query(None, description="User address to filter the report"),
         net_position_usd_threshold: int
         | None = Query(
             None,
@@ -687,4 +689,6 @@ class internal_router_builder_reports(router_builder_baseTemplate):
         All usd values are calculated using prices at operation block ( at the time the operation happened).
         """
 
-        return await report_galaxe(net_position_usd_threshold, deposits_usd_threshold)
+        return await report_galaxe(
+            user_address, net_position_usd_threshold, deposits_usd_threshold
+        )
