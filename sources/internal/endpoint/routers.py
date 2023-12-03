@@ -491,8 +491,6 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
         #         detail=f"ini_timestamp cannot be greater than 120 days ago.",
         #     )
 
-        hypervisors = filter_addresses(hypervisors)
-
         # set ini timestamp to 7 days ago if not provided
         return await get_average_tvl(
             chain=chain,
@@ -500,7 +498,7 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
             ini_timestamp=ini_timestamp
             or int(datetime.now(timezone.utc).timestamp() - (86400 * 7)),
             end_timestamp=end_timestamp,
-            hypervisors=hypervisors,
+            hypervisors=filter_addresses(hypervisors),
         )
 
     @cache(expire=DB_CACHE_TIMEOUT)
@@ -539,9 +537,6 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
                 detail=f"ini_timestamp cannot be greater than 120 days ago.",
             )
 
-        # remove any empty or 'string' hypervisors
-        hypervisors = filter_addresses(hypervisors)
-
         # set ini timestamp to 7 days ago if not provided
         return await get_transactions(
             chain=chain,
@@ -549,7 +544,7 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
             ini_timestamp=ini_timestamp
             or int(datetime.now(timezone.utc).timestamp() - (86400 * 7)),
             end_timestamp=end_timestamp,
-            hypervisors=hypervisors,
+            hypervisors=filter_addresses(hypervisors),
         )
 
     @cache(expire=DB_CACHE_TIMEOUT)
@@ -583,8 +578,6 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
 
         All usd values are calculated using the current price of the token.
         """
-        # remove any empty or 'string' hypervisors
-        hypervisors = filter_addresses(hypervisors)
 
         return await get_transactions_summary(
             chain=chain,
@@ -592,7 +585,7 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
             ini_timestamp=ini_timestamp
             or int(datetime.now(timezone.utc).timestamp() - (86400 * 7)),
             end_timestamp=end_timestamp,
-            hypervisors=hypervisors,
+            hypervisors=filter_addresses(hypervisors),
         )
 
     @cache(expire=DB_CACHE_TIMEOUT)
@@ -619,7 +612,7 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
             chain=chain,
             ini_timestamp=ini_timestamp,
             end_timestamp=end_timestamp,
-            hypervisors=hypervisors,
+            hypervisors=filter_addresses(hypervisors),
         )
 
 
@@ -690,5 +683,7 @@ class internal_router_builder_reports(router_builder_baseTemplate):
         """
 
         return await report_galaxe(
-            user_address, net_position_usd_threshold, deposits_usd_threshold
+            user_address=filter_addresses(user_address),
+            net_position_usd_threshold=net_position_usd_threshold,
+            deposits_usd_threshold=deposits_usd_threshold,
         )
