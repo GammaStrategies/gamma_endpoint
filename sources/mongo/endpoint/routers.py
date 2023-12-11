@@ -29,6 +29,7 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
     (Protocol.ZYBERSWAP, Chain.ARBITRUM),
     (Protocol.THENA, Chain.BSC),
+    (Protocol.THENA, Chain.OPBNB),
     (Protocol.CAMELOT, Chain.ARBITRUM),
     (Protocol.GLACIER, Chain.AVALANCHE),
     (Protocol.RETRO, Chain.POLYGON),
@@ -49,6 +50,8 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.APERTURE, Chain.MANTA),
     (Protocol.QUICKSWAP, Chain.MANTA),
     (Protocol.HERCULES, Chain.METIS),
+    (Protocol.BASESWAP, Chain.BASE),
+    (Protocol.SWAPBASED, Chain.BASE),
 ]
 
 

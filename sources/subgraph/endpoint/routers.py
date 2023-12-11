@@ -59,6 +59,7 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
     (Protocol.ZYBERSWAP, Chain.ARBITRUM),
     (Protocol.THENA, Chain.BSC),
+    (Protocol.THENA, Chain.OPBNB),
     (Protocol.CAMELOT, Chain.ARBITRUM),
     (Protocol.GLACIER, Chain.AVALANCHE),
     (Protocol.RETRO, Chain.POLYGON),
@@ -79,6 +80,8 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.APERTURE, Chain.MANTA),
     (Protocol.QUICKSWAP, Chain.MANTA),
     (Protocol.HERCULES, Chain.METIS),
+    (Protocol.BASESWAP, Chain.BASE),
+    (Protocol.SWAPBASED, Chain.BASE),
 ]
 
 
@@ -216,6 +219,14 @@ def build_routers_compatible() -> list:
             chain=Chain.BSC,
             tags=["Thena - BSC"],
             prefix=f"/{Protocol.THENA.api_url}/{Chain.BSC.api_url}",
+        )
+    )
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.THENA,
+            chain=Chain.OPBNB,
+            tags=["Thena - opBNB"],
+            prefix=f"/{Protocol.THENA.api_url}/{Chain.OPBNB.api_url}",
         )
     )
     routes.append(
@@ -395,6 +406,24 @@ def build_routers_compatible() -> list:
             chain=Chain.METIS,
             tags=["Hercules - Metis"],
             prefix=f"/{Protocol.HERCULES.api_url}/{Chain.METIS.api_url}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.BASESWAP,
+            chain=Chain.BASE,
+            tags=["Baseswap - Base"],
+            prefix=f"/{Protocol.BASESWAP.api_url}/{Chain.BASE.api_url}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.SWAPBASED,
+            chain=Chain.BASE,
+            tags=["Swapbased - Base"],
+            prefix=f"/{Protocol.SWAPBASED.api_url}/{Chain.BASE.api_url}",
         )
     )
 

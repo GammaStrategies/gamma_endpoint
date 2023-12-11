@@ -12,6 +12,7 @@ DEPLOYMENTS = [
     (Protocol.QUICKSWAP, Chain.POLYGON),
     (Protocol.ZYBERSWAP, Chain.ARBITRUM),
     (Protocol.THENA, Chain.BSC),
+    (Protocol.THENA, Chain.OPBNB),
     (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
     (Protocol.CAMELOT, Chain.ARBITRUM),
     (Protocol.GLACIER, Chain.AVALANCHE),
@@ -33,6 +34,8 @@ DEPLOYMENTS = [
     (Protocol.APERTURE, Chain.MANTA),
     (Protocol.QUICKSWAP, Chain.MANTA),
     (Protocol.HERCULES, Chain.METIS),
+    (Protocol.BASESWAP, Chain.BASE),
+    (Protocol.SWAPBASED, Chain.BASE),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -68,6 +71,7 @@ DEX_SUBGRAPH_URLS = {
     },
     Protocol.THENA: {
         Chain.BSC: get_config("THENA_BSC_SUBGRAPH_URL"),
+        Chain.OPBNB: get_config("THENA_OPBNB_SUBGRAPH_URL"),
     },
     Protocol.CAMELOT: {
         Chain.ARBITRUM: get_config("CAMELOT_ARBITRUM_SUBGRAPH_URL"),
@@ -122,6 +126,12 @@ DEX_SUBGRAPH_URLS = {
     Protocol.HERCULES: {
         Chain.METIS: get_config("HERCULES_METIS_SUBGRAPH_URL"),
     },
+    Protocol.BASESWAP: {
+        Chain.BASE: get_config("BASESWAP_BASE_SUBGRAPH_URL"),
+    },
+    Protocol.SWAPBASED: {
+        Chain.BASE: get_config("SWAPBASED_BASE_SUBGRAPH_URL"),
+    },
 }
 
 DEX_HYPEPOOL_SUBGRAPH_URLS = {
@@ -144,6 +154,7 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     },
     Protocol.THENA: {
         Chain.BSC: get_config("THENA_BSC_HP_SUBGRAPH_URL"),
+        Chain.OPBNB: get_config("THENA_OPBNB_HP_SUBGRAPH_URL"),
     },
     Protocol.CAMELOT: {
         Chain.ARBITRUM: get_config("CAMELOT_ARBITRUM_HP_SUBGRAPH_URL"),
@@ -198,6 +209,12 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.HERCULES: {
         Chain.METIS: get_config("HERCULES_METIS_HP_SUBGRAPH_URL"),
     },
+    Protocol.BASESWAP: {
+        Chain.BASE: get_config("BASESWAP_BASE_HP_SUBGRAPH_URL"),
+    },
+    Protocol.SWAPBASED: {
+        Chain.BASE: get_config("SWAPBASED_BASE_HP_SUBGRAPH_URL"),
+    },
 }
 
 GAMMA_SUBGRAPH_URLS = {
@@ -220,6 +237,7 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.THENA: {
         Chain.BSC: get_config("THENA_BSC_GAMMA_SUBGRAPH_URL"),
+        Chain.OPBNB: get_config("THENA_OPBNB_GAMMA_SUBGRAPH_URL"),
     },
     Protocol.CAMELOT: {
         Chain.ARBITRUM: get_config("CAMELOT_ARBITRUM_GAMMA_SUBGRAPH_URL"),
@@ -273,6 +291,12 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.HERCULES: {
         Chain.METIS: get_config("HERCULES_METIS_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.BASESWAP: {
+        Chain.BASE: get_config("BASESWAP_BASE_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.SWAPBASED: {
+        Chain.BASE: get_config("SWAPBASED_BASE_GAMMA_SUBGRAPH_URL"),
     },
 }
 

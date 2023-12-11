@@ -10,6 +10,7 @@ QUICKSWAP_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ga
 QUICKSWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-quickswap-pzke/version/latest
 ZYBERSWAP_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/zyberswap-arbitrum
 THENA_BSC_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/thena
+THENA_OPBNB_GAMMA_SUBGRAPH_URL: https://opbnb-mainnet-graph.nodereal.io/subgraphs/name/gamma-thena-opbnb
 CAMELOT_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-camelot-arbitrum
 GLACIER_AVALANCHE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-glacier-avax
 RETRO_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-retro-polygon
@@ -30,6 +31,8 @@ PANCAKESWAP_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name
 APERTURE_MANTA_GAMMA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-aperture-manta/v0.2.0/gn
 QUICKSWAP_MANTA_GAMMA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-quickswap-manta/v0.1.0/gn
 HERCULES_METIS_GAMMA_SUBGRAPH_URL: https://metisapi.0xgraph.xyz/subgraphs/name/gamma-hercules-metis
+BASESWAP_BASE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-baseswap-base/version/latest
+SWAPBASED_BASE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-swapbased-base/version/latest
 
 # DEX Subgraph URL
 UNISWAP_MAINNET_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3
@@ -43,6 +46,7 @@ QUICKSWAP_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/sameepsi
 QUICKSWAP_POLYGON_ZKEVM_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44554/quickswap-v3-02/0.0.7
 ZYBERSWAP_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/iliaazhel/zyberswap-info
 THENA_BSC_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/iliaazhel/thena-info
+THENA_OPBNB_SUBGRAPH_URL: _
 CAMELOT_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/camelotlabs/camelot-amm-v3
 GLACIER_AVALANCHE_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/iliaazhel/glacier-info
 RETRO_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ruvlol/univ3-test
@@ -63,6 +67,8 @@ PANCAKESWAP_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/panca
 APERTURE_MANTA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clnz7akg41cv72ntv0uhyd3ai/subgraphs/aperture/uniswap-v3/gn
 QUICKSWAP_MANTA_SUBGRAPH_URL: _
 HERCULES_METIS_SUBGRAPH_URL: _
+BASESWAP_BASE_SUBGRAPH_URL: _
+SWAPBASED_BASE_SUBGRAPH_URL: _
 
 # HypePool Subgraph URL
 UNISWAP_MAINNET_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-mainnet
@@ -76,6 +82,7 @@ QUICKSWAP_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t
 QUICKSWAP_POLYGON_ZKEVM_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-pzke/version/latest
 ZYBERSWAP_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-zyberswap-arbitrum
 THENA_BSC_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-thena-bsc
+THENA_OPBNB_HP_SUBGRAPH_URL: https://opbnb-mainnet-graph.nodereal.io/subgraphs/name/gamma-hp-thena-opbnb
 CAMELOT_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-camelot-arbitrum
 GLACIER_AVALANCHE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-glacier-avax
 RETRO_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-retro-polygon
@@ -96,6 +103,8 @@ PANCAKESWAP_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0
 APERTURE_MANTA_HP_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-aperture-manta/v0.2.0/gn
 QUICKSWAP_MANTA_HP_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-quickswap-manta/v0.1.0/gn
 HERCULES_METIS_HP_SUBGRAPH_URL: https://metisapi.0xgraph.xyz/subgraphs/name/gamma-hp-hercules-metis
+BASESWAP_BASE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-baseswap-base/version/latest
+SWAPBASED_BASE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-swapbased-base/version/latest
 
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {
