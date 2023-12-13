@@ -65,7 +65,7 @@ PROTOCOL_CHAIN_REWARDS_DATABASE = {
     Protocol.QUICKSWAP: [],
     Protocol.ZYBERSWAP: [Chain.ARBITRUM],
     Protocol.THENA: [Chain.BSC],
-    Protocol.CAMELOT: [],
+    Protocol.CAMELOT: [Chain.ARBITRUM],
     Protocol.GLACIER: [],
     Protocol.RETRO: [],
     Protocol.STELLASWAP: [],
