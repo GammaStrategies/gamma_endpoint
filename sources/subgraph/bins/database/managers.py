@@ -1769,11 +1769,11 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
                         reward["hypervisor_address"]
                     ]["apr"] += reward["apr"]
                     logger.error(
-                        f" {chain}'s {protocol} has same rewarder address with different reward token "
+                        f" {chain}'s {protocol} has same rewarder address with different reward token. APR will be added anyway. "
                     )
                 else:
                     logger.error(
-                        f" {chain}'s {protocol} has same rewarder address with same reward token "
+                        f" {chain}'s {protocol} has same rewarder address with same reward token. APR will NOT be added."
                     )
         except IndexError as e:
             raise IndexError(
