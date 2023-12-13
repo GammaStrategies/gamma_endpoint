@@ -657,6 +657,59 @@ class database_local(db_collections_common):
             collection_name="operations", query=query
         )
 
+    async def get_grouped_user_current_status(self, user_address: str, chain:Chain) -> list:
+        """Get a grouped by hypervisor picture of a user, with regards shares and operations.
+
+        Args:
+            user_address (str): user address
+
+        Returns:
+            list: of hypervisors with their operations and status like:
+
+            {
+            "hypervisor": "0x998c07827578c83949a6b755dd3416fdfd98a75e",
+            "last_block": 146654091,
+            "last_timestamp": 1699000302,
+            "decimals": {
+                "hype": 18,
+                "token0": 18,
+                "token1": 18
+            },
+            "last_shares": {
+                "$numberDecimal": "2454851542501644905"
+            },
+            "last_token0": {
+                "$numberDecimal": "161005324767134413"
+            },
+            "last_token1": {
+                "$numberDecimal": "3675185849966923774"
+            },
+            "operations": [
+                {
+                "block": 146654091,
+                "timestamp": 1699000302,
+                "topic": "deposit",
+                "shares": {
+                    "$numberDecimal": "2454851542501644905"
+                },
+                "token0": {
+                    "$numberDecimal": "161005324767134413"
+                },
+                "token1": {
+                    "$numberDecimal": "3675185849966923774"
+                }
+                }
+            ]
+            }
+
+        """
+        return await self.get_items_from_database(
+            collection_name="operations",
+            aggregate=self.query_user_shares_operations(
+                user_address=user_address.lower(), chain=chain
+            ),
+        )
+
     # status
 
     async def set_status(self, data: dict):
@@ -1779,6 +1832,180 @@ class database_local(db_collections_common):
             query.insert(0, {"$match": _match})
         # debug_query = f"{query}"
         return query
+
+    @staticmethod
+    def query_user_shares_operations(user_address: str, chain: Chain) -> list[dict]:
+        """Return the user status as per shares and qtty currently staked in the hypervisor and all its operations, including transfers
+
+        Args:
+            user_address (str): user address
+
+        Returns:
+            list[dict]: query
+        """
+        return [
+            {
+                "$match": {
+                    "$and": [
+                        {
+                            "$or": [
+                                {"src": user_address},
+                                {"dst": user_address},
+                                {"sender": user_address},
+                                {"to": user_address},
+                            ]
+                        },
+                        {"src": {"$ne": "0x0000000000000000000000000000000000000000"}},
+                        {"dst": {"$ne": "0x0000000000000000000000000000000000000000"}},
+                    ]
+                }
+            },
+            {"$sort": {"blockNumber": 1}},
+            {
+                "$lookup": {
+                    "from": "static",
+                    "let": {"op_address": "$address"},
+                    "pipeline": [
+                        {"$match": {"$expr": {"$eq": ["$address", "$$op_address"]}}},
+                        {"$limit": 1},
+                        {
+                            "$project": {
+                                "address": "$address",
+                                "symbol": "$symbol",
+                                "pool": {
+                                    "address": "$pool.address",
+                                    "token0": "$pool.token0.address",
+                                    "token1": "$pool.token1.address",
+                                    "dex": "$pool.dex",
+                                },
+                                "dex": "$dex",
+                            }
+                        },
+                        {"$unset": ["_id"]},
+                    ],
+                    "as": "static",
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "block": "$blockNumber",
+                    "timestamp": "$timestamp",
+                    "hypervisor": "$address",
+                    "hypervisor_symbol": {"$arrayElemAt": ["$static.symbol", 0]},
+                    "token0_address": {"$arrayElemAt": ["$static.pool.token0", 0]},
+                    "token1_address": {"$arrayElemAt": ["$static.pool.token1", 0]},
+                    "decimals_contract": "$decimals_contract",
+                    "decimals_token0": "$decimals_token0",
+                    "decimals_token1": "$decimals_token1",
+                    "topic": "$topic",
+                    "shares": {
+                        "$ifNull": [
+                            {
+                                "$cond": [
+                                    {
+                                        "$or": [
+                                            {"$eq": ["$topic", "deposit"]},
+                                            {"$eq": ["$dst", user_address]},
+                                        ]
+                                    },
+                                    {"$toDecimal": {"$ifNull": ["$qtty", "$shares"]}},
+                                    {
+                                        "$multiply": [
+                                            {
+                                                "$toDecimal": {
+                                                    "$ifNull": ["$qtty", "$shares"]
+                                                }
+                                            },
+                                            -1,
+                                        ]
+                                    },
+                                ]
+                            },
+                            0,
+                        ]
+                    },
+                    "token0": {
+                        "$ifNull": [
+                            {
+                                "$cond": [
+                                    {"$eq": ["$topic", "deposit"]},
+                                    {"$toDecimal": "$qtty_token0"},
+                                    {"$multiply": [{"$toDecimal": "$qtty_token0"}, -1]},
+                                ]
+                            },
+                            0,
+                        ]
+                    },
+                    "token1": {
+                        "$ifNull": [
+                            {
+                                "$cond": [
+                                    {"$eq": ["$topic", "deposit"]},
+                                    {"$toDecimal": "$qtty_token1"},
+                                    {"$multiply": [{"$toDecimal": "$qtty_token1"}, -1]},
+                                ]
+                            },
+                            0,
+                        ]
+                    },
+                }
+            },
+            {
+                "$group": {
+                    "_id": {"hype": "$hypervisor"},
+                    "last_block": {"$last": "$block"},
+                    "last_timestamp": {"$last": "$timestamp"},
+                    "info": {
+                        "$first": {
+                            "hypervisor_symbol": "$hypervisor_symbol",
+                            "token0_address": "$token0_address",
+                            "token1_address": "$token1_address",
+                            "decimals_hype": "$decimals_contract",
+                            "decimals_token0": "$decimals_token0",
+                            "decimals_token1": "$decimals_token1",
+                        }
+                    },
+                    "last_shares": {"$sum": "$shares"},
+                    "last_token0": {"$sum": "$token0"},
+                    "last_token1": {"$sum": "$token1"},
+                    "operations": {
+                        "$push": {
+                            "block": "$block",
+                            "timestamp": "$timestamp",
+                            "topic": "$topic",
+                            "shares": "$shares",
+                            "token0": "$token0",
+                            "token1": "$token1",
+                        }
+                    },
+                    "price_id_token0": {
+                        "$push": {
+                            "$concat": [
+                                chain.database_name,
+                                "_",
+                                {"$toString": "$block"},
+                                "_",
+                                "$token0_address",
+                            ]
+                        }
+                    },
+                    "price_id_token1": {
+                        "$push": {
+                            "$concat": [
+                                chain.database_name,
+                                "_",
+                                {"$toString": "$block"},
+                                "_",
+                                "$token1_address",
+                            ]
+                        }
+                    },
+                }
+            },
+            {"$addFields": {"hypervisor": "$_id.hype"}},
+            {"$unset": "_id"},
+        ]
 
     @staticmethod
     def query_rewarders_by_rewardRegistry() -> list[dict]:
