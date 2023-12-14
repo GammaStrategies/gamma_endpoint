@@ -772,7 +772,7 @@ async def get_revenue_operations(
     yearly: bool = False,
 ) -> list:
     """Return the revenue operations for a specific protocol and chain by month and year, if requested.
-
+       Camelot revenue is multiplied by 0.623529 to match the fee split.
     Args:
         chain (Chain):
         protocol (Protocol):
@@ -818,7 +818,14 @@ async def get_revenue_operations(
                 "token": {"$cond": ["$token", "$token", "$address"]},
                 "token_symbol": "$symbol",
                 "timestamp": "$timestamp",
-                "usd_value": "$usd_value",
+                # "usd_value": "$usd_value",
+                "usd_value": {
+                    "$cond": [
+                        {"$eq": ["$dex", "camelot"]},
+                        {"$multiply": ["$usd_value", 0.623529]},
+                        "$usd_value",
+                    ]
+                },
             }
         },
         {
