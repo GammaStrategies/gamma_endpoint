@@ -1201,6 +1201,19 @@ class db_returns_manager(db_collection_manager):
                         },
                         {"$sort": {"datetime": -1}},
                         {"$addFields": {"obj_as_arr": {"$objectToArray": "$$ROOT"}}},
+                        # sum yield from previous addfield
+                        {
+                            "$addFields": {
+                                "year_allRewards2": {
+                                    "$ifNull": [
+                                        {
+                                            "$sum": f"$obj_as_arr.v.pools.{hypervisor_address}.apr"
+                                        },
+                                        0,
+                                    ]
+                                }
+                            }
+                        },
                         {"$unwind": "$obj_as_arr"},
                         {"$match": _allrewards2_match},
                         {"$limit": 1},
@@ -1219,7 +1232,7 @@ class db_returns_manager(db_collection_manager):
                     "period": "$period",
                     "year_feeApr": "$fees.feeApr",
                     "year_feeApy": "$fees.feeApy",
-                    "year_allRewards2": year_allRewards2_subquery,
+                    "year_allRewards2": {"$sum": ["$allRewards2.year_allRewards2"]},
                     "period_feeApr": {
                         "$multiply": ["$period", {"$divide": ["$fees.feeApr", 365]}]
                     },
@@ -1228,7 +1241,7 @@ class db_returns_manager(db_collection_manager):
                             "$period",
                             {
                                 "$divide": [
-                                    year_allRewards2_subquery,
+                                    {"$sum": ["$allRewards2.year_allRewards2"]},
                                     365,
                                 ]
                             },
