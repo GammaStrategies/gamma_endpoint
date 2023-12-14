@@ -1669,13 +1669,26 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
                 mongo_url=self._db_mongo_url, db_name=db_name
             )
 
+            # create period to get rewards from
+
+            _timestamp = current_timestamp or int(
+                datetime.timestamp(datetime.now(timezone.utc))
+            )
+
             # get data from local database rewards_status ( web3 database)
             rewards_status = await local_db_helper.get_items_from_database(
-                aggregate=self.query_rewards(
-                    timestamp_end=current_timestamp, protocol=protocol
+                aggregate=self.query_rewards_new(
+                    timestamp=_timestamp,
+                    protocol=protocol,
                 ),
-                collection_name="rewards_status",
+                collection_name="rewards_static",
             )
+            # rewards_status = await local_db_helper.get_items_from_database(
+            #     aggregate=self.query_rewards(
+            #         timestamp_end=current_timestamp, protocol=protocol
+            #     ),
+            #     collection_name="rewards_status",
+            # )
 
             block = rewards_status[0]["block"]
             timestamp = rewards_status[0]["timestamp"]
@@ -1768,9 +1781,34 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
                     data[reward["rewarder_registry"]]["pools"][
                         reward["hypervisor_address"]
                     ]["apr"] += reward["apr"]
-                    logger.error(
-                        f" {chain}'s {protocol} has same rewarder address with different reward token. APR will be added anyway. "
+                    # logger.error(
+                    #     f" {chain}'s {protocol} has same rewarder address with different reward token. APR will be added anyway. "
+                    # )
+                    # add to extra field
+                    if (
+                        not "extra"
+                        in data[reward["rewarder_registry"]]["pools"][
+                            reward["hypervisor_address"]
+                        ]
+                    ):
+                        data[reward["rewarder_registry"]]["pools"][
+                            reward["hypervisor_address"]
+                        ]["extra"] = []
+                    # add to extra field
+                    data[reward["rewarder_registry"]]["pools"][
+                        reward["hypervisor_address"]
+                    ]["extra"].append(
+                        {
+                            "rewardToken": reward["rewardToken"],
+                            "rewardTokenDecimals": reward["rewardToken_decimals"],
+                            "rewardTokenSymbol": reward["rewardToken_symbol"],
+                            "rewardPerSecond": float(reward["rewards_perSecond"])
+                            / (10 ** reward["rewardToken_decimals"]),
+                            "allocPoint": 0,
+                            "apr": reward["apr"],
+                        }
                     )
+
                 else:
                     logger.error(
                         f" {chain}'s {protocol} has same rewarder address with same reward token. APR will NOT be added."
@@ -1840,11 +1878,16 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
 
         return existing_data
 
+    # DEPRECATED
     @staticmethod
     def query_rewards(
         timestamp_end: int | None = None,
         protocol: Protocol | None = None,
     ) -> list[dict]:
+        raise NotImplementedError(
+            " query_rewards should not be used anymore. Use query_rewards_new instead "
+        )
+
         result = [
             {"$sort": {"block": -1}},
             {
@@ -1897,6 +1940,99 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
         if _match:
             result.insert(0, {"$match": _match})
 
+        return result
+
+    @staticmethod
+    def query_rewards_new(
+        timestamp: int,
+        protocol: Protocol | None = None,
+    ) -> list[dict]:
+        """Get all LAST rewards status active within a period
+             >> query into STATIC collection
+
+        Args:
+            timestamp_end (int | None, optional): . Defaults to None.
+            protocol (Protocol | None, optional): . Defaults to None.
+
+        Returns:
+            list[dict]: query
+
+        """
+
+        # build match
+        _match = {
+            "start_rewards_timestamp": {"$lt": timestamp},
+            "$or": [
+                {"end_rewards_timestamp": {"$gt": timestamp}},
+                {"end_rewards_timestamp": 0},
+            ],
+        }
+
+        # build lookup
+        _lookup = {
+            "from": "rewards_status",
+            "let": {
+                "op_rewarder_address": "$rewarder_address",
+                "op_hype_address": "$hypervisor_address",
+                "op_rewardToken": "$rewardToken",
+            },
+            "pipeline": [
+                {
+                    "$match": {
+                        "$expr": {
+                            "$and": [
+                                {
+                                    "$eq": [
+                                        "$hypervisor_address",
+                                        "$$op_hype_address",
+                                    ]
+                                },
+                                {
+                                    "$eq": [
+                                        "$rewarder_address",
+                                        "$$op_rewarder_address",
+                                    ]
+                                },
+                                {"$eq": ["$rewardToken", "$$op_rewardToken"]},
+                            ]
+                        }
+                    }
+                },
+                {"$sort": {"block": -1}},
+                {"$limit": 1},
+            ],
+            "as": "rewards_status",
+        }
+        if protocol:
+            # insert protocol match
+            _lookup["pipeline"][0]["$match"]["$expr"]["$and"].append(
+                {"$eq": ["$dex", protocol.database_name]}
+            )
+
+        # build query ( ease debuggin)
+        result = [
+            {"$match": _match},
+            {"$lookup": _lookup},
+            {"$unwind": "$rewards_status"},
+            {"$replaceRoot": {"newRoot": "$rewards_status"}},
+            {
+                "$project": {
+                    "_id": 0,
+                    "block": "$block",
+                    "timestamp": "$timestamp",
+                    "apr": "$apr",
+                    "hypervisor_address": "$hypervisor_address",
+                    "rewarder_address": "$rewarder_address",
+                    "rewarder_registry": "$rewarder_registry",
+                    "rewardToken": "$rewardToken",
+                    "rewardToken_decimals": "$rewardToken_decimals",
+                    "rewardToken_symbol": "$rewardToken_symbol",
+                    "rewards_perSecond": "$rewards_perSecond",
+                    "total_hypervisorToken_qtty": "$total_hypervisorToken_qtty",
+                    "hypervisor_share_price_usd": "$hypervisor_share_price_usd",
+                }
+            },
+        ]
         return result
 
 
