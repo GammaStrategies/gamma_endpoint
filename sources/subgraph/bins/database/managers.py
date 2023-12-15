@@ -1641,19 +1641,29 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
         self, chain: Chain, protocol: Protocol, current_timestamp: int = None
     ):
         try:
-            # save as 1 item ( not separated)
-            if data := await self.create_data(
-                chain=chain, protocol=protocol, current_timestamp=current_timestamp
+            # get data from database matching current_timestamp
+            if existing_data := await self.get_existing_data(
+                chain=chain, protocol=protocol, timestamp=current_timestamp
             ):
-                # merge with existing rewards at same id
-                data = await self.merge_with_existing(
-                    chain=chain, protocol=protocol, data=data
-                )
+                # get data from external source
+                if new_data := await self.create_external_data(
+                    chain=chain,
+                    protocol=protocol,
+                    current_timestamp=current_timestamp,
+                ):
+                    # merge with existing rewards at same id
+                    data_result = await self.merge_data(
+                        chain=chain,
+                        protocol=protocol,
+                        existing_data=existing_data,
+                        new_data=new_data,
+                    )
 
-                await self.save_item_to_database(
-                    data=data,
-                    collection_name=self.db_collection_name,
-                )
+                    await self.save_item_to_database(
+                        data=data_result,
+                        collection_name=self.db_collection_name,
+                    )
+
         except ValueError:
             pass
         except Exception as e:
@@ -1661,7 +1671,46 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
                 f" Unexpected error feeding  {chain}'s {protocol} external allRewards2 to db   err:{e}"
             )
 
-    async def create_data(
+    async def get_existing_data(
+        self, chain: Chain, protocol: Protocol, timestamp: int = None
+    ) -> dict:
+        """Get the last or closest to timestamp/timestamp-1h rewards2 data available at database
+
+        Args:
+            chain (Chain):
+            protocol (Protocol):
+            timestamp (int, optional): . Defaults to now utc.
+
+        Returns:
+            dict: allRewards2 data
+        """
+        _timestamp = timestamp or int(datetime.timestamp(datetime.now(timezone.utc)))
+
+        #  get same id from database
+        if existing_data := await self.get_items_from_database(
+            collection_name="allRewards2",
+            find={
+                "chain": chain,
+                "protocol": protocol,
+                "datetime": {
+                    "$lte": datetime.fromtimestamp(_timestamp),
+                    # "$gte": datetime.fromtimestamp(_timestamp) - timedelta(hours=1),
+                },
+            },
+            sort=[("datetime", -1)],
+            limit=1,
+        ):
+            # pick the first one ( closest to datetime)
+            return existing_data[0]
+
+        else:
+            logger.debug(
+                f" {chain}'s {protocol} has no existing rewards close to {_timestamp}"
+            )
+
+        return None
+
+    async def create_external_data(
         self, chain: Chain, protocol: Protocol, current_timestamp: int = None
     ) -> dict:
         """Create the data ready to be saved to database
@@ -1696,12 +1745,6 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
                 ),
                 collection_name="rewards_static",
             )
-            # rewards_status = await local_db_helper.get_items_from_database(
-            #     aggregate=self.query_rewards(
-            #         timestamp_end=current_timestamp, protocol=protocol
-            #     ),
-            #     collection_name="rewards_status",
-            # )
 
             block = rewards_status[0]["block"]
             timestamp = rewards_status[0]["timestamp"]
@@ -1842,54 +1885,73 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
         # return
         return data
 
-    async def merge_with_existing(
-        self, chain: Chain, protocol: Protocol, data: dict
+    async def merge_data(
+        self, chain: Chain, protocol: Protocol, existing_data: dict, new_data: dict
     ) -> dict:
-        #  get same id from database
-        if existing_data := await self.get_items_from_database(
-            collection_name="allRewards2",
-            find={
-                "chain": chain,
-                "protocol": protocol,
-                "datetime": {
-                    "$lte": data["datetime"],
-                    "$gte": data["datetime"] - timedelta(hours=1),
-                },
-            },
-            sort=[("datetime", -1)],
-        ):
-            # pick the first one ( closest to datetime)
-            existing_data = existing_data[0]
-            # log time difference
-            # logger.debug(
-            #     f" {chain}'s {protocol} has existing rewards with a diff of {(data['datetime']-existing_data['datetime']).total_seconds()/60} min."
-            # )
+        """Merge allRewards2 data
 
-            for key, value in data.items():
-                if key not in [
-                    "id",
-                    "datetime",
-                    "chain",
-                    "protocol",
-                    "block",
-                ] and key.startswith("0x"):
-                    if key not in existing_data:
-                        existing_data[key] = data[key]
-                        logger.debug(
-                            f" Merged {chain}'s {protocol} 3rd party rewards with existing ones at {key}"
-                        )
-                    else:
-                        logger.debug(
-                            f" Found error while merging rewards. {chain}'s {protocol} has same rewarder address {key}. May be already merged in the past."
-                        )
-                        # existing_data[key] = data[key]
-        else:
-            logger.debug(
-                f" {chain}'s {protocol} has no existing rewards close to {data['datetime']}"
-            )
-            existing_data = data
+        Args:
+            chain (Chain): _description_
+            protocol (Protocol): _description_
+            existing_data (dict): _description_
+            new_data (dict): _description_
+
+        Returns:
+            dict: allRewards2 data
+        """
+        for key, value in new_data.items():
+            if key not in [
+                "id",
+                "datetime",
+                "chain",
+                "protocol",
+                "block",
+            ] and key.startswith("0x"):
+                if key not in existing_data:
+                    existing_data[key] = new_data[key]
+                    logger.debug(
+                        f" Merged {chain}'s {protocol} 3rd party rewards with existing ones at {key}"
+                    )
+                else:
+                    logger.debug(
+                        f" Found error while merging rewards. {chain}'s {protocol} has same rewarder address {key}. May be already merged in the past."
+                    )
+                    # existing_data[key] = new_data[key]
 
         return existing_data
+
+    async def fill_data_gaps(self, chain: Chain, protocol: Protocol):
+        """Try to fill external data gaps in allRewards2 database
+
+        Args:
+            chain (Chain):
+            protocol (Protocol):
+        """
+        logger.debug(f" Filling data gaps for {chain}'s {protocol}")
+
+        for allRewards2_item in await self.get_items_from_database(
+            collection_name="allRewards2",
+            find={"chain": chain, "protocol": protocol},
+            sort=[("datetime", -1)],
+        ):
+            # get data from external source
+            if new_data := await self.create_external_data(
+                chain=chain,
+                protocol=protocol,
+                current_timestamp=allRewards2_item["datetime"].timestamp(),
+            ):
+                # merge with existing rewards at same id
+                data_result = await self.merge_data(
+                    chain=chain,
+                    protocol=protocol,
+                    existing_data=allRewards2_item,
+                    new_data=new_data,
+                )
+
+                await self.save_item_to_database(
+                    data=data_result,
+                    collection_name=self.db_collection_name,
+                )
 
     # DEPRECATED
     @staticmethod
