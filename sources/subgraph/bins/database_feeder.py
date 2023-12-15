@@ -52,14 +52,6 @@ CHAINS_PROTOCOLS = [
 ]
 
 # Rewards managed by gamma utilities ( 3rd party rewards not in subgraph)
-# PROTOCOL_REWARDS_DATABASE = [
-#     Protocol.ZYBERSWAP,
-#     Protocol.THENA,
-#     Protocol.SUSHI,
-#     Protocol.BEAMSWAP,
-#     Protocol.RAMSES,
-#     Protocol.SYNTHSWAP,
-# ]
 PROTOCOL_CHAIN_REWARDS_DATABASE = {
     Protocol.UNISWAP: [Chain.ARBITRUM],
     Protocol.QUICKSWAP: [],
@@ -232,7 +224,7 @@ async def feed_database_allRewards2_externals(current_timestamp: int | None = No
             current_timestamp=current_timestamp,
         )
         for chain, protocol in CHAINS_PROTOCOLS
-        if chain in PROTOCOL_CHAIN_REWARDS_DATABASE.get(protocol, [])
+        # if chain in PROTOCOL_CHAIN_REWARDS_DATABASE.get(protocol, [])
     ]
 
     # execute feed

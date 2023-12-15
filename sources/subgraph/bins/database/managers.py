@@ -1712,7 +1712,7 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
 
     async def create_external_data(
         self, chain: Chain, protocol: Protocol, current_timestamp: int = None
-    ) -> dict:
+    ) -> dict | None:
         """Create the data ready to be saved to database
 
         Args:
@@ -1745,6 +1745,10 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
                 ),
                 collection_name="rewards_static",
             )
+
+            if not rewards_status:
+                logger.debug(f" {chain}'s {protocol} has no rewards data in database at {_timestamp} timestamp")
+                return None
 
             block = rewards_status[0]["block"]
             timestamp = rewards_status[0]["timestamp"]
@@ -1876,6 +1880,7 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
                     logger.error(
                         f" {chain}'s {protocol} has same rewarder address with same reward token. APR will NOT be added."
                     )
+
         except IndexError as e:
             raise IndexError(
                 f""" {chain}'s {protocol} has no rewards data in database {f"for {current_timestamp} timestamp" if current_timestamp else ""}"""
@@ -1927,28 +1932,46 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
 
         return existing_data
 
-    async def fill_data_gaps(self, chain: Chain, protocol: Protocol, limit: int = 500):
+    async def fill_data_gaps(
+        self, chain: Chain, protocol: Protocol, rewrite: bool = False, limit: int = 500
+    ):
         """Try to fill external data gaps in allRewards2 database
 
         Args:
             chain (Chain):
             protocol (Protocol):
+            rewrite (bool, optional): rewrite existing data. Defaults to False.
             limit (int, optional): number of allRewards2 items totry fill, ( from the newest to the oldest ) . Defaults to 500.
         """
-        logger.debug(f" Filling data gaps for {chain}'s {protocol}")
+        logger.info(f" Filling {limit} data gaps for {chain}'s {protocol}")
 
-        for allRewards2_item in await self.get_items_from_database(
+        allRewards2_list = await self.get_items_from_database(
             collection_name="allRewards2",
             find={"chain": chain, "protocol": protocol},
             sort=[("datetime", -1)],
             limit=limit,
-        ):
+        )
+
+        for idx, allRewards2_item in enumerate(allRewards2_list):
             # get data from external source
             if new_data := await self.create_external_data(
                 chain=chain,
                 protocol=protocol,
                 current_timestamp=allRewards2_item["datetime"].timestamp(),
             ):
+                # check if should be updated ( compare keys starting with 0x, if exists)
+                if not rewrite:
+                    _new_data_keys = [
+                        key
+                        for key in new_data.keys()
+                        if key.startswith("0x") and key not in allRewards2_item
+                    ]
+                    if not _new_data_keys:
+                        logger.debug(
+                            f" No data gaps found on {idx} of {len(allRewards2_list)} for {chain}'s {protocol}. [ {idx/len(allRewards2_list):,.1%}]"
+                        )
+                        continue
+
                 # merge with existing rewards at same id
                 data_result = await self.merge_data(
                     chain=chain,
@@ -1960,6 +1983,9 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
                 await self.save_item_to_database(
                     data=data_result,
                     collection_name=self.db_collection_name,
+                )
+                logger.info(
+                    f" Filled data gap on {idx} of {len(allRewards2_list)} for {chain}'s {protocol}. [ {idx/len(allRewards2_list):,.1%}]"
                 )
 
     # DEPRECATED
