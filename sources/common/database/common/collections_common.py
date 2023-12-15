@@ -52,6 +52,13 @@ class db_collections_common:
             data (list): data list following tool_mongodb_general class to be saved to database in a dict format
             collection_name (str): collection name to save data to
         """
+
+        if not data:
+            logger.warning(
+                f"  No data to save in bulk to mongo's {collection_name} collection."
+            )
+            return
+
         data = [
             {"filter": {"id": item["id"]}, "data": item} for key, item in data.items()
         ]
