@@ -1747,7 +1747,9 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
             )
 
             if not rewards_status:
-                logger.debug(f" {chain}'s {protocol} has no rewards data in database at {_timestamp} timestamp")
+                logger.debug(
+                    f" {chain}'s {protocol} has no rewards data in database at {_timestamp} timestamp"
+                )
                 return None
 
             block = rewards_status[0]["block"]
