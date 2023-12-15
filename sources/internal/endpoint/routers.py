@@ -25,7 +25,7 @@ from sources.internal.bins.kpis import (
     get_transactions_summary,
     get_users_activity,
 )
-from sources.internal.bins.reports import report_galaxe
+from sources.internal.bins.reports import global_report_revenue, report_galaxe
 from sources.mongo.bins.apps.hypervisor import hypervisors_collected_fees
 from sources.mongo.bins.apps.prices import get_current_prices
 from sources.mongo.bins.helpers import local_database_helper
@@ -628,6 +628,11 @@ class internal_router_builder_reports(router_builder_baseTemplate):
             methods=["GET"],
         )
         #
+        router.add_api_route(
+            path="/global_revenue",
+            endpoint=self.global_revenue,
+            methods=["GET"],
+        )
 
         return router
 
@@ -687,3 +692,14 @@ class internal_router_builder_reports(router_builder_baseTemplate):
             net_position_usd_threshold=net_position_usd_threshold,
             deposits_usd_threshold=deposits_usd_threshold,
         )
+
+    # @cache(expire=DAILY_CACHE_TIMEOUT)
+    async def global_revenue(self, response: Response) -> dict:
+        """Global revenue report
+        * **total_usd**:  Total revenue in USD
+        * **potential total usd**:  Current month's total_usd linear extrapolation.
+        * **yearly_percentage**:  this total_usd / year's total_usd
+        * **monthly_percentage**:  this total_usd / month's total_usd
+
+        """
+        return await global_report_revenue()

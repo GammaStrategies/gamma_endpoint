@@ -1,5 +1,5 @@
 from sources.subgraph.bins.enums import Chain, Protocol
-from sources.mongo.bins.helpers import local_database_helper
+from sources.mongo.bins.helpers import local_database_helper, global_database_helper
 
 
 async def report_galaxe(
@@ -43,3 +43,18 @@ async def report_galaxe(
             result["details"][user] = user_details
 
     return result
+
+
+async def global_report_revenue():
+    """Global report revenue
+
+    Returns:
+        dict: _description_
+
+    """
+    result = await global_database_helper().get_items_from_database(
+        collection_name="reports",
+        find={"id": "revenue"},
+        projection={"_id": 0, "id": 0},
+    )
+    return result[0]
