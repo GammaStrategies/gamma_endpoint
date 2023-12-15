@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 
 from sources.common.database.collection_endpoint import database_local
 from sources.common.database.common.collections_common import db_collections_common
-from sources.common.general.enums import Period
+from sources.common.general.enums import Period, rewarderType
 from sources.subgraph.bins.common.hypervisors.all_data import AllData as HypeAllData
 from sources.subgraph.bins.config import MASTERCHEF_ADDRESSES
 from sources.subgraph.bins.enums import Chain, Protocol
@@ -1763,6 +1763,13 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
             # create pools content
 
             for reward in rewards_status:
+                # filter our CAMELOT MERKL ( camelot will show spNFT + nitro)
+                if reward["rewarder_type"] == rewarderType.ANGLE_MERKLE:
+                    logger.debug(
+                        f" {chain}'s {protocol} has MERKL rewards. Skipping. ( only spNFT + Nitro ) "
+                    )
+                    continue
+
                 # create masterchef level in data if not exists
                 if reward["rewarder_registry"] not in data:
                     data[reward["rewarder_registry"]] = {"pools": {}}
@@ -1920,12 +1927,13 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
 
         return existing_data
 
-    async def fill_data_gaps(self, chain: Chain, protocol: Protocol):
+    async def fill_data_gaps(self, chain: Chain, protocol: Protocol, limit: int = 500):
         """Try to fill external data gaps in allRewards2 database
 
         Args:
             chain (Chain):
             protocol (Protocol):
+            limit (int, optional): number of allRewards2 items totry fill, ( from the newest to the oldest ) . Defaults to 500.
         """
         logger.debug(f" Filling data gaps for {chain}'s {protocol}")
 
@@ -1933,6 +1941,7 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
             collection_name="allRewards2",
             find={"chain": chain, "protocol": protocol},
             sort=[("datetime", -1)],
+            limit=limit,
         ):
             # get data from external source
             if new_data := await self.create_external_data(
@@ -2105,6 +2114,7 @@ class db_allRewards2_external_manager(db_allRewards2_manager):
                     "rewards_perSecond": "$rewards_perSecond",
                     "total_hypervisorToken_qtty": "$total_hypervisorToken_qtty",
                     "hypervisor_share_price_usd": "$hypervisor_share_price_usd",
+                    "rewarder_type": "$rewarder_type",
                 }
             },
         ]
