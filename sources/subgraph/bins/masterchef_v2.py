@@ -16,9 +16,9 @@ class MasterchefV2Data:
     async def _get_masterchef_data(self):
         query = """
         {
-            masterChefV2S {
+            masterChefV2S(first: 1000) {
                 id
-                pools {
+                pools(first: 1000) {
                     id
                     lastRewardTimestamp
                     poolId
@@ -46,7 +46,7 @@ class MasterchefV2Data:
                             }
                         }
                     }
-                    rewarders {
+                    rewarders(first: 1000) {
                         allocPoint
                         rewarder {
                             id
