@@ -12,7 +12,7 @@ DEPLOYMENTS = [
     (Protocol.QUICKSWAP, Chain.POLYGON),
     (Protocol.ZYBERSWAP, Chain.ARBITRUM),
     (Protocol.THENA, Chain.BSC),
-    # (Protocol.THENA, Chain.OPBNB),
+    (Protocol.THENA, Chain.OPBNB),
     (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
     (Protocol.CAMELOT, Chain.ARBITRUM),
     (Protocol.GLACIER, Chain.AVALANCHE),
@@ -34,8 +34,8 @@ DEPLOYMENTS = [
     (Protocol.APERTURE, Chain.MANTA),
     (Protocol.QUICKSWAP, Chain.MANTA),
     (Protocol.HERCULES, Chain.METIS),
-    # (Protocol.BASESWAP, Chain.BASE),
-    # (Protocol.SWAPBASED, Chain.BASE),
+    (Protocol.BASESWAP, Chain.BASE),
+    (Protocol.SWAPBASED, Chain.BASE),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
