@@ -697,7 +697,7 @@ class internal_router_builder_reports(router_builder_baseTemplate):
     async def global_revenue(self, response: Response) -> dict:
         """Global revenue report
         * **total_usd**:  Total revenue in USD
-        * **potential total usd**:  Current month's total_usd linear extrapolation.
+        * **potential total usd**:  Current month's total_usd 50% decay linear extrapolation [ total_usd/days_passed * 0.5 * days left + total_usd ].
         * **yearly_percentage**:  this total_usd / year's total_usd
         * **monthly_percentage**:  this total_usd / month's total_usd
 
