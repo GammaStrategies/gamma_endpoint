@@ -36,6 +36,7 @@ DEPLOYMENTS = [
     (Protocol.HERCULES, Chain.METIS),
     (Protocol.BASESWAP, Chain.BASE),
     (Protocol.SWAPBASED, Chain.BASE),
+    (Protocol.PHARAOH, Chain.AVALANCHE),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -132,6 +133,9 @@ DEX_SUBGRAPH_URLS = {
     Protocol.SWAPBASED: {
         Chain.BASE: get_config("SWAPBASED_BASE_SUBGRAPH_URL"),
     },
+    Protocol.PHARAOH: {
+        Chain.AVALANCHE: get_config("PHARAOH_AVALANCHE_SUBGRAPH_URL"),
+    },
 }
 
 DEX_HYPEPOOL_SUBGRAPH_URLS = {
@@ -215,6 +219,9 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.SWAPBASED: {
         Chain.BASE: get_config("SWAPBASED_BASE_HP_SUBGRAPH_URL"),
     },
+    Protocol.PHARAOH: {
+        Chain.AVALANCHE: get_config("PHARAOH_AVALANCHE_HP_SUBGRAPH_URL"),
+    },
 }
 
 GAMMA_SUBGRAPH_URLS = {
@@ -297,6 +304,9 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.SWAPBASED: {
         Chain.BASE: get_config("SWAPBASED_BASE_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.PHARAOH: {
+        Chain.AVALANCHE: get_config("PHARAOH_AVALANCHE_GAMMA_SUBGRAPH_URL"),
     },
 }
 

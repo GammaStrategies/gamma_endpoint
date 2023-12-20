@@ -82,6 +82,7 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.HERCULES, Chain.METIS),
     (Protocol.BASESWAP, Chain.BASE),
     (Protocol.SWAPBASED, Chain.BASE),
+    (Protocol.PHARAOH, Chain.AVALANCHE),
 ]
 
 
@@ -424,6 +425,15 @@ def build_routers_compatible() -> list:
             chain=Chain.BASE,
             tags=["Swapbased - Base"],
             prefix=f"/{Protocol.SWAPBASED.api_url}/{Chain.BASE.api_url}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.PHARAOH,
+            chain=Chain.AVALANCHE,
+            tags=["Pharaoh - Avalanche"],
+            prefix=f"/{Protocol.PHARAOH.api_url}/{Chain.AVALANCHE.api_url}",
         )
     )
 

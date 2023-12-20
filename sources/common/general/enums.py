@@ -96,6 +96,7 @@ class Dex(str, Enum):
     HERCULES = "hercules"
     BASESWAP = "baseswap"
     SWAPBASED = "swapbased"
+    PHARAOH = "pharaoh"
 
 
 class Protocol(str, Enum):
@@ -129,6 +130,7 @@ class Protocol(str, Enum):
     HERCULES = ("hercules", None, None, None, "hercules", "Hercules")
     BASESWAP = ("baseswap", None, None, None, "baseswap", "Baseswap")
     SWAPBASED = ("swapbased", None, None, None, "swapbased", "Swapbased")
+    PHARAOH = ("pharaoh", None, None, None, "pharaoh", "Pharaoh")
 
     # extra properties
     api_url: str

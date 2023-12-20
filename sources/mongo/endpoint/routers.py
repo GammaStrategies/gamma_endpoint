@@ -52,6 +52,7 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.HERCULES, Chain.METIS),
     (Protocol.BASESWAP, Chain.BASE),
     (Protocol.SWAPBASED, Chain.BASE),
+    (Protocol.PHARAOH, Chain.AVALANCHE),
 ]
 
 
