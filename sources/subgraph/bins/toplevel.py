@@ -127,19 +127,40 @@ class TopLevelData:
                     )
                 )
 
-            if self.chain == Chain.BSC and self.protocol == Protocol.THENA and hypervisor["id"] == "0x01dd2d28eeb95d740acb5344b1e2c99b61cc3e64":
+            if (
+                self.chain == Chain.BSC
+                and self.protocol == Protocol.THENA
+                and hypervisor["id"] == "0x01dd2d28eeb95d740acb5344b1e2c99b61cc3e64"
+            ):
                 hypervisor["grossFeesClaimedUSD"] = str(
                     max(
-                        float(hypervisor["grossFeesClaimedUSD"])
-                        - 707293639.8442053 - 180446479065422783579566400230944600000 + 348.2528026369851712613650107144147,
+                        float(hypervisor["grossFeesClaimedUSD"]) - 707293639.8442053,
                         0,
                     )
                 )
-            if self.chain == Chain.BSC and self.protocol == Protocol.THENA and hypervisor["id"] == "0x99f5fd4588401e482d577a775b645c86678e308d":
+            if (
+                self.chain == Chain.BSC
+                and self.protocol == Protocol.THENA
+                and hypervisor["id"] == "0x99f5fd4588401e482d577a775b645c86678e308d"
+            ):
                 hypervisor["grossFeesClaimedUSD"] = str(
                     max(
                         float(hypervisor["grossFeesClaimedUSD"])
-                        - 180446479065422783579566400230944600000 + 348.2528026369851712613650107144147,
+                        - 180446479065422783579566400230944600000
+                        + 348.2528026369851712613650107144147,
+                        0,
+                    )
+                )
+            if (
+                self.chain == Chain.BSC
+                and self.protocol == Protocol.THENA
+                and hypervisor["id"] == "0x5c11e97bc720e5c61afaa991f839dc6fdaa6cc00"
+            ):
+                hypervisor["grossFeesClaimedUSD"] = str(
+                    max(
+                        float(hypervisor["grossFeesClaimedUSD"])
+                        - 204139348363971053920264706541381100000
+                        + 292.9308911763711601986269689517349,
                         0,
                     )
                 )
