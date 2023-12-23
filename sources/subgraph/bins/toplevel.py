@@ -178,6 +178,9 @@ class TopLevelData:
                     )
                 )
 
+            if float(hypervisor["grossFeesClaimedUSD"]) > 10000000:
+                hypervisor["grossFeesClaimedUSD"] = "0"
+
             hypervisor_tvl = float(hypervisor["tvlUSD"])
             if (hypervisor_tvl not in self.excluded_hypervisors) and (
                 hypervisor_tvl < TVL_MAX
