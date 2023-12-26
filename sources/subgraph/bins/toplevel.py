@@ -55,7 +55,7 @@ class TopLevelData:
         return response["data"]["uniswapV3Pools"]
 
     async def _get_all_stats_data(self):
-        query = """
+        query_rebal = """
         query allStats($grossFeesMax: Int!) {
             uniswapV3Hypervisors(
                 first: 1000
@@ -78,6 +78,40 @@ class TopLevelData:
             }
         }
         """
+
+        query_zeroburn = """
+        query allStats($grossFeesMax: Int!) {
+            uniswapV3Hypervisors(
+                first: 1000
+            ){
+                id
+                grossFeesClaimedUSD
+                tvlUSD
+                badRebalances: rebalances(
+                    where: {grossFeesUSD_gte: $grossFeesMax}
+                ) {
+                    grossFeesUSD
+                    protocolFeesUSD
+                    netFeesUSD
+                }
+                badFees: feeUpdates(
+                    where: {feesUSD_gte: $grossFeesMax}
+                ) {
+                    feesUSD
+                }
+            }
+            uniswapV3Pools(
+                first: 1000
+            ){
+                id
+            }
+        }
+        """
+
+        if self.protocol == Protocol.THENA and self.chain == Chain.BSC:
+            query = query_zeroburn
+        else:
+            query = query_rebal
 
         variables = {"grossFeesMax": GROSS_FEES_MAX}
         response = await self.gamma_client.query(query, variables)
@@ -113,7 +147,7 @@ class TopLevelData:
         total_tvl = 0
         for hypervisor in data["uniswapV3Hypervisors"]:
             if hypervisor["badRebalances"]:
-                fees_correction_value = sum(
+                rebalance_fees_correction_value = sum(
                     [
                         float(rebalance["grossFeesUSD"])
                         for rebalance in hypervisor["badRebalances"]
@@ -122,58 +156,19 @@ class TopLevelData:
                 hypervisor["grossFeesClaimedUSD"] = str(
                     max(
                         float(hypervisor["grossFeesClaimedUSD"])
-                        - fees_correction_value,
+                        - rebalance_fees_correction_value,
                         0,
                     )
                 )
 
-            if (
-                self.chain == Chain.BSC
-                and self.protocol == Protocol.THENA
-                and hypervisor["id"] == "0x01dd2d28eeb95d740acb5344b1e2c99b61cc3e64"
-            ):
-                hypervisor["grossFeesClaimedUSD"] = str(
-                    max(
-                        float(hypervisor["grossFeesClaimedUSD"]) - 707293639.8442053,
-                        0,
-                    )
+            elif hypervisor["badFees"]:
+                fees_correction_value = sum(
+                    [float(bad_fees["feesUSD"]) for bad_fees in hypervisor["badFees"]]
                 )
-            if (
-                self.chain == Chain.BSC
-                and self.protocol == Protocol.THENA
-                and hypervisor["id"] == "0x99f5fd4588401e482d577a775b645c86678e308d"
-            ):
                 hypervisor["grossFeesClaimedUSD"] = str(
                     max(
                         float(hypervisor["grossFeesClaimedUSD"])
-                        - 180446479065422783579566400230944600000
-                        + 348.2528026369851712613650107144147,
-                        0,
-                    )
-                )
-            if (
-                self.chain == Chain.BSC
-                and self.protocol == Protocol.THENA
-                and hypervisor["id"] == "0x5c11e97bc720e5c61afaa991f839dc6fdaa6cc00"
-            ):
-                hypervisor["grossFeesClaimedUSD"] = str(
-                    max(
-                        float(hypervisor["grossFeesClaimedUSD"])
-                        - 204139348363971053920264706541381100000
-                        + 292.9308911763711601986269689517349,
-                        0,
-                    )
-                )
-            if (
-                self.chain == Chain.BSC
-                and self.protocol == Protocol.THENA
-                and hypervisor["id"] == "0xa614f6a18b484d9946024b2f48687853589f9296"
-            ):
-                hypervisor["grossFeesClaimedUSD"] = str(
-                    max(
-                        float(hypervisor["grossFeesClaimedUSD"])
-                        - 132680098270120337796923875906769800
-                        + 0.0005556920919671264040809536243588581,
+                        - fees_correction_value,
                         0,
                     )
                 )

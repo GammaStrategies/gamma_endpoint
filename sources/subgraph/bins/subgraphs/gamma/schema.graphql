@@ -454,6 +454,9 @@ enum Hypervisor_orderBy {
   vaultFactory__owner
 }
 
+"8 bytes signed integer\n"
+scalar Int8
+
 type MasterChef {
   id: ID!
   rewardToken: Token!
@@ -1481,6 +1484,27 @@ enum MasterChef_orderBy {
   pools
 }
 
+enum Network {
+  mainnet
+  arbitrum
+  celo
+  matic
+  optimism
+  bsc
+  pzke
+  avalanche
+  fantom
+  moonbeam
+  mantle
+  syscoin
+  linea
+  base
+  kava
+  opbnb
+  manta
+  metis
+}
+
 """Defines the order direction, either ascending or descending"""
 enum OrderDirection {
   asc
@@ -1488,8 +1512,21 @@ enum OrderDirection {
 }
 
 type Protocol {
-  id: ID!
+  """Hypervisor registry address"""
+  id: String!
+
+  """Name of protocol"""
+  slug: String!
   name: String!
+
+  """Underlying infrastructure protocol"""
+  underlyingProtocol: UnderlyingProtocol!
+
+  """Network/chain"""
+  network: Network!
+
+  """Subgraph version"""
+  version: String!
 }
 
 type ProtocolDistribution {
@@ -1542,14 +1579,46 @@ enum ProtocolDistribution_orderBy {
 }
 
 input Protocol_filter {
-  id: ID
-  id_not: ID
-  id_gt: ID
-  id_lt: ID
-  id_gte: ID
-  id_lte: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
+  id: String
+  id_not: String
+  id_gt: String
+  id_lt: String
+  id_gte: String
+  id_lte: String
+  id_in: [String!]
+  id_not_in: [String!]
+  id_contains: String
+  id_contains_nocase: String
+  id_not_contains: String
+  id_not_contains_nocase: String
+  id_starts_with: String
+  id_starts_with_nocase: String
+  id_not_starts_with: String
+  id_not_starts_with_nocase: String
+  id_ends_with: String
+  id_ends_with_nocase: String
+  id_not_ends_with: String
+  id_not_ends_with_nocase: String
+  slug: String
+  slug_not: String
+  slug_gt: String
+  slug_lt: String
+  slug_gte: String
+  slug_lte: String
+  slug_in: [String!]
+  slug_not_in: [String!]
+  slug_contains: String
+  slug_contains_nocase: String
+  slug_not_contains: String
+  slug_not_contains_nocase: String
+  slug_starts_with: String
+  slug_starts_with_nocase: String
+  slug_not_starts_with: String
+  slug_not_starts_with_nocase: String
+  slug_ends_with: String
+  slug_ends_with_nocase: String
+  slug_not_ends_with: String
+  slug_not_ends_with_nocase: String
   name: String
   name_not: String
   name_gt: String
@@ -1570,6 +1639,34 @@ input Protocol_filter {
   name_ends_with_nocase: String
   name_not_ends_with: String
   name_not_ends_with_nocase: String
+  underlyingProtocol: UnderlyingProtocol
+  underlyingProtocol_not: UnderlyingProtocol
+  underlyingProtocol_in: [UnderlyingProtocol!]
+  underlyingProtocol_not_in: [UnderlyingProtocol!]
+  network: Network
+  network_not: Network
+  network_in: [Network!]
+  network_not_in: [Network!]
+  version: String
+  version_not: String
+  version_gt: String
+  version_lt: String
+  version_gte: String
+  version_lte: String
+  version_in: [String!]
+  version_not_in: [String!]
+  version_contains: String
+  version_contains_nocase: String
+  version_not_contains: String
+  version_not_contains_nocase: String
+  version_starts_with: String
+  version_starts_with_nocase: String
+  version_not_starts_with: String
+  version_not_starts_with_nocase: String
+  version_ends_with: String
+  version_ends_with_nocase: String
+  version_not_ends_with: String
+  version_not_ends_with_nocase: String
 
   """Filter for the block changed event."""
   _change_block: BlockChangedFilter
@@ -1579,7 +1676,11 @@ input Protocol_filter {
 
 enum Protocol_orderBy {
   id
+  slug
   name
+  underlyingProtocol
+  network
+  version
 }
 
 type Query {
@@ -2603,6 +2704,36 @@ type Query {
     """
     subgraphError: _SubgraphErrorPolicy_! = deny
   ): [MasterChefV2RewarderPoolAccount!]!
+  poolQueue(
+    id: ID!
+
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): _PoolQueue
+  poolQueues(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: _PoolQueue_orderBy
+    orderDirection: OrderDirection
+    where: _PoolQueue_filter
+
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [_PoolQueue!]!
 
   """Access to subgraph metadata"""
   _meta(block: Block_height): _Meta_
@@ -4182,6 +4313,36 @@ type Subscription {
     """
     subgraphError: _SubgraphErrorPolicy_! = deny
   ): [MasterChefV2RewarderPoolAccount!]!
+  poolQueue(
+    id: ID!
+
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): _PoolQueue
+  poolQueues(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: _PoolQueue_orderBy
+    orderDirection: OrderDirection
+    where: _PoolQueue_filter
+
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [_PoolQueue!]!
 
   """Access to subgraph metadata"""
   _meta(block: Block_height): _Meta_
@@ -4273,6 +4434,12 @@ enum Token_orderBy {
   name
   decimals
   totalSupply
+}
+
+enum UnderlyingProtocol {
+  uniswapV3
+  algebraV1
+  algebraV2
 }
 
 type UniswapV3Deposit {
@@ -4459,6 +4626,9 @@ type UniswapV3FeeUpdate {
   hypervisor: UniswapV3Hypervisor!
   block: BigInt!
   timestamp: BigInt!
+  fees0: BigInt!
+  fees1: BigInt!
+  feesUSD: BigDecimal!
 }
 
 input UniswapV3FeeUpdate_filter {
@@ -4507,6 +4677,30 @@ input UniswapV3FeeUpdate_filter {
   timestamp_lte: BigInt
   timestamp_in: [BigInt!]
   timestamp_not_in: [BigInt!]
+  fees0: BigInt
+  fees0_not: BigInt
+  fees0_gt: BigInt
+  fees0_lt: BigInt
+  fees0_gte: BigInt
+  fees0_lte: BigInt
+  fees0_in: [BigInt!]
+  fees0_not_in: [BigInt!]
+  fees1: BigInt
+  fees1_not: BigInt
+  fees1_gt: BigInt
+  fees1_lt: BigInt
+  fees1_gte: BigInt
+  fees1_lte: BigInt
+  fees1_in: [BigInt!]
+  fees1_not_in: [BigInt!]
+  feesUSD: BigDecimal
+  feesUSD_not: BigDecimal
+  feesUSD_gt: BigDecimal
+  feesUSD_lt: BigDecimal
+  feesUSD_gte: BigDecimal
+  feesUSD_lte: BigDecimal
+  feesUSD_in: [BigDecimal!]
+  feesUSD_not_in: [BigDecimal!]
 
   """Filter for the block changed event."""
   _change_block: BlockChangedFilter
@@ -4567,6 +4761,9 @@ enum UniswapV3FeeUpdate_orderBy {
   hypervisor__lastUpdated
   block
   timestamp
+  fees0
+  fees1
+  feesUSD
 }
 
 type UniswapV3Hypervisor {
@@ -4635,6 +4832,7 @@ type UniswapV3HypervisorConversion {
   baseToken: Token!
   usdPath: [String!]!
   usdPathIndex: [Int!]!
+  usdPathStartBlock: [Int!]!
   priceTokenInBase: BigDecimal!
   priceBaseInUSD: BigDecimal!
 }
@@ -4710,6 +4908,12 @@ input UniswapV3HypervisorConversion_filter {
   usdPathIndex_contains_nocase: [Int!]
   usdPathIndex_not_contains: [Int!]
   usdPathIndex_not_contains_nocase: [Int!]
+  usdPathStartBlock: [Int!]
+  usdPathStartBlock_not: [Int!]
+  usdPathStartBlock_contains: [Int!]
+  usdPathStartBlock_contains_nocase: [Int!]
+  usdPathStartBlock_not_contains: [Int!]
+  usdPathStartBlock_not_contains_nocase: [Int!]
   priceTokenInBase: BigDecimal
   priceTokenInBase_not: BigDecimal
   priceTokenInBase_gt: BigDecimal
@@ -4793,6 +4997,7 @@ enum UniswapV3HypervisorConversion_orderBy {
   baseToken__totalSupply
   usdPath
   usdPathIndex
+  usdPathStartBlock
   priceTokenInBase
   priceBaseInUSD
 }
@@ -5875,6 +6080,7 @@ enum UniswapV3Hypervisor_orderBy {
   pool__id
   pool__fee
   pool__sqrtPriceX96
+  pool__tick
   pool__lastSwapTime
   pool__lastHypervisorRefreshTime
   fee
@@ -5938,6 +6144,7 @@ type UniswapV3Pool {
   token1: Token!
   fee: Int!
   sqrtPriceX96: BigInt!
+  tick: Int!
   hypervisors: [String!]!
   lastSwapTime: BigInt!
   lastHypervisorRefreshTime: BigInt!
@@ -6010,6 +6217,14 @@ input UniswapV3Pool_filter {
   sqrtPriceX96_lte: BigInt
   sqrtPriceX96_in: [BigInt!]
   sqrtPriceX96_not_in: [BigInt!]
+  tick: Int
+  tick_not: Int
+  tick_gt: Int
+  tick_lt: Int
+  tick_gte: Int
+  tick_lte: Int
+  tick_in: [Int!]
+  tick_not_in: [Int!]
   hypervisors: [String!]
   hypervisors_not: [String!]
   hypervisors_contains: [String!]
@@ -6055,6 +6270,7 @@ enum UniswapV3Pool_orderBy {
   token1__totalSupply
   fee
   sqrtPriceX96
+  tick
   hypervisors
   lastSwapTime
   lastHypervisorRefreshTime
@@ -6712,6 +6928,46 @@ type _Meta_ {
 
   """If `true`, the subgraph encountered indexing errors at some past block"""
   hasIndexingErrors: Boolean!
+}
+
+type _PoolQueue {
+  id: ID!
+  addresses: [String!]!
+  startBlocks: [BigInt!]!
+}
+
+input _PoolQueue_filter {
+  id: ID
+  id_not: ID
+  id_gt: ID
+  id_lt: ID
+  id_gte: ID
+  id_lte: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  addresses: [String!]
+  addresses_not: [String!]
+  addresses_contains: [String!]
+  addresses_contains_nocase: [String!]
+  addresses_not_contains: [String!]
+  addresses_not_contains_nocase: [String!]
+  startBlocks: [BigInt!]
+  startBlocks_not: [BigInt!]
+  startBlocks_contains: [BigInt!]
+  startBlocks_contains_nocase: [BigInt!]
+  startBlocks_not_contains: [BigInt!]
+  startBlocks_not_contains_nocase: [BigInt!]
+
+  """Filter for the block changed event."""
+  _change_block: BlockChangedFilter
+  and: [_PoolQueue_filter]
+  or: [_PoolQueue_filter]
+}
+
+enum _PoolQueue_orderBy {
+  id
+  addresses
+  startBlocks
 }
 
 enum _SubgraphErrorPolicy_ {
