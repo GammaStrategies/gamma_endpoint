@@ -161,7 +161,7 @@ class TopLevelData:
                     )
                 )
 
-            elif hypervisor["badFees"]:
+            elif hypervisor.get("badFees"):
                 fees_correction_value = sum(
                     [float(bad_fees["feesUSD"]) for bad_fees in hypervisor["badFees"]]
                 )
