@@ -821,6 +821,7 @@ async def get_revenue_operations(
                 # "usd_value": "$usd_value",
                 "usd_value": {
                     "$cond": [
+                        # CAMELOT dex revenue is multiplied by 0.623529 to match the fee split
                         {"$eq": ["$dex", "camelot"]},
                         {"$multiply": ["$usd_value", 0.623529]},
                         "$usd_value",

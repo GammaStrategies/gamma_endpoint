@@ -1288,7 +1288,7 @@ class db_returns_manager(db_collection_manager):
                     }
                 }
             },
-            {"$match": {"exclude": {"$lte": 0.2 if period < 90 else 100}}},
+            {"$match": {"exclude": {"$lte": 0.39 if period < 90 else 1000}}},
             {"$unset": ["_id", "exclude"]},
             # {"$unset": ["_id", "exclude", "allRewards2._id"]},
         ]
