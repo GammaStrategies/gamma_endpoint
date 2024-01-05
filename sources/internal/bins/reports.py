@@ -58,3 +58,22 @@ async def global_report_revenue():
         projection={"_id": 0, "id": 0},
     )
     return result[0]
+
+
+async def custom_report(chain: Chain, user_address: str | None = None):
+    """Custom report
+
+    Returns:
+        dict: _description_
+
+    """
+    find = {"type": "custom"}
+    if user_address is not None:
+        find["user_address"] = user_address
+    data = await local_database_helper(network=chain).get_items_from_database(
+        collection_name="reports",
+        find=find,
+        projection={"_id": 0, "id": 0},
+    )
+
+    return [global_database_helper().convert_d128_to_decimal(x) for x in data]

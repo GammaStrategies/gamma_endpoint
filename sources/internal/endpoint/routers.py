@@ -25,7 +25,11 @@ from sources.internal.bins.kpis import (
     get_transactions_summary,
     get_users_activity,
 )
-from sources.internal.bins.reports import global_report_revenue, report_galaxe
+from sources.internal.bins.reports import (
+    custom_report,
+    global_report_revenue,
+    report_galaxe,
+)
 from sources.mongo.bins.apps.hypervisor import hypervisors_collected_fees
 from sources.mongo.bins.apps.prices import get_current_prices
 from sources.mongo.bins.helpers import local_database_helper
@@ -634,6 +638,12 @@ class internal_router_builder_reports(router_builder_baseTemplate):
             methods=["GET"],
         )
 
+        router.add_api_route(
+            path="/custom",
+            endpoint=self.custom_report,
+            methods=["GET"],
+        )
+
         return router
 
     # ROUTE FUNCTIONS
@@ -703,3 +713,11 @@ class internal_router_builder_reports(router_builder_baseTemplate):
 
         """
         return await global_report_revenue()
+
+    async def custom_report(self, response: Response, user_address: str | None = None):
+        """Custom report
+        """
+
+        reports = await custom_report(chain=Chain.ARBITRUM, user_address=user_address)
+
+        return reports
