@@ -50,7 +50,7 @@ def query_frontend_revenue_stats_by_monthDex(
     if ini_timestamp:
         _match["timestamp"] = {"$gte": ini_timestamp}
 
-    return [
+    _query = [
         {"$match": _match},
         {"$sort": {"timestamp": 1, "total_revenue": -1}},
         {
@@ -86,6 +86,8 @@ def query_frontend_revenue_stats_by_monthDex(
         {"$unset": ["_id", "id"]},
         {"$sort": {"timestamp": 1, "total_revenue": -1}},
     ]
+
+    return _query
 
 
 def query_frontend_revenue_stats_byYear(
