@@ -27,6 +27,10 @@ async def get_revenue_stats(
         ),
     )
 
+    # sort by year
+    if yearly:
+        result.sort(key=lambda x: x["year"])
+
     return result
 
 
