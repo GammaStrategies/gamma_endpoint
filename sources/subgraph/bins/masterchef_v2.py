@@ -266,11 +266,13 @@ class UserRewardsV2(MasterchefV2Data):
                 hypervisor_symbol = pool["hypervisor"]["symbol"]
                 hypervisor_decimal = 18
 
+                account_amount = int(account["amount"]) / 10**hypervisor_decimal
+
                 pool_id = int(pool["poolId"])
 
                 for rewarder in pool["rewarders"]:
                     rewarder_info = rewarder["rewarder"]
-                    if int(rewarder_info["rewardPerSecond"]) <= 0:
+                    if (int(rewarder_info["rewardPerSecond"]) <= 0) and (account_amount <= 0):
                         continue
 
                     rewarder_id = rewarder_info["id"]
@@ -286,8 +288,7 @@ class UserRewardsV2(MasterchefV2Data):
                             "rewarder": rewarder_id,
                             "rewardToken": reward_token_id,
                             "rewardTokenSymbol": reward_token_symbol,
-                            "stakedAmount": int(account["amount"])
-                            / 10**hypervisor_decimal,
+                            "stakedAmount": account_amount,
                         }
                     )
         else:
