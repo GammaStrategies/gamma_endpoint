@@ -7,6 +7,7 @@ async def get_revenue_stats(
     protocol: Protocol | None = None,
     ini_timestamp: int | None = None,
     yearly: bool = False,
+    filter_zero_revenue: bool = False,
 ) -> list[dict]:
     """Returns the Gamma's Volume, fees and revenue
 
@@ -18,11 +19,17 @@ async def get_revenue_stats(
         collection_name="frontend",
         aggregate=(
             query_frontend_revenue_stats_by_monthDex(
-                chain=chain, protocol=protocol, ini_timestamp=ini_timestamp
+                chain=chain,
+                protocol=protocol,
+                ini_timestamp=ini_timestamp,
+                filter_zero_revenue=filter_zero_revenue,
             )
             if not yearly
             else query_frontend_revenue_stats_byYear(
-                chain=chain, protocol=protocol, ini_timestamp=ini_timestamp
+                chain=chain,
+                protocol=protocol,
+                ini_timestamp=ini_timestamp,
+                filter_zero_revenue=filter_zero_revenue,
             )
         ),
     )
@@ -38,8 +45,15 @@ def query_frontend_revenue_stats_by_monthDex(
     chain: Chain | None = None,
     protocol: Protocol | None = None,
     ini_timestamp: int | None = None,
+    filter_zero_revenue: bool = False,
 ) -> list[dict]:
     """Frontent collection query for revenue stats ordered by month and dex
+
+    Args:
+        chain (Chain, optional): chain. Defaults to None.
+        protocol (Protocol, optional): protocol. Defaults to None.
+        ini_timestamp (int, optional): initial timestamp. Defaults to None.
+        filter_zero_revenue (bool, optional): filter out zero revenue. Defaults to True.
 
     Returns:
         list[dict]: query pipeline
@@ -53,6 +67,8 @@ def query_frontend_revenue_stats_by_monthDex(
         _match["protocol"] = protocol.database_name
     if ini_timestamp:
         _match["timestamp"] = {"$gte": ini_timestamp}
+    if filter_zero_revenue:
+        _match["total_revenue"] = {"$gt": 0}
 
     _query = [
         {"$match": _match},
@@ -98,10 +114,25 @@ def query_frontend_revenue_stats_byYear(
     chain: Chain | None = None,
     protocol: Protocol | None = None,
     ini_timestamp: int | None = None,
+    filter_zero_revenue: bool = False,
 ):
+    """Frontent collection query for revenue stats grouped by year
+
+    Args:
+        chain (Chain, optional): chain. Defaults to None.
+        protocol (Protocol, optional): protocol. Defaults to None.
+        ini_timestamp (int, optional): initial timestamp. Defaults to None.
+        filter_zero_revenue (bool, optional): filter out zero revenue items. Defaults to True.
+
+    Returns:
+        list[dict]: query pipeline
+    """
     # use monthly
     _query = query_frontend_revenue_stats_by_monthDex(
-        chain=chain, protocol=protocol, ini_timestamp=ini_timestamp
+        chain=chain,
+        protocol=protocol,
+        ini_timestamp=ini_timestamp,
+        filter_zero_revenue=filter_zero_revenue,
     )
     #  group by year
     _query.append(
