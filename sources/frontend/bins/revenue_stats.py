@@ -59,8 +59,10 @@ def query_frontend_revenue_stats_by_monthDex(
         list[dict]: query pipeline
 
     """
-
+    # fix frontend type
     _match = {"frontend_type": "revenue_stats"}
+
+    # filter by chain, protocol and timestamp
     if chain:
         _match["chain"] = chain.database_name
     if protocol:
@@ -70,6 +72,7 @@ def query_frontend_revenue_stats_by_monthDex(
     if filter_zero_revenue:
         _match["total_revenue"] = {"$gt": 0}
 
+    # build query
     _query = [
         {"$match": _match},
         {"$sort": {"timestamp": 1, "total_revenue": -1}},
