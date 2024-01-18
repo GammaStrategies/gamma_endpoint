@@ -452,7 +452,6 @@ class mongo_router_builder(router_builder_baseTemplate):
         )
 
     # Hypervisor returns
-    @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisor_returns_detail(
         self,
         hypervisor_address: str,
@@ -476,7 +475,7 @@ class mongo_router_builder(router_builder_baseTemplate):
 
             if csv:
                 return StreamingResponse(
-                    iter([hype_return_analysis.get_graph_csv()]),
+                    content=iter([hype_return_analysis.get_graph_csv()]),
                     media_type="text/csv",
                     headers={
                         f"Content-Disposition": f"attachment; filename={_filename}"
