@@ -645,7 +645,10 @@ class period_yield_analyzer:
     ) -> None:
         # save base data
         self.chain = chain
-        self.yield_data_list = yield_data_list
+        # filter yield_data_list outliers
+        self.yield_data_list = self.discard_data_outliers(
+            yield_data_list=yield_data_list
+        )
         self.hypervisor_static = hypervisor_static
         # init other vars
         self._initialize()
@@ -773,6 +776,37 @@ class period_yield_analyzer:
         self._year_net_yield_per_share_yield = (
             self._year_net_yield_per_share / self._ini_price_per_share
         )
+
+    def discard_data_outliers(
+        self,
+        yield_data_list: list[period_yield_data],
+        max_items: int | None = None,
+        max_value_per_second: float = 0.001,
+    ):
+        """yield_data_list often contain initial data with humongous yields ( due to the init of the hype, Gamma team may be testing rewards, or injecting liquidity directly without using deposit [to mod token weights])"""
+        result_list = []
+        max_value_per_second = Decimal(str(max_value_per_second))
+        for idx, itm in enumerate(
+            yield_data_list[:max_items] if max_items else yield_data_list
+        ):
+            if itm.period_seconds == 0:
+                continue
+
+            # rewards vs tvl ratio
+            _reward_yield = (itm.rewards.usd or 0) / itm.ini_underlying_usd
+            if _reward_yield / itm.period_seconds > max_value_per_second:
+                continue
+
+            if (
+                itm.fees_per_share_percentage_yield / itm.period_seconds
+                > max_value_per_second
+            ):
+                continue
+
+            # add to result
+            result_list.append(itm)
+
+        return result_list
 
     # COMPARISON PROPERTIES
     @property
