@@ -1,3 +1,5 @@
+import calendar
+from datetime import datetime, timezone
 from sources.common.general.enums import Chain, Protocol
 from sources.mongo.bins.helpers import global_database_helper
 
@@ -8,8 +10,17 @@ async def get_revenue_stats(
     ini_timestamp: int | None = None,
     yearly: bool = False,
     filter_zero_revenue: bool = False,
+    trailing: int = 30,
 ) -> list[dict]:
     """Returns the Gamma's Volume, fees and revenue
+
+    Args:
+        chain (Chain, optional): chain. Defaults to None.
+        protocol (Protocol, optional): protocol. Defaults to None.
+        ini_timestamp (int, optional): initial timestamp. Defaults to None.
+        yearly (bool, optional): group by year. Defaults to False.
+        filter_zero_revenue (bool, optional): filter out zero revenue items. Defaults to True.
+        trailing (int, optional): trailing days [ only functionalt when yearly is]. Defaults to 0.
 
     Returns:
         dict: revenue status
@@ -37,6 +48,42 @@ async def get_revenue_stats(
     # sort by year
     if yearly:
         result.sort(key=lambda x: x["year"])
+
+        # add a monthly estimation using trailing days
+        trailing_usd = 0
+        try:
+            _months_back = trailing // 30
+            # define current month as last item (year) -> last 'items' (month)
+            _current_month = result[-1]["items"][-1]
+            # define first month as current month minus trailing months
+            _first_month = _current_month["month"] - _months_back
+
+            if _current_month["month"] == 1:
+                _last_month = result[-2]["items"][-1]
+            else:
+                _last_month = result[-1]["items"][-2]
+
+            # get last_month total days
+            _last_month["total_revenue"] / 30
+
+            # get current_month total days left
+            days_passed_current_month = datetime.now(timezone.utc).day
+            total_days_current_month = calendar.monthrange(
+                datetime.now(timezone.utc).year, datetime.now(timezone.utc).month
+            )[1]
+            days_left_current_month = (
+                total_days_current_month - days_passed_current_month
+            )
+
+            trailing_usd = (
+                (_last_month["total_revenue"] / 30) * days_left_current_month
+            ) + _current_month["total_revenue"]
+
+            # add it to the current year
+            result[-1]["total_revenue_potential"] = trailing_usd * 12
+
+        except Exception as e:
+            pass
 
     return result
 
