@@ -781,11 +781,11 @@ class period_yield_analyzer:
         self,
         yield_data_list: list[period_yield_data],
         max_items: int | None = None,
-        max_value_per_second: float = 0.001,
+        max_reward_yield: float = 2.0,
+        max_fees_yield: float = 2.0,
     ):
         """yield_data_list often contain initial data with humongous yields ( due to the init of the hype, Gamma team may be testing rewards, or injecting liquidity directly without using deposit [to mod token weights])"""
         result_list = []
-        max_value_per_second = Decimal(str(max_value_per_second))
         for idx, itm in enumerate(
             yield_data_list[:max_items] if max_items else yield_data_list
         ):
@@ -798,13 +798,10 @@ class period_yield_analyzer:
                 if itm.ini_underlying_usd
                 else 0
             )
-            if _reward_yield / itm.period_seconds > max_value_per_second:
+            if _reward_yield > max_reward_yield:
                 continue
 
-            if (
-                itm.fees_per_share_percentage_yield / itm.period_seconds
-                > max_value_per_second
-            ):
+            if itm.fees_per_share_percentage_yield > max_fees_yield:
                 continue
 
             # add to result
@@ -1122,23 +1119,39 @@ class period_yield_analyzer:
                     },
                     "gamma_vs": {
                         "hodl_deposited": (
-                            (self._net_roi_yield + 1)
-                            / (self._period_hodl_deposited_yield + 1)
+                            (
+                                (self._net_roi_yield + 1)
+                                / (self._period_hodl_deposited_yield + 1)
+                            )
+                            if self._period_hodl_deposited_yield != -1
+                            else 0
                         )
                         - 1,
                         "hodl_fifty": (
-                            (self._net_roi_yield + 1)
-                            / (self._period_hodl_fifty_yield + 1)
+                            (
+                                (self._net_roi_yield + 1)
+                                / (self._period_hodl_fifty_yield + 1)
+                            )
+                            if self._period_hodl_fifty_yield != -1
+                            else 0
                         )
                         - 1,
                         "hodl_token0": (
-                            (self._net_roi_yield + 1)
-                            / (self._period_hodl_token0_yield + 1)
+                            (
+                                (self._net_roi_yield + 1)
+                                / (self._period_hodl_token0_yield + 1)
+                            )
+                            if self._period_hodl_token0_yield != -1
+                            else 0
                         )
                         - 1,
                         "hodl_token1": (
-                            (self._net_roi_yield + 1)
-                            / (self._period_hodl_token1_yield + 1)
+                            (
+                                (self._net_roi_yield + 1)
+                                / (self._period_hodl_token1_yield + 1)
+                            )
+                            if self._period_hodl_token1_yield != -1
+                            else 0
                         )
                         - 1,
                     },
