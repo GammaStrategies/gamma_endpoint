@@ -793,7 +793,11 @@ class period_yield_analyzer:
                 continue
 
             # rewards vs tvl ratio
-            _reward_yield = (itm.rewards.usd or 0) / itm.ini_underlying_usd
+            _reward_yield = (
+                (itm.rewards.usd or 0) / itm.ini_underlying_usd
+                if itm.ini_underlying_usd
+                else 0
+            )
             if _reward_yield / itm.period_seconds > max_value_per_second:
                 continue
 
