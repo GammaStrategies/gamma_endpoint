@@ -14,6 +14,10 @@ from endpoint.routers.template import (
 )
 from sources.common.general.utils import filter_addresses
 from sources.frontend.bins.analytics import get_positions_analysis
+from sources.frontend.bins.correlation import (
+    get_correlation,
+    get_correlation_from_hypervisors,
+)
 from sources.frontend.bins.revenue_stats import get_revenue_stats
 
 from sources.subgraph.bins.enums import Chain, Protocol
@@ -97,6 +101,12 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
             methods=["GET"],
         )
 
+        router.add_api_route(
+            path="/{chain}/analytics/correlation",
+            endpoint=self.correlation,
+            methods=["GET"],
+        )
+
         return router
 
     # ROUTE FUNCTIONS
@@ -144,3 +154,43 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
             ini_timestamp=from_timestamp,
             end_timestamp=to_timestamp,
         )
+
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def correlation(
+        self,
+        response: Response,
+        chain: Chain,
+        token_addresses: list[str] = Query(None, description=" token addresses"),
+        hypervisor_addresses: list[str] = Query(
+            None, description=" hypervisor addresses"
+        ),
+    ):
+        """Returns the usd price correlation between tokens, using the last 6000 prices found for the specified tokens.
+
+        ### Query parameters
+        * **chain** Chain to filter by.
+        * **token_addresses** Token addresses to filter by.
+        * **hypervisor_addresses** Hypervisor addresses to filter by.
+
+         ( you must provide either token_addresses or hypervisor_address )
+
+        """
+
+        token_addresses = filter_addresses(token_addresses)
+        hypervisor_addresses = filter_addresses(hypervisor_addresses)
+
+        if token_addresses:
+            return await get_correlation(
+                chains=[chain], token_addresses=token_addresses
+            )
+        elif hypervisor_addresses:
+            return await get_correlation_from_hypervisors(
+                chain=chain, hypervisor_addresses=hypervisor_addresses
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="You must provide either token_addresses or hypervisor_address",
+            )
+
+
