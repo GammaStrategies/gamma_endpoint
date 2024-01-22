@@ -792,6 +792,10 @@ class period_yield_analyzer:
             if itm.period_seconds == 0:
                 continue
 
+            # impermanent in absolute terms
+            if abs(itm.impermanent_per_share_percentage_yield) > max_reward_yield:
+                continue
+
             # rewards vs tvl ratio
             _reward_yield = (
                 (itm.rewards.usd or 0) / itm.ini_underlying_usd
