@@ -101,6 +101,11 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
             endpoint=self.positions_status,
             methods=["GET"],
         )
+        router.add_api_route(
+            path="/{chain}/{hypervisor_address}/analytics/correlation",
+            endpoint=self.correlation_hypervisor,
+            methods=["GET"],
+        )
 
         router.add_api_route(
             path="/{chain}/analytics/correlation",
@@ -154,6 +159,22 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
             hypervisor_address=hypervisor_address,
             ini_timestamp=from_timestamp,
             end_timestamp=to_timestamp,
+        )
+
+    @cache(expire=LONG_CACHE_TIMEOUT)
+    async def correlation_hypervisor(
+        self,
+        response: Response,
+        chain: Chain,
+        hypervisor_address: str = Query(..., description=" hypervisor address"),
+    ):
+        """Returns the usd price correlation between the underlying hypervisor tokens, using the last 6000 prices found for the specified tokens.
+        (  1 = correlated    -1 = inversely correlated )
+
+        When no common block database price is found between tokens, the correlation is set to "no data".
+        """
+        return await self.correlation(
+            chain=chain, hypervisor_addresses=[hypervisor_address]
         )
 
     @cache(expire=LONG_CACHE_TIMEOUT)
