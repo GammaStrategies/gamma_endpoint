@@ -7,6 +7,7 @@ from fastapi_cache.decorator import cache
 from endpoint.config.cache import (
     DAILY_CACHE_TIMEOUT,
     DB_CACHE_TIMEOUT,
+    LONG_CACHE_TIMEOUT,
 )
 from endpoint.routers.template import (
     router_builder_generalTemplate,
@@ -155,7 +156,7 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
             end_timestamp=to_timestamp,
         )
 
-    @cache(expire=DB_CACHE_TIMEOUT)
+    @cache(expire=LONG_CACHE_TIMEOUT)
     async def correlation(
         self,
         response: Response,
