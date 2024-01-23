@@ -167,11 +167,14 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         ),
     ):
         """Returns the usd price correlation between tokens, using the last 6000 prices found for the specified tokens.
+             (  1 = correlated    -1 = inversely correlated )
+
+             When no common block database price is found between tokens, the correlation is set to "no data".
 
         ### Query parameters
         * **chain** Chain to filter by.
         * **token_addresses** Token addresses to filter by.
-        * **hypervisor_addresses** Hypervisor addresses to filter by.
+        * **hypervisor_addresses** When supplied, the underlying hypervisor tokens will be used.
 
          ( you must provide either token_addresses or hypervisor_address )
 
