@@ -4,6 +4,7 @@
 import asyncio
 from sources.common.general.enums import Chain
 from sources.mongo.bins.apps.prices import get_current_prices
+from sources.mongo.bins.apps.returns import build_hype_return_analysis_from_database
 from sources.mongo.bins.helpers import local_database_helper
 
 
@@ -108,3 +109,22 @@ async def get_positions_analysis(
         )
 
     return result
+
+
+async def build_hypervisor_returns_graph(
+    chain: Chain,
+    hypervisor_address: str,
+    ini_timestamp: int | None = None,
+    end_timestamp: int | None = None,
+    ini_block: int | None = None,
+    end_block: int | None = None,
+):
+    if hype_return_analysis := await build_hype_return_analysis_from_database(
+        chain=chain,
+        hypervisor_address=hypervisor_address,
+        ini_timestamp=ini_timestamp,
+        end_timestamp=end_timestamp,
+        ini_block=ini_block,
+        end_block=end_block,
+    ):
+        return hype_return_analysis.get_graph(level="simple")

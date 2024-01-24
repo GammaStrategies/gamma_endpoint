@@ -715,8 +715,7 @@ class internal_router_builder_reports(router_builder_baseTemplate):
         return await global_report_revenue()
 
     async def custom_report(self, response: Response, user_address: str | None = None):
-        """Custom report
-        """
+        """Custom report"""
 
         reports = await custom_report(chain=Chain.ARBITRUM, user_address=user_address)
 

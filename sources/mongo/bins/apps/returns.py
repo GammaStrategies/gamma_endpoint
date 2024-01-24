@@ -1,13 +1,10 @@
 import asyncio
-from datetime import datetime
 import time
 from sources.common.database.objects.hypervisor_returns.period_yield import (
     period_yield_analyzer,
     period_yield_data,
 )
-from sources.common.general.enums import Chain, Protocol
-from sources.common.database.collection_endpoint import database_global, database_local
-from sources.common.database.common.collections_common import db_collections_common
+from sources.common.general.enums import Chain
 from ..helpers import local_database_helper, global_database_helper
 
 

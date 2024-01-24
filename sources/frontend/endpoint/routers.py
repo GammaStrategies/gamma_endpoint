@@ -13,8 +13,12 @@ from endpoint.routers.template import (
     router_builder_generalTemplate,
     router_builder_baseTemplate,
 )
+from sources.common.general.enums import Period
 from sources.common.general.utils import filter_addresses
-from sources.frontend.bins.analytics import get_positions_analysis
+from sources.frontend.bins.analytics import (
+    build_hypervisor_returns_graph,
+    get_positions_analysis,
+)
 from sources.frontend.bins.correlation import (
     get_correlation,
     get_correlation_from_hypervisors,
@@ -94,6 +98,12 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
     # ROUTEs BUILD FUNCTIONS
     def router(self) -> APIRouter:
         router = APIRouter(prefix=self.prefix)
+
+        router.add_api_route(
+            path="/{chain}/{hypervisor_address}/analytics/returns/chart",
+            endpoint=self.hypervisor_analytics_return_graph,
+            methods=["GET"],
+        )
 
         #
         router.add_api_route(
@@ -217,5 +227,26 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="You must provide either token_addresses or hypervisor_address",
             )
+
+    @cache(expire=DAILY_CACHE_TIMEOUT)
+    async def hypervisor_analytics_return_graph(
+        self, chain: Chain, hypervisor_address: str, response: Response, period: Period
+    ):
+        """Hypervisor returns data within the period, including token0 and token1 prices:
+
+        * **timestamp**: unix timestamp
+
+        """
+
+        # convert period to timestamp: current timestamp in utc timezone
+        ini_timestamp = int(datetime.now(tz=timezone.utc).timestamp()) - (
+            period.days * 24 * 60 * 60
+        )
+
+        return await build_hypervisor_returns_graph(
+            chain=chain,
+            hypervisor_address=hypervisor_address,
+            ini_timestamp=ini_timestamp,
+        )
 
 
