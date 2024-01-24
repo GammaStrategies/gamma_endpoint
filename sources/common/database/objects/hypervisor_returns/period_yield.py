@@ -1227,8 +1227,34 @@ class period_yield_analyzer:
             raise Exception("USD qtty calculation error")
 
     # GETTERS
-    def get_graph(self) -> list[dict]:
-        return self._graph_data
+    def get_graph(self, level: str | None = None) -> list[dict]:
+        if not level or level.lower() == "full":
+            return self._graph_data
+        elif level.lower() == "simple":
+            # return only the fields needed for the simple graph
+            return [
+                {
+                    "chain": x["chain"],
+                    "address": x["address"],
+                    "symbol": x["symbol"],
+                    "block": x["block"],
+                    "timestamp": x["timestamp"],
+                    "year_feeApr": x["year_feeApr"],
+                    "year_feeApy": x["year_feeApy"],
+                    "year_allRewards2": x["year_allRewards2"],
+                    "period_feeApr": x["period_feeApr"],
+                    "period_rewardsApr": x["period_rewardsApr"],
+                    "period_lping": x["period_lping"],
+                    "period_hodl_deposited": x["period_hodl_deposited"],
+                    "period_hodl_fifty": x["period_hodl_fifty"],
+                    "period_hodl_token0": x["period_hodl_token0"],
+                    "period_hodl_token1": x["period_hodl_token1"],
+                    "period_netApr": x["period_netApr"],
+                    "period_impermanentResult": x["period_impermanentResult"],
+                    "gamma_vs_hodl": x["gamma_vs_hodl"],
+                }
+                for x in self._graph_data
+            ]
 
     def get_rewards_detail(self):
         result = {}
