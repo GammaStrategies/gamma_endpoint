@@ -24,6 +24,7 @@ from sources.subgraph.bins.common import (
     hypervisor,
     masterchef,
     masterchef_v2,
+    recovery,
     subgraph_status,
     users,
 )
@@ -515,6 +516,14 @@ class subgraph_router_builder(router_builder_generalTemplate):
                 generate_unique_id_function=self.generate_unique_id,
             )
 
+        if self.chain == Chain.ARBITRUM:
+            router.add_api_route(
+                path=f"{self.prefix}{'/recoveryDistribution'}",
+                endpoint=self.recovery_stats,
+                methods=["GET"],
+                generate_unique_id_function=self.generate_unique_id,
+            )
+
         return router
 
     def _create_routes_hypervisor_analytics(
@@ -798,6 +807,9 @@ class subgraph_router_builder(router_builder_generalTemplate):
         return await users.account_data(
             protocol=self.dex, chain=self.chain, address=address
         )
+
+    async def recovery_stats(self):
+        return await recovery.recovery_stats()
 
 
 class subgraph_router_builder_compatible(subgraph_router_builder):
