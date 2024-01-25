@@ -184,7 +184,10 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         When no common block database price is found between tokens, the correlation is set to "no data".
         """
         return await self.correlation(
-            chain=chain, hypervisor_addresses=[hypervisor_address]
+            response=response,
+            chain=chain,
+            token_addresses=None,
+            hypervisor_addresses=[hypervisor_address],
         )
 
     @cache(expire=LONG_CACHE_TIMEOUT)
