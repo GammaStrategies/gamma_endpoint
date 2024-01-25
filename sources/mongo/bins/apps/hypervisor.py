@@ -236,25 +236,6 @@ async def get_hypervisor_prices(hypervisor_address: str, network: Chain) -> dict
     }
 
 
-async def get_hypervisor_return(
-    network: Chain,
-    hypervisor_address: str,
-    start_timestamp: int | None = None,
-    end_timestamp: int | None = None,
-    start_block: int | None = None,
-    end_block: int | None = None,
-) -> dict:
-    hype_helper = direct_db_hypervisor_info(
-        hypervisor_address=hypervisor_address.lower(),
-        network=network.database_name,
-        protocol="gamma",
-    )
-
-    # result = hype_helper.get_feeReturn_and_IL(
-    #     ini_date=hype_ini_date, end_date=hype_end_date
-    # )
-
-
 async def get_hypervisor_rewards_status(
     network: Chain,
     hypervisor_address: str,
