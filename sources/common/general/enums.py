@@ -324,3 +324,18 @@ def text_to_protocol(text: str) -> Protocol:
         ]:
             return protocol
     raise ValueError(f"Protocol with text {text} not found")
+
+
+def int_to_period(num: int) -> Period:
+    """Day numbers to Protocol conversion
+
+    Args:
+        num (int): days
+
+    Returns:
+        Protocol:
+    """
+    for per in Period:
+        if num == per.days:
+            return per
+    raise ValueError(f"Period with days {num} not found")
