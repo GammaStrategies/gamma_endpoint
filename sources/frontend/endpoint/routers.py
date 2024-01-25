@@ -13,7 +13,7 @@ from endpoint.routers.template import (
     router_builder_generalTemplate,
     router_builder_baseTemplate,
 )
-from sources.common.general.enums import Period
+from sources.common.general.enums import Period, int_to_period
 from sources.common.general.utils import filter_addresses
 from sources.frontend.bins.analytics import (
     build_hypervisor_returns_graph,
@@ -230,23 +230,32 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
 
     @cache(expire=DAILY_CACHE_TIMEOUT)
     async def hypervisor_analytics_return_graph(
-        self, chain: Chain, hypervisor_address: str, response: Response, period: Period
+        self,
+        chain: Chain,
+        hypervisor_address: str,
+        response: Response,
+        period: Period | int,
     ):
         """Hypervisor returns data within the period, including token0 and token1 prices:
 
         * **timestamp**: unix timestamp
 
         """
+        if isinstance(period, int):
+            period = int_to_period(period)
 
         # convert period to timestamp: current timestamp in utc timezone
         ini_timestamp = int(datetime.now(tz=timezone.utc).timestamp()) - (
-            period.days * 24 * 60 * 60
+            (period.days * 24 * 60 * 60)
+            if period != Period.DAILY
+            else period.days * 24 * 2 * 60 * 60
         )
 
         return await build_hypervisor_returns_graph(
             chain=chain,
             hypervisor_address=hypervisor_address,
             ini_timestamp=ini_timestamp,
+            points_every=(60 * 60) if period == Period.DAILY else (60 * 60 * 12),
         )
 
 

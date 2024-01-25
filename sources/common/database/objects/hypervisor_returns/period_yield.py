@@ -719,7 +719,7 @@ class period_yield_analyzer:
         self._period_hodl_token1_yield = Decimal("0")
 
         # graphic
-        self._graph_data = []
+        self._graph_data: list[dict] = []
 
     def _create_year_vars(self):
         # convert total seconds to decimal
@@ -1227,11 +1227,58 @@ class period_yield_analyzer:
             raise Exception("USD qtty calculation error")
 
     # GETTERS
-    def get_graph(self, level: str | None = None) -> list[dict]:
+    def get_graph(
+        self, level: str | None = None, points_every: int | None = None
+    ) -> list[dict]:
         if not level or level.lower() == "full":
             return self._graph_data
         elif level.lower() == "simple":
             # return only the fields needed for the simple graph
+
+            ### NO FILTER ###
+            if not points_every:
+                return [
+                    {
+                        "chain": x["chain"],
+                        "address": x["address"],
+                        "symbol": x["symbol"],
+                        "block": x["block"],
+                        "timestamp": x["timestamp"],
+                        "year_feeApr": x["year_feeApr"],
+                        "year_feeApy": x["year_feeApy"],
+                        "year_allRewards2": x["year_allRewards2"],
+                        "period_feeApr": x["period_feeApr"],
+                        "period_rewardsApr": x["period_rewardsApr"],
+                        "period_lping": x["period_lping"],
+                        "period_hodl_deposited": x["period_hodl_deposited"],
+                        "period_hodl_fifty": x["period_hodl_fifty"],
+                        "period_hodl_token0": x["period_hodl_token0"],
+                        "period_hodl_token1": x["period_hodl_token1"],
+                        "period_netApr": x["period_netApr"],
+                        "period_impermanentResult": x["period_impermanentResult"],
+                        "gamma_vs_hodl": x["gamma_vs_hodl"],
+                    }
+                    for x in self._graph_data
+                ]
+
+            ### FILTER ###
+            _last_timestamp = 0
+
+            def _should_include(item: dict) -> bool:
+                nonlocal _last_timestamp
+
+                if _last_timestamp == 0:
+                    _last_timestamp = item["timestamp"]
+                    return True
+
+                # add control point
+                if item["timestamp"] - _last_timestamp >= points_every:
+                    _last_timestamp = item["timestamp"]
+                    return True
+                else:
+                    return False
+
+            # control points var
             return [
                 {
                     "chain": x["chain"],
@@ -1253,7 +1300,7 @@ class period_yield_analyzer:
                     "period_impermanentResult": x["period_impermanentResult"],
                     "gamma_vs_hodl": x["gamma_vs_hodl"],
                 }
-                for x in self._graph_data
+                for x in list(filter(_should_include, self._graph_data))
             ]
 
     def get_rewards_detail(self):

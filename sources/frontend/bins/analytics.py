@@ -118,7 +118,22 @@ async def build_hypervisor_returns_graph(
     end_timestamp: int | None = None,
     ini_block: int | None = None,
     end_block: int | None = None,
-):
+    points_every: int | None = None,
+) -> list[dict]:
+    """Return a graph with the hypervisor returns
+
+    Args:
+        chain (Chain): _description_
+        hypervisor_address (str): _description_
+        ini_timestamp (int | None, optional): _description_. Defaults to None.
+        end_timestamp (int | None, optional): _description_. Defaults to None.
+        ini_block (int | None, optional): _description_. Defaults to None.
+        end_block (int | None, optional): _description_. Defaults to None.
+        points_every (int | None, optional): number of seconds between points. Defaults to None.
+
+    Returns:
+        list[dict]:
+    """
     if hype_return_analysis := await build_hype_return_analysis_from_database(
         chain=chain,
         hypervisor_address=hypervisor_address,
@@ -127,4 +142,4 @@ async def build_hypervisor_returns_graph(
         ini_block=ini_block,
         end_block=end_block,
     ):
-        return hype_return_analysis.get_graph(level="simple")
+        return hype_return_analysis.get_graph(level="simple", points_every=points_every)
