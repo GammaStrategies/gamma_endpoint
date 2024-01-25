@@ -143,3 +143,5 @@ async def build_hypervisor_returns_graph(
         end_block=end_block,
     ):
         return hype_return_analysis.get_graph(level="simple", points_every=points_every)
+    else:
+        return []
