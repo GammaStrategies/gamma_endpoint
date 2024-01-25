@@ -1086,6 +1086,7 @@ class period_yield_analyzer:
                 "symbol": self.hypervisor_static["symbol"],
                 "block": yield_item.timeframe.end.block,
                 "timestamp": yield_item.timeframe.end.timestamp,
+                "timestamp_from": yield_item.timeframe.ini.timestamp,
                 "datetime_from": f"{yield_item.timeframe.ini.datetime:%Y-%m-%d %H:%M:%S}",
                 "datetime_to": f"{yield_item.timeframe.ini.datetime:%Y-%m-%d %H:%M:%S}",
                 "period_seconds": self._total_seconds,
@@ -1295,7 +1296,9 @@ class period_yield_analyzer:
                     return False
 
             # control points var
-            return [
+            filtered_data = list(filter(_should_include, self._graph_data))
+
+            result = [
                 {
                     "chain": x["chain"],
                     "address": x["address"],
@@ -1317,8 +1320,31 @@ class period_yield_analyzer:
                     # "gamma_vs_hodl": x["gamma_vs_hodl"],
                     "price_per_share": x["status"]["end"]["prices"]["share"],
                 }
-                for x in list(filter(_should_include, self._graph_data))
+                for x in filtered_data
             ]
+
+            # insert first item
+            result.insert(
+                0,
+                {
+                    "chain": filtered_data[0]["chain"],
+                    "address": filtered_data[0]["address"],
+                    "symbol": filtered_data[0]["symbol"],
+                    "block": filtered_data[0]["block"],
+                    "timestamp": filtered_data[0]["timestamp_from"],
+                    "period_hodl_fifty": 0,
+                    "period_hodl_token0": 0,
+                    "period_hodl_token1": 0,
+                    "period_gamma_netApr": 0,
+                    "period_gamma_feeApr": 0,
+                    "period_gamma_rewardsApr": 0,
+                    "price_per_share": filtered_data[0]["status"]["ini"]["prices"][
+                        "share"
+                    ],
+                },
+            )
+
+            return result
 
     def get_rewards_detail(self):
         result = {}
