@@ -16,7 +16,6 @@ from sources.mongo.bins.apps import hypervisor
 from sources.mongo.bins.apps import user
 from sources.mongo.bins.apps import prices
 from sources.mongo.bins.apps import rewards
-from sources.mongo.bins.apps.returns import build_hype_return_analysis_from_database
 
 
 DEPLOYED: list[tuple[Protocol, Chain]] = [

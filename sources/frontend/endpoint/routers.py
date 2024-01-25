@@ -25,6 +25,7 @@ from sources.frontend.bins.correlation import (
     get_correlation_from_hypervisors,
 )
 from sources.frontend.bins.revenue_stats import get_revenue_stats
+from sources.mongo.bins.apps.returns import build_hype_return_analysis_from_database
 
 from sources.subgraph.bins.enums import Chain, Protocol
 
@@ -268,7 +269,6 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         )
 
     # Hypervisor returns
-    @cache(expire=DAILY_CACHE_TIMEOUT)
     async def hypervisor_analytics_return_detail(
         self,
         chain: Chain,
@@ -306,5 +306,3 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         else:
             response.status_code = status.HTTP_404_NOT_FOUND
             return {"detail": "No data found for the given parameters"}
-
-
