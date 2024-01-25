@@ -268,6 +268,7 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         )
 
     # Hypervisor returns
+    @cache(expire=DAILY_CACHE_TIMEOUT)
     async def hypervisor_analytics_return_detail(
         self,
         chain: Chain,
