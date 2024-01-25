@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import MutableMapping
 import pandas as pd
-
+from datetime import datetime, timezone
 from sources.common.general.enums import Chain
 from sources.common.general.utils import flatten_dict
 
@@ -11,6 +11,16 @@ from sources.common.general.utils import flatten_dict
 class time_location:
     timestamp: int = None
     block: int = None
+
+    @property
+    def datetime(self) -> datetime:
+        """UTC datetime from timestamp
+        Can return None when timestamp is None"""
+        return (
+            datetime.fromtimestamp(self.timestamp, tz=timezone.utc)
+            if self.timestamp
+            else None
+        )
 
     def to_dict(self) -> dict:
         return {
@@ -1035,7 +1045,6 @@ class period_yield_analyzer:
             x: {"qtty": 0, "usd": 0, "seconds": 0, "period yield": 0}
             for x in self._rewards_token_symbols
         }
-
         if yield_item.rewards.details:
             for reward_detail in yield_item.rewards.details:
                 _rwds_details[reward_detail["symbol"]] = {
@@ -1044,6 +1053,31 @@ class period_yield_analyzer:
                     "seconds": reward_detail["seconds"],
                     "period yield": reward_detail["period yield"],
                 }
+        # calculate per share prices ( to help when debugging)
+        _status_ini = yield_item.status.ini.to_dict()
+        _status_ini["prices"]["share"] = (
+            (
+                yield_item.status.ini.prices.token0
+                * yield_item.status.ini.underlying.qtty.token0
+                + yield_item.status.ini.prices.token1
+                * yield_item.status.ini.underlying.qtty.token1
+            )
+            / yield_item.status.ini.supply
+            if yield_item.status.ini.supply
+            else 0
+        )
+        _status_end = yield_item.status.end.to_dict()
+        _status_end["prices"]["share"] = (
+            (
+                yield_item.status.end.prices.token0
+                * yield_item.status.end.underlying.qtty.token0
+                + yield_item.status.end.prices.token1
+                * yield_item.status.end.underlying.qtty.token1
+            )
+            / yield_item.status.end.supply
+            if yield_item.status.end.supply
+            else 0
+        )
         # add to graph data
         self._graph_data.append(
             {
@@ -1052,10 +1086,12 @@ class period_yield_analyzer:
                 "symbol": self.hypervisor_static["symbol"],
                 "block": yield_item.timeframe.end.block,
                 "timestamp": yield_item.timeframe.end.timestamp,
+                "datetime_from": f"{yield_item.timeframe.ini.datetime:%Y-%m-%d %H:%M:%S}",
+                "datetime_to": f"{yield_item.timeframe.ini.datetime:%Y-%m-%d %H:%M:%S}",
                 "period_seconds": self._total_seconds,
                 "status": {
-                    "ini": yield_item.status.ini.to_dict(),
-                    "end": yield_item.status.end.to_dict(),
+                    "ini": _status_ini,
+                    "end": _status_end,
                 },
                 "fees": {
                     "period": {
@@ -1179,26 +1215,6 @@ class period_yield_analyzer:
                 - 1,
             }
         )
-        # OLD VERSION
-        #     "chain": "celo",
-        #     "address": "0x002e2a8215e892e77681e2568f85c8f720ce63db",
-        #     "symbol": "xPACT-CELO3",
-        #     "block": 21593485,
-        #     "timestamp": 1695635990,
-        #     "period": 1,
-        #     "year_feeApr": 0,
-        #     "year_feeApy": 0,
-        #     "year_allRewards2": 0,
-        #     "period_feeApr": 0,
-        #     "period_rewardsApr": 0,
-        #     "period_lping": 8.36195166288179e-7,
-        #     "period_hodl_deposited": 0.008339392081189901,
-        #     "period_hodl_fifty": 0.00942349677500146,
-        #     "period_hodl_token0": 0,
-        #     "period_hodl_token1": 0.01884699355000292,
-        #     "period_netApr": 8.36195166288179e-7,
-        #     "period_impermanentResult": 8.36195166288179e-7,
-        #     "gamma_vs_hodl": -0.008269592511716772
 
     def _check_data_consistency(self):
         """Check if data is consistent
