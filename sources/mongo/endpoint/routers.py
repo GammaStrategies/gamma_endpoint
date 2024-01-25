@@ -247,13 +247,6 @@ class mongo_router_builder(router_builder_baseTemplate):
             generate_unique_id_function=self.generate_unique_id,
         )
 
-        router.add_api_route(
-            path=f"{self.prefix}{'/hypervisor/{hypervisor_address}/returns'}",
-            endpoint=self.hypervisor_returns_detail,
-            methods=["GET"],
-            generate_unique_id_function=self.generate_unique_id,
-        )
-
         return router
 
     def _create_routes_user(self, router: APIRouter) -> APIRouter:
@@ -450,40 +443,3 @@ class mongo_router_builder(router_builder_baseTemplate):
         return await user.get_user_analytic_data(
             chain=self.chain, address=user_address.lower()
         )
-
-    # Hypervisor returns
-    async def hypervisor_returns_detail(
-        self,
-        hypervisor_address: str,
-        response: Response,
-        start_timestamp: int | None = None,
-        end_timestamp: int | None = None,
-        start_block: int | None = None,
-        end_block: int | None = None,
-        csv: bool = False,
-    ):
-        """Returns a csv file with all the detailed ROI data for the given hypervisor"""
-        if hype_return_analysis := await build_hype_return_analysis_from_database(
-            chain=self.chain,
-            hypervisor_address=hypervisor_address,
-            ini_timestamp=start_timestamp,
-            end_timestamp=end_timestamp,
-            ini_block=start_block,
-            end_block=end_block,
-        ):
-            _filename = f"{self.chain.fantasy_name}_{hypervisor_address}_returns.csv"
-
-            if csv:
-                return StreamingResponse(
-                    content=iter([hype_return_analysis.get_graph_csv()]),
-                    media_type="text/csv",
-                    headers={
-                        f"Content-Disposition": f"attachment; filename={_filename}"
-                    },
-                )
-            else:
-                return hype_return_analysis.get_graph()
-
-        else:
-            response.status_code = status.HTTP_404_NOT_FOUND
-            return {"detail": "No data found for the given parameters"}
