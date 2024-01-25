@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime, timezone
 import logging
 from fastapi import HTTPException, Query, Response, APIRouter, status
+from fastapi.responses import StreamingResponse
 from fastapi_cache.decorator import cache
 
 from endpoint.config.cache import (
@@ -102,6 +103,11 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         router.add_api_route(
             path="/{chain}/{hypervisor_address}/analytics/returns/chart",
             endpoint=self.hypervisor_analytics_return_graph,
+            methods=["GET"],
+        )
+        router.add_api_route(
+            path="/{chain}/{hypervisor_address}/analytics/returns/csv",
+            endpoint=self.hypervisor_analytics_return_detail,
             methods=["GET"],
         )
 
@@ -236,8 +242,8 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         self,
         chain: Chain,
         hypervisor_address: str,
-        response: Response,
         period: Period | int,
+        response: Response,
     ):
         """Hypervisor returns data within the period, including token0 and token1 prices:
 
@@ -260,5 +266,44 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
             ini_timestamp=ini_timestamp,
             points_every=(60 * 60) if period == Period.DAILY else (60 * 60 * 12),
         )
+
+    # Hypervisor returns
+    async def hypervisor_analytics_return_detail(
+        self,
+        chain: Chain,
+        hypervisor_address: str,
+        period: Period | int,
+        response: Response,
+    ):
+        """Return a csv file containing all hypervisor returns details with respect to the specified period returns"""
+
+        if isinstance(period, int):
+            period = int_to_period(period)
+        # convert period to timestamp: current timestamp in utc timezone
+        ini_timestamp = int(datetime.now(tz=timezone.utc).timestamp()) - (
+            (period.days * 24 * 60 * 60)
+            if period != Period.DAILY
+            else period.days * 24 * 2 * 60 * 60
+        )
+
+        """Returns a csv file with all the detailed ROI data for the given hypervisor"""
+        if hype_return_analysis := await build_hype_return_analysis_from_database(
+            chain=chain,
+            hypervisor_address=hypervisor_address,
+            ini_timestamp=ini_timestamp,
+        ):
+            _filename = (
+                f"{chain.fantasy_name}_{hypervisor_address}_{period.name}_returns.csv"
+            )
+
+            return StreamingResponse(
+                content=iter([hype_return_analysis.get_graph_csv()]),
+                media_type="text/csv",
+                headers={f"Content-Disposition": f"attachment; filename={_filename}"},
+            )
+
+        else:
+            response.status_code = status.HTTP_404_NOT_FOUND
+            return {"detail": "No data found for the given parameters"}
 
 
