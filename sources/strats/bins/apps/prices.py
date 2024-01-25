@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime, timezone
 from sources.common.database.collection_endpoint import database_global
 from sources.common.general.enums import Chain, text_to_chain
+from sources.common.general.utils import filter_addresses
 from sources.strats.bins.enums import convert_chain_name
 from sources.subgraph.bins.config import MONGO_DB_URL
 
@@ -18,13 +19,16 @@ async def get_current_prices(
     Returns:
         list[dict]:
     """
+    token_addresses = filter_addresses(token_addresses)
     find = {}
     if chain:
         find = {"network": chain.database_name}
-    if token_addresses:
-        # build ids
-        ids = [f"{chain.database_name}_{address}" for address in token_addresses]
+        if token_addresses:
+            # build ids
+            ids = [f"{chain.database_name}_{address}" for address in token_addresses]
         find["id"] = {"$in": ids}
+    if token_addresses and not "id" in find:
+        find["address"] = {"$in": token_addresses}
 
     result = []
     current_time = datetime.now(timezone.utc).timestamp()
