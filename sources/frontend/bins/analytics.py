@@ -88,19 +88,27 @@ async def get_positions_analysis(
         )
         itm["totalLiquidity_usd"] = itm["baseLiquidity_usd"] + itm["limitLiquidity_usd"]
 
+        # convert tick to price
+        itm["baseUpper"] = 1.0001 ** int(itm["baseUpper"])
+        itm["baseLower"] = 1.0001 ** int(itm["baseLower"])
+        itm["limitUpper"] = 1.0001 ** int(itm["limitUpper"])
+        itm["limitLower"] = 1.0001 ** int(itm["limitLower"])
+
+        itm["currentTick"] = 1.0001 ** int(itm["currentTick"])
+
         result.append(
             {
                 "symbol": itm["symbol"],
                 "timestamp": itm["timestamp"],
                 "block": itm["block"],
-                "currentTick": int(itm["currentTick"]),
-                "baseUpper": int(itm["baseUpper"]),
-                "baseLower": int(itm["baseLower"]),
+                "currentTick": itm["currentTick"],
+                "baseUpper": itm["baseUpper"],
+                "baseLower": itm["baseLower"],
                 # "baseLiquidity_0": itm["baseLiquidity_0"],
                 # "baseLiquidity_1": itm["baseLiquidity_1"],
                 "baseLiquidity_usd": itm["baseLiquidity_usd"],
-                "limitUpper": int(itm["limitUpper"]),
-                "limitLower": int(itm["limitLower"]),
+                "limitUpper": itm["limitUpper"],
+                "limitLower": itm["limitLower"],
                 # "limitLiquidity_0": itm["limitLiquidity_0"],
                 # "limitLiquidity_1": itm["limitLiquidity_1"],
                 "limitLiquidity_usd": itm["limitLiquidity_usd"],

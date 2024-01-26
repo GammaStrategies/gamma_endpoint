@@ -21,7 +21,6 @@ from sources.frontend.bins.analytics import (
     get_positions_analysis,
 )
 from sources.frontend.bins.correlation import (
-    get_correlation,
     get_correlation_from_hypervisors,
 )
 from sources.frontend.bins.revenue_stats import get_revenue_stats
@@ -143,7 +142,7 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         response: Response,
         hypervisor_address: str,
         chain: Chain
-        | int = Query(Chain.ETHEREUM, enum=[*Chain, *[x.id for x in Chain]]),
+        | int = Query(Chain.ARBITRUM, enum=[*Chain, *[x.id for x in Chain]]),
         period: Period
         | int = Query(Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]),
         from_timestamp: int
@@ -210,46 +209,35 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         self,
         response: Response,
         chain: Chain
-        | int = Query(Chain.ETHEREUM, enum=[*Chain, *[x.id for x in Chain]]),
+        | int = Query(Chain.ARBITRUM, enum=[*Chain, *[x.id for x in Chain]]),
         period: Period
         | int = Query(Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]),
-        token_addresses: list[str] | None = Query(None, description=" token addresses"),
-        hypervisor_addresses: list[str]
-        | None = Query(None, description=" hypervisor addresses"),
+        hypervisor_address: str = Query(..., description=" hypervisor addresses"),
     ):
-        """Returns the usd price correlation between tokens, using the last 6000 prices found for the specified tokens.
-             (  1 = correlated    -1 = inversely correlated )
-
-             When no common block database price is found between tokens, the correlation is set to "no data".
-
-        ### Query parameters
-        * **chain** Chain to filter by.
-        * **token_addresses** Token addresses to filter by.
-        * **hypervisor_addresses** When supplied, the underlying hypervisor tokens will be used.
-
-         ( you must provide either token_addresses or hypervisor_address )
+        """Returns the usd price correlation between tokens.
+        (  1 = correlated    -1 = inversely correlated )
 
         """
 
         if isinstance(chain, int):
             chain = int_to_chain(chain)
+        if isinstance(period, int):
+            period = int_to_period(period)
 
-        token_addresses = filter_addresses(token_addresses)
-        hypervisor_addresses = filter_addresses(hypervisor_addresses)
+        hypervisor_address = filter_addresses(hypervisor_address)
 
-        if token_addresses:
-            return await get_correlation(
-                chains=[chain], token_addresses=token_addresses
-            )
-        elif hypervisor_addresses:
-            return await get_correlation_from_hypervisors(
-                chain=chain, hypervisor_addresses=hypervisor_addresses
-            )
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="You must provide either token_addresses or hypervisor_address",
-            )
+        # convert period to timestamp: current timestamp in utc timezone
+        from_timestamp = int(datetime.now(tz=timezone.utc).timestamp()) - (
+            (period.days * 24 * 60 * 60)
+            if period != Period.DAILY
+            else period.days * 24 * 2 * 60 * 60
+        )
+
+        return await get_correlation_from_hypervisors(
+            chain=chain,
+            hypervisor_addresses=[hypervisor_address],
+            from_timestamp=from_timestamp,
+        )
 
     @cache(expire=DAILY_CACHE_TIMEOUT)
     async def hypervisor_analytics_return_graph(
