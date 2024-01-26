@@ -243,7 +243,7 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         response: Response,
         hypervisor_address: str,
         chain: Chain
-        | int = Query(Chain.ETHEREUM, enum=[*Chain, *[x.id for x in Chain]]),
+        | int = Query(Chain.ARBITRUM, enum=[*Chain, *[x.id for x in Chain]]),
         period: Period
         | int = Query(Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]),
     ):
@@ -279,7 +279,7 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         response: Response,
         hypervisor_address: str,
         chain: Chain
-        | int = Query(Chain.ETHEREUM, enum=[*Chain, *[x.id for x in Chain]]),
+        | int = Query(Chain.ARBITRUM, enum=[*Chain, *[x.id for x in Chain]]),
         period: Period
         | int = Query(Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]),
     ):
