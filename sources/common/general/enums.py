@@ -307,6 +307,21 @@ def text_to_chain(text: str) -> Chain:
     raise ValueError(f"Chain with text {text} not found")
 
 
+def int_to_chain(num: int) -> Chain:
+    """Chain id to Chain enum conversion
+
+    Args:
+        num (int): chain id
+
+    Returns:
+        Protocol:
+    """
+    for ch in Chain:
+        if num == ch.id:
+            return ch
+    raise ValueError(f"Chain id {num} not found")
+
+
 def text_to_protocol(text: str) -> Protocol:
     """Text to Protocol conversion
 
