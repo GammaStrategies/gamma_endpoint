@@ -113,28 +113,15 @@ async def get_correlation_from_one_token_pair(
     correlation = df.expanding(10).corr(pairwise=True)
     # remove NaN and inf
     correlation = correlation[~correlation.isin([np.nan, np.inf, -np.inf]).any(axis=1)]
-    # correlation.drop(token_addresses[1], axis=1, inplace=True)
-    # correlation.drop(token_addresses[0], level=1, axis=0, inplace=True)
-    # correlation.columns = correlation.droplevel()
 
-    # return [{"timestamp":i,token_addresses[1]:row[] }]
-    # for i, row in correlation.iterrows():
-    #     unique_id = i
-    #     token0 = row[token_addresses[0]]
-    #     token1 = row[token_addresses[1]]
-
-    # return (
-    #     correlation.groupby(level=0)
-    #     .apply(lambda correlation: correlation.xs(correlation.name).to_dict())
-    #     .to_dict()
-    # )
     return [
         {
             "timestamp": idx[0],
-            token_addresses[0]: row[token_addresses[0]],
-            token_addresses[1]: row[token_addresses[1]],
+            token_addresses[0]: round(row[token_addresses[0]], 2),
+            token_addresses[1]: round(row[token_addresses[1]], 2),
         }
         for idx, row in correlation.iterrows()
+        if idx[-1] == token_addresses[0]
     ]
 
 
@@ -197,7 +184,6 @@ async def convert_to_blocks(
             collection_name="blocks",
             find={"timestamp": _timestamp, "network": chain.database_name},
             sort=[("timestamp", 1)],
-            # limit=1,
         )
         from_block = _data[0]["block"]
         if to_timestamp:
@@ -223,188 +209,6 @@ async def get_hypervisor_tokens(chain: Chain, hypervisor_addresses: list[str]) -
     return result
 
 
-# async def get_prices(
-#     chains: list[Chain] = None,
-#     token_addresses: list[str] = None,
-#     from_timestamp: int = None,
-#     to_timestamp: int = None,
-# ) -> list[dict]:
-#     """Get a list of prices from the database
-
-#     Args:
-#         chains (list[Chain], optional): . Defaults to None.
-#         token_addresses (list[str], optional): . Defaults to None.
-#         limit (int, optional): . Defaults to None.
-
-#     Returns:
-#         list[dict]:
-#     """
-#     # create match
-#     _match = {}
-#     if chains:
-#         _match["network"] = {"$in": [chain.database_name for chain in chains]}
-#     if token_addresses:
-#         _match["address"] = {"$in": token_addresses}
-#     # build query
-#     query = [
-#         {
-#             "$group": {
-#                 "_id": {"block": "$block", "network": "$network"},
-#                 "items": {
-#                     "$push": {
-#                         "block": "$block",
-#                         "network": "$network",
-#                         "address": "$address",
-#                         "price": "$price",
-#                     }
-#                 },
-#                 "count": {"$sum": 1},
-#             }
-#         },
-#         # {"$sort": {"_id.block": -1}},
-#         {"$match": {"count": {"$gt": 1}}},
-#         {
-#             "$lookup": {
-#                 "from": "blocks",
-#                 "let": {"op_network": "$_id.network", "op_block": "$_id.block"},
-#                 "pipeline": [
-#                     {
-#                         "$match": {
-#                             "$expr": {
-#                                 "$and": [
-#                                     {"$eq": ["$block", "$$op_block"]},
-#                                     {"$eq": ["$network", "$$op_network"]},
-#                                 ]
-#                             }
-#                         }
-#                     }
-#                 ],
-#                 "as": "timestamp",
-#             }
-#         },
-#         {"$addFields": {"timestamp": {"$first": "$timestamp.timestamp"}}},
-#     ]
-
-#     # add first match
-#     if _match:
-#         query.insert(0, {"$match": _match})
-
-#     # add second match (timestamp)
-#     if from_timestamp or to_timestamp:
-#         _match2 = {}
-#         if from_timestamp:
-#             _match2["$gte"] = from_timestamp
-#         if to_timestamp:
-#             _match2["$lte"] = to_timestamp
-#         query.append(
-#             {"$match": _match2},
-#         )
-
-#     # sort by block
-#     query.append({"$sort": {"_id.block": 1}})
-
-#     # get prices
-#     return await global_database_helper().get_items_from_database(
-#         collection_name="usd_prices", aggregate=query
-#     )
-
-
-# async def get_prices(
-#     chains: list[Chain],
-#     token_addresses: list[str],
-#     from_block: int,
-#     to_block: int | None = None,
-# ) -> list[dict]:
-#     """Get a list of prices from the database
-
-#     Args:
-#         chains (list[Chain], optional): . Defaults to None.
-#         token_addresses (list[str], optional): . Defaults to None.
-#         limit (int, optional): . Defaults to None.
-
-#     Returns:
-#         list[dict]:
-#     """
-#     # create match
-#     _match = {}
-#     _match["network"] = {"$in": [chain.database_name for chain in chains]}
-#     _match["address"] = {"$in": token_addresses}
-#     _match["block"] = {"$gte": from_block}
-#     if to_block:
-#         _match["block"]["$lte"] = to_block
-#     # build query
-#     query = [
-#         {
-#             "$group": {
-#                 "_id": {"block": "$block", "network": "$network"},
-#                 "items": {
-#                     "$push": {
-#                         "block": "$block",
-#                         "network": "$network",
-#                         "address": "$address",
-#                         "price": "$price",
-#                     }
-#                 },
-#                 "count": {"$sum": 1},
-#                 "block_group": {
-#                     "$first": {
-#                         "$subtract": [
-#                             "$block",
-#                             {
-#                                 "$mod": [
-#                                     "$block",
-#                                     100 if Chain.ETHEREUM not in chains else 10,
-#                                 ],
-#                             },
-#                         ],
-#                     },
-#                 },
-#             }
-#         },
-#         # {"$sort": {"_id.block": -1}},
-#         {"$match": {"count": {"$gt": 1}}},
-#         {
-#             "$group": {
-#                 "_id": {"block": "$block_group", "network": "$_id.network"},
-#                 "items": {"$first": "$items"},
-#             }
-#         },
-#         {"$limit": 8000},
-#         {
-#             "$lookup": {
-#                 "from": "blocks",
-#                 "let": {"op_network": "$_id.network", "op_block": "$_id.block"},
-#                 "pipeline": [
-#                     {
-#                         "$match": {
-#                             "$expr": {
-#                                 "$and": [
-#                                     {"$eq": ["$block", "$$op_block"]},
-#                                     {"$eq": ["$network", "$$op_network"]},
-#                                 ]
-#                             }
-#                         }
-#                     }
-#                 ],
-#                 "as": "timestamp",
-#             }
-#         },
-#         {"$addFields": {"timestamp": {"$first": "$timestamp.timestamp"}}},
-#     ]
-
-#     # add first match
-#     if _match:
-#         query.insert(0, {"$match": _match})
-
-#     # sort by block
-#     query.append({"$sort": {"_id.block": 1}})
-
-#     # get prices
-#     return await global_database_helper().get_items_from_database(
-#         collection_name="usd_prices", aggregate=query
-#     )
-
-
 async def get_prices(
     chains: list[Chain],
     token_addresses: list[str],
@@ -422,7 +226,6 @@ async def get_prices(
     Returns:
         list[dict]:
     """
-    print(f" get_prices: {from_block} - {to_block}  group_blocks:{group_blocks}")
 
     # create match
     _match = {}
