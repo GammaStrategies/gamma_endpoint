@@ -172,6 +172,7 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
             chain = int_to_chain(chain)
         if isinstance(period, int):
             period = int_to_period(period)
+        hypervisor_address = filter_addresses(hypervisor_address)
 
         if not from_timestamp and period:
             # Period exists and from_timestamp is not set
@@ -194,8 +195,6 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
                 detail="You must provide either period or from_timestamp",
             )
 
-        # make sure address is valid
-        hypervisor_address = filter_addresses([hypervisor_address])[0]
         # return result
         return await get_positions_analysis(
             chain=chain,
@@ -223,7 +222,6 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
             chain = int_to_chain(chain)
         if isinstance(period, int):
             period = int_to_period(period)
-
         hypervisor_address = filter_addresses(hypervisor_address)
 
         # convert period to timestamp: current timestamp in utc timezone
@@ -259,6 +257,7 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
             chain = int_to_chain(chain)
         if isinstance(period, int):
             period = int_to_period(period)
+        hypervisor_address = filter_addresses(hypervisor_address)
 
         # convert period to timestamp: current timestamp in utc timezone
         ini_timestamp = int(datetime.now(tz=timezone.utc).timestamp()) - (
@@ -274,7 +273,7 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
             points_every=(60 * 60) if period == Period.DAILY else (60 * 60 * 12),
         )
 
-    # Hypervisor returns
+    # Hypervisor returns ( no cache for csv files )
     async def hypervisor_analytics_return_detail(
         self,
         response: Response,
@@ -290,6 +289,8 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
             chain = int_to_chain(chain)
         if isinstance(period, int):
             period = int_to_period(period)
+        hypervisor_address = filter_addresses(hypervisor_address)
+
         # convert period to timestamp: current timestamp in utc timezone
         ini_timestamp = int(datetime.now(tz=timezone.utc).timestamp()) - (
             (period.days * 24 * 60 * 60)
