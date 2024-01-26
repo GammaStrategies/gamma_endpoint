@@ -14,7 +14,7 @@ from endpoint.routers.template import (
     router_builder_generalTemplate,
     router_builder_baseTemplate,
 )
-from sources.common.general.enums import Period, int_to_period
+from sources.common.general.enums import Period, int_to_chain, int_to_period
 from sources.common.general.utils import filter_addresses
 from sources.frontend.bins.analytics import (
     build_hypervisor_returns_graph,
@@ -66,7 +66,7 @@ class frontend_revenueStatus_router_builder_main(router_builder_baseTemplate):
     async def revenue_status(
         self,
         response: Response,
-        chain: Chain | None = None,
+        chain: Chain | int | None = Query(None, enum=[*Chain, *[x.id for x in Chain]]),
         protocol: Protocol | None = None,
         from_timestamp: int | None = None,
         yearly: bool = False,
@@ -87,6 +87,9 @@ class frontend_revenueStatus_router_builder_main(router_builder_baseTemplate):
 
         """
 
+        if isinstance(chain, int):
+            chain = int_to_chain(chain)
+
         return await get_revenue_stats(
             chain=chain,
             protocol=protocol,
@@ -101,31 +104,32 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
     def router(self) -> APIRouter:
         router = APIRouter(prefix=self.prefix)
 
+        # TODO: DELETE. This is replaced by its next route to the function
         router.add_api_route(
             path="/{chain}/{hypervisor_address}/analytics/returns/chart",
             endpoint=self.hypervisor_analytics_return_graph,
             methods=["GET"],
         )
         router.add_api_route(
-            path="/{chain}/{hypervisor_address}/analytics/returns/csv",
+            path="/analytics/returns/chart",
+            endpoint=self.hypervisor_analytics_return_graph,
+            methods=["GET"],
+        )
+
+        router.add_api_route(
+            path="/analytics/returns/csv",
             endpoint=self.hypervisor_analytics_return_detail,
             methods=["GET"],
         )
 
-        #
         router.add_api_route(
-            path="/{chain}/{hypervisor_address}/analytics/positions",
+            path="/analytics/positions",
             endpoint=self.positions_status,
-            methods=["GET"],
-        )
-        router.add_api_route(
-            path="/{chain}/{hypervisor_address}/analytics/correlation",
-            endpoint=self.correlation_hypervisor,
             methods=["GET"],
         )
 
         router.add_api_route(
-            path="/{chain}/analytics/correlation",
+            path="/analytics/correlation",
             endpoint=self.correlation,
             methods=["GET"],
         )
@@ -137,8 +141,11 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
     async def positions_status(
         self,
         response: Response,
-        chain: Chain,
-        hypervisor_address: str = Query(..., description=" hypervisor address"),
+        hypervisor_address: str,
+        chain: Chain
+        | int = Query(Chain.ETHEREUM, enum=[*Chain, *[x.id for x in Chain]]),
+        period: Period
+        | int = Query(Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]),
         from_timestamp: int
         | None = Query(
             None,
@@ -161,11 +168,31 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         * **limitLiquidity_usd**: limit position liquidity in USD, using current token prices
 
         """
+        # convert to chain and period
+        if isinstance(chain, int):
+            chain = int_to_chain(chain)
+        if isinstance(period, int):
+            period = int_to_period(period)
 
-        if not from_timestamp:
+        if not from_timestamp and period:
+            # Period exists and from_timestamp is not set
+            # convert period to timestamp: current timestamp in utc timezone
+            from_timestamp = int(datetime.now(tz=timezone.utc).timestamp()) - (
+                (period.days * 24 * 60 * 60)
+                if period != Period.DAILY
+                else period.days * 24 * 2 * 60 * 60
+            )
+
+        elif not period:
             # set from_timestamp to 14 days ago
             from_timestamp = int(
                 datetime.now(tz=timezone.utc).timestamp() - (14 * 24 * 60 * 60)
+            )
+        elif from_timestamp and period:
+            # both from_timestamp and period are set
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="You must provide either period or from_timestamp",
             )
 
         # make sure address is valid
@@ -179,33 +206,16 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         )
 
     @cache(expire=LONG_CACHE_TIMEOUT)
-    async def correlation_hypervisor(
-        self,
-        response: Response,
-        chain: Chain,
-        hypervisor_address: str = Query(..., description=" hypervisor address"),
-    ):
-        """Returns the usd price correlation between the underlying hypervisor tokens, using the last 6000 prices found for the specified tokens.
-        (  1 = correlated    -1 = inversely correlated )
-
-        When no common block database price is found between tokens, the correlation is set to "no data".
-        """
-        return await self.correlation(
-            response=response,
-            chain=chain,
-            token_addresses=None,
-            hypervisor_addresses=[hypervisor_address],
-        )
-
-    @cache(expire=LONG_CACHE_TIMEOUT)
     async def correlation(
         self,
         response: Response,
-        chain: Chain,
-        token_addresses: list[str] = Query(None, description=" token addresses"),
-        hypervisor_addresses: list[str] = Query(
-            None, description=" hypervisor addresses"
-        ),
+        chain: Chain
+        | int = Query(Chain.ETHEREUM, enum=[*Chain, *[x.id for x in Chain]]),
+        period: Period
+        | int = Query(Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]),
+        token_addresses: list[str] | None = Query(None, description=" token addresses"),
+        hypervisor_addresses: list[str]
+        | None = Query(None, description=" hypervisor addresses"),
     ):
         """Returns the usd price correlation between tokens, using the last 6000 prices found for the specified tokens.
              (  1 = correlated    -1 = inversely correlated )
@@ -220,6 +230,9 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
          ( you must provide either token_addresses or hypervisor_address )
 
         """
+
+        if isinstance(chain, int):
+            chain = int_to_chain(chain)
 
         token_addresses = filter_addresses(token_addresses)
         hypervisor_addresses = filter_addresses(hypervisor_addresses)
@@ -241,16 +254,21 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
     @cache(expire=DAILY_CACHE_TIMEOUT)
     async def hypervisor_analytics_return_graph(
         self,
-        chain: Chain,
-        hypervisor_address: str,
-        period: Period | int,
         response: Response,
+        hypervisor_address: str,
+        chain: Chain
+        | int = Query(Chain.ETHEREUM, enum=[*Chain, *[x.id for x in Chain]]),
+        period: Period
+        | int = Query(Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]),
     ):
         """Hypervisor returns data within the period, including token0 and token1 prices:
 
         * **timestamp**: unix timestamp
 
         """
+        # convert
+        if isinstance(chain, int):
+            chain = int_to_chain(chain)
         if isinstance(period, int):
             period = int_to_period(period)
 
@@ -271,13 +289,17 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
     # Hypervisor returns
     async def hypervisor_analytics_return_detail(
         self,
-        chain: Chain,
-        hypervisor_address: str,
-        period: Period | int,
         response: Response,
+        hypervisor_address: str,
+        chain: Chain
+        | int = Query(Chain.ETHEREUM, enum=[*Chain, *[x.id for x in Chain]]),
+        period: Period
+        | int = Query(Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]),
     ):
         """Return a csv file containing all hypervisor returns details with respect to the specified period returns"""
-
+        # convert
+        if isinstance(chain, int):
+            chain = int_to_chain(chain)
         if isinstance(period, int):
             period = int_to_period(period)
         # convert period to timestamp: current timestamp in utc timezone
