@@ -97,7 +97,7 @@ async def get_correlation_from_one_token_pair(
     )
 
     # build dataFrame
-    df = convert_to_dataframe(
+    if df := convert_to_dataframe(
         await get_prices(
             chains=[chain],
             token_addresses=token_addresses,
@@ -105,24 +105,30 @@ async def get_correlation_from_one_token_pair(
             to_block=to_block,
             group_blocks=_group_blocks,
         )
-    )
-    df = df.set_index(keys="timestamp", append=True, verify_integrity=True, drop=True)
-    df = df.groupby("timestamp", as_index=True, sort=True).last()
+    ):
+        df = df.set_index(
+            keys="timestamp", append=True, verify_integrity=True, drop=True
+        )
+        df = df.groupby("timestamp", as_index=True, sort=True).last()
 
-    # calculate correlation ( expanding data from 0 to xx)
-    correlation = df.expanding(10).corr(pairwise=True)
-    # remove NaN and inf
-    correlation = correlation[~correlation.isin([np.nan, np.inf, -np.inf]).any(axis=1)]
+        # calculate correlation ( expanding data from 0 to xx)
+        correlation = df.expanding(10).corr(pairwise=True)
+        # remove NaN and inf
+        correlation = correlation[
+            ~correlation.isin([np.nan, np.inf, -np.inf]).any(axis=1)
+        ]
 
-    return [
-        {
-            "timestamp": idx[0],
-            token_addresses[0]: round(row[token_addresses[0]], 2),
-            token_addresses[1]: round(row[token_addresses[1]], 2),
-        }
-        for idx, row in correlation.iterrows()
-        if idx[-1] == token_addresses[0]
-    ]
+        return [
+            {
+                "timestamp": idx[0],
+                token_addresses[0]: round(row[token_addresses[0]], 2),
+                token_addresses[1]: round(row[token_addresses[1]], 2),
+            }
+            for idx, row in correlation.iterrows()
+            if idx[-1] == token_addresses[0]
+        ]
+    else:
+        return []
 
 
 # Helper functions
