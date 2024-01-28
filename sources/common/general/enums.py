@@ -20,7 +20,7 @@ class Chain(str, Enum):
     )
     AVALANCHE = ("avalanche", 43114, "avalanche", "Avalanche", None, None, "Avalanche")
     FANTOM = ("fantom", 250, "fantom", "Fantom", None, None, "Fantom")
-    MOONBEAM = ("moonbeam", 1287, "moonbeam", "Moonbeam", None, None, "Moonbeam")
+    MOONBEAM = ("moonbeam", 1284, "moonbeam", "Moonbeam", None, None, "Moonbeam")
     MANTLE = ("mantle", 5000, "mantle", "Mantle", None, None, "Mantle")
     BASE = ("base", 8453, "base", "Base", None, None, "Base")
     LINEA = ("linea", 59144, "linea", "Linea", None, None, "Linea")
