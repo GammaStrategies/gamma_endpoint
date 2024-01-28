@@ -69,6 +69,7 @@ class frontend_revenueStatus_router_builder_main(router_builder_baseTemplate):
         protocol: Protocol | None = None,
         from_timestamp: int | None = None,
         yearly: bool = False,
+        monthly: bool = False,
         filter_zero_revenue: bool = True,
     ) -> list[dict]:
         """Returns Gamma's fees aquired by hypervisors, calculated volume of swaps on those same hypervisors and their revenue (Gamma service fees).
@@ -82,6 +83,7 @@ class frontend_revenueStatus_router_builder_main(router_builder_baseTemplate):
         * **protocol** Protocol to filter by.
         * **from_timestamp** Limit returned data from timestamp to now.
         * **yearly** group result by year.
+        * **monthly** group result by month.
         * **filter_zero_revenue** filter out zero revenue items.
 
         """
@@ -93,6 +95,7 @@ class frontend_revenueStatus_router_builder_main(router_builder_baseTemplate):
             chain=chain,
             protocol=protocol,
             yearly=yearly,
+            monthly=monthly,
             ini_timestamp=from_timestamp,
             filter_zero_revenue=filter_zero_revenue,
         )
