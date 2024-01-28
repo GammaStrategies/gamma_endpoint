@@ -28,6 +28,7 @@ class Chain(str, Enum):
     MANTA = ("manta", 169, "manta", "Manta", None, None, "Manta")
     METIS = ("metis", 1088, "metis", "Metis", None, None, "Metis")
     OPBNB = ("opbnb", 204, "opbnb", "Opbnb", None, None, "Opbnb")
+    GNOSIS = ("gnosis", 204, "gnosis", "Gnosis", None, None, "Gnosis")
 
     # extra properties
     id: int
@@ -97,6 +98,8 @@ class Dex(str, Enum):
     BASESWAP = "baseswap"
     SWAPBASED = "swapbased"
     PHARAOH = "pharaoh"
+    SWAPR = "swapr"
+    THICK = "thick"
 
 
 class Protocol(str, Enum):
@@ -131,6 +134,8 @@ class Protocol(str, Enum):
     BASESWAP = ("baseswap", None, None, None, "baseswap", "Baseswap")
     SWAPBASED = ("swapbased", None, None, None, "swapbased", "Swapbased")
     PHARAOH = ("pharaoh", None, None, None, "pharaoh", "Pharaoh")
+    SWAPR = ("swapr", None, None, None, "swapr", "Swapr")
+    THICK = ("thick", None, None, None, "thick", "Thick")
 
     # extra properties
     api_url: str

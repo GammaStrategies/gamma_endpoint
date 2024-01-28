@@ -37,6 +37,8 @@ DEPLOYMENTS = [
     (Protocol.BASESWAP, Chain.BASE),
     (Protocol.SWAPBASED, Chain.BASE),
     (Protocol.PHARAOH, Chain.AVALANCHE),
+    (Protocol.SWAPR, Chain.GNOSIS),
+    (Protocol.THICK, Chain.BASE),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -136,6 +138,12 @@ DEX_SUBGRAPH_URLS = {
     Protocol.PHARAOH: {
         Chain.AVALANCHE: get_config("PHARAOH_AVALANCHE_SUBGRAPH_URL"),
     },
+    Protocol.SWAPR: {
+        Chain.GNOSIS: get_config("SWAPR_GNOSIS_SUBGRAPH_URL"),
+    },
+    Protocol.THICK: {
+        Chain.BASE: get_config("THICK_BASE_SUBGRAPH_URL"),
+    }
 }
 
 DEX_HYPEPOOL_SUBGRAPH_URLS = {
@@ -222,6 +230,12 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.PHARAOH: {
         Chain.AVALANCHE: get_config("PHARAOH_AVALANCHE_HP_SUBGRAPH_URL"),
     },
+    Protocol.SWAPR: {
+        Chain.GNOSIS: get_config("SWAPR_GNOSIS_HP_SUBGRAPH_URL"),
+    },
+    Protocol.THICK: {
+        Chain.BASE: get_config("THICK_BASE_HP_SUBGRAPH_URL"),
+    }
 }
 
 GAMMA_SUBGRAPH_URLS = {
@@ -308,6 +322,12 @@ GAMMA_SUBGRAPH_URLS = {
     Protocol.PHARAOH: {
         Chain.AVALANCHE: get_config("PHARAOH_AVALANCHE_GAMMA_SUBGRAPH_URL"),
     },
+    Protocol.SWAPR: {
+        Chain.GNOSIS: get_config("SWAPR_GNOSIS_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.THICK: {
+        Chain.BASE: get_config("THICK_BASE_GAMMA_SUBGRAPH_URL"),
+    }
 }
 
 XGAMMA_SUBGRAPH_URL = "https://api.thegraph.com/subgraphs/name/l0c4t0r/xgamma"

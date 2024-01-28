@@ -438,6 +438,24 @@ def build_routers_compatible() -> list:
         )
     )
 
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.SWAPR,
+            chain=Chain.GNOSIS,
+            tags=["Swapr - Gnosis"],
+            prefix=f"/{Protocol.SWAPR.api_url}/{Chain.GNOSIS.api_url}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.THICK,
+            chain=Chain.BASE,
+            tags=["Thick - Base"],
+            prefix=f"/{Protocol.THICK.api_url}/{Chain.BASE.api_url}",
+        )
+    )
+
     # Simulation
     routes.append(
         subgraph_router_builder_Simulator(tags=["Simulator"], prefix="/simulator")
