@@ -5,7 +5,7 @@ from fastapi import Query, Response, APIRouter, status
 from fastapi.responses import StreamingResponse
 from fastapi.routing import APIRoute
 from fastapi_cache.decorator import cache
-from endpoint.config.cache import DB_CACHE_TIMEOUT
+from endpoint.config.cache import DB_CACHE_TIMEOUT, DAILY_CACHE_TIMEOUT
 
 from endpoint.routers.template import (
     router_builder_generalTemplate,
@@ -221,6 +221,13 @@ class mongo_router_builder(router_builder_baseTemplate):
         )
 
         router.add_api_route(
+            path=f"{self.prefix}{'/hypervisors/lastSnapshot'}",
+            endpoint=self.hypervisors_last_snapshot,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
+        router.add_api_route(
             path=f"{self.prefix}{'/hypervisors/collectedFees'}",
             endpoint=self.hypervisors_collected_fees,
             methods=["GET"],
@@ -379,6 +386,13 @@ class mongo_router_builder(router_builder_baseTemplate):
     async def hypervisors_list(self, response: Response):
         """Returns the hypervisor found in the database"""
         return await hypervisor.hypervisors_list(
+            network=self.chain, protocol=self.protocol
+        )
+
+    @cache(expire=DAILY_CACHE_TIMEOUT)
+    async def hypervisors_last_snapshot(self, response: Response):
+        """Returns the hypervisor found in the database"""
+        return await hypervisor.hypervisors_last_snapshot(
             network=self.chain, protocol=self.protocol
         )
 

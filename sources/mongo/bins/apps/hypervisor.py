@@ -20,6 +20,31 @@ async def hypervisors_list(network: Chain, protocol: Protocol):
     )
 
 
+async def hypervisors_last_snapshot(network: Chain, protocol: Protocol):
+    _query = [
+        {
+            "$lookup": {
+                "from": "status",
+                "let": {"op_address": "$address"},
+                "pipeline": [
+                    {"$match": {"$expr": {"$eq": ["$address", "$$op_address"]}}},
+                    {"$sort": {"block": -1}},
+                    {"$limit": 1},
+                    {"$unset": ["_id"]},
+                ],
+                "as": "status",
+            }
+        },
+        {"$unwind": {"path": "$status", "preserveNullAndEmptyArrays": False}},
+        {"$replaceRoot": {"newRoot": "$status"}},
+    ]
+
+    return await local_database_helper(network=network).get_items_from_database(
+        collection_name="static",
+        aggregate=_query,
+    )
+
+
 async def hypervisors_uncollected_fees(
     network: Chain,
     timestamp: int | None = None,
