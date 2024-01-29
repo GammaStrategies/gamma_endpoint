@@ -30,7 +30,7 @@ async def hypervisors_last_snapshot(network: Chain, protocol: Protocol):
                     {"$match": {"$expr": {"$eq": ["$address", "$$op_address"]}}},
                     {"$sort": {"block": -1}},
                     {"$limit": 1},
-                    {"$unset": ["_id"]},
+                    {"$unset": ["_id", "id"]},
                 ],
                 "as": "status",
             }
