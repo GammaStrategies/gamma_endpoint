@@ -105,6 +105,18 @@ async def get_positions_analysis(
             10 ** itm["token1_decimals"] / 10 ** itm["token0_decimals"]
         )
 
+        # outliers are zeroed out so that graph is not out of boundss
+        if itm["baseUpper"] > 1e10:
+            itm["baseUpper"] = 0
+        if itm["baseLower"] > 1e10:
+            itm["baseLower"] = 0
+        if itm["limitUpper"] > 1e10:
+            itm["limitUpper"] = 0
+        if itm["limitLower"] > 1e10:
+            itm["limitLower"] = 0
+        if itm["currentTick"] > 1e10:
+            itm["currentTick"] = 0
+
         result.append(
             {
                 "symbol": itm["symbol"],
