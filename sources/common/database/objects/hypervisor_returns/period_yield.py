@@ -1323,26 +1323,27 @@ class period_yield_analyzer:
                 for x in filtered_data
             ]
 
-            # insert first item
-            result.insert(
-                0,
-                {
-                    "chain": filtered_data[0]["chain"],
-                    "address": filtered_data[0]["address"],
-                    "symbol": filtered_data[0]["symbol"],
-                    "block": filtered_data[0]["block"],
-                    "timestamp": filtered_data[0]["timestamp_from"],
-                    "period_hodl_fifty": 0,
-                    "period_hodl_token0": 0,
-                    "period_hodl_token1": 0,
-                    "period_gamma_netApr": 0,
-                    "period_gamma_feeApr": 0,
-                    "period_gamma_rewardsApr": 0,
-                    "price_per_share": filtered_data[0]["status"]["ini"]["prices"][
-                        "share"
-                    ],
-                },
-            )
+            # insert first item if there is only one item
+            if len(result) == 1:
+                result.insert(
+                    0,
+                    {
+                        "chain": filtered_data[0]["chain"],
+                        "address": filtered_data[0]["address"],
+                        "symbol": filtered_data[0]["symbol"],
+                        "block": filtered_data[0]["block"],
+                        "timestamp": filtered_data[0]["timestamp_from"],
+                        "period_hodl_fifty": 0,
+                        "period_hodl_token0": 0,
+                        "period_hodl_token1": 0,
+                        "period_gamma_netApr": 0,
+                        "period_gamma_feeApr": 0,
+                        "period_gamma_rewardsApr": 0,
+                        "price_per_share": filtered_data[0]["status"]["ini"]["prices"][
+                            "share"
+                        ],
+                    },
+                )
 
             return result
 
