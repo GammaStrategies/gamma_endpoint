@@ -88,13 +88,22 @@ async def get_positions_analysis(
         )
         itm["totalLiquidity_usd"] = itm["baseLiquidity_usd"] + itm["limitLiquidity_usd"]
 
-        # convert tick to price
-        itm["baseUpper"] = 1.0001 ** int(itm["baseUpper"])
-        itm["baseLower"] = 1.0001 ** int(itm["baseLower"])
-        itm["limitUpper"] = 1.0001 ** int(itm["limitUpper"])
-        itm["limitLower"] = 1.0001 ** int(itm["limitLower"])
-
-        itm["currentTick"] = 1.0001 ** int(itm["currentTick"])
+        # convert tick to price: price ratio of token1 to token0, denoted as token1/token0
+        itm["baseUpper"] = 1.0001 ** int(itm["baseUpper"]) / (
+            10 ** itm["token1_decimals"] / 10 ** itm["token0_decimals"]
+        )
+        itm["baseLower"] = 1.0001 ** int(itm["baseLower"]) / (
+            10 ** itm["token1_decimals"] / 10 ** itm["token0_decimals"]
+        )
+        itm["limitUpper"] = 1.0001 ** int(itm["limitUpper"]) / (
+            10 ** itm["token1_decimals"] / 10 ** itm["token0_decimals"]
+        )
+        itm["limitLower"] = 1.0001 ** int(itm["limitLower"]) / (
+            10 ** itm["token1_decimals"] / 10 ** itm["token0_decimals"]
+        )
+        itm["currentTick"] = 1.0001 ** int(itm["currentTick"]) / (
+            10 ** itm["token1_decimals"] / 10 ** itm["token0_decimals"]
+        )
 
         result.append(
             {
