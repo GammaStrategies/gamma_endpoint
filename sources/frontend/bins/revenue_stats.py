@@ -244,7 +244,6 @@ async def get_revenue_stats(
         )
         #
         # add a monthly estimation using trailing days
-        trailing_usd = 0
         try:
             _months_back = trailing // 30
             # define current month as last item (year) -> last 'items' (month)
@@ -262,6 +261,10 @@ async def get_revenue_stats(
 
             # get current_month total days left
             days_passed_current_month = datetime.now(timezone.utc).day
+
+            total_days_last_month = calendar.monthrange(
+                _last_month["year"], _last_month["month"]
+            )[1]
             total_days_current_month = calendar.monthrange(
                 datetime.now(timezone.utc).year, datetime.now(timezone.utc).month
             )[1]
@@ -269,12 +272,19 @@ async def get_revenue_stats(
                 total_days_current_month - days_passed_current_month
             )
 
-            trailing_usd = (
-                (_last_month["total_revenue"] / 30) * days_left_current_month
-            ) + _current_month["total_revenue"]
+            # revenue per day last month
+            last_month_daily_revenue_per_day = (
+                _last_month["total_revenue"] / total_days_last_month
+            )
+            current_month_potential_revenue = _current_month["total_revenue"] + (
+                days_left_current_month * last_month_daily_revenue_per_day
+            )
+            yearly_potential_revenue = (
+                current_month_potential_revenue / total_days_current_month
+            ) * 365
 
             # add it to the current year
-            result[-1]["total_revenue_potential"] = trailing_usd * 12
+            result[-1]["total_revenue_potential"] = yearly_potential_revenue
 
         except Exception as e:
             pass
