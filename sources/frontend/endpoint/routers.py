@@ -24,6 +24,7 @@ from sources.frontend.bins.correlation import (
     get_correlation_from_hypervisors,
 )
 from sources.frontend.bins.revenue_stats import get_revenue_stats
+from sources.frontend.bins.users import get_user_positions
 from sources.mongo.bins.apps.returns import build_hype_return_analysis_from_database
 
 from sources.subgraph.bins.enums import Chain, Protocol
@@ -39,6 +40,8 @@ def build_routers() -> list:
         frontend_revenueStatus_router_builder_main(tags=["Revenue status"], prefix="")
     )
     routes.append(frontend_analytics_router_builder_main(tags=["Analytics"], prefix=""))
+
+    routes.append(frontend_user_router_builder_main(tags=["User"], prefix=""))
 
     return routes
 
@@ -106,12 +109,13 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
     def router(self) -> APIRouter:
         router = APIRouter(prefix=self.prefix)
 
-        # TODO: DELETE. This is replaced by its next route to the function
-        router.add_api_route(
-            path="/{chain}/{hypervisor_address}/analytics/returns/chart",
-            endpoint=self.hypervisor_analytics_return_graph,
-            methods=["GET"],
-        )
+        # # TODO: DELETE. This is replaced by its next route to the function
+        # router.add_api_route(
+        #     path="/{chain}/{hypervisor_address}/analytics/returns/chart",
+        #     endpoint=self.hypervisor_analytics_return_graph,
+        #     methods=["GET"],
+        # )
+
         router.add_api_route(
             path="/analytics/returns/chart",
             endpoint=self.hypervisor_analytics_return_graph,
@@ -320,3 +324,40 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         else:
             response.status_code = status.HTTP_404_NOT_FOUND
             return {"detail": "No data found for the given parameters"}
+
+
+class frontend_user_router_builder_main(router_builder_baseTemplate):
+    # ROUTEs BUILD FUNCTIONS
+    def router(self) -> APIRouter:
+        router = APIRouter(prefix=self.prefix)
+
+        router.add_api_route(
+            path="/user/positions",
+            endpoint=self.user_positions,
+            methods=["GET"],
+        )
+
+        return router
+
+    # ROUTE FUNCTIONS
+    @cache(expire=DAILY_CACHE_TIMEOUT)
+    async def user_positions(
+        self,
+        response: Response,
+        address: str,
+        chain: Chain | int | None = Query(None, enum=[*Chain, *[x.id for x in Chain]]),
+    ):
+        """Returns all positions for a given user address"""
+        if isinstance(chain, int):
+            chain = int_to_chain(chain)
+        address = filter_addresses(address)
+
+        if chain:
+            return await get_user_positions(user_address=address, chain=chain)
+        else:
+            return await asyncio.gather(
+                *[
+                    get_user_positions(user_address=address, chain=cha)
+                    for cha in list(Chain)
+                ]
+            )

@@ -5,88 +5,342 @@ from sources.mongo.bins.helpers import global_database_helper, local_database_he
 from sources.mongo.endpoint.routers import DEPLOYED
 
 
-async def user_positions_summary_worker(
-    user_address: str, chains: list[Chain] | None = None
-):
-    details = await asyncio.gather(
-        *[
-            user_positions_summary_worker_chain(user_address, chain)
-            for chain in chains or list(set(list([cha for pro, cha in DEPLOYED])))
-        ]
-    )
-
-    # return a summary totals dict object with all data in details field
-    return {
-        "total_current_usd_value": sum(
-            [
-                sum([itm["current_usd_value"] for itm in chain_details])
-                for chain_details in details
-            ]
-        ),
-        "details": details,
-    }
-
-
-async def user_positions_summary_worker_chain(
-    user_address: str, chain: Chain | None = None
-):
-    # get all user's positions within the chain and current prices
-    _current_prices, _user_data = await asyncio.gather(
-        get_current_prices(network=chain),
-        local_database_helper(network=chain).get_grouped_user_current_status(
-            user_address=user_address, chain=chain
-        ),
-    )
-    _current_prices = {itm["address"]: itm["price"] for itm in _current_prices}
-
-    # get prices for all operations
-    _prices_to_get = [itm["price_id_token0"] for itm in _user_data] + [
-        itm["price_id_token1"] for itm in _user_data
+async def get_user_positions(user_address: str, chain: Chain) -> list[dict]:
+    # 1) Get the user positions from operations
+    return [
+        global_database_helper().convert_d128_to_decimal(x)
+        for x in await local_database_helper(network=chain).get_items_from_database(
+            collection_name="operations",
+            aggregate=query_user_positions(user_address=user_address),
+        )
     ]
-    _historic_prices = await global_database_helper().get_items_from_database(
-        collection_name="usd_prices", find={"id": {"$in": _prices_to_get}}
-    )
-    _historic_prices = {itm["id"]: itm["price"] for itm in _historic_prices}
 
-    # calc usd values
-    for _position in _user_data:
-        # convert decimals128 to floats
-        _position = global_database_helper().convert_decimal_to_float(
-            global_database_helper().convert_d128_to_decimal(_position)
-        )
-        # ease access to vars
-        _current_usd_price_token0 = _current_prices[_position["info"]["token0_address"]]
-        _current_usd_price_token1 = _current_prices[_position["info"]["token1_address"]]
-        _token0_decimals = _position["info"]["decimals_token0"]
-        _token1_decimals = _position["info"]["decimals_token1"]
+    # 2) Identfy staked positions ( current zero shares last deposit == known rewarder )
 
-        # set current position value in usd ( general current value)
-        _position["current_usd_value"] = (
-            (_position["last_token0"] / (10**_token0_decimals))
-            * _current_usd_price_token0
-        ) + (
-            (_position["last_token1"] / (10**_token1_decimals))
-            * _current_usd_price_token1
-        )
 
-        # set usd value per operation
-        for idx, _operation in enumerate(_position["operations"]):
-            _op_usd_price_token0 = _historic_prices.get(
-                _position["price_id_token0"][idx],
-                _current_prices[_position["info"]["token0_address"]],
-            )
-            _op_usd_price_token1 = _historic_prices.get(
-                _position["price_id_token1"][idx],
-                _current_prices[_position["info"]["token1_address"]],
-            )
+def query_user_positions(user_address: str) -> list[dict]:
+    """
 
-            _operation["usd_value"] = (
-                (_operation["token0"] / (10**_token0_decimals))
-                * _historic_prices[_position["price_id_token0"][idx]]
-            ) + (
-                (_operation["token1"] / (10**_token0_decimals))
-                * _historic_prices[_position["price_id_token1"][idx]]
-            )
+    Returns:
+     the database will return a list of :
+        {
+        hypervisor: "0x0000.."
+        last_block: 0000
+        last_timestamp: 0000
 
-    # return data
-    return _user_data
+        info {
+            hypervisor_symbol: "wstETH-ETH3"
+            token0_address: "0x5979d7b546e38e414f7e9822514be443a4800529"
+            token1_address:"0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+            decimals_hype:18
+            decimals_token0:18
+            decimals_token1:18
+        }
+
+        last_shares:0
+        last_token0: 002312312212121
+        last_token1: -122222254646
+        last_share_price: 123.9947843234
+
+        operations:[
+            {
+                block:66896174
+                timestamp: 1677993616
+                topic:"deposit"
+                shares: 443268479662442397
+                token0: 2696738539132030705
+                token1: 785083692322936013
+                share_price: 13385.15685806833258923989827337968
+                token0_price: 1743.6310375106418
+                token1_price: 1568.1144897579422
+        }
+        ...
+        ]
+        }
+
+    """
+    _query = [
+        {
+            "$match": {
+                "$and": [
+                    {
+                        "$or": [
+                            {"src": user_address},
+                            {"dst": user_address},
+                            {"sender": user_address},
+                            {"to": user_address},
+                        ]
+                    },
+                    {"src": {"$ne": "0x0000000000000000000000000000000000000000"}},
+                    {"dst": {"$ne": "0x0000000000000000000000000000000000000000"}},
+                ]
+            }
+        },
+        {"$sort": {"blockNumber": 1}},
+        {
+            "$lookup": {
+                "from": "static",
+                "let": {"op_address": "$address"},
+                "pipeline": [
+                    {"$match": {"$expr": {"$eq": ["$address", "$$op_address"]}}},
+                    {"$limit": 1},
+                    {
+                        "$project": {
+                            "address": "$address",
+                            "symbol": "$symbol",
+                            "pool": {
+                                "address": "$pool.address",
+                                "token0": "$pool.token0.address",
+                                "token1": "$pool.token1.address",
+                                "dex": "$pool.dex",
+                            },
+                            "dex": "$dex",
+                        }
+                    },
+                    {"$unset": ["_id"]},
+                ],
+                "as": "static",
+            }
+        },
+        {
+            "$lookup": {
+                "from": "hypervisor_returns",
+                "let": {"op_address": "$address", "op_block": "$blockNumber"},
+                "pipeline": [
+                    {
+                        "$match": {
+                            "$expr": {
+                                "$and": [
+                                    {"$eq": ["$address", "$$op_address"]},
+                                    {"$gte": ["$timeframe.ini.block", "$$op_block"]},
+                                ]
+                            }
+                        }
+                    },
+                    {"$limit": 1},
+                    {
+                        "$project": {
+                            "token_prices": "$status.ini.prices",
+                            "share_price": {
+                                "$divide": [
+                                    {
+                                        "$sum": [
+                                            {
+                                                "$multiply": [
+                                                    "$status.ini.prices.token0",
+                                                    "$status.ini.underlying.qtty.token0",
+                                                ]
+                                            },
+                                            {
+                                                "$multiply": [
+                                                    "$status.ini.prices.token1",
+                                                    "$status.ini.underlying.qtty.token1",
+                                                ]
+                                            },
+                                        ]
+                                    },
+                                    "$status.ini.supply",
+                                ]
+                            },
+                        }
+                    },
+                    {"$unset": ["_id"]},
+                ],
+                "as": "hype_returns",
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "block": "$blockNumber",
+                "timestamp": "$timestamp",
+                "hypervisor": "$address",
+                "hypervisor_symbol": {"$first": "$static.symbol"},
+                "token0_address": {"$first": "$static.pool.token0"},
+                "token1_address": {"$first": "$static.pool.token1"},
+                "decimals_contract": "$decimals_contract",
+                "decimals_token0": "$decimals_token0",
+                "decimals_token1": "$decimals_token1",
+                "topic": "$topic",
+                "shares": {
+                    "$ifNull": [
+                        {
+                            "$cond": [
+                                {
+                                    "$or": [
+                                        {"$eq": ["$topic", "deposit"]},
+                                        {"$eq": ["$dst", user_address]},
+                                    ]
+                                },
+                                {"$toDecimal": {"$ifNull": ["$qtty", "$shares"]}},
+                                {
+                                    "$multiply": [
+                                        {
+                                            "$toDecimal": {
+                                                "$ifNull": ["$qtty", "$shares"]
+                                            }
+                                        },
+                                        -1,
+                                    ]
+                                },
+                            ]
+                        },
+                        0,
+                    ]
+                },
+                "token0": {
+                    "$ifNull": [
+                        {
+                            "$cond": [
+                                {"$eq": ["$topic", "deposit"]},
+                                {"$toDecimal": "$qtty_token0"},
+                                {"$multiply": [{"$toDecimal": "$qtty_token0"}, -1]},
+                            ]
+                        },
+                        0,
+                    ]
+                },
+                "token1": {
+                    "$ifNull": [
+                        {
+                            "$cond": [
+                                {"$eq": ["$topic", "deposit"]},
+                                {"$toDecimal": "$qtty_token1"},
+                                {"$multiply": [{"$toDecimal": "$qtty_token1"}, -1]},
+                            ]
+                        },
+                        0,
+                    ]
+                },
+                "prices": {
+                    "share_price": {"$first": "$hype_returns.share_price"},
+                    "token0": {"$first": "$hype_returns.token_prices.token0"},
+                    "token1": {"$first": "$hype_returns.token_prices.token1"},
+                },
+            }
+        },
+        {
+            "$group": {
+                "_id": {"hype": "$hypervisor"},
+                "last_block": {"$last": "$block"},
+                "last_timestamp": {"$last": "$timestamp"},
+                "info": {
+                    "$first": {
+                        "hypervisor_symbol": "$hypervisor_symbol",
+                        "token0_address": "$token0_address",
+                        "token1_address": "$token1_address",
+                        "decimals_hype": "$decimals_contract",
+                        "decimals_token0": "$decimals_token0",
+                        "decimals_token1": "$decimals_token1",
+                    }
+                },
+                "last_shares": {"$sum": "$shares"},
+                "last_token0": {"$sum": "$token0"},
+                "last_token1": {"$sum": "$token1"},
+                "operations": {
+                    "$push": {
+                        "block": "$block",
+                        "timestamp": "$timestamp",
+                        "topic": "$topic",
+                        "shares": "$shares",
+                        "token0": "$token0",
+                        "token1": "$token1",
+                        "share_price": "$prices.share_price",
+                        "token0_price": "$prices.token0",
+                        "token1_price": "$prices.token1",
+                        "usd_value": {
+                            "$multiply": [
+                                {
+                                    "$divide": [
+                                        {"$multiply": [-1, "$shares"]},
+                                        {"$pow": [10, "$decimals_contract"]},
+                                    ]
+                                },
+                                "$prices.share_price",
+                            ]
+                        },
+                    }
+                },
+                "price_id_token0": {
+                    "$push": {
+                        "$concat": [
+                            "arbitrum_",
+                            {"$toString": "$block"},
+                            "_",
+                            "$token0_address",
+                        ]
+                    }
+                },
+                "price_id_token1": {
+                    "$push": {
+                        "$concat": [
+                            "arbitrum_",
+                            {"$toString": "$block"},
+                            "_",
+                            "$token1_address",
+                        ]
+                    }
+                },
+            }
+        },
+        {
+            "$lookup": {
+                "from": "hypervisor_returns",
+                "let": {"op_address": "$_id.hype"},
+                "pipeline": [
+                    {"$match": {"$expr": {"$eq": ["$address", "$$op_address"]}}},
+                    {"$sort": {"block": -1}},
+                    {"$limit": 1},
+                    {
+                        "$project": {
+                            "_id": 0,
+                            "share_price": {
+                                "$divide": [
+                                    {
+                                        "$sum": [
+                                            {
+                                                "$multiply": [
+                                                    "$status.ini.prices.token0",
+                                                    "$status.ini.underlying.qtty.token0",
+                                                ]
+                                            },
+                                            {
+                                                "$multiply": [
+                                                    "$status.ini.prices.token1",
+                                                    "$status.ini.underlying.qtty.token1",
+                                                ]
+                                            },
+                                        ]
+                                    },
+                                    "$status.ini.supply",
+                                ]
+                            },
+                        }
+                    },
+                ],
+                "as": "current_share_price",
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "hypervisor": "$_id.hype",
+                "current_usd_value": {
+                    "$multiply": [
+                        "$last_shares",
+                        {"$first": "$current_share_price.share_price"},
+                    ]
+                },
+                "PnL": {"$sum": ["$operations.usd_value"]},
+                "last_block": "$last_block",
+                "last_timestamp": "$last_timestamp",
+                "info": "$info",
+                "last_shares": "$last_shares",
+                "last_token0": "$last_token0",
+                "last_token1": "$last_token1",
+                "last_share_price": {"$first": "$current_share_price.share_price"},
+                "operations": "$operations",
+            }
+        },
+    ]
+    return _query
