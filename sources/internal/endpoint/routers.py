@@ -401,13 +401,11 @@ class internal_router_builder_main(router_builder_baseTemplate):
         response: Response,
         chain: Chain,
         protocol: Protocol | None = None,
-        ini_timestamp: int
-        | None = Query(
+        ini_timestamp: int | None = Query(
             None,
             description="will limit the data returned from this value",
         ),
-        end_timestamp: int
-        | None = Query(
+        end_timestamp: int | None = Query(
             None,
             description="will limit the data returned to this value.",
         ),
@@ -465,13 +463,11 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
         response: Response,
         chain: Chain,
         protocol: Protocol | None = None,
-        ini_timestamp: int
-        | None = Query(
+        ini_timestamp: int | None = Query(
             None,
             description="will limit the data returned from this value. When no value is provided, -7 days will be used",
         ),
-        end_timestamp: int
-        | None = Query(
+        end_timestamp: int | None = Query(
             None,
             description="will limit the data returned to this value. When no value is provided, last available timestamp data will be used.",
         ),
@@ -511,13 +507,11 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
         response: Response,
         chain: Chain,
         protocol: Protocol | None = None,
-        ini_timestamp: int
-        | None = Query(
+        ini_timestamp: int | None = Query(
             None,
             description="will limit the data returned from this value. When no value is provided, -7 days will be used",
         ),
-        end_timestamp: int
-        | None = Query(
+        end_timestamp: int | None = Query(
             None,
             description="will limit the data returned to this value. When no value is provided, last available timestamp data will be used.",
         ),
@@ -532,13 +526,13 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
         All usd values are calculated using the current price of the token.
         """
 
-        # do not allow ini_timestamp to be greater than 120 days ago
+        # do not allow ini_timestamp to be greater than 240 days ago
         if ini_timestamp and (
-            datetime.now(timezone.utc).timestamp() - ini_timestamp > 86400 * 120
+            datetime.now(timezone.utc).timestamp() - ini_timestamp > 86400 * 240
         ):
             raise HTTPException(
                 status_code=400,
-                detail=f"ini_timestamp cannot be greater than 120 days ago.",
+                detail=f"ini_timestamp cannot be greater than 240 days ago.",
             )
 
         # set ini timestamp to 7 days ago if not provided
@@ -557,13 +551,11 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
         response: Response,
         chain: Chain,
         protocol: Protocol | None = None,
-        ini_timestamp: int
-        | None = Query(
+        ini_timestamp: int | None = Query(
             None,
             description="will limit the data returned from this value. When no value is provided, -7 days will be used",
         ),
-        end_timestamp: int
-        | None = Query(
+        end_timestamp: int | None = Query(
             None,
             description="will limit the data returned to this value. When no value is provided, last available timestamp data will be used.",
         ),
@@ -597,13 +589,11 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
         self,
         response: Response,
         chain: Chain | None = None,
-        ini_timestamp: int
-        | None = Query(
+        ini_timestamp: int | None = Query(
             None,
             description="will limit the data returned from this value. When no value is provided, -7 days will be used",
         ),
-        end_timestamp: int
-        | None = Query(
+        end_timestamp: int | None = Query(
             None,
             description="will limit the data returned to this value. When no value is provided, last available timestamp data will be used.",
         ),
@@ -651,15 +641,14 @@ class internal_router_builder_reports(router_builder_baseTemplate):
     async def galxe_report(
         self,
         response: Response,
-        user_address: str
-        | None = Query(None, description="User address to filter the report"),
-        net_position_usd_threshold: int
-        | None = Query(
+        user_address: str | None = Query(
+            None, description="User address to filter the report"
+        ),
+        net_position_usd_threshold: int | None = Query(
             None,
             description="Minimum USD net value during the whole period (deposits-withdraws).",
         ),
-        deposits_usd_threshold: int
-        | None = Query(
+        deposits_usd_threshold: int | None = Query(
             100, description="Minimum USD deposits value during the whole period."
         ),
     ) -> dict:
