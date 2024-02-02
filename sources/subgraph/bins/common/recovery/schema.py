@@ -1,4 +1,5 @@
 from typing import List
+
 from pydantic import BaseModel
 
 
@@ -16,3 +17,4 @@ class RecoveryOutput(BaseModel):
     """Output for recovery"""
 
     dailyDistributions: List[RecoveryDistribution]
+    latest: RecoveryDistribution

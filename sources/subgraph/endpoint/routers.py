@@ -826,8 +826,8 @@ class subgraph_router_builder(router_builder_generalTemplate):
             protocol=self.dex, chain=self.chain, address=address
         )
 
-    async def recovery_stats(self):
-        return await recovery.recovery_stats()
+    async def recovery_stats(self, days: int=7, timezone: str="UTC-5"):
+        return await recovery.recovery_stats(days, timezone)
 
 
 class subgraph_router_builder_compatible(subgraph_router_builder):

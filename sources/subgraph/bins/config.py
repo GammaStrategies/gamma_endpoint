@@ -143,7 +143,7 @@ DEX_SUBGRAPH_URLS = {
     },
     Protocol.THICK: {
         Chain.BASE: get_config("THICK_BASE_SUBGRAPH_URL"),
-    }
+    },
 }
 
 DEX_HYPEPOOL_SUBGRAPH_URLS = {
@@ -235,7 +235,7 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     },
     Protocol.THICK: {
         Chain.BASE: get_config("THICK_BASE_HP_SUBGRAPH_URL"),
-    }
+    },
 }
 
 GAMMA_SUBGRAPH_URLS = {
@@ -327,10 +327,13 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.THICK: {
         Chain.BASE: get_config("THICK_BASE_GAMMA_SUBGRAPH_URL"),
-    }
+    },
 }
 
 XGAMMA_SUBGRAPH_URL = "https://api.thegraph.com/subgraphs/name/l0c4t0r/xgamma"
+RECOVERY_POOL_URL = (
+    "https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-recovery-pool"
+)
 
 DEFAULT_TIMEZONE = get_config("TIMEZONE")
 
