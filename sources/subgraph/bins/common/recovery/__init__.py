@@ -45,7 +45,7 @@ class RecoveryInfo(SubgraphData):
             RecoveryDistribution(
                 timestamp=int(day["date"]),
                 date=timestamp_to_date(int(day["date"]), format="%m/%d/%Y"),
-                feesEarned=0,
+                feesEarned=int(day["distributed"]) / 10**decimals,
                 usdcRecovered=int(day["distributed"]) / 10**decimals,
                 usdcRecoveredCumulative=int(day["cumulativeDistributed"])
                 / 10**decimals,
