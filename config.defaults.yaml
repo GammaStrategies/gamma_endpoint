@@ -28,8 +28,8 @@ LYNEX_LINEA_GAMMA_SUBGRAPH_URL: https://graph-query.linea.build/subgraphs/name/g
 PEGASYS_ROLLUX_GAMMA_SUBGRAPH_URL: https://rollux.graph.pegasys.fi/subgraphs/name/gammastrategies/pegasys-rollux
 BASEX_BASE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-basex-base
 PANCAKESWAP_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-pancakeswap-arbitrum
-APERTURE_MANTA_GAMMA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-aperture-manta/v0.2.0/gn
-QUICKSWAP_MANTA_GAMMA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-quickswap-manta/v0.1.0/gn
+APERTURE_MANTA_GAMMA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-aperture-manta/latest/gn
+QUICKSWAP_MANTA_GAMMA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-quickswap-manta/latest/gn
 HERCULES_METIS_GAMMA_SUBGRAPH_URL: https://metisapi.0xgraph.xyz/subgraphs/name/gamma-hercules-metis
 BASESWAP_BASE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-baseswap-base/version/latest
 SWAPBASED_BASE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-swapbased-base/version/latest
@@ -106,8 +106,8 @@ LYNEX_LINEA_HP_SUBGRAPH_URL: https://graph-query.linea.build/subgraphs/name/gamm
 PEGASYS_ROLLUX_HP_SUBGRAPH_URL: https://rollux.graph.pegasys.fi/subgraphs/name/gammastrategies/hype-pool-pegasys-rollux
 BASEX_BASE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-basex-base
 PANCAKESWAP_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-pancakeswap-arbitrum
-APERTURE_MANTA_HP_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-aperture-manta/v0.2.0/gn
-QUICKSWAP_MANTA_HP_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-quickswap-manta/v0.1.0/gn
+APERTURE_MANTA_HP_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-aperture-manta/latest/gn
+QUICKSWAP_MANTA_HP_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-quickswap-manta/latest/gn
 HERCULES_METIS_HP_SUBGRAPH_URL: https://metisapi.0xgraph.xyz/subgraphs/name/gamma-hp-hercules-metis
 BASESWAP_BASE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-baseswap-base/version/latest
 SWAPBASED_BASE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-swapbased-base/version/latest
