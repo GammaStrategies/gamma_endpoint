@@ -109,12 +109,12 @@ async def get_positions_analysis(
         if itm["currentTick"] > 1e7:
             itm["currentTick"] = 0
         # define a maximum bound for the graph, taking currentTick as reference from point
-        _max_bound = itm["currentTick"] * 20
+        _max_bound = 1e7
         for k in ["baseUpper", "baseLower", "limitUpper", "limitLower"]:
             if itm[k] > _max_bound:
-                itm[k] = _max_bound
-            elif itm[k] < -_max_bound:
-                itm[k] = -_max_bound
+                itm[k] = 0
+            # elif itm[k] < -_max_bound:
+            #     itm[k] = -_max_bound
 
         result.append(
             {
