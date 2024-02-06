@@ -105,17 +105,16 @@ async def get_positions_analysis(
             10 ** itm["token1_decimals"] / 10 ** itm["token0_decimals"]
         )
 
-        # outliers are zeroed out so that graph is not out of boundss
-        if itm["baseUpper"] > 1e10:
-            itm["baseUpper"] = 0
-        if itm["baseLower"] > 1e10:
-            itm["baseLower"] = 0
-        if itm["limitUpper"] > 1e10:
-            itm["limitUpper"] = 0
-        if itm["limitLower"] > 1e10:
-            itm["limitLower"] = 0
-        if itm["currentTick"] > 1e10:
+        # outliers are zeroed out so that graph is not out of bounds
+        if itm["currentTick"] > 1e7:
             itm["currentTick"] = 0
+        # define a maximum bound for the graph, taking currentTick as reference from point
+        _max_bound = itm["currentTick"] * 20
+        for k in ["baseUpper", "baseLower", "limitUpper", "limitLower"]:
+            if itm[k] > _max_bound:
+                itm[k] = _max_bound
+            elif itm[k] < -_max_bound:
+                itm[k] = -_max_bound
 
         result.append(
             {
@@ -125,13 +124,13 @@ async def get_positions_analysis(
                 "currentTick": itm["currentTick"],
                 "baseUpper": itm["baseUpper"],
                 "baseLower": itm["baseLower"],
-                # "baseLiquidity_0": itm["baseLiquidity_0"],
-                # "baseLiquidity_1": itm["baseLiquidity_1"],
+                "baseLiquidity_0": itm["baseLiquidity_0"],
+                "baseLiquidity_1": itm["baseLiquidity_1"],
                 "baseLiquidity_usd": itm["baseLiquidity_usd"],
                 "limitUpper": itm["limitUpper"],
                 "limitLower": itm["limitLower"],
-                # "limitLiquidity_0": itm["limitLiquidity_0"],
-                # "limitLiquidity_1": itm["limitLiquidity_1"],
+                "limitLiquidity_0": itm["limitLiquidity_0"],
+                "limitLiquidity_1": itm["limitLiquidity_1"],
                 "limitLiquidity_usd": itm["limitLiquidity_usd"],
                 # "totalLiquidity_usd": itm["totalLiquidity_usd"],
             }
