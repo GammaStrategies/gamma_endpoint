@@ -1415,13 +1415,9 @@ class period_yield_analyzer:
                         "block": x["block"],
                         "timestamp": x["timestamp"],
                         #
-                        "period_hodl_fifty": x["comparison"]["gamma_vs"]["hodl_fifty"],
-                        "period_hodl_token0": x["comparison"]["gamma_vs"][
-                            "hodl_token0"
-                        ],
-                        "period_hodl_token1": x["comparison"]["gamma_vs"][
-                            "hodl_token1"
-                        ],
+                        "period_hodl_fifty": x["comparison"]["return"]["hodl_fifty"],
+                        "period_hodl_token0": x["comparison"]["return"]["hodl_token0"],
+                        "period_hodl_token1": x["comparison"]["return"]["hodl_token1"],
                         #
                         "period_gamma_netApr": x["roi"]["period"]["return"],
                         "period_gamma_feeApr": x["fees"]["period"]["yield"],
@@ -1491,9 +1487,9 @@ class period_yield_analyzer:
                     "block": x["block"],
                     "timestamp": x["timestamp"],
                     #
-                    "period_hodl_fifty": x["comparison"]["gamma_vs"]["hodl_fifty"],
-                    "period_hodl_token0": x["comparison"]["gamma_vs"]["hodl_token0"],
-                    "period_hodl_token1": x["comparison"]["gamma_vs"]["hodl_token1"],
+                    "period_hodl_fifty": x["comparison"]["return"]["hodl_fifty"],
+                    "period_hodl_token0": x["comparison"]["return"]["hodl_token0"],
+                    "period_hodl_token1": x["comparison"]["return"]["hodl_token1"],
                     #
                     "period_gamma_netApr": x["roi"]["period"]["return"],
                     "period_gamma_feeApr": x["fees"]["period"]["yield"],
