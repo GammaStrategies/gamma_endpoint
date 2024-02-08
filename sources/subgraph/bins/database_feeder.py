@@ -70,6 +70,7 @@ PROTOCOL_CHAIN_REWARDS_DATABASE = {
     Protocol.SYNTHSWAP: [Chain.BASE],
     Protocol.LYNEX: [],
     Protocol.PEGASYS: [],
+    Protocol.PHARAOH: [Chain.AVALANCHE],
 }
 
 # set cron vars
