@@ -527,13 +527,13 @@ class internal_router_builder_KPIs(router_builder_baseTemplate):
         """
 
         # do not allow ini_timestamp to be greater than 240 days ago
-        if ini_timestamp and (
-            datetime.now(timezone.utc).timestamp() - ini_timestamp > 86400 * 240
-        ):
-            raise HTTPException(
-                status_code=400,
-                detail=f"ini_timestamp cannot be greater than 240 days ago.",
-            )
+        # if ini_timestamp and (
+        #     datetime.now(timezone.utc).timestamp() - ini_timestamp > 86400 * 240
+        # ):
+        #     raise HTTPException(
+        #         status_code=400,
+        #         detail=f"ini_timestamp cannot be greater than 240 days ago.",
+        #     )
 
         # set ini timestamp to 7 days ago if not provided
         return await get_transactions(
