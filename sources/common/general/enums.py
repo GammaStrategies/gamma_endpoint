@@ -28,7 +28,7 @@ class Chain(str, Enum):
     MANTA = ("manta", 169, "manta", "Manta", None, None, "Manta")
     METIS = ("metis", 1088, "metis", "Metis", None, None, "Metis")
     OPBNB = ("opbnb", 204, "opbnb", "Opbnb", None, None, "Opbnb")
-    GNOSIS = ("gnosis", 204, "gnosis", "Gnosis", None, None, "Gnosis")
+    GNOSIS = ("gnosis", 100, "gnosis", "Gnosis", None, None, "Gnosis")
 
     # extra properties
     id: int
