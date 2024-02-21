@@ -1,4 +1,6 @@
 import asyncio
+
+from bson import Decimal128
 from sources.common.general.enums import Chain
 from sources.mongo.bins.apps.prices import get_current_prices, get_prices
 from sources.mongo.bins.helpers import global_database_helper, local_database_helper
@@ -6,20 +8,513 @@ from sources.mongo.endpoint.routers import DEPLOYED
 
 
 async def get_user_positions(user_address: str, chain: Chain) -> list[dict]:
-    # 1) Get the user positions from operations
+    """User positions from the POV of the user operations collection.
+
+    Args:
+        user_address (str): user address to query
+        chain (Chain): chain to query
+
+    Returns:
+        list[dict]: list of user positions
+
+            hypervisor
+            current_usd_value
+            PnL
+            block
+            timestamp
+            info
+                address
+                ...
+            share_percent
+            shares
+            current_supply
+            token0
+            token1
+            share_price
+            operations
+                ...
+
+
+    """
+    # 1) Get the user positions
     return [
         global_database_helper().convert_d128_to_decimal(x)
         for x in await local_database_helper(network=chain).get_items_from_database(
-            collection_name="operations",
+            collection_name="user_operations",
             aggregate=query_user_positions(user_address=user_address),
         )
     ]
 
-    # 2) Identfy staked positions ( current zero shares last deposit == known rewarder )
+
+# QUERIES
 
 
-def query_user_positions(user_address: str) -> list[dict]:
+def query_user_positions(
+    user_address: str,
+    timestamp_ini: int | None = None,
+    timestamp_end: int | None = None,
+    block_ini: int | None = None,
+    block_end: int | None = None,
+) -> list[dict]:
+    """User positions from the POV of the user operations collection.
+        This will show all user addresses, including those hidden behind proxied deposits ( loke Camelot spNFT )
+
+    Args:
+        user_address (str): user address to query
+        timestamp_ini (int | None, optional): initial timestamp to include operations from (including). Defaults to None.
+        timestamp_end (int | None, optional): end timestamp. Defaults to None.
+        block_ini (int | None, optional): . Defaults to None.
+        block_end (int | None, optional): . Defaults to None.
+
+    Returns:
+        list[dict]:
     """
+
+    # build standard match
+    _match = {
+        "$and": [
+            {
+                "$or": [
+                    {"sender": user_address},
+                    {"to": user_address},
+                ]
+            }
+        ]
+    }
+
+    # add timestamp and block filters
+    if timestamp_ini and timestamp_end:
+        _match["$and"].append(
+            {"timestamp": {"$gte": timestamp_ini, "$lte": timestamp_end}}
+        )
+    elif timestamp_ini:
+        _match["$and"].append({"timestamp": {"$gte": timestamp_ini}})
+    elif timestamp_end:
+        _match["$and"].append({"timestamp": {"$lte": timestamp_end}})
+    #
+    if block_ini and block_end:
+        _match["$and"].append({"blockNumber": {"$gte": block_ini, "$lte": block_end}})
+    elif block_ini:
+        _match["$and"].append({"blockNumber": {"$gte": block_ini}})
+    elif block_end:
+        _match["$and"].append({"blockNumber": {"$lte": block_end}})
+
+    # build query
+    _query = [
+        {"$match": _match},
+        {"$sort": {"blockNumber": 1}},
+        {
+            "$lookup": {
+                "from": "hypervisor_returns",
+                "let": {
+                    "op_address": "$hypervisor.address",
+                    "op_block": "$blockNumber",
+                },
+                "pipeline": [
+                    {
+                        "$match": {
+                            "$expr": {
+                                "$and": [
+                                    {"$eq": ["$address", "$$op_address"]},
+                                    {"$gte": ["$timeframe.ini.block", "$$op_block"]},
+                                ]
+                            }
+                        }
+                    },
+                    {"$limit": 1},
+                    {
+                        "$project": {
+                            "token_prices": "$status.ini.prices",
+                            "share_price": {
+                                "$divide": [
+                                    {
+                                        "$sum": [
+                                            {
+                                                "$multiply": [
+                                                    "$status.ini.prices.token0",
+                                                    "$status.ini.underlying.qtty.token0",
+                                                ]
+                                            },
+                                            {
+                                                "$multiply": [
+                                                    "$status.ini.prices.token1",
+                                                    "$status.ini.underlying.qtty.token1",
+                                                ]
+                                            },
+                                        ]
+                                    },
+                                    "$status.ini.supply",
+                                ]
+                            },
+                        }
+                    },
+                    {"$unset": ["_id"]},
+                ],
+                "as": "hype_returns",
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "block": "$blockNumber",
+                "timestamp": "$timestamp",
+                "topic": "$topic",
+                "info": "$hypervisor",
+                "shares": {
+                    "$ifNull": [
+                        {
+                            "$cond": [
+                                {
+                                    "$or": [
+                                        {"$eq": ["$topic", "deposit"]},
+                                        {
+                                            "$and": [
+                                                {"$eq": ["$topic", "transfer"]},
+                                                {
+                                                    "$eq": [
+                                                        "$to",
+                                                        user_address,
+                                                    ]
+                                                },
+                                            ]
+                                        },
+                                    ]
+                                },
+                                {"$toDecimal": {"$ifNull": ["$qtty", "$shares"]}},
+                                {
+                                    "$cond": [
+                                        {
+                                            "$or": [
+                                                {"$eq": ["$topic", "withdraw"]},
+                                                {
+                                                    "$and": [
+                                                        {"$eq": ["$topic", "transfer"]},
+                                                        {
+                                                            "$eq": [
+                                                                "$from",
+                                                                user_address,
+                                                            ]
+                                                        },
+                                                    ]
+                                                },
+                                            ]
+                                        },
+                                        {
+                                            "$multiply": [
+                                                {
+                                                    "$toDecimal": {
+                                                        "$ifNull": ["$qtty", "$shares"]
+                                                    }
+                                                },
+                                                -1,
+                                            ]
+                                        },
+                                        0,
+                                    ]
+                                },
+                            ]
+                        },
+                        0,
+                    ]
+                },
+                "token0": {
+                    "$ifNull": [
+                        {
+                            "$cond": [
+                                {
+                                    "$or": [
+                                        {"$eq": ["$topic", "deposit"]},
+                                        {
+                                            "$and": [
+                                                {"$eq": ["$topic", "transfer"]},
+                                                {
+                                                    "$eq": [
+                                                        "$to",
+                                                        user_address,
+                                                    ]
+                                                },
+                                            ]
+                                        },
+                                    ]
+                                },
+                                {"$toDecimal": {"$ifNull": ["$qtty_token0", 0]}},
+                                {
+                                    "$cond": [
+                                        {
+                                            "$or": [
+                                                {"$eq": ["$topic", "withdraw"]},
+                                                {
+                                                    "$and": [
+                                                        {"$eq": ["$topic", "transfer"]},
+                                                        {
+                                                            "$eq": [
+                                                                "$from",
+                                                                user_address,
+                                                            ]
+                                                        },
+                                                    ]
+                                                },
+                                            ]
+                                        },
+                                        {
+                                            "$multiply": [
+                                                {
+                                                    "$toDecimal": {
+                                                        "$ifNull": ["$qtty_token0", 0]
+                                                    }
+                                                },
+                                                -1,
+                                            ]
+                                        },
+                                        0,
+                                    ]
+                                },
+                            ]
+                        },
+                        0,
+                    ]
+                },
+                "token1": {
+                    "$ifNull": [
+                        {
+                            "$cond": [
+                                {
+                                    "$or": [
+                                        {"$eq": ["$topic", "deposit"]},
+                                        {
+                                            "$and": [
+                                                {"$eq": ["$topic", "transfer"]},
+                                                {
+                                                    "$eq": [
+                                                        "$to",
+                                                        user_address,
+                                                    ]
+                                                },
+                                            ]
+                                        },
+                                    ]
+                                },
+                                {"$toDecimal": {"$ifNull": ["$qtty_token1", 0]}},
+                                {
+                                    "$cond": [
+                                        {
+                                            "$or": [
+                                                {"$eq": ["$topic", "withdraw"]},
+                                                {
+                                                    "$and": [
+                                                        {"$eq": ["$topic", "transfer"]},
+                                                        {
+                                                            "$eq": [
+                                                                "$from",
+                                                                user_address,
+                                                            ]
+                                                        },
+                                                    ]
+                                                },
+                                            ]
+                                        },
+                                        {
+                                            "$multiply": [
+                                                {
+                                                    "$toDecimal": {
+                                                        "$ifNull": ["$qtty_token1", 0]
+                                                    }
+                                                },
+                                                -1,
+                                            ]
+                                        },
+                                        0,
+                                    ]
+                                },
+                            ]
+                        },
+                        0,
+                    ]
+                },
+                "prices": {
+                    "share_price": {"$first": "$hype_returns.share_price"},
+                    "token0": {"$first": "$hype_returns.token_prices.token0"},
+                    "token1": {"$first": "$hype_returns.token_prices.token1"},
+                },
+            }
+        },
+        {
+            "$group": {
+                "_id": {"hype": "$info.address"},
+                "last_block": {"$last": "$block"},
+                "last_timestamp": {"$last": "$timestamp"},
+                "info": {"$first": "$info"},
+                "operations_shares": {"$sum": "$shares"},
+                "operations_token0": {"$sum": "$token0"},
+                "operations_token1": {"$sum": "$token1"},
+                "operations": {
+                    "$push": {
+                        "block": "$block",
+                        "timestamp": "$timestamp",
+                        "topic": "$topic",
+                        "shares": "$shares",
+                        "token0": "$token0",
+                        "token1": "$token1",
+                        "share_price": "$prices.share_price",
+                        "token0_price": "$prices.token0",
+                        "token1_price": "$prices.token1",
+                        "usd_value": {
+                            "$multiply": [
+                                {
+                                    "$divide": [
+                                        {"$multiply": [-1, "$shares"]},
+                                        {"$pow": [10, "$info.decimals"]},
+                                    ]
+                                },
+                                "$prices.share_price",
+                            ]
+                        },
+                    }
+                },
+            }
+        },
+        {
+            "$lookup": {
+                "from": "hypervisor_returns",
+                "let": {"op_address": "$_id.hype"},
+                "pipeline": [
+                    {"$match": {"$expr": {"$eq": ["$address", "$$op_address"]}}},
+                    {"$sort": {"timeframe.end.block": -1}},
+                    {"$limit": 1},
+                    {
+                        "$project": {
+                            "_id": 0,
+                            "share_price": {
+                                "$divide": [
+                                    {
+                                        "$sum": [
+                                            {
+                                                "$multiply": [
+                                                    "$status.end.prices.token0",
+                                                    "$status.end.underlying.qtty.token0",
+                                                ]
+                                            },
+                                            {
+                                                "$multiply": [
+                                                    "$status.end.prices.token1",
+                                                    "$status.end.underlying.qtty.token1",
+                                                ]
+                                            },
+                                        ]
+                                    },
+                                    "$status.end.supply",
+                                ]
+                            },
+                            "supply": "$status.end.supply",
+                            "token0_qtty": "$status.end.underlying.qtty.token0",
+                            "token1_qtty": "$status.end.underlying.qtty.token1",
+                        }
+                    },
+                ],
+                "as": "last_hypervisor_returns",
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "hypervisor": "$_id.hype",
+                "current_usd_value": {
+                    "$cond": [
+                        {"$gt": ["$operations_shares", 0]},
+                        {
+                            "$multiply": [
+                                {
+                                    "$divide": [
+                                        "$operations_shares",
+                                        {"$pow": [10, "$info.decimals"]},
+                                    ]
+                                },
+                                {"$first": "$last_hypervisor_returns.share_price"},
+                            ]
+                        },
+                        Decimal128("0"),
+                    ]
+                },
+                "operations_pnl": {"$sum": ["$operations.usd_value"]},
+                "block": "$last_block",
+                "timestamp": "$last_timestamp",
+                "info": "$info",
+                "shares": "$operations_shares",
+                "current_supply": {
+                    "$multiply": [
+                        {"$first": "$last_hypervisor_returns.supply"},
+                        {"$pow": [10, "$info.decimals"]},
+                    ]
+                },
+                "total_token0": {
+                    "$multiply": [
+                        {"$first": "$last_hypervisor_returns.token0_qtty"},
+                        {"$pow": [10, "$info.token0_decimals"]},
+                    ]
+                },
+                "total_token1": {
+                    "$multiply": [
+                        {"$first": "$last_hypervisor_returns.token1_qtty"},
+                        {"$pow": [10, "$info.token1_decimals"]},
+                    ]
+                },
+                "share_price": {"$first": "$last_hypervisor_returns.share_price"},
+                "operations": "$operations",
+            }
+        },
+        {
+            "$project": {
+                "hypervisor": "$hypervisor",
+                "current_usd_value": "$current_usd_value",
+                "PnL": {"$sum": ["$operations_pnl", "$current_usd_value"]},
+                "block": "$block",
+                "timestamp": "$timestamp",
+                "info": "$info",
+                "share_percent": {
+                    "$cond": [
+                        {"$gt": ["$shares", 0]},
+                        {"$divide": ["$shares", "$current_supply"]},
+                        Decimal128("0"),
+                    ]
+                },
+                "shares": "$shares",
+                "current_supply": "$current_supply",
+                "token0": {
+                    "$cond": [
+                        {"$gt": ["$shares", 0]},
+                        {
+                            "$multiply": [
+                                "$total_token0",
+                                {"$divide": ["$shares", "$current_supply"]},
+                            ]
+                        },
+                        Decimal128("0"),
+                    ]
+                },
+                "token1": {
+                    "$cond": [
+                        {"$gt": ["$shares", 0]},
+                        {
+                            "$multiply": [
+                                "$total_token1",
+                                {"$divide": ["$shares", "$current_supply"]},
+                            ]
+                        },
+                        Decimal128("0"),
+                    ]
+                },
+                "share_price": "$share_price",
+                "operations": "$operations",
+            }
+        },
+    ]
+
+    return _query
+
+
+def query_user_positions_from_global_operations(user_address: str) -> list[dict]:
+    """User positions from the POV of the operations collection.
+        This will not show user addresses hidden behind proxied deposits ( loke Camelot spNFT )
 
     Returns:
      the database will return a list of :

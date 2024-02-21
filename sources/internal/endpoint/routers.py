@@ -11,6 +11,7 @@ from endpoint.routers.template import (
     router_builder_baseTemplate,
 )
 from sources.common.formulas.fees import convert_feeProtocol
+from sources.common.general.enums import int_to_chain
 from sources.common.general.utils import filter_addresses
 from sources.internal.bins.internal import (
     InternalFeeReturnsOutput,
@@ -30,6 +31,7 @@ from sources.internal.bins.reports import (
     global_report_revenue,
     report_galaxe,
 )
+from sources.internal.bins.user import get_user_addresses, get_user_shares
 from sources.mongo.bins.apps.hypervisor import hypervisors_collected_fees
 from sources.mongo.bins.apps.prices import get_current_prices
 from sources.mongo.bins.helpers import local_database_helper
@@ -107,6 +109,18 @@ class internal_router_builder_main(router_builder_baseTemplate):
         router.add_api_route(
             path="/{chain}/revenue",
             endpoint=self.get_revenue,
+            methods=["GET"],
+        )
+
+        ## MERKL REWARD RELATED
+        router.add_api_route(
+            path="/user_addresses",
+            endpoint=self.user_addresses,
+            methods=["GET"],
+        )
+        router.add_api_route(
+            path="/user_shares",
+            endpoint=self.user_shares,
             methods=["GET"],
         )
 
@@ -422,6 +436,79 @@ class internal_router_builder_main(router_builder_baseTemplate):
             end_timestamp=end_timestamp,
             yearly=yearly,
         )
+
+    # USER MERKL REWARD RELATED #################################################################
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def user_addresses(
+        self,
+        response: Response,
+        chain: Chain | int | None = Query(None, enum=[*Chain, *[x.id for x in Chain]]),
+        hypervisor_address: str | None = Query(None, description="hypervisor address"),
+    ):
+        """Returns known user addresses"""
+        if isinstance(chain, int):
+            chain = int_to_chain(chain)
+
+        if chain:
+            return await get_user_addresses(
+                chain=chain, hypervisor_address=hypervisor_address
+            )
+        else:
+            return await asyncio.gather(
+                *[
+                    get_user_addresses(chain=cha, hypervisor_address=hypervisor_address)
+                    for cha in list(Chain)
+                ]
+            )
+
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def user_shares(
+        self,
+        response: Response,
+        address: str,
+        chain: Chain | int | None = Query(None, enum=[*Chain, *[x.id for x in Chain]]),
+        timestamp_ini: int | None = Query(
+            None, description="will limit the data returned from this value."
+        ),
+        timestamp_end: int | None = Query(
+            None, description="will limit the data returned to this value."
+        ),
+        block_ini: int | None = Query(
+            None, description="will limit the data returned from this value."
+        ),
+        block_end: int | None = Query(
+            None, description="will limit the data returned to this value."
+        ),
+    ):
+        """Returns shares for a given user address"""
+
+        if isinstance(chain, int):
+            chain = int_to_chain(chain)
+        address = filter_addresses(address)
+
+        if chain:
+            return await get_user_shares(
+                user_address=address,
+                chain=chain,
+                timestamp_ini=timestamp_ini,
+                timestamp_end=timestamp_end,
+                block_ini=block_ini,
+                block_end=block_end,
+            )
+        else:
+            return await asyncio.gather(
+                *[
+                    get_user_shares(
+                        user_address=address,
+                        chain=cha,
+                        timestamp_ini=timestamp_ini,
+                        timestamp_end=timestamp_end,
+                        block_ini=block_ini,
+                        block_end=block_end,
+                    )
+                    for cha in list(Chain)
+                ]
+            )
 
 
 class internal_router_builder_KPIs(router_builder_baseTemplate):

@@ -148,17 +148,19 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         self,
         response: Response,
         hypervisor_address: str,
-        chain: Chain
-        | int = Query(Chain.ARBITRUM, enum=[*Chain, *[x.id for x in Chain]]),
-        period: Period
-        | int = Query(Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]),
-        from_timestamp: int
-        | None = Query(
+        chain: Chain | int = Query(
+            Chain.ARBITRUM, enum=[*Chain, *[x.id for x in Chain]]
+        ),
+        period: Period | int = Query(
+            Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]
+        ),
+        from_timestamp: int | None = Query(
             None,
             description=" limit the data returned from this value. When not set, it will return the last 14 days.",
         ),
-        to_timestamp: int
-        | None = Query(None, description=" limit the data returned to this value"),
+        to_timestamp: int | None = Query(
+            None, description=" limit the data returned to this value"
+        ),
     ) -> list[dict]:
         """Returns data regarding the base and limit positions of a given hypervisor for a given period of time.
 
@@ -214,10 +216,12 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
     async def correlation(
         self,
         response: Response,
-        chain: Chain
-        | int = Query(Chain.ARBITRUM, enum=[*Chain, *[x.id for x in Chain]]),
-        period: Period
-        | int = Query(Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]),
+        chain: Chain | int = Query(
+            Chain.ARBITRUM, enum=[*Chain, *[x.id for x in Chain]]
+        ),
+        period: Period | int = Query(
+            Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]
+        ),
         hypervisor_address: str = Query(..., description=" hypervisor addresses"),
     ):
         """Returns the usd price correlation between tokens.
@@ -249,10 +253,12 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         self,
         response: Response,
         hypervisor_address: str,
-        chain: Chain
-        | int = Query(Chain.ARBITRUM, enum=[*Chain, *[x.id for x in Chain]]),
-        period: Period
-        | int = Query(Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]),
+        chain: Chain | int = Query(
+            Chain.ARBITRUM, enum=[*Chain, *[x.id for x in Chain]]
+        ),
+        period: Period | int = Query(
+            Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]
+        ),
     ):
         """Hypervisor returns data within the period, including token0 and token1 prices:
 
@@ -285,10 +291,12 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         self,
         response: Response,
         hypervisor_address: str,
-        chain: Chain
-        | int = Query(Chain.ARBITRUM, enum=[*Chain, *[x.id for x in Chain]]),
-        period: Period
-        | int = Query(Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]),
+        chain: Chain | int = Query(
+            Chain.ARBITRUM, enum=[*Chain, *[x.id for x in Chain]]
+        ),
+        period: Period | int = Query(
+            Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]
+        ),
     ):
         """Return a csv file containing all hypervisor returns details with respect to the specified period returns"""
         # convert
@@ -340,7 +348,7 @@ class frontend_user_router_builder_main(router_builder_baseTemplate):
         return router
 
     # ROUTE FUNCTIONS
-    @cache(expire=DAILY_CACHE_TIMEOUT)
+    @cache(expire=DB_CACHE_TIMEOUT)
     async def user_positions(
         self,
         response: Response,
