@@ -143,6 +143,7 @@ def query_user_shares_merkl(
                             }
                         }
                     },
+                    {"$sort": {"block": -1}},
                     {"$limit": 1},
                     {
                         "$project": {
