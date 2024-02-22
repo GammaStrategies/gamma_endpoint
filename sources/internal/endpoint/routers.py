@@ -467,6 +467,7 @@ class internal_router_builder_main(router_builder_baseTemplate):
         response: Response,
         address: str,
         chain: Chain | int | None = Query(None, enum=[*Chain, *[x.id for x in Chain]]),
+        hypervisor_address: str | None = Query(None, description="hypervisor address"),
         timestamp_ini: int | None = Query(
             None, description="will limit the data returned from this value."
         ),
@@ -485,6 +486,7 @@ class internal_router_builder_main(router_builder_baseTemplate):
         if isinstance(chain, int):
             chain = int_to_chain(chain)
         address = filter_addresses(address)
+        hypervisor_address = filter_addresses(hypervisor_address)
 
         if chain:
             return await get_user_shares(
@@ -494,6 +496,7 @@ class internal_router_builder_main(router_builder_baseTemplate):
                 timestamp_end=timestamp_end,
                 block_ini=block_ini,
                 block_end=block_end,
+                hypervisor_address=hypervisor_address,
             )
         else:
             return await asyncio.gather(
@@ -505,6 +508,7 @@ class internal_router_builder_main(router_builder_baseTemplate):
                         timestamp_end=timestamp_end,
                         block_ini=block_ini,
                         block_end=block_end,
+                        hypervisor_address=hypervisor_address,
                     )
                     for cha in list(Chain)
                 ]

@@ -30,6 +30,7 @@ async def get_user_shares(
     timestamp_end: int | None = None,
     block_ini: int | None = None,
     block_end: int | None = None,
+    hypervisor_address: str | None = None,
 ) -> list[dict]:
     """User shares at a specific time ( default is last known)."""
     return [
@@ -42,6 +43,7 @@ async def get_user_shares(
                 timestamp_end=timestamp_end,
                 block_ini=block_ini,
                 block_end=block_end,
+                hypervisor_address=hypervisor_address,
             ),
         )
     ]
@@ -72,6 +74,7 @@ def query_user_shares_merkl(
     timestamp_end: int | None = None,
     block_ini: int | None = None,
     block_end: int | None = None,
+    hypervisor_address: str | None = None,
 ):
     """Query to get user shares from the database at a specific time
         ( user_operations collection )
@@ -82,6 +85,7 @@ def query_user_shares_merkl(
         timestamp_end (int | None, optional): . Defaults to None.
         block_ini (int | None, optional): . Defaults to None.
         block_end (int | None, optional): . Defaults to None.
+        hypervisor_address (str | None, optional): . Defaults to None.
     """
 
     # build standard match
@@ -112,6 +116,10 @@ def query_user_shares_merkl(
         _match["$and"].append({"blockNumber": {"$gte": block_ini}})
     elif block_end:
         _match["$and"].append({"blockNumber": {"$lte": block_end}})
+
+    # add hypervisor address to match if set
+    if hypervisor_address:
+        _match["$and"].append({"hypervisor.address": hypervisor_address})
 
     _query = [
         {"$match": _match},
