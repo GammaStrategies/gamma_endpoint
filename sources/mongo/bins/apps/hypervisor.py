@@ -20,7 +20,11 @@ async def hypervisors_list(network: Chain, protocol: Protocol):
     )
 
 
-async def hypervisors_last_snapshot(network: Chain, protocol: Protocol):
+async def hypervisors_last_snapshot(
+    network: Chain,
+    protocol: Protocol | None = None,
+    hypervisor_address: str | None = None,
+):
     _query = [
         {
             "$lookup": {
@@ -38,6 +42,11 @@ async def hypervisors_last_snapshot(network: Chain, protocol: Protocol):
         {"$unwind": {"path": "$status", "preserveNullAndEmptyArrays": False}},
         {"$replaceRoot": {"newRoot": "$status"}},
     ]
+
+    if hypervisor_address:
+        _query.insert(0, {"$match": {"address": hypervisor_address.lower()}})
+    elif protocol:
+        _query.insert(0, {"$match": {"dex": protocol.database_name}})
 
     return await local_database_helper(network=network).get_items_from_database(
         collection_name="static",

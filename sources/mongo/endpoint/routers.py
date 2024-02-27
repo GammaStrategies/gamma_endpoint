@@ -11,7 +11,8 @@ from endpoint.routers.template import (
     router_builder_generalTemplate,
     router_builder_baseTemplate,
 )
-from sources.common.general.enums import Chain, Protocol
+from sources.common.general.enums import Chain, Protocol, int_to_chain
+from sources.common.general.utils import filter_addresses
 from sources.mongo.bins.apps import hypervisor
 from sources.mongo.bins.apps import user
 from sources.mongo.bins.apps import prices
@@ -390,10 +391,18 @@ class mongo_router_builder(router_builder_baseTemplate):
         )
 
     @cache(expire=DAILY_CACHE_TIMEOUT)
-    async def hypervisors_last_snapshot(self, response: Response):
+    async def hypervisors_last_snapshot(
+        self,
+        response: Response,
+        address: str | None = Query(None, description="hypervisor address"),
+    ):
         """Returns the hypervisor found in the database"""
+
+        if address:
+            address = filter_addresses(address)
+
         return await hypervisor.hypervisors_last_snapshot(
-            network=self.chain, protocol=self.protocol
+            network=self.chain, protocol=self.protocol, hypervisor_address=address
         )
 
     @cache(expire=DB_CACHE_TIMEOUT)
