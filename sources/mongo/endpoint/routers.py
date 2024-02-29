@@ -260,6 +260,14 @@ class mongo_router_builder(router_builder_baseTemplate):
         return router
 
     def _create_routes_user(self, router: APIRouter) -> APIRouter:
+
+        router.add_api_route(
+            path=f"{self.prefix}{'/user/list'}",
+            endpoint=self.user_list_addresses,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
         router.add_api_route(
             path=f"{self.prefix}{'/user/{user_address}'}",
             endpoint=self.user_data,
@@ -273,13 +281,6 @@ class mongo_router_builder(router_builder_baseTemplate):
         #     methods=["GET"],
         #     generate_unique_id_function=self.generate_unique_id,
         # )
-
-        router.add_api_route(
-            path=f"{self.prefix}{'/user/addresses'}",
-            endpoint=self.user_addresses,
-            methods=["GET"],
-            generate_unique_id_function=self.generate_unique_id,
-        )
 
         router.add_api_route(
             path=f"{self.prefix}{'/user/{user_address}/shares'}",
@@ -486,7 +487,7 @@ class mongo_router_builder(router_builder_baseTemplate):
         # USER MERKL REWARD RELATED #################################################################
 
     @cache(expire=DB_CACHE_TIMEOUT)
-    async def user_addresses(
+    async def user_list_addresses(
         self,
         response: Response,
         hypervisor_address: str | None = Query(None, description="hypervisor address"),
@@ -494,7 +495,14 @@ class mongo_router_builder(router_builder_baseTemplate):
         """Returns known user addresses"""
 
         return await get_user_addresses(
-            chain=self.chain, hypervisor_address=hypervisor_address
+            chain=self.chain,
+            hypervisor_address=hypervisor_address
+            or [
+                x["address"]
+                for x in await hypervisor.hypervisors_list(
+                    network=self.chain, protocol=self.protocol
+                )
+            ],
         )
 
     @cache(expire=DB_CACHE_TIMEOUT)
