@@ -480,6 +480,10 @@ class internal_router_builder_main(router_builder_baseTemplate):
         block_end: int | None = Query(
             None, description="will limit the data returned to this value."
         ),
+        include_operations: bool = Query(
+            False,
+            description="will include a justifying operations list",
+        ),
     ):
         """Returns shares for a given user address"""
 
@@ -497,6 +501,7 @@ class internal_router_builder_main(router_builder_baseTemplate):
                 block_ini=block_ini,
                 block_end=block_end,
                 hypervisor_address=hypervisor_address,
+                include_operations=include_operations,
             )
         else:
             return await asyncio.gather(
@@ -509,6 +514,7 @@ class internal_router_builder_main(router_builder_baseTemplate):
                         block_ini=block_ini,
                         block_end=block_end,
                         hypervisor_address=hypervisor_address,
+                        include_operations=include_operations,
                     )
                     for cha in list(Chain)
                 ]

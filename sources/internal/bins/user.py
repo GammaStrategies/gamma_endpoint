@@ -2,6 +2,7 @@
 #
 
 
+import asyncio
 from sources.common.general.enums import Chain
 from sources.mongo.bins.helpers import global_database_helper, local_database_helper
 
@@ -31,6 +32,7 @@ async def get_user_shares(
     block_ini: int | None = None,
     block_end: int | None = None,
     hypervisor_address: str | None = None,
+    include_operations: bool = False,
 ) -> list[dict]:
     """User shares at a specific time ( default is last known)."""
     return [
@@ -44,6 +46,7 @@ async def get_user_shares(
                 block_ini=block_ini,
                 block_end=block_end,
                 hypervisor_address=hypervisor_address,
+                include_operations=include_operations,
             ),
         )
     ]
@@ -78,6 +81,7 @@ def query_user_shares_merkl(
     block_ini: int | None = None,
     block_end: int | None = None,
     hypervisor_address: str | None = None,
+    include_operations: bool = False,
 ):
     """Query to get user shares from the database at a specific time
         ( user_operations collection )
@@ -89,6 +93,7 @@ def query_user_shares_merkl(
         block_ini (int | None, optional): . Defaults to None.
         block_end (int | None, optional): . Defaults to None.
         hypervisor_address (str | None, optional): . Defaults to None.
+        include_operations (bool, optional): Include the list of justifying operations ? . Defaults to False.
     """
 
     # build standard match
@@ -124,23 +129,73 @@ def query_user_shares_merkl(
     if hypervisor_address:
         _match["$and"].append({"address": hypervisor_address})
 
-    _query = [
-        {
-            "$match": _match,
+    _group = {
+        "_id": "$address",
+        "hypervisor": {"$first": "$address"},
+        "user_shares": {"$sum": "$shares"},
+    }
+    _project = {
+        "_id": 0,
+        "hypervisor": "$hypervisor",
+        "timestamp": {"$first": "$hype_status.timestamp"},
+        "block": {"$first": "$hype_status.block"},
+        "user_shares": "$user_shares",
+        "hypervisor_info": {
+            "address": "$address",
+            "symbol": {"$first": "$hype_status.symbol"},
+            "dex": {"$first": "$hype_status.dex"},
+            "decimals": {"$first": "$hype_status.decimals"},
+            "pool_address": {"$first": "$hype_status.pool_address"},
+            "token0_address": {"$first": "$hype_status.token0_address"},
+            "token1_address": {"$first": "$hype_status.token1_address"},
+            "token0_symbol": {"$first": "$hype_status.token0_symbol"},
+            "token1_symbol": {"$first": "$hype_status.token1_symbol"},
+            "token0_decimals": {"$first": "$hype_status.token0_decimals"},
+            "token1_decimals": {"$first": "$hype_status.token1_decimals"},
         },
+        "total_shares": {"$first": "$hype_status.totalSupply"},
+        "total_token0": {"$first": "$hype_status.underlying_qtty0"},
+        "total_token1": {"$first": "$hype_status.underlying_qtty1"},
+    }
+    if include_operations:
+        _group["operations"] = {
+            "$push": {
+                "block": "$blockNumber",
+                "timestamp": "$timestamp",
+                "topic": "$topic",
+                "shares": "$shares",
+            }
+        }
+        _project["operations"] = "$operations"
+
+    _query = [
+        {"$match": _match},
+        {"$sort": {"blockNumber": 1}},
+        {
+            "$addFields": {
+                "shares": {
+                    "$ifNull": [
+                        {
+                            "$cond": [
+                                {"$eq": ["$dst", user_address]},
+                                {"$toDecimal": {"$ifNull": ["$qtty", "$shares"]}},
+                                {"$multiply": [{"$toDecimal": "$qtty"}, -1]},
+                            ]
+                        },
+                        0,
+                    ]
+                }
+            }
+        },
+        {"$group": _group},
         {
             "$lookup": {
                 "from": "status",
-                "let": {"op_address": "$address", "op_block": "$blockNumber"},
+                "let": {"op_address": "$hypervisor"},
                 "pipeline": [
                     {
                         "$match": {
-                            "$expr": {
-                                "$and": [
-                                    {"$eq": ["$address", "$$op_address"]},
-                                    {"$gte": ["$block", "$$op_block"]},
-                                ]
-                            }
+                            "$expr": {"$and": [{"$eq": ["$address", "$$op_address"]}]}
                         }
                     },
                     {"$sort": {"block": -1}},
@@ -179,63 +234,7 @@ def query_user_shares_merkl(
                 "as": "hype_status",
             }
         },
-        {"$sort": {"blockNumber": 1}},
-        {
-            "$addFields": {
-                "shares": {
-                    "$ifNull": [
-                        {
-                            "$cond": [
-                                {
-                                    "$eq": [
-                                        "$dst",
-                                        user_address,
-                                    ]
-                                },
-                                {"$toDecimal": {"$ifNull": ["$qtty", "$shares"]}},
-                                {"$multiply": [{"$toDecimal": "$qtty"}, -1]},
-                            ]
-                        },
-                        0,
-                    ]
-                }
-            }
-        },
-        {
-            "$group": {
-                "_id": "$address",
-                "hypervisor": {"$first": "$address"},
-                "timestamp": {"$first": {"$first": "$hype_status.timestamp"}},
-                "block": {"$first": {"$first": "$hype_status.block"}},
-                "user_shares": {"$sum": "$shares"},
-                "hypervisor_info": {
-                    "$first": {
-                        "address": "$address",
-                        "symbol": {"$first": "$hype_status.symbol"},
-                        "dex": {"$first": "$hype_status.dex"},
-                        "decimals": {"$first": "$hype_status.decimals"},
-                        "pool_address": {"$first": "$hype_status.pool_address"},
-                        "token0_address": {"$first": "$hype_status.token0_address"},
-                        "token1_address": {"$first": "$hype_status.token1_address"},
-                        "token0_symbol": {"$first": "$hype_status.token0_symbol"},
-                        "token1_symbol": {"$first": "$hype_status.token1_symbol"},
-                        "token0_decimals": {"$first": "$hype_status.token0_decimals"},
-                        "token1_decimals": {"$first": "$hype_status.token1_decimals"},
-                    }
-                },
-                "total_shares": {"$first": {"$first": "$hype_status.totalSupply"}},
-                "total_token0": {"$first": {"$first": "$hype_status.underlying_qtty0"}},
-                "total_token1": {"$first": {"$first": "$hype_status.underlying_qtty1"}},
-                "operations": {
-                    "$push": {
-                        "block": "$blockNumber",
-                        "timestamp": "$timestamp",
-                        "topic": "$topic",
-                        "shares": "$shares",
-                    }
-                },
-            }
-        },
+        {"$project": _project},
     ]
 
     return _query
