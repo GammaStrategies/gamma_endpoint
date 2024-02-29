@@ -13,6 +13,7 @@ from endpoint.routers.template import (
 )
 from sources.common.general.enums import Chain, Protocol, int_to_chain
 from sources.common.general.utils import filter_addresses
+from sources.internal.bins.user import get_user_addresses, get_user_shares
 from sources.mongo.bins.apps import hypervisor
 from sources.mongo.bins.apps import user
 from sources.mongo.bins.apps import prices
@@ -266,9 +267,23 @@ class mongo_router_builder(router_builder_baseTemplate):
             generate_unique_id_function=self.generate_unique_id,
         )
 
+        # router.add_api_route(
+        #     path=f"{self.prefix}{'/user/{user_address}/analytics'}",
+        #     endpoint=self.user_analytics,
+        #     methods=["GET"],
+        #     generate_unique_id_function=self.generate_unique_id,
+        # )
+
         router.add_api_route(
-            path=f"{self.prefix}{'/user/{user_address}/analytics'}",
-            endpoint=self.user_analytics,
+            path=f"{self.prefix}{'/user/addresses'}",
+            endpoint=self.user_addresses,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
+        router.add_api_route(
+            path=f"{self.prefix}{'/user/{user_address}/shares'}",
+            endpoint=self.user_shares,
             methods=["GET"],
             generate_unique_id_function=self.generate_unique_id,
         )
@@ -466,4 +481,57 @@ class mongo_router_builder(router_builder_baseTemplate):
     async def user_analytics(self, user_address: str, response: Response):
         return await user.get_user_analytic_data(
             chain=self.chain, address=user_address.lower()
+        )
+
+        # USER MERKL REWARD RELATED #################################################################
+
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def user_addresses(
+        self,
+        response: Response,
+        hypervisor_address: str | None = Query(None, description="hypervisor address"),
+    ):
+        """Returns known user addresses"""
+
+        return await get_user_addresses(
+            chain=self.chain, hypervisor_address=hypervisor_address
+        )
+
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def user_shares(
+        self,
+        response: Response,
+        user_address: str,
+        hypervisor_address: str | None = Query(None, description="hypervisor address"),
+        timestamp_ini: int | None = Query(
+            None, description="will limit the data returned from this value."
+        ),
+        timestamp_end: int | None = Query(
+            None, description="will limit the data returned to this value."
+        ),
+        block_ini: int | None = Query(
+            None, description="will limit the data returned from this value."
+        ),
+        block_end: int | None = Query(
+            None, description="will limit the data returned to this value."
+        ),
+        include_operations: bool = Query(
+            False,
+            description="will include a justifying operations list",
+        ),
+    ):
+        """Returns shares for a given user address"""
+
+        user_address = filter_addresses(user_address)
+        hypervisor_address = filter_addresses(hypervisor_address)
+
+        return await get_user_shares(
+            user_address=user_address,
+            chain=self.chain,
+            timestamp_ini=timestamp_ini,
+            timestamp_end=timestamp_end,
+            block_ini=block_ini,
+            block_end=block_end,
+            hypervisor_address=hypervisor_address,
+            include_operations=include_operations,
         )
