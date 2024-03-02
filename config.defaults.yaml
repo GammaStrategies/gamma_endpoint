@@ -36,6 +36,7 @@ SWAPBASED_BASE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/g
 PHARAOH_AVALANCHE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-pharaoh-avax
 SWAPR_GNOSIS_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-swapr-gnosis
 THICK_BASE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-thick-base/version/latest
+CLEOPATRA_MANTLE_GAMMA_SUBGRAPH_URL: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-cleopatra-mantle
 
 # DEX Subgraph URL
 UNISWAP_MAINNET_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3
@@ -75,6 +76,7 @@ SWAPBASED_BASE_SUBGRAPH_URL: _
 PHARAOH_AVALANCHE_SUBGRAPH_URL: _
 SWAPR_GNOSIS_SUBGRAPH_URL: _
 THICK_BASE_SUBGRAPH_URL: _
+CLEOPATRA_MANTLE_SUBGRAPH_URL: _
 
 # HypePool Subgraph URL
 UNISWAP_MAINNET_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-mainnet
@@ -114,6 +116,7 @@ SWAPBASED_BASE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamm
 PHARAOH_AVALANCHE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-hp-pharaoh-avax
 SWAPR_GNOSIS_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-hp-swapr-gnosis
 THICK_BASE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-thick-base/version/latest
+CLEOPATRA_MANTLE_HP_SUBGRAPH_URL: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-hp-cleopatra-mantle
 
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {

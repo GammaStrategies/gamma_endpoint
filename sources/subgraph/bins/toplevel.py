@@ -145,6 +145,7 @@ class TopLevelData:
         data = self.all_stats_data
 
         total_tvl = 0
+        print(data["uniswapV3Hypervisors"])
         for hypervisor in data["uniswapV3Hypervisors"]:
             if hypervisor["badRebalances"]:
                 rebalance_fees_correction_value = sum(
@@ -180,7 +181,9 @@ class TopLevelData:
             if (hypervisor_tvl not in self.excluded_hypervisors) and (
                 hypervisor_tvl < TVL_MAX
             ):
+                print(hypervisor["id"])
                 total_tvl += hypervisor_tvl
+                print(total_tvl)
 
         return {
             "pool_count": len(data["uniswapV3Pools"]),

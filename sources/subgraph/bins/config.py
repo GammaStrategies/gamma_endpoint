@@ -39,6 +39,7 @@ DEPLOYMENTS = [
     (Protocol.PHARAOH, Chain.AVALANCHE),
     (Protocol.SWAPR, Chain.GNOSIS),
     (Protocol.THICK, Chain.BASE),
+    (Protocol.CLEOPATRA, Chain.MANTLE),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -144,6 +145,9 @@ DEX_SUBGRAPH_URLS = {
     Protocol.THICK: {
         Chain.BASE: get_config("THICK_BASE_SUBGRAPH_URL"),
     },
+    Protocol.CLEOPATRA: {
+        Chain.MANTLE: get_config("CLEOPATRA_MANTLE_SUBGRAPH_URL"),
+    },
 }
 
 DEX_HYPEPOOL_SUBGRAPH_URLS = {
@@ -236,6 +240,9 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.THICK: {
         Chain.BASE: get_config("THICK_BASE_HP_SUBGRAPH_URL"),
     },
+    Protocol.CLEOPATRA: {
+        Chain.MANTLE: get_config("CLEOPATRA_MANTLE_HP_SUBGRAPH_URL"),
+    },
 }
 
 GAMMA_SUBGRAPH_URLS = {
@@ -327,6 +334,9 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.THICK: {
         Chain.BASE: get_config("THICK_BASE_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.CLEOPATRA: {
+        Chain.MANTLE: get_config("CLEOPATRA_MANTLE_GAMMA_SUBGRAPH_URL"),
     },
 }
 

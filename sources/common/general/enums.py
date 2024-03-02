@@ -100,6 +100,7 @@ class Dex(str, Enum):
     PHARAOH = "pharaoh"
     SWAPR = "swapr"
     THICK = "thick"
+    CLEOPATRA = "cleopatra"
 
 
 class Protocol(str, Enum):
@@ -136,6 +137,7 @@ class Protocol(str, Enum):
     PHARAOH = ("pharaoh", None, None, None, "pharaoh", "Pharaoh")
     SWAPR = ("swapr", None, None, None, "swapr", "Swapr")
     THICK = ("thick", None, None, None, "thick", "Thick")
+    CLEOPATRA = ("cleopatra", None, None, None, "cleopatra", "Cleopatra")
 
     # extra properties
     api_url: str

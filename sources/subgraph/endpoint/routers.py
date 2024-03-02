@@ -84,6 +84,7 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.BASESWAP, Chain.BASE),
     (Protocol.SWAPBASED, Chain.BASE),
     (Protocol.PHARAOH, Chain.AVALANCHE),
+    (Protocol.CLEOPATRA, Chain.MANTLE),
 ]
 
 
@@ -453,6 +454,15 @@ def build_routers_compatible() -> list:
             chain=Chain.BASE,
             tags=["Thick - Base"],
             prefix=f"/{Protocol.THICK.api_url}/{Chain.BASE.api_url}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.CLEOPATRA,
+            chain=Chain.MANTLE,
+            tags=["Cleopatra - Mantle"],
+            prefix=f"/{Protocol.CLEOPATRA.api_url}/{Chain.MANTLE.api_url}",
         )
     )
 
