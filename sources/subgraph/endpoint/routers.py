@@ -58,6 +58,7 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.UNISWAP, Chain.MOONBEAM),
     (Protocol.QUICKSWAP, Chain.POLYGON),
     (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
+    (Protocol.QUICKSWAP, Chain.ASTAR_ZKEVM),
     (Protocol.ZYBERSWAP, Chain.ARBITRUM),
     (Protocol.THENA, Chain.BSC),
     (Protocol.THENA, Chain.OPBNB),
@@ -206,6 +207,14 @@ def build_routers_compatible() -> list:
             chain=Chain.POLYGON_ZKEVM,
             tags=["Quickswap - Polygon zkEVM"],
             prefix=f"/{Protocol.QUICKSWAP.api_url}/{Chain.POLYGON_ZKEVM.api_url}",
+        )
+    )
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.QUICKSWAP,
+            chain=Chain.ASTAR_ZKEVM,
+            tags=["Quickswap - Astar zkEVM"],
+            prefix=f"/{Protocol.QUICKSWAP.api_url}/{Chain.ASTAR_ZKEVM.api_url}",
         )
     )
     routes.append(
@@ -836,7 +845,7 @@ class subgraph_router_builder(router_builder_generalTemplate):
             protocol=self.dex, chain=self.chain, address=address
         )
 
-    async def recovery_stats(self, days: int=7, timezone: str="UTC-5"):
+    async def recovery_stats(self, days: int = 7, timezone: str = "UTC-5"):
         return await recovery.recovery_stats(days, timezone)
 
 

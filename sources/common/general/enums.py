@@ -18,6 +18,15 @@ class Chain(str, Enum):
         None,
         "Polygon zkEVM",
     )
+    ASTAR_ZKEVM = (
+        "astar_zkevm",
+        3776,
+        "astar-zkevm",
+        "Astar zkEVM",
+        None,
+        None,
+        "Astar zkEVM",
+    )
     AVALANCHE = ("avalanche", 43114, "avalanche", "Avalanche", None, None, "Avalanche")
     FANTOM = ("fantom", 250, "fantom", "Fantom", None, None, "Fantom")
     MOONBEAM = ("moonbeam", 1284, "moonbeam", "Moonbeam", None, None, "Moonbeam")

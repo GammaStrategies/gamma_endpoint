@@ -14,6 +14,7 @@ DEPLOYMENTS = [
     (Protocol.THENA, Chain.BSC),
     (Protocol.THENA, Chain.OPBNB),
     (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
+    (Protocol.QUICKSWAP, Chain.ASTAR_ZKEVM),
     (Protocol.CAMELOT, Chain.ARBITRUM),
     (Protocol.GLACIER, Chain.AVALANCHE),
     (Protocol.RETRO, Chain.POLYGON),
@@ -69,6 +70,7 @@ DEX_SUBGRAPH_URLS = {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_SUBGRAPH_URL"),
         Chain.POLYGON_ZKEVM: get_config("QUICKSWAP_POLYGON_ZKEVM_SUBGRAPH_URL"),
         Chain.MANTA: get_config("QUICKSWAP_MANTA_SUBGRAPH_URL"),
+        Chain.ASTAR_ZKEVM: get_config("QUICKSWAP_ASTAR_ZKEVM_SUBGRAPH_URL"),
     },
     Protocol.ZYBERSWAP: {
         Chain.ARBITRUM: get_config("ZYBERSWAP_ARBITRUM_SUBGRAPH_URL"),
@@ -164,6 +166,7 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_HP_SUBGRAPH_URL"),
         Chain.POLYGON_ZKEVM: get_config("QUICKSWAP_POLYGON_ZKEVM_HP_SUBGRAPH_URL"),
         Chain.MANTA: get_config("QUICKSWAP_MANTA_HP_SUBGRAPH_URL"),
+        Chain.ASTAR_ZKEVM: get_config("QUICKSWAP_ASTAR_ZKEVM_HP_SUBGRAPH_URL"),
     },
     Protocol.ZYBERSWAP: {
         Chain.ARBITRUM: get_config("ZYBERSWAP_ARBITRUM_HP_SUBGRAPH_URL"),
@@ -259,6 +262,7 @@ GAMMA_SUBGRAPH_URLS = {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_GAMMA_SUBGRAPH_URL"),
         Chain.POLYGON_ZKEVM: get_config("QUICKSWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH_URL"),
         Chain.MANTA: get_config("QUICKSWAP_MANTA_GAMMA_SUBGRAPH_URL"),
+        Chain.ASTAR_ZKEVM: get_config("QUICKSWAP_ASTAR_ZKEVM_GAMMA_SUBGRAPH_URL"),
     },
     Protocol.ZYBERSWAP: {
         Chain.ARBITRUM: get_config("ZYBERSWAP_ARBITRUM_GAMMA_SUBGRAPH_URL"),
