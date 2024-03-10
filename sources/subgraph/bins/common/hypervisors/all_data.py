@@ -16,7 +16,7 @@ from sources.subgraph.bins.utils import timestamp_to_date
 
 # from fastapi import Response, status
 
-
+HYPE_TVL_MAX = 1000000000
 
 logger = logging.getLogger(__name__)
 
@@ -144,7 +144,7 @@ class AllData:
             tvl0 = hype.tvl.value0.adjusted
             tvl1 = hype.tvl.value1.adjusted
 
-            if hype.tvl_usd == 0 and (tvl0 > 0 or tvl1 >0):
+            if (hype.tvl_usd == 0 and (tvl0 > 0 or tvl1 > 0)) or (hype.tvl_usd > HYPE_TVL_MAX):
                 tvl_usd = (
                     tvl0 * self.prices.get(hype.token_0.address, 0)
                     + tvl1 * self.prices.get(hype.token_1.address, 0)
