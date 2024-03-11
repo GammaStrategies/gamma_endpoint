@@ -313,25 +313,32 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
             else period.days * 24 * 2 * 60 * 60
         )
 
-        """Returns a csv file with all the detailed ROI data for the given hypervisor"""
-        if hype_return_analysis := await build_hype_return_analysis_from_database(
+        # try get data
+        hype_return_analysis = await build_hype_return_analysis_from_database(
             chain=chain,
             hypervisor_address=hypervisor_address,
             ini_timestamp=ini_timestamp,
-        ):
-            _filename = (
-                f"{chain.fantasy_name}_{hypervisor_address}_{period.name}_returns.csv"
+        )
+        if not hype_return_analysis:
+            # try get data using the latest collection
+            hype_return_analysis = await build_hype_return_analysis_from_database(
+                chain=chain,
+                hypervisor_address=hypervisor_address,
+                ini_timestamp=ini_timestamp,
+                use_latest_collection=True,
             )
-
-            return StreamingResponse(
-                content=iter([hype_return_analysis.get_graph_csv()]),
-                media_type="text/csv",
-                headers={f"Content-Disposition": f"attachment; filename={_filename}"},
-            )
-
-        else:
+        if not hype_return_analysis:
             response.status_code = status.HTTP_404_NOT_FOUND
             return {"detail": "No data found for the given parameters"}
+
+        _filename = (
+            f"{chain.fantasy_name}_{hypervisor_address}_{period.name}_returns.csv"
+        )
+        return StreamingResponse(
+            content=iter([hype_return_analysis.get_graph_csv()]),
+            media_type="text/csv",
+            headers={f"Content-Disposition": f"attachment; filename={_filename}"},
+        )
 
 
 class frontend_user_router_builder_main(router_builder_baseTemplate):
