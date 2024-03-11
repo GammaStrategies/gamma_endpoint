@@ -18,6 +18,7 @@ async def build_hype_return_analysis_from_database(
     ini_block: int | None = None,
     end_block: int | None = None,
     hypervisor_address: str | None = None,
+    use_latest_collection: bool = False,
 ) -> period_yield_analyzer | None:
     # build query
     find = {"$and": []}
@@ -38,7 +39,12 @@ async def build_hype_return_analysis_from_database(
     # get yield items and static hype info
     db_yield_items, hype_static = await asyncio.gather(
         local_database_helper(network=chain).get_items_from_database(
-            collection_name="hypervisor_returns", find=find
+            collection_name=(
+                "hypervisor_returns"
+                if not use_latest_collection
+                else "latest_hypervisor_returns"
+            ),
+            find=find,
         ),
         local_database_helper(network=chain).get_items_from_database(
             collection_name="static",

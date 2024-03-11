@@ -172,4 +172,18 @@ async def build_hypervisor_returns_graph(
     ):
         return hype_return_analysis.get_graph(level="simple", points_every=points_every)
     else:
+        # try using the latest hype return collection
+        if hype_return_analysis := await build_hype_return_analysis_from_database(
+            chain=chain,
+            hypervisor_address=hypervisor_address,
+            ini_timestamp=ini_timestamp,
+            end_timestamp=end_timestamp,
+            ini_block=ini_block,
+            end_block=end_block,
+            use_latest_collection=True,
+        ):
+            return hype_return_analysis.get_graph(
+                level="simple", points_every=points_every
+            )
+
         return []
