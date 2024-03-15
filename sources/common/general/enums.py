@@ -27,6 +27,15 @@ class Chain(str, Enum):
         None,
         "Astar zkEVM",
     )
+    IMMUTABLE_ZKEVM = (
+        "immutable_zkevm",
+        13371,
+        "immutable-zkevm",
+        "Immutable zkEVM",
+        None,
+        None,
+        "Immutable zkEVM",
+    )
     AVALANCHE = ("avalanche", 43114, "avalanche", "Avalanche", None, None, "Avalanche")
     FANTOM = ("fantom", 250, "fantom", "Fantom", None, None, "Fantom")
     MOONBEAM = ("moonbeam", 1284, "moonbeam", "Moonbeam", None, None, "Moonbeam")
@@ -85,6 +94,7 @@ class Chain(str, Enum):
 
 class Dex(str, Enum):
     QUICKSWAP = "quickswap"
+    QUICKSWAP_UNISWAP = "quickswap_uniswap"
     UNISWAP = "uniswapv3"
     ZYBERSWAP = "zyberswap"
     THENA = "thena"
@@ -120,6 +130,14 @@ class Protocol(str, Enum):
     UNISWAPv3 = ("uniswapv3", None, None, None, "uniswapv3", "Uniswap V3")
 
     QUICKSWAP = ("quickswap", None, None, None, "quickswap", "QuickSwap")
+    QUICKSWAP_UNISWAP = (
+        "quickswap-uniswap",
+        None,
+        None,
+        None,
+        "quickswap-uniswap",
+        "QuickSwap-uniswap",
+    )
     UNISWAP = ("uniswap", None, None, None, "uniswapv3", "Uniswap")
     ZYBERSWAP = ("zyberswap", None, None, None, "zyberswap", "Zyberswap")
     THENA = ("thena", None, None, None, "thena", "Thena")

@@ -59,6 +59,8 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.QUICKSWAP, Chain.POLYGON),
     (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
     (Protocol.QUICKSWAP, Chain.ASTAR_ZKEVM),
+    (Protocol.QUICKSWAP, Chain.IMMUTABLE_ZKEVM),
+    (Protocol.QUICKSWAP_UNISWAP, Chain.POLYGON_ZKEVM),
     (Protocol.ZYBERSWAP, Chain.ARBITRUM),
     (Protocol.THENA, Chain.BSC),
     (Protocol.THENA, Chain.OPBNB),
@@ -215,6 +217,22 @@ def build_routers_compatible() -> list:
             chain=Chain.ASTAR_ZKEVM,
             tags=["Quickswap - Astar zkEVM"],
             prefix=f"/{Protocol.QUICKSWAP.api_url}/{Chain.ASTAR_ZKEVM.api_url}",
+        )
+    )
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.QUICKSWAP,
+            chain=Chain.IMMUTABLE_ZKEVM,
+            tags=["Quickswap - Immutable zkEVM"],
+            prefix=f"/{Protocol.QUICKSWAP.api_url}/{Chain.IMMUTABLE_ZKEVM.api_url}",
+        )
+    )
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.QUICKSWAP_UNISWAP,
+            chain=Chain.POLYGON_ZKEVM,
+            tags=["Quickswap (Uniswap) - Polygon zkEVM"],
+            prefix=f"/{Protocol.QUICKSWAP_UNISWAP.api_url}/{Chain.POLYGON_ZKEVM.api_url}",
         )
     )
     routes.append(

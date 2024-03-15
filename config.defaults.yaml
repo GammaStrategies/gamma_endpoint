@@ -30,6 +30,7 @@ BASEX_BASE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/g
 PANCAKESWAP_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-pancakeswap-arbitrum
 APERTURE_MANTA_GAMMA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-aperture-manta/latest/gn
 QUICKSWAP_MANTA_GAMMA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-quickswap-manta/latest/gn
+QUICKSWAP_IMMUTABLE_GAMMA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-quickswap-imtblzke/latest/gn
 HERCULES_METIS_GAMMA_SUBGRAPH_URL: https://metisapi.0xgraph.xyz/subgraphs/name/gamma-hercules-metis
 BASESWAP_BASE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-baseswap-base/version/latest
 SWAPBASED_BASE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-swapbased-base/version/latest
@@ -38,6 +39,7 @@ SWAPR_GNOSIS_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r
 THICK_BASE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-thick-base/version/latest
 CLEOPATRA_MANTLE_GAMMA_SUBGRAPH_URL: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-cleopatra-mantle
 QUICKSWAP_ASTAR_ZKEVM_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-quickswap-azke/version/latest
+QUICKSWAP_UNISWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-quickswap-uni-pzke/version/latest
 
 # DEX Subgraph URL
 UNISWAP_MAINNET_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3
@@ -71,6 +73,7 @@ BASEX_BASE_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/basex/base
 PANCAKESWAP_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/pancakeswap/exchange-v3-arb
 APERTURE_MANTA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clnz7akg41cv72ntv0uhyd3ai/subgraphs/aperture/uniswap-v3/gn
 QUICKSWAP_MANTA_SUBGRAPH_URL: _
+QUICKSWAP_IMMUTABLE_SUBGRAPH_URL: _
 HERCULES_METIS_SUBGRAPH_URL: _
 BASESWAP_BASE_SUBGRAPH_URL: _
 SWAPBASED_BASE_SUBGRAPH_URL: _
@@ -79,6 +82,7 @@ SWAPR_GNOSIS_SUBGRAPH_URL: _
 THICK_BASE_SUBGRAPH_URL: _
 CLEOPATRA_MANTLE_SUBGRAPH_URL: _
 QUICKSWAP_ASTAR_ZKEVM_SUBGRAPH_URL: _
+QUICKSWAP_UNISWAP_POLYGON_ZKEVM_SUBGRAPH_URL: _
 
 # HypePool Subgraph URL
 UNISWAP_MAINNET_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-mainnet
@@ -112,6 +116,7 @@ BASEX_BASE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype
 PANCAKESWAP_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-pancakeswap-arbitrum
 APERTURE_MANTA_HP_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-aperture-manta/latest/gn
 QUICKSWAP_MANTA_HP_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-quickswap-manta/latest/gn
+QUICKSWAP_IMMUTABLE_HP_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-quickswap-imtblzke/latest/gn
 HERCULES_METIS_HP_SUBGRAPH_URL: https://metisapi.0xgraph.xyz/subgraphs/name/gamma-hp-hercules-metis
 BASESWAP_BASE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-baseswap-base/version/latest
 SWAPBASED_BASE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-swapbased-base/version/latest
@@ -120,6 +125,7 @@ SWAPR_GNOSIS_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/ga
 THICK_BASE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-thick-base/version/latest
 CLEOPATRA_MANTLE_HP_SUBGRAPH_URL: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-hp-cleopatra-mantle
 QUICKSWAP_ASTAR_ZKEVM_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-azke/version/latest
+QUICKSWAP_UNISWAP_POLYGON_ZKEVM_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-uni-pzke/version/latest
 
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {

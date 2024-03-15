@@ -31,5 +31,7 @@ BLOCK_TIME_SECONDS = {
     Chain.MANTA: 12,
     Chain.METIS: 3.6,
     Chain.OPBNB: 1,
-    Chain.GNOSIS: 5
+    Chain.GNOSIS: 5,
+    Chain.ASTAR_ZKEVM: 3,
+    Chain.IMMUTABLE_ZKEVM: 2,
 }
