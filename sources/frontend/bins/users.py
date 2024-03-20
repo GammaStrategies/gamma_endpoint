@@ -48,7 +48,6 @@ async def get_user_positions(user_address: str, chain: Chain) -> list[dict]:
 
 # QUERIES
 
-
 def query_user_positions(
     user_address: str,
     timestamp_ini: int | None = None,
@@ -795,19 +794,19 @@ def query_user_positions_from_global_operations(user_address: str) -> list[dict]
                                         "$sum": [
                                             {
                                                 "$multiply": [
-                                                    "$status.ini.prices.token0",
-                                                    "$status.ini.underlying.qtty.token0",
+                                                    "$status.end.prices.token0",
+                                                    "$status.end.underlying.qtty.token0",
                                                 ]
                                             },
                                             {
                                                 "$multiply": [
-                                                    "$status.ini.prices.token1",
-                                                    "$status.ini.underlying.qtty.token1",
+                                                    "$status.end.prices.token1",
+                                                    "$status.end.underlying.qtty.token1",
                                                 ]
                                             },
                                         ]
                                     },
-                                    "$status.ini.supply",
+                                    "$status.end.supply",
                                 ]
                             },
                         }
