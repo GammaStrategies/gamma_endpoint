@@ -10,7 +10,7 @@ from sources.subgraph.bins.constants import (
 )
 from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.gamma import GammaCalculations, ProtocolFeesCalculations
-from sources.subgraph.bins.pricing import gamma_price
+from sources.subgraph.bins.pricing import token_prices
 from sources.subgraph.bins.toplevel import TopLevelData
 from sources.subgraph.bins.utils import timestamp_ago
 from sources.subgraph.bins.xgamma import XGammaData
@@ -157,9 +157,11 @@ class Dashboard:
         self.rewards_hypervisor_data = {"rewardHypervisor": data["rewardHypervisor"]}
 
     async def info(self, timezone):
-        _, gamma_price_usd = await asyncio.gather(
-            self._get_data(timezone), gamma_price()
+        _, eth_uniswap_prices = await asyncio.gather(
+            self._get_data(timezone), token_prices(Chain.ETHEREUM, Protocol.UNISWAP)
         )
+
+        gamma_price_usd = eth_uniswap_prices[GAMMA_ADDRESS]
 
         gamma_calcs = GammaCalculations(self.chain, days=30)
         gamma_calcs.data = self.gamma_data

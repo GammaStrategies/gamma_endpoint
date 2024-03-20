@@ -12,7 +12,7 @@ from sources.subgraph.bins.constants import (
     XGAMMA_ADDRESS,
 )
 from sources.subgraph.bins.enums import Chain, Protocol
-from sources.subgraph.bins.pricing import gamma_price
+from sources.subgraph.bins.pricing import gamma_price, token_prices
 from sources.subgraph.bins.utils import timestamp_ago
 
 
@@ -298,7 +298,9 @@ class ProtocolFeesCalculations(ProtocolFeesData):
 
         df_rebalances = DataFrame(rebalances, dtype=np.float64)
 
-        gamma_in_usd = await gamma_price()
+        gamma_in_usd = (await token_prices(Chain.ETHEREUM, Protocol.UNISWAP))[
+            GAMMA_ADDRESS
+        ]
 
         gamma_staked_usd = (
             gamma_in_usd * int(self.data["rewardHypervisor"]["totalGamma"]) / 10**18
