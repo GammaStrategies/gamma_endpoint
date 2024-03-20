@@ -26,7 +26,7 @@ async def get_current_prices(
         if token_addresses:
             # build ids
             ids = [f"{chain.database_name}_{address}" for address in token_addresses]
-        find["id"] = {"$in": ids}
+            find["id"] = {"$in": ids}
     if token_addresses and not "id" in find:
         find["address"] = {"$in": token_addresses}
 
