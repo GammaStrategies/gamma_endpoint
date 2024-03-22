@@ -34,4 +34,5 @@ BLOCK_TIME_SECONDS = {
     Chain.GNOSIS: 5,
     Chain.ASTAR_ZKEVM: 3,
     Chain.IMMUTABLE_ZKEVM: 2,
+    Chain.BLAST: 2
 }

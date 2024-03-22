@@ -6,6 +6,7 @@ UNISWAP_OPTIMISM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gam
 UNISWAP_CELO_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/celo
 UNISWAP_BSC_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/uniswap-bsc
 UNISWAP_MOONBEAM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-moonbeam
+UNISWAP_AVALANCHE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-uniswap-avax/version/latest
 QUICKSWAP_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/algebra-polygon
 QUICKSWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-quickswap-pzke/version/latest
 ZYBERSWAP_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/zyberswap-arbitrum
@@ -40,6 +41,7 @@ THICK_BASE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma
 CLEOPATRA_MANTLE_GAMMA_SUBGRAPH_URL: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-cleopatra-mantle
 QUICKSWAP_ASTAR_ZKEVM_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-quickswap-azke/version/latest
 QUICKSWAP_UNISWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-quickswap-uni-pzke/version/latest
+BLASTER_BLAST_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-blaster-blast/version/latest
 
 # DEX Subgraph URL
 UNISWAP_MAINNET_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3
@@ -49,6 +51,7 @@ UNISWAP_OPTIMISM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ianlapham
 UNISWAP_CELO_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/jesse-sawa/uniswap-celo
 UNISWAP_BSC_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-bsc
 UNISWAP_MOONBEAM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-moonbeam
+UNISWAP_AVALANCHE_SUBGRAPH_URL: _
 QUICKSWAP_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/sameepsi/quickswap-v3
 QUICKSWAP_POLYGON_ZKEVM_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44554/quickswap-v3-02/0.0.7
 ZYBERSWAP_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/iliaazhel/zyberswap-info
@@ -83,6 +86,7 @@ THICK_BASE_SUBGRAPH_URL: _
 CLEOPATRA_MANTLE_SUBGRAPH_URL: _
 QUICKSWAP_ASTAR_ZKEVM_SUBGRAPH_URL: _
 QUICKSWAP_UNISWAP_POLYGON_ZKEVM_SUBGRAPH_URL: _
+BLASTER_BLAST_SUBGRAPH_URL: _
 
 # HypePool Subgraph URL
 UNISWAP_MAINNET_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-mainnet
@@ -92,6 +96,7 @@ UNISWAP_OPTIMISM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0
 UNISWAP_CELO_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-celo
 UNISWAP_BSC_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-bsc
 UNISWAP_MOONBEAM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-moonbeam
+UNISWAP_AVALANCHE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-avax/version/latest
 QUICKSWAP_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-quickswap-polygon
 QUICKSWAP_POLYGON_ZKEVM_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-pzke/version/latest
 ZYBERSWAP_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-zyberswap-arbitrum
@@ -126,6 +131,7 @@ THICK_BASE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp
 CLEOPATRA_MANTLE_HP_SUBGRAPH_URL: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-hp-cleopatra-mantle
 QUICKSWAP_ASTAR_ZKEVM_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-azke/version/latest
 QUICKSWAP_UNISWAP_POLYGON_ZKEVM_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-uni-pzke/version/latest
+BLASTER_BLAST_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-blaster-blast/version/latest
 
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {

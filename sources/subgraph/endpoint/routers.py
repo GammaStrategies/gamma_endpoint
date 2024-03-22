@@ -197,6 +197,14 @@ def build_routers_compatible() -> list:
     )
     routes.append(
         subgraph_router_builder(
+            dex=Protocol.UNISWAP,
+            chain=Chain.AVALANCHE,
+            tags=["Avalanche"],
+            prefix=f"/{Chain.AVALANCHE.api_url}",
+        )
+    )
+    routes.append(
+        subgraph_router_builder(
             dex=Protocol.QUICKSWAP,
             chain=Chain.POLYGON,
             tags=["Quickswap - Polygon"],
@@ -490,6 +498,15 @@ def build_routers_compatible() -> list:
             chain=Chain.MANTLE,
             tags=["Cleopatra - Mantle"],
             prefix=f"/{Protocol.CLEOPATRA.api_url}/{Chain.MANTLE.api_url}",
+        )
+    )
+
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.BLASTER,
+            chain=Chain.BLAST,
+            tags=["Blaster - Blast"],
+            prefix=f"/{Protocol.BLASTER.api_url}/{Chain.BLAST.api_url}",
         )
     )
 
