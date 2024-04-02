@@ -4,7 +4,7 @@ from typing import MutableMapping
 import pandas as pd
 from datetime import datetime, timezone
 from sources.common.general.enums import Chain
-from sources.common.general.utils import flatten_dict
+from sources.common.general.utils import convert_to_csv, flatten_dict
 
 
 @dataclass
@@ -1577,25 +1577,8 @@ class period_yield_analyzer:
         Returns:
             str: csv string
         """
-
-        # flat_items = [ flatten_dict(x) for x in self._graph_data ]
-        # columns = list(flat_items[0].keys())
-        # df = pd.DataFrame(list(flat_items.values()), columns=columns)
-        # return df.to_csv(index=False)
-        # create csv string
-        csv_string = ""
-        for item in self._graph_data:
-            flat_item = flatten_dict(item)
-
-            # create header if not already
-            if csv_string == "":
-                headers = list(flat_item.keys())
-                csv_string += ",".join(headers) + "\n"
-            # append data to csv string
-            csv_string += ",".join([str(x) for x in flat_item.values()]) + "\n"
-
         # return csv string
-        return csv_string
+        return convert_to_csv(self._graph_data)
 
     def get_rewards_detail(self):
         result = {}

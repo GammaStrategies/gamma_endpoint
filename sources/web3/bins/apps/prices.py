@@ -1,5 +1,6 @@
 import asyncio
-from sources.mongo.bins.apps.prices import get_prices
+
+from sources.common.prices.helpers import get_prices
 from sources.web3.bins.mixed.price_utilities import price_scraper
 
 

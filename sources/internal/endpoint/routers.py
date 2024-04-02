@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import logging
 import typing
 from fastapi import HTTPException, Query, Response, APIRouter, status
+from fastapi.responses import StreamingResponse
 from fastapi_cache.decorator import cache
 from endpoint.config.cache import DB_CACHE_TIMEOUT, DAILY_CACHE_TIMEOUT
 
@@ -28,6 +29,7 @@ from sources.internal.bins.kpis import (
 )
 from sources.internal.bins.reports import (
     custom_report,
+    get_kpis_dashboard,
     global_report_revenue,
     report_galaxe,
 )
@@ -40,7 +42,6 @@ from sources.subgraph.bins.hype_fees.fees_yield import fee_returns_all
 
 from ..bins.fee_internal import (
     get_chain_usd_fees,
-    get_fees,
     get_gross_fees,
     get_revenue_operations,
 )
@@ -177,8 +178,8 @@ class internal_router_builder_main(router_builder_baseTemplate):
 
     async def gross_fees(
         self,
-        chain: Chain,
         response: Response,
+        chain: Chain,
         protocol: Protocol | None = None,
         start_timestamp: int | None = None,
         end_timestamp: int | None = None,
@@ -202,7 +203,6 @@ class internal_router_builder_main(router_builder_baseTemplate):
             * feeTier: percentage of fee the pool is charging on swaps
             * eVolume: estimated volume in usd ( feeTier/calculated gross fees,  using the current price of the token)
         """
-
         if protocol and (protocol, chain) not in DEPLOYMENTS:
             raise HTTPException(
                 status_code=400, detail=f"{protocol} on {chain} not available."
@@ -220,7 +220,7 @@ class internal_router_builder_main(router_builder_baseTemplate):
     async def all_chain_usd_fees(
         self,
         response: Response,
-        chain: Chain | None = None,
+        chain: Chain | int | None = Query(None, enum=[*Chain, *[x.id for x in Chain]]),
         protocol: Protocol | None = None,
         start_timestamp: int | None = None,
         end_timestamp: int | None = None,
@@ -239,7 +239,11 @@ class internal_router_builder_main(router_builder_baseTemplate):
 
         * **collectedFees_perDay** are the daily fees collected in the period.
         """
-        if protocol and (protocol, chain) not in DEPLOYMENTS:
+
+        if isinstance(chain, int):
+            chain = int_to_chain(chain)
+
+        if protocol and chain and (protocol, chain) not in DEPLOYMENTS:
             raise HTTPException(
                 status_code=400, detail=f"{protocol} on {chain} not available."
             )
@@ -281,7 +285,7 @@ class internal_router_builder_main(router_builder_baseTemplate):
     async def weekly_chain_usd_fees(
         self,
         response: Response,
-        chain: Chain | None = None,
+        chain: Chain | int | None = Query(None, enum=[*Chain, *[x.id for x in Chain]]),
         week_start_timestamp: int | str = "last",
         protocol: Protocol | None = None,
     ) -> list[dict]:
@@ -301,6 +305,8 @@ class internal_router_builder_main(router_builder_baseTemplate):
         """
         week_in_seconds = 604800
 
+        if isinstance(chain, int):
+            chain = int_to_chain(chain)
         if isinstance(week_start_timestamp, str):
             _now = datetime.now(timezone.utc)
             if week_start_timestamp == "last":
@@ -725,6 +731,12 @@ class internal_router_builder_reports(router_builder_baseTemplate):
             methods=["GET"],
         )
 
+        router.add_api_route(
+            path="/kpi_dashboard",
+            endpoint=self.kpi_dashboard,
+            methods=["GET"],
+        )
+
         return router
 
     # ROUTE FUNCTIONS
@@ -800,3 +812,48 @@ class internal_router_builder_reports(router_builder_baseTemplate):
         reports = await custom_report(chain=Chain.ARBITRUM, user_address=user_address)
 
         return reports
+
+    async def kpi_dashboard(
+        self,
+        response: Response,
+        chain: Chain | int | None = Query(None, enum=[*Chain, *[x.id for x in Chain]]),
+        protocol: Protocol | None = None,
+        ini_timestamp: int | None = Query(
+            None,
+            description="will limit the data returned from this value. When no value is provided, -7 days will be used",
+        ),
+        end_timestamp: int | None = Query(
+            None,
+            description="will limit the data returned to this value. When no value is provided, last available timestamp data will be used.",
+        ),
+        period_seconds: int | None = Query(
+            None,
+            description="will group the data in periods of this length in seconds.",
+        ),
+    ):
+
+        if isinstance(chain, int):
+            chain = int_to_chain(chain)
+
+        if protocol and chain and (protocol, chain) not in DEPLOYMENTS:
+            raise HTTPException(
+                status_code=400, detail=f"{protocol} on {chain} not available."
+            )
+
+        _filename = f"{chain.id}_{protocol or 'None'}_{ini_timestamp or 'None'}_{end_timestamp or 'None'}_kpiDashboard.csv"
+
+        return StreamingResponse(
+            content=iter(
+                [
+                    await get_kpis_dashboard(
+                        chain=chain,
+                        protocol=protocol,
+                        ini_timestamp=ini_timestamp,
+                        end_timestamp=end_timestamp,
+                        period_seconds=period_seconds,
+                    )
+                ]
+            ),
+            media_type="text/csv",
+            headers={f"Content-Disposition": f"attachment; filename={_filename}"},
+        )
