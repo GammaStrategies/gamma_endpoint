@@ -845,7 +845,21 @@ class internal_router_builder_reports(router_builder_baseTemplate):
                 status_code=400, detail=f"{protocol} on {chain} not available."
             )
 
-        _filename = f"{chain.id}_{protocol or 'None'}_{hypervisor_addresses or 'None'}_{ini_timestamp or 'None'}_{end_timestamp or 'None'}_kpiDashboard.csv"
+        # build filename
+        _filename = f"{chain.id}"
+        if protocol:
+            _filename += f"_{protocol}"
+        if hypervisor_addresses:
+            for hypervisor_address in hypervisor_addresses:
+                _filename += f"_{hypervisor_address}"
+        if ini_timestamp:
+            _filename += f"_{ini_timestamp}"
+        if end_timestamp:
+            _filename += f"_{end_timestamp}"
+        if period_seconds:
+            _filename += f"_{period_seconds}"
+
+        _filename += "_kpiDashboard.csv"
 
         return StreamingResponse(
             content=iter(
