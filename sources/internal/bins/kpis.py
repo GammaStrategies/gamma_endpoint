@@ -8,6 +8,10 @@ from fastapi import HTTPException
 
 from sources.common.formulas.fees import convert_feeProtocol
 from sources.common.general.enums import text_to_protocol
+from sources.common.prices.helpers import (
+    get_current_prices,
+    get_database_prices_closeto,
+)
 from sources.internal.bins.fee_internal import get_gross_fees
 from sources.internal.bins.internal import (
     InternalGrossFeesOutput,
@@ -15,16 +19,13 @@ from sources.internal.bins.internal import (
     InternalTimeframe,
     InternalTokens,
 )
-from sources.mongo.bins.apps.prices import get_current_prices
 from sources.mongo.bins.helpers import local_database_helper
 
 from sources.common.database.collection_endpoint import database_local
-from sources.common.database.common.collections_common import db_collections_common
 
 from sources.subgraph.bins.enums import Chain, Protocol
 
 from sources.subgraph.bins.config import DEPLOYMENTS
-from sources.web3.bins.w3.helpers import build_erc20_helper, build_hypervisor
 
 
 async def get_average_tvl(
@@ -65,12 +66,15 @@ async def get_average_tvl(
         }
         # get current prices and hypervisor data from database
         _prices, _data = await asyncio.gather(
-            get_current_prices(network=chain),
+            get_database_prices_closeto(
+                chain=chain, timestamp=end_timestamp, default_to_current=True
+            ),
+            # get_current_prices(network=chain),
             local_database_helper(network=chain).get_items_from_database(
                 collection_name="static", aggregate=_query
             ),
         )
-        _prices = {itm["address"]: itm["price"] for itm in _prices}
+        # _prices = {itm["address"]: itm["price"] for itm in _prices}
 
         for itm in _data:
             # convert Decimal128 to float
@@ -79,8 +83,8 @@ async def get_average_tvl(
             )
             try:
                 # ease to use variables
-                _price0 = _prices[itm["token0"]]
-                _price1 = _prices[itm["token1"]]
+                _price0 = _prices[itm["token0"]]["price"]
+                _price1 = _prices[itm["token1"]]["price"]
                 # calculate tvls
                 av_tvl = (
                     itm["tvl"]["av_tvl0"] * _price0 + itm["tvl"]["av_tvl1"] * _price1
@@ -171,12 +175,15 @@ async def get_transactions(
         }
         # get current prices and hypervisor data from database
         _prices, _data = await asyncio.gather(
-            get_current_prices(network=chain),
+            get_database_prices_closeto(
+                chain=chain, timestamp=end_timestamp, default_to_current=True
+            ),
+            # get_current_prices(network=chain),
             local_database_helper(network=chain).get_items_from_database(
                 collection_name="static", aggregate=_query
             ),
         )
-        _prices = {itm["address"]: itm["price"] for itm in _prices}
+        # _prices = {itm["address"]: itm["price"] for itm in _prices}
 
         for itm in _data:
             hypervisor_output = {
@@ -205,8 +212,8 @@ async def get_transactions(
 
             try:
                 # ease to use variables
-                _price0 = _prices[itm["token0"]]
-                _price1 = _prices[itm["token1"]]
+                _price0 = _prices[itm["token0"]]["price"]
+                _price1 = _prices[itm["token1"]]["price"]
 
                 for operation in itm["operations"]:
                     _usd = (
@@ -568,7 +575,7 @@ def _query_users_activity(
         {"$match": _match},
         {
             "$addFields": {
-                "user": {"$cond": [{"$eq": ["$topic", "deposit"]}, "$sender", "$to"]}
+                "user": {"$cond": [{"$eq": ["$topic", "deposit"]}, "$to", "$sender"]}
             }
         },
         {"$group": {"_id": "$user", "activity_count": {"$sum": 1}}},

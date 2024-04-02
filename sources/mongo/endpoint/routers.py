@@ -13,10 +13,12 @@ from endpoint.routers.template import (
 )
 from sources.common.general.enums import Chain, Protocol, int_to_chain
 from sources.common.general.utils import filter_addresses
+from sources.common.prices.helpers import get_current_prices, get_prices
 from sources.internal.bins.user import get_user_addresses, get_user_shares
 from sources.mongo.bins.apps import hypervisor
 from sources.mongo.bins.apps import user
-from sources.mongo.bins.apps import prices
+
+# from sources.mongo.bins.apps import prices
 from sources.mongo.bins.apps import rewards
 
 
@@ -384,21 +386,21 @@ class mongo_router_builder(router_builder_baseTemplate):
         """
         if token_addresses is None:
             if block is None:
-                return await prices.get_current_prices(
+                return await get_current_prices(
                     network=self.chain, token_addresses=token_addresses
                 )
             else:
-                return await prices.get_prices(
+                return await get_prices(
                     network=self.chain, token_addresses=None, block=block
                 )
             #    return "Please provide a list of token addresses or a block number"
         if block is None:
-            return await prices.get_current_prices(
+            return await get_current_prices(
                 token_addresses=[x.lower().strip() for x in token_addresses],
                 network=self.chain,
             )
         else:
-            return await prices.get_prices(
+            return await get_prices(
                 token_addresses=[x.lower().strip() for x in token_addresses],
                 network=self.chain,
                 block=block,

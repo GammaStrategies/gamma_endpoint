@@ -6,7 +6,7 @@ from collections import defaultdict
 
 from gql.dsl import DSLQuery
 
-from sources.mongo.bins.apps.prices import get_current_prices
+from sources.common.prices.helpers import get_current_prices
 from sources.subgraph.bins import LlamaClient, UniswapV3Client
 from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.subgraphs import SubgraphData
@@ -152,9 +152,9 @@ POOLS = {
     },
     Chain.BSC: {},
     Chain.AVALANCHE: {
-        "GLCR_USDC" : {
+        "GLCR_USDC": {
             "protocol": Protocol.GLACIER,
-            "address": "0x5de8128b5f49ed6bdac9fa9b8661e9d3bb9334da"
+            "address": "0x5de8128b5f49ed6bdac9fa9b8661e9d3bb9334da",
         }
     },
     Chain.ARBITRUM: {
@@ -187,7 +187,7 @@ POOLS = {
     },
     Chain.FANTOM: {},
     Chain.BASE: {},
-    Chain.ROLLUX: {}
+    Chain.ROLLUX: {},
 }
 
 
@@ -353,7 +353,7 @@ POOL_PATHS = {
     },
     Chain.FANTOM: {},
     Chain.BASE: {},
-    Chain.ROLLUX: {}
+    Chain.ROLLUX: {},
 }
 
 
@@ -482,7 +482,7 @@ async def token_prices(chain: Chain, protocol: Protocol) -> dict:
 
     llama_prices, db_token_prices = await asyncio.gather(
         llama_client.current_token_price_multi(token_data.data),
-        get_current_prices(chain, token_data.data)
+        get_current_prices(chain, token_data.data),
     )
 
     # Base case pricing from DB

@@ -3,7 +3,7 @@
 #
 import asyncio
 from sources.common.general.enums import Chain
-from sources.mongo.bins.apps.prices import get_current_prices
+from sources.common.prices.helpers import get_current_prices
 from sources.mongo.bins.apps.returns import build_hype_return_analysis_from_database
 from sources.mongo.bins.helpers import local_database_helper
 

@@ -2,7 +2,6 @@ import asyncio
 
 from bson import Decimal128
 from sources.common.general.enums import Chain
-from sources.mongo.bins.apps.prices import get_current_prices, get_prices
 from sources.mongo.bins.helpers import global_database_helper, local_database_helper
 from sources.mongo.endpoint.routers import DEPLOYED
 
@@ -47,6 +46,7 @@ async def get_user_positions(user_address: str, chain: Chain) -> list[dict]:
 
 
 # QUERIES
+
 
 def query_user_positions(
     user_address: str,

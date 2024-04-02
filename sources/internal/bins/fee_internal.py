@@ -5,16 +5,20 @@ import logging
 from fastapi import HTTPException
 
 
+from sources.common.database.helpers import addFields_usdvalue_revenue_query_part
 from sources.common.formulas.fees import convert_feeProtocol
 from sources.common.general.enums import text_to_protocol
+from sources.common.prices.helpers import (
+    get_current_prices,
+    get_database_prices_closeto,
+)
 from sources.internal.bins.internal import (
     InternalGrossFeesOutput,
     InternalKpi,
     InternalTimeframe,
     InternalTokens,
 )
-from sources.mongo.bins.apps.prices import get_current_prices
-from sources.mongo.bins.helpers import local_database_helper
+from sources.mongo.bins.helpers import local_database_helper, global_database_helper
 
 from sources.common.database.collection_endpoint import database_local
 from sources.common.database.common.collections_common import db_collections_common
@@ -61,8 +65,15 @@ async def get_fees(
     # create result dict
     output = {}
 
-    # get hypervisors current prices
-    token_prices = {x["address"]: x for x in await get_current_prices(network=chain)}
+    # get hypervisors prices at the end of the period
+    token_prices = await get_database_prices_closeto(
+        chain=chain,
+        timestamp=end_timestamp,
+        block=end_block,
+        threshold=10000,
+        default_to_current=True,
+    )
+
     # get all hypervisors last status from the database
     query_hype_status = [
         {"$sort": {"block": -1}},
@@ -302,8 +313,15 @@ async def get_gross_fees(
     # create result dict
     output = {}
 
-    # get hypervisors current prices
-    token_prices = {x["address"]: x for x in await get_current_prices(network=chain)}
+    # get hypervisors prices at the end of the period
+    token_prices = await get_database_prices_closeto(
+        chain=chain,
+        timestamp=end_timestamp,
+        block=end_block,
+        threshold=10000,
+        default_to_current=True,
+    )
+
     # get all hypervisors last status from the database
     query_last_hype_status = [
         {"$sort": {"block": -1}},
@@ -808,6 +826,7 @@ async def get_revenue_operations(
     # build query
     _query = [
         {"$match": _match},
+        addFields_usdvalue_revenue_query_part(chain=chain),
         {
             "$project": {
                 "_id": 0,
@@ -818,15 +837,15 @@ async def get_revenue_operations(
                 "token": {"$cond": ["$token", "$token", "$address"]},
                 "token_symbol": "$symbol",
                 "timestamp": "$timestamp",
-                # "usd_value": "$usd_value",
-                "usd_value": {
-                    "$cond": [
-                        # CAMELOT dex revenue is multiplied by 0.623529 to match the fee split
-                        {"$eq": ["$dex", "camelot"]},
-                        {"$multiply": ["$usd_value", 0.623529]},
-                        "$usd_value",
-                    ]
-                },
+                "usd_value": "$usd_value",
+                # "usd_value": {
+                #     "$cond": [
+                #         # CAMELOT dex revenue is multiplied by 0.623529 to match the fee split
+                #         {"$eq": ["$dex", "camelot"]},
+                #         {"$multiply": ["$usd_value", 0.623529]},
+                #         "$usd_value",
+                #     ]
+                # },
             }
         },
         {
