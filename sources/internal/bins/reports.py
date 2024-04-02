@@ -8,6 +8,7 @@ from sources.internal.bins.fee_internal import (
 from sources.internal.bins.kpis import (
     get_average_tvl,
     get_transactions,
+    get_transactions_summary,
     get_users_activity,
 )
 from sources.subgraph.bins.enums import Chain, Protocol
@@ -100,6 +101,7 @@ async def get_kpis_dashboard(
     ini_timestamp: int | None = None,
     end_timestamp: int | None = None,
     period_seconds: int | None = None,
+    hypervisor_addresses: list[str] | None = None,
 ):
 
     # create a list of ini_timestamp,end_timestamp tuples for each period
@@ -117,64 +119,55 @@ async def get_kpis_dashboard(
     result = []
     # reverse the periods
     periods = periods[::-1]
-    for ini_timestamp, end_timestamp in periods:
+    for ini_time, end_time in periods:
 
         # Average TVL	Δ% TVL	Fees	∑ Fees	Fees / Day	Revenue	∑ Revenue	Revenue / Day	Volume	∑ Volume	Volume / Day	Cap Efficiency 	Fee APR	Incentives	∑ Incentives	Incentives / Day	Avg Price	Incentives ($)	∑ Incentives ($)	Incentives / Day ($)	Incentive APR	Incentivized LR	Deposits	Withdrawals	Compounds	Rebalances	Users	Total Txns	∑ Txns	Txns / Day	D/W Ratio
-        average_tvl, fees, revenue, transactions = await asyncio.gather(
-            get_average_tvl(
-                chain=chain,
-                protocol=protocol,
-                ini_timestamp=ini_timestamp,
-                end_timestamp=end_timestamp,
-            ),
-            get_chain_usd_fees(
-                chain=chain,
-                protocol=protocol,
-                start_timestamp=ini_timestamp,
-                end_timestamp=end_timestamp,
-            ),
-            get_revenue_operations(
-                chain=chain,
-                protocol=protocol,
-                ini_timestamp=ini_timestamp,
-                end_timestamp=end_timestamp,
-            ),
-            get_transactions(
-                chain=chain,
-                protocol=protocol,
-                ini_timestamp=ini_timestamp,
-                end_timestamp=end_timestamp,
-            ),
+        average_tvl, transactions_summary, user_activity, transactions = (
+            await asyncio.gather(
+                get_average_tvl(
+                    chain=chain,
+                    protocol=protocol,
+                    ini_timestamp=ini_time,
+                    end_timestamp=end_time,
+                    hypervisors=hypervisor_addresses,
+                ),
+                get_transactions_summary(
+                    chain=chain,
+                    protocol=protocol,
+                    ini_timestamp=ini_time,
+                    end_timestamp=end_time,
+                    hypervisors=hypervisor_addresses,
+                ),
+                get_users_activity(
+                    chain=chain,
+                    ini_timestamp=ini_time,
+                    end_timestamp=end_time,
+                    hypervisors=hypervisor_addresses,
+                ),
+                get_transactions(
+                    chain=chain,
+                    protocol=protocol,
+                    ini_timestamp=ini_time,
+                    end_timestamp=end_time,
+                    hypervisors=hypervisor_addresses,
+                ),
+            )
         )
 
-        hypervisor_addresses = [
-            hype["address"] for hype in average_tvl["chains"][chain.id]["hypervisors"]
-        ]
-
-        # # gfet users activity
-        # users_activitry = await get_users_activity(
-        #     chain=chain,
-        #     ini_timestamp=ini_timestamp,
-        #     end_timestamp=end_timestamp,
-        #     hypervisors=hypervisor_addresses,
-        # )
         result.append(
             {
                 "ini_timestamp": average_tvl["ini_timestamp"],
                 "end_timestamp": average_tvl["end_timestamp"],
                 "average_tvl": average_tvl["average_tvl"],
-                "hypervisors_qtty": fees["hypervisors"],
-                "collectedFees": fees["collectedFees"],
-                "calculatedGrossFees": fees["calculatedGrossFees"],
-                "collectedFees_perDay": fees["collectedFees_perDay"],
-                "eVolume": fees["eVolume"],
-                "revenue": revenue[0]["total_usd"],
+                "fees": transactions_summary["fees_usd"],
+                "gross_fees": transactions_summary["gross_fees_usd"],
+                "volume": transactions_summary["volume"],
                 "deposits": transactions[chain.id]["deposits_qtty"],
                 "withdraws": transactions[chain.id]["withdraws_qtty"],
                 "compounds": transactions[chain.id]["zeroBurns_qtty"],
                 "rebalances": transactions[chain.id]["rebalances_qtty"],
-                # "transfers": transactions["transfers_qtty"],
-                # "users": ,
+                "transfers": transactions[chain.id]["transfers_qtty"],
+                "users": user_activity["total_users"],
             }
         )
 

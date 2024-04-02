@@ -809,7 +809,9 @@ class internal_router_builder_reports(router_builder_baseTemplate):
     async def custom_report(self, response: Response, user_address: str | None = None):
         """Custom report"""
 
-        reports = await custom_report(chain=Chain.ARBITRUM, user_address=user_address)
+        reports = await custom_report(
+            chain=Chain.ARBITRUM, user_address=filter_addresses(user_address)
+        )
 
         return reports
 
@@ -829,6 +831,9 @@ class internal_router_builder_reports(router_builder_baseTemplate):
         period_seconds: int | None = Query(
             None,
             description="will group the data in periods of this length in seconds.",
+        ),
+        hypervisor_addresses: typing.List[str] | None = Query(
+            None, description="List of hypervisor addresses to filter"
         ),
     ):
 
@@ -851,6 +856,7 @@ class internal_router_builder_reports(router_builder_baseTemplate):
                         ini_timestamp=ini_timestamp,
                         end_timestamp=end_timestamp,
                         period_seconds=period_seconds,
+                        hypervisor_addresses=filter_addresses(hypervisor_addresses),
                     )
                 ]
             ),
