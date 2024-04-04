@@ -165,6 +165,18 @@ async def get_kpis_dashboard(
             )
         )
 
+        transactions = transactions.get(
+            str(chain.id),
+            {
+                "deposits_qtty": 0,
+                "withdraws_qtty": 0,
+                "zeroBurns_qtty": 0,
+                "rebalances_qtty": 0,
+                "transfers_qtty": 0,
+            },
+        )
+
+        # append the data
         result.append(
             {
                 "ini_timestamp": average_tvl["ini_timestamp"],
@@ -173,31 +185,11 @@ async def get_kpis_dashboard(
                 "fees": transactions_summary["fees_usd"],
                 "gross_fees": transactions_summary["gross_fees_usd"],
                 "volume": transactions_summary["volume"],
-                "deposits": (
-                    transactions[chain.id]["deposits_qtty"]
-                    if chain.id in transactions
-                    else 0
-                ),
-                "withdraws": (
-                    transactions[chain.id]["withdraws_qtty"]
-                    if chain.id in transactions
-                    else 0
-                ),
-                "compounds": (
-                    transactions[chain.id]["zeroBurns_qtty"]
-                    if chain.id in transactions
-                    else 0
-                ),
-                "rebalances": (
-                    transactions[chain.id]["rebalances_qtty"]
-                    if chain.id in transactions
-                    else 0
-                ),
-                "transfers": (
-                    transactions[chain.id]["transfers_qtty"]
-                    if chain.id in transactions
-                    else 0
-                ),
+                "deposits": transactions["deposits_qtty"],
+                "withdraws": transactions["withdraws_qtty"],
+                "compounds": transactions["zeroBurns_qtty"],
+                "rebalances": transactions["rebalances_qtty"],
+                "transfers": transactions["transfers_qtty"],
                 "users": user_activity["total_users"],
             }
         )
