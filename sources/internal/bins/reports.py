@@ -1,6 +1,7 @@
 import asyncio
 import time
 from sources.common.general.utils import convert_to_csv
+from sources.common.prices.helpers import get_database_prices_closeto
 from sources.internal.bins.fee_internal import (
     get_chain_usd_fees,
     get_revenue_operations,
@@ -121,6 +122,13 @@ async def get_kpis_dashboard(
     periods = periods[::-1]
     for ini_time, end_time in periods:
 
+        # get prices close to the period ( to be used in the calculations)
+        _prices = await get_database_prices_closeto(
+            chain=chain,
+            timestamp=end_timestamp,
+            default_to_current=True,
+        )
+
         # Average TVL	Δ% TVL	Fees	∑ Fees	Fees / Day	Revenue	∑ Revenue	Revenue / Day	Volume	∑ Volume	Volume / Day	Cap Efficiency 	Fee APR	Incentives	∑ Incentives	Incentives / Day	Avg Price	Incentives ($)	∑ Incentives ($)	Incentives / Day ($)	Incentive APR	Incentivized LR	Deposits	Withdrawals	Compounds	Rebalances	Users	Total Txns	∑ Txns	Txns / Day	D/W Ratio
         average_tvl, transactions_summary, user_activity, transactions = (
             await asyncio.gather(
@@ -130,6 +138,7 @@ async def get_kpis_dashboard(
                     ini_timestamp=ini_time,
                     end_timestamp=end_time,
                     hypervisors=hypervisor_addresses,
+                    prices=_prices,
                 ),
                 get_transactions_summary(
                     chain=chain,
@@ -137,6 +146,7 @@ async def get_kpis_dashboard(
                     ini_timestamp=ini_time,
                     end_timestamp=end_time,
                     hypervisors=hypervisor_addresses,
+                    prices=_prices,
                 ),
                 get_users_activity(
                     chain=chain,
@@ -150,6 +160,7 @@ async def get_kpis_dashboard(
                     ini_timestamp=ini_time,
                     end_timestamp=end_time,
                     hypervisors=hypervisor_addresses,
+                    prices=_prices,
                 ),
             )
         )
@@ -162,11 +173,31 @@ async def get_kpis_dashboard(
                 "fees": transactions_summary["fees_usd"],
                 "gross_fees": transactions_summary["gross_fees_usd"],
                 "volume": transactions_summary["volume"],
-                "deposits": transactions[chain.id]["deposits_qtty"],
-                "withdraws": transactions[chain.id]["withdraws_qtty"],
-                "compounds": transactions[chain.id]["zeroBurns_qtty"],
-                "rebalances": transactions[chain.id]["rebalances_qtty"],
-                "transfers": transactions[chain.id]["transfers_qtty"],
+                "deposits": (
+                    transactions[chain.id]["deposits_qtty"]
+                    if chain.id in transactions
+                    else 0
+                ),
+                "withdraws": (
+                    transactions[chain.id]["withdraws_qtty"]
+                    if chain.id in transactions
+                    else 0
+                ),
+                "compounds": (
+                    transactions[chain.id]["zeroBurns_qtty"]
+                    if chain.id in transactions
+                    else 0
+                ),
+                "rebalances": (
+                    transactions[chain.id]["rebalances_qtty"]
+                    if chain.id in transactions
+                    else 0
+                ),
+                "transfers": (
+                    transactions[chain.id]["transfers_qtty"]
+                    if chain.id in transactions
+                    else 0
+                ),
                 "users": user_activity["total_users"],
             }
         )

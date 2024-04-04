@@ -70,9 +70,7 @@ async def get_fees(
         chain=chain,
         timestamp=end_timestamp,
         block=end_block,
-        threshold=10000,
         default_to_current=True,
-        any_lower_to=True,
     )
 
     # get all hypervisors last status from the database
@@ -306,6 +304,7 @@ async def get_gross_fees(
     start_block: int | None = None,
     end_block: int | None = None,
     hypervisor_addresses: list[str] | None = None,
+    prices: dict[str, dict[str, float]] | None = None,
 ) -> dict[str, InternalGrossFeesOutput]:
     """
     Calculates the gross fees aquired (not uncollected) in a period of time for a specific protocol and chain using the protocol fee switch data.
@@ -313,16 +312,6 @@ async def get_gross_fees(
 
     # create result dict
     output = {}
-
-    # get hypervisors prices at the end of the period
-    token_prices = await get_database_prices_closeto(
-        chain=chain,
-        timestamp=end_timestamp,
-        block=end_block,
-        threshold=10000,
-        default_to_current=True,
-        any_lower_to=True,
-    )
 
     # get all hypervisors last status from the database
     query_last_hype_status = [
@@ -360,13 +349,33 @@ async def get_gross_fees(
     if match:
         query_last_hype_status.insert(0, {"$match": match})
 
+    # get prices and status
+    if not prices:
+        token_prices, last_hype_status_data = await asyncio.gather(
+            get_database_prices_closeto(
+                chain=chain,
+                timestamp=end_timestamp,
+                block=end_block,
+                default_to_current=True,
+            ),
+            local_database_helper(network=chain).get_items_from_database(
+                collection_name="status",
+                aggregate=query_last_hype_status,
+            ),
+        )
+    else:
+        token_prices = prices
+        last_hype_status_data = await local_database_helper(
+            network=chain
+        ).get_items_from_database(
+            collection_name="status",
+            aggregate=query_last_hype_status,
+        )
+
     # last known hype status for each hypervisor at the end of the period
     last_hypervisor_status = {}
     first_hypervisor_status = {}
-    for status in await local_database_helper(network=chain).get_items_from_database(
-        collection_name="status",
-        aggregate=query_last_hype_status,
-    ):
+    for status in last_hype_status_data:
         last_hypervisor_status[status["_id"]] = status["last"]
         first_hypervisor_status[status["_id"]] = status["first"]
 

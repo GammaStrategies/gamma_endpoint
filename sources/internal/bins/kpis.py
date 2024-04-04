@@ -34,6 +34,7 @@ async def get_average_tvl(
     ini_timestamp: int | None = None,
     end_timestamp: int | None = None,
     hypervisors: list[str] | None = None,
+    prices: dict[str, dict] | None = None,
 ) -> dict:
     # define chains
     if chain:
@@ -56,6 +57,7 @@ async def get_average_tvl(
         "chains": {},  #  "chain": "" "average_tvl": 0, "hypervisors": []},
     }
 
+    _start_time = time.time()
     # execute tasks
     for chain in chains:
         chain_output = {
@@ -64,20 +66,24 @@ async def get_average_tvl(
             "average_tvl": 0,
             "hypervisors": [],
         }
-        # get current prices and hypervisor data from database
-        _prices, _data = await asyncio.gather(
-            get_database_prices_closeto(
-                chain=chain,
-                timestamp=end_timestamp,
-                default_to_current=True,
-                any_lower_to=True,
-            ),
-            # get_current_prices(network=chain),
-            local_database_helper(network=chain).get_items_from_database(
+        if prices is None:
+            # get current prices and hypervisor data from database
+            _prices, _data = await asyncio.gather(
+                get_database_prices_closeto(
+                    chain=chain,
+                    timestamp=end_timestamp,
+                    default_to_current=True,
+                ),
+                # get_current_prices(network=chain),
+                local_database_helper(network=chain).get_items_from_database(
+                    collection_name="static", aggregate=_query
+                ),
+            )
+        else:
+            _data = await local_database_helper(network=chain).get_items_from_database(
                 collection_name="static", aggregate=_query
-            ),
-        )
-        # _prices = {itm["address"]: itm["price"] for itm in _prices}
+            )
+            _prices = prices
 
         for itm in _data:
             # convert Decimal128 to float
@@ -121,6 +127,9 @@ async def get_average_tvl(
         output["chains"][chain.id] = chain_output
 
     #
+    logging.getLogger(__name__).info(
+        f" get_average_tvl took {time.time()-_start_time} seconds."
+    )
     return output
 
 
@@ -130,6 +139,7 @@ async def get_transactions(
     ini_timestamp: int | None = None,
     end_timestamp: int | None = None,
     hypervisors: list[str] | None = None,
+    prices: dict[str, dict] | None = None,
 ) -> dict:
     # define chains
     if chain:
@@ -176,20 +186,25 @@ async def get_transactions(
             "deposits_shares": 0,
             "hypervisors": [],
         }
-        # get current prices and hypervisor data from database
-        _prices, _data = await asyncio.gather(
-            get_database_prices_closeto(
-                chain=chain,
-                timestamp=end_timestamp,
-                default_to_current=True,
-                any_lower_to=True,
-            ),
-            # get_current_prices(network=chain),
-            local_database_helper(network=chain).get_items_from_database(
+
+        if prices is None:
+            # get current prices and hypervisor data from database
+            _prices, _data = await asyncio.gather(
+                get_database_prices_closeto(
+                    chain=chain,
+                    timestamp=end_timestamp,
+                    default_to_current=True,
+                ),
+                # get_current_prices(network=chain),
+                local_database_helper(network=chain).get_items_from_database(
+                    collection_name="static", aggregate=_query
+                ),
+            )
+        else:
+            _data = await local_database_helper(network=chain).get_items_from_database(
                 collection_name="static", aggregate=_query
-            ),
-        )
-        # _prices = {itm["address"]: itm["price"] for itm in _prices}
+            )
+            _prices = prices
 
         for itm in _data:
             hypervisor_output = {
@@ -283,6 +298,7 @@ async def get_transactions_summary(
     ini_timestamp: int | None = None,
     end_timestamp: int | None = None,
     hypervisors: list[str] | None = None,
+    prices: dict[str, dict] | None = None,
 ):
     output = {
         "ini_timestamp": ini_timestamp,
@@ -306,6 +322,7 @@ async def get_transactions_summary(
         start_timestamp=ini_timestamp,
         end_timestamp=end_timestamp,
         hypervisor_addresses=hypervisors,
+        prices=prices,
     )
 
     for hype_address, hype_data in gFess.items():

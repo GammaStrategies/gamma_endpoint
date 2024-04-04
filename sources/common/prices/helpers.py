@@ -1,7 +1,9 @@
 import asyncio
 import logging
+import time
 from sources.common.general.enums import Chain
 from sources.mongo.bins.helpers import global_database_helper
+from sources.subgraph.bins.constants import BLOCK_TIME_SECONDS
 
 
 async def get_prices(
@@ -91,9 +93,7 @@ async def get_database_prices_closeto(
     chain: Chain,
     timestamp: int | None = None,
     block: int | None = None,
-    threshold: int = 10000,
     default_to_current: bool = True,
-    any_lower_to: bool = False,
 ) -> list[dict]:
     """Return the closest prices to the period
 
@@ -103,7 +103,6 @@ async def get_database_prices_closeto(
         end_block (int | None, optional): . Defaults to None.
         threshold (int, optional): blocks before the specified to be considered close. Defaults to 10000.
         default_to_current (bool, optional): If errors occur, default to current prices. Defaults to True.
-        any_lower_to (bool, optional): Pick any price lower than timestamp ( usefull to include all tokens). Defaults to False.
 
     Returns:
         list[dict]:  {address:{
@@ -131,13 +130,17 @@ async def get_database_prices_closeto(
                 logging.getLogger(__name__).debug(
                     f" using database proces closest block: {_db_end_block}"
                 )
+                _initial_block = _db_end_block - (
+                    60 * 60 * 24 * 30 * 4 / BLOCK_TIME_SECONDS.get(chain, 10)
+                )
+                if _initial_block < _db_end_block:
+                    _initial_block = int(_db_end_block * 0.92)
+
             # build and_query part
             _and_query = [
                 {"network": chain.database_name},
-                {"block": {"$lte": _db_end_block}},
+                {"block": {"$lte": _db_end_block, "$gte": _initial_block}},
             ]
-            if not any_lower_to:
-                _and_query.append({"block": {"$gte": _db_end_block - threshold}})
             # build query
             query = [
                 {"$match": {"$and": _and_query}},
