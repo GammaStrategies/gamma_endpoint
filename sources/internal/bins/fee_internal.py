@@ -72,6 +72,7 @@ async def get_fees(
         block=end_block,
         threshold=10000,
         default_to_current=True,
+        any_lower_to=True,
     )
 
     # get all hypervisors last status from the database
@@ -320,6 +321,7 @@ async def get_gross_fees(
         block=end_block,
         threshold=10000,
         default_to_current=True,
+        any_lower_to=True,
     )
 
     # get all hypervisors last status from the database
@@ -410,6 +412,7 @@ async def get_gross_fees(
             logging.getLogger(__name__).error(
                 f"Price not found for token0[{token0_price}] or token1[{token1_price}] of hypervisor {hype_summary['address']}"
             )
+            #
             continue
 
         # check for price outliers

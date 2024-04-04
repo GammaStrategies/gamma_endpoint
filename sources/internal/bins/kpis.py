@@ -67,7 +67,10 @@ async def get_average_tvl(
         # get current prices and hypervisor data from database
         _prices, _data = await asyncio.gather(
             get_database_prices_closeto(
-                chain=chain, timestamp=end_timestamp, default_to_current=True
+                chain=chain,
+                timestamp=end_timestamp,
+                default_to_current=True,
+                any_lower_to=True,
             ),
             # get_current_prices(network=chain),
             local_database_helper(network=chain).get_items_from_database(
@@ -176,7 +179,10 @@ async def get_transactions(
         # get current prices and hypervisor data from database
         _prices, _data = await asyncio.gather(
             get_database_prices_closeto(
-                chain=chain, timestamp=end_timestamp, default_to_current=True
+                chain=chain,
+                timestamp=end_timestamp,
+                default_to_current=True,
+                any_lower_to=True,
             ),
             # get_current_prices(network=chain),
             local_database_helper(network=chain).get_items_from_database(

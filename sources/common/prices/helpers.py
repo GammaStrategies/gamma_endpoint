@@ -93,6 +93,7 @@ async def get_database_prices_closeto(
     block: int | None = None,
     threshold: int = 10000,
     default_to_current: bool = True,
+    any_lower_to: bool = False,
 ) -> list[dict]:
     """Return the closest prices to the period
 
@@ -102,6 +103,7 @@ async def get_database_prices_closeto(
         end_block (int | None, optional): . Defaults to None.
         threshold (int, optional): blocks before the specified to be considered close. Defaults to 10000.
         default_to_current (bool, optional): If errors occur, default to current prices. Defaults to True.
+        any_lower_to (bool, optional): Pick any price lower than timestamp ( usefull to include all tokens). Defaults to False.
 
     Returns:
         list[dict]:  {address:{
@@ -129,17 +131,16 @@ async def get_database_prices_closeto(
                 logging.getLogger(__name__).debug(
                     f" using database proces closest block: {_db_end_block}"
                 )
+            # build and_query part
+            _and_query = [
+                {"network": chain.database_name},
+                {"block": {"$lte": _db_end_block}},
+            ]
+            if not any_lower_to:
+                _and_query.append({"block": {"$gte": _db_end_block - threshold}})
             # build query
             query = [
-                {
-                    "$match": {
-                        "$and": [
-                            {"network": chain.database_name},
-                            {"block": {"$gte": _db_end_block - threshold}},
-                            {"block": {"$lte": _db_end_block}},
-                        ]
-                    }
-                },
+                {"$match": {"$and": _and_query}},
                 {"$sort": {"block": -1}},
                 {"$group": {"_id": "$address", "last": {"$first": "$$ROOT"}}},
             ]
