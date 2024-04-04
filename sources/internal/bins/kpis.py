@@ -57,7 +57,6 @@ async def get_average_tvl(
         "chains": {},  #  "chain": "" "average_tvl": 0, "hypervisors": []},
     }
 
-    _start_time = time.time()
     # execute tasks
     for chain in chains:
         chain_output = {
@@ -126,10 +125,6 @@ async def get_average_tvl(
         # add to global output
         output["chains"][chain.id] = chain_output
 
-    #
-    logging.getLogger(__name__).info(
-        f" get_average_tvl took {time.time()-_start_time} seconds."
-    )
     return output
 
 
