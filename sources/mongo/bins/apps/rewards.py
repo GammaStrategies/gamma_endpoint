@@ -138,11 +138,11 @@ async def rewrite_mfd_with_api(data: dict, chain: Chain) -> dict:
 
                     #### modify rewarder data
                     ####
-                    rewarder_data["rewardPerSecond"] = tmp_data["rewardsPerSecond"]
+                    rewarder_data["rewardPerSecond"] = tmp_data["rewardRate"]
                     rewarder_data["apr"] = tmp_data["apr"]
                     rewarder_data["baseApr"] = tmp_data["apr"]
                     rewarder_data["boostApr"] = 0
-                    rewarder_data["baseRewardPerSecond"] = tmp_data["rewardsPerSecond"]
+                    rewarder_data["baseRewardPerSecond"] = tmp_data["rewardRate"]
                     rewarder_data["boostRewardPerSecond"] = 0
 
                     #### modify totals
