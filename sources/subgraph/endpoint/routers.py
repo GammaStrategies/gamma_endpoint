@@ -205,6 +205,22 @@ def build_routers_compatible() -> list:
     )
     routes.append(
         subgraph_router_builder(
+            dex=Protocol.UNISWAP,
+            chain=Chain.BASE,
+            tags=["Base"],
+            prefix=f"/{Chain.BASE.api_url}",
+        )
+    )
+    routes.append(
+        subgraph_router_builder(
+            dex=Protocol.UNISWAP,
+            chain=Chain.BLAST,
+            tags=["Blast"],
+            prefix=f"/{Chain.BLAST.api_url}",
+        )
+    )
+    routes.append(
+        subgraph_router_builder(
             dex=Protocol.QUICKSWAP,
             chain=Chain.POLYGON,
             tags=["Quickswap - Polygon"],

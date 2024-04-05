@@ -7,6 +7,8 @@ UNISWAP_CELO_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammast
 UNISWAP_BSC_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/uniswap-bsc
 UNISWAP_MOONBEAM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-moonbeam
 UNISWAP_AVALANCHE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-uniswap-avax/version/latest
+UNISWAP_BASE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-uniswap-base/version/latest
+UNISWAP_BLAST_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-uniswap-blast/version/latest
 QUICKSWAP_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/algebra-polygon
 QUICKSWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-quickswap-pzke/version/latest
 ZYBERSWAP_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/zyberswap-arbitrum
@@ -52,6 +54,8 @@ UNISWAP_CELO_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/jesse-sawa/un
 UNISWAP_BSC_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-bsc
 UNISWAP_MOONBEAM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-moonbeam
 UNISWAP_AVALANCHE_SUBGRAPH_URL: _
+UNISWAP_BASE_SUBGRAPH_URL: _
+UNISWAP_BLAST_SUBGRAPH_URL: _
 QUICKSWAP_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/sameepsi/quickswap-v3
 QUICKSWAP_POLYGON_ZKEVM_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44554/quickswap-v3-02/0.0.7
 ZYBERSWAP_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/iliaazhel/zyberswap-info
@@ -97,6 +101,8 @@ UNISWAP_CELO_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hy
 UNISWAP_BSC_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-bsc
 UNISWAP_MOONBEAM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-moonbeam
 UNISWAP_AVALANCHE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-avax/version/latest
+UNISWAP_BASE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-base/version/latest
+UNISWAP_BLAST_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-blast/version/latest
 QUICKSWAP_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-quickswap-polygon
 QUICKSWAP_POLYGON_ZKEVM_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-pzke/version/latest
 ZYBERSWAP_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-zyberswap-arbitrum

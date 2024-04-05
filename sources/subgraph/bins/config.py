@@ -10,6 +10,8 @@ DEPLOYMENTS = [
     (Protocol.UNISWAP, Chain.CELO),
     (Protocol.UNISWAP, Chain.MOONBEAM),
     (Protocol.UNISWAP, Chain.AVALANCHE),
+    (Protocol.UNISWAP, Chain.BASE),
+    (Protocol.UNISWAP, Chain.BLAST),
     (Protocol.QUICKSWAP, Chain.POLYGON),
     (Protocol.ZYBERSWAP, Chain.ARBITRUM),
     (Protocol.THENA, Chain.BSC),
@@ -70,6 +72,8 @@ DEX_SUBGRAPH_URLS = {
         Chain.BSC: get_config("UNISWAP_BSC_SUBGRAPH_URL"),
         Chain.MOONBEAM: get_config("UNISWAP_MOONBEAM_SUBGRAPH_URL"),
         Chain.AVALANCHE: get_config("UNISWAP_AVALANCHE_SUBGRAPH_URL"),
+        Chain.BASE: get_config("UNISWAP_BASE_SUBGRAPH_URL"),
+        Chain.BLAST: get_config("UNISWAP_BLAST_SUBGRAPH_URL"),
     },
     Protocol.QUICKSWAP: {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_SUBGRAPH_URL"),
@@ -174,6 +178,8 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
         Chain.BSC: get_config("UNISWAP_BSC_HP_SUBGRAPH_URL"),
         Chain.MOONBEAM: get_config("UNISWAP_MOONBEAM_HP_SUBGRAPH_URL"),
         Chain.AVALANCHE: get_config("UNISWAP_AVALANCHE_HP_SUBGRAPH_URL"),
+        Chain.BASE: get_config("UNISWAP_BASE_HP_SUBGRAPH_URL"),
+        Chain.BLAST: get_config("UNISWAP_BLAST_HP_SUBGRAPH_URL"),
     },
     Protocol.QUICKSWAP: {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_HP_SUBGRAPH_URL"),
@@ -278,6 +284,8 @@ GAMMA_SUBGRAPH_URLS = {
         Chain.BSC: get_config("UNISWAP_BSC_GAMMA_SUBGRAPH_URL"),
         Chain.MOONBEAM: get_config("UNISWAP_MOONBEAM_GAMMA_SUBGRAPH_URL"),
         Chain.AVALANCHE: get_config("UNISWAP_AVALANCHE_GAMMA_SUBGRAPH_URL"),
+        Chain.BASE: get_config("UNISWAP_BASE_GAMMA_SUBGRAPH_URL"),
+        Chain.BLAST: get_config("UNISWAP_BLAST_GAMMA_SUBGRAPH_URL"),
     },
     Protocol.QUICKSWAP: {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_GAMMA_SUBGRAPH_URL"),
