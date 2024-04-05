@@ -165,15 +165,16 @@ async def get_kpis_dashboard(
             )
         )
 
-        transactions = transactions.get(
-            str(chain.id),
-            {
+        transactions = (
+            transactions.get(chain.id, {})
+            or transactions.get(str(chain.id), {})
+            or {
                 "deposits_qtty": 0,
                 "withdraws_qtty": 0,
                 "zeroBurns_qtty": 0,
                 "rebalances_qtty": 0,
                 "transfers_qtty": 0,
-            },
+            }
         )
 
         # append the data
