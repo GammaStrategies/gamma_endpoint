@@ -33,6 +33,7 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.UNISWAP, Chain.AVALANCHE),
     (Protocol.UNISWAP, Chain.BASE),
     (Protocol.UNISWAP, Chain.BLAST),
+    (Protocol.UNISWAP, Chain.SCROLL),
     (Protocol.QUICKSWAP, Chain.POLYGON),
     (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
     (Protocol.QUICKSWAP, Chain.ASTAR_ZKEVM),
@@ -68,6 +69,7 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.THICK, Chain.BASE),
     (Protocol.CLEOPATRA, Chain.MANTLE),
     (Protocol.BLASTER, Chain.BLAST),
+    (Protocol.THRUSTER, Chain.BLAST),
 ]
 
 

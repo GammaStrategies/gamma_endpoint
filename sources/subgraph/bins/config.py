@@ -12,6 +12,7 @@ DEPLOYMENTS = [
     (Protocol.UNISWAP, Chain.AVALANCHE),
     (Protocol.UNISWAP, Chain.BASE),
     (Protocol.UNISWAP, Chain.BLAST),
+    (Protocol.UNISWAP, Chain.SCROLL),
     (Protocol.QUICKSWAP, Chain.POLYGON),
     (Protocol.ZYBERSWAP, Chain.ARBITRUM),
     (Protocol.THENA, Chain.BSC),
@@ -47,6 +48,7 @@ DEPLOYMENTS = [
     (Protocol.THICK, Chain.BASE),
     (Protocol.CLEOPATRA, Chain.MANTLE),
     (Protocol.BLASTER, Chain.BLAST),
+    (Protocol.THRUSTER, Chain.BLAST),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -74,6 +76,7 @@ DEX_SUBGRAPH_URLS = {
         Chain.AVALANCHE: get_config("UNISWAP_AVALANCHE_SUBGRAPH_URL"),
         Chain.BASE: get_config("UNISWAP_BASE_SUBGRAPH_URL"),
         Chain.BLAST: get_config("UNISWAP_BLAST_SUBGRAPH_URL"),
+        Chain.SCROLL: get_config("UNISWAP_SCROLL_SUBGRAPH_URL"),
     },
     Protocol.QUICKSWAP: {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_SUBGRAPH_URL"),
@@ -166,6 +169,9 @@ DEX_SUBGRAPH_URLS = {
     Protocol.BLASTER: {
         Chain.BLAST: get_config("BLASTER_BLAST_SUBGRAPH_URL"),
     },
+    Protocol.THRUSTER: {
+        Chain.BLAST: get_config("THRUSTER_BLAST_SUBGRAPH_URL"),
+    },
 }
 
 DEX_HYPEPOOL_SUBGRAPH_URLS = {
@@ -180,6 +186,7 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
         Chain.AVALANCHE: get_config("UNISWAP_AVALANCHE_HP_SUBGRAPH_URL"),
         Chain.BASE: get_config("UNISWAP_BASE_HP_SUBGRAPH_URL"),
         Chain.BLAST: get_config("UNISWAP_BLAST_HP_SUBGRAPH_URL"),
+        Chain.SCROLL: get_config("UNISWAP_SCROLL_HP_SUBGRAPH_URL"),
     },
     Protocol.QUICKSWAP: {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_HP_SUBGRAPH_URL"),
@@ -272,6 +279,9 @@ DEX_HYPEPOOL_SUBGRAPH_URLS = {
     Protocol.BLASTER: {
         Chain.BLAST: get_config("BLASTER_BLAST_HP_SUBGRAPH_URL"),
     },
+    Protocol.THRUSTER: {
+        Chain.BLAST: get_config("THRUSTER_BLAST_HP_SUBGRAPH_URL"),
+    },
 }
 
 GAMMA_SUBGRAPH_URLS = {
@@ -286,6 +296,7 @@ GAMMA_SUBGRAPH_URLS = {
         Chain.AVALANCHE: get_config("UNISWAP_AVALANCHE_GAMMA_SUBGRAPH_URL"),
         Chain.BASE: get_config("UNISWAP_BASE_GAMMA_SUBGRAPH_URL"),
         Chain.BLAST: get_config("UNISWAP_BLAST_GAMMA_SUBGRAPH_URL"),
+        Chain.SCROLL: get_config("UNISWAP_SCROLL_GAMMA_SUBGRAPH_URL"),
     },
     Protocol.QUICKSWAP: {
         Chain.POLYGON: get_config("QUICKSWAP_POLYGON_GAMMA_SUBGRAPH_URL"),
@@ -377,6 +388,9 @@ GAMMA_SUBGRAPH_URLS = {
     },
     Protocol.BLASTER: {
         Chain.BLAST: get_config("BLASTER_BLAST_GAMMA_SUBGRAPH_URL"),
+    },
+    Protocol.THRUSTER: {
+        Chain.BLAST: get_config("THRUSTER_BLAST_GAMMA_SUBGRAPH_URL"),
     },
 }
 
