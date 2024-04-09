@@ -23,8 +23,10 @@ class ramses_api_helper:
     def set_url(self, chain: Chain) -> str:
         if chain == Chain.ARBITRUM:
             return "https://api-v2-production-a6e6.up.railway.app/mixed-pairs"
-        # elif chain == Chain.AVALANCHE:
-        #     return "https://pharaoh-api-production.up.railway.app/mixed-pairs"
+        elif chain == Chain.AVALANCHE:
+            return "https://pharaoh-api-production.up.railway.app/mixed-pairs"
+        elif chain == Chain.MANTLE:
+            return "https://cleopatra-api-production.up.railway.app/mixed-pairs"
         else:
             raise ValueError(f"Chain {chain} not supported")
 
