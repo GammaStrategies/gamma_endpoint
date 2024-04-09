@@ -109,10 +109,10 @@ async def get_kpis_dashboard(
     periods = []
     if period_seconds:
         # calculate the periods
-        end_timestamp = end_timestamp or int(time.time())
-        while end_timestamp > ini_timestamp:
-            periods.append((end_timestamp - period_seconds, end_timestamp))
-            end_timestamp -= period_seconds
+        _tmp_end_timestamp = end_timestamp or int(time.time())
+        while _tmp_end_timestamp > ini_timestamp:
+            periods.append((_tmp_end_timestamp - period_seconds, _tmp_end_timestamp))
+            _tmp_end_timestamp -= period_seconds
 
     else:
         periods.append((ini_timestamp, end_timestamp))
@@ -125,7 +125,7 @@ async def get_kpis_dashboard(
         # get prices close to the period ( to be used in the calculations)
         _prices = await get_database_prices_closeto(
             chain=chain,
-            timestamp=end_timestamp,
+            timestamp=end_time,
             default_to_current=True,
         )
 
