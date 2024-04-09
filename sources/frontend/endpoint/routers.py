@@ -23,9 +23,9 @@ from sources.frontend.bins.analytics import (
 from sources.frontend.bins.correlation import (
     get_correlation_from_hypervisors,
 )
+from sources.frontend.bins.external_apis import get_ramsesLike_api_data
 from sources.frontend.bins.revenue_stats import get_revenue_stats
 from sources.frontend.bins.users import get_user_positions
-from sources.mongo.bins.apps.returns import build_hype_return_analysis_from_database
 
 from sources.subgraph.bins.enums import Chain, Protocol
 
@@ -42,6 +42,10 @@ def build_routers() -> list:
     routes.append(frontend_analytics_router_builder_main(tags=["Analytics"], prefix=""))
 
     routes.append(frontend_user_router_builder_main(tags=["User"], prefix=""))
+
+    routes.append(
+        frontend_externalApis_router_builder_main(tags=["External APIs"], prefix="")
+    )
 
     return routes
 
@@ -376,3 +380,51 @@ class frontend_user_router_builder_main(router_builder_baseTemplate):
                     for cha in list(Chain)
                 ]
             )
+
+
+class frontend_externalApis_router_builder_main(router_builder_baseTemplate):
+    # ROUTEs BUILD FUNCTIONS
+    def router(self) -> APIRouter:
+        router = APIRouter(prefix=self.prefix)
+
+        router.add_api_route(
+            path="/externalApis/ramsesLike",
+            endpoint=self.get_rewardsApr,
+            methods=["GET"],
+        )
+
+        return router
+
+    # ROUTE FUNCTIONS
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def get_rewardsApr(
+        self,
+        response: Response,
+        chain: Chain | int = Query(
+            Chain.ARBITRUM, enum=[*Chain, *[x.id for x in Chain]]
+        ),
+        protocol: Protocol = Query(
+            Protocol.RAMSES,
+            enum=[Protocol.RAMSES, Protocol.CLEOPATRA, Protocol.PHARAOH],
+        ),
+    ):
+        """Get rewards APR for a given chain and protocol."""
+
+        # check if protocol is in the list
+        if protocol not in [
+            Protocol.RAMSES,
+            Protocol.CLEOPATRA,
+            Protocol.PHARAOH,
+        ]:
+            raise HTTPException(
+                status_code=400,
+                detail="Protocol not supported. Supported protocols are: ramses, cleopatra, pharaoh",
+            )
+
+        try:
+            if isinstance(chain, int):
+                chain = int_to_chain(chain)
+
+            return await get_ramsesLike_api_data(chain=chain, protocol=protocol)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail="Error getting rewards APR")

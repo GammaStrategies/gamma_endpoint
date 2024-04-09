@@ -222,8 +222,8 @@ class ramses_api_helper:
                 "apr": (usd_per_day * 365) / float(dta["totalValueLockedUSD"]),
             }
 
-            logging.getLogger(__name__).info(
-                f" {rewardToken} {tmp_price['symbol']} -> reward/day:{rewards_per_second*60*60*24:,.2f} usd/day:${usd_per_day:,.2f} apr: {result[rewardToken]['apr']:,.2%}"
-            )
+            # logging.getLogger(__name__).info(
+            #     f" {rewardToken} {tmp_price['symbol']} -> reward/day:{rewards_per_second*60*60*24:,.2f} usd/day:${usd_per_day:,.2f} apr: {result[rewardToken]['apr']:,.2%}"
+            # )
 
         return result
