@@ -111,8 +111,8 @@ async def get_ramsesLike_api_data(chain: Chain, protocol: Protocol) -> dict:
                 if aprData["apr"]:
                     # add rewarder data
                     result[_gauge_address]["hypervisors"][hypervisor["address"]][
-                        rewardToken
-                    ] = {
+                        "rewarders"
+                    ][rewardToken] = {
                         # "timestamp": aprData["timestamp"],
                         "rewardToken": rewardToken,
                         "rewardToken_price": aprData["price"],
