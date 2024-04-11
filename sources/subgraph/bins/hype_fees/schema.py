@@ -36,6 +36,8 @@ class _TokenPairDecimals:
 @dataclass
 class HypervisorStaticInfo:
     symbol: str
+    token0: str
+    token1: str
     decimals: _TokenPairInt = field(init=False)
     decimals0: InitVar[int]
     decimals1: InitVar[int]
@@ -256,7 +258,7 @@ class FeesData:
             )
 
     def update_tvl(self, tvl0: int, tvl1: int, tvl_usd: int) -> None:
-        self.tvl = self.tvl = TokenPair(
+        self.tvl = TokenPair(
             raw0=tvl0,
             raw1=tvl1,
             decimals0=self.decimals.value0,

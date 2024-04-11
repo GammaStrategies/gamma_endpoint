@@ -69,9 +69,9 @@ class FeesYield:
 
         # handle divisionByZero errors
         df_snapshots["period_yield"] = df_snapshots.apply(
-            lambda x: np.nan
-            if x["tvl_usd"] == 0
-            else x["fee_growth_usd"] / x["tvl_usd"],
+            lambda x: (
+                np.nan if x["tvl_usd"] == 0 else x["fee_growth_usd"] / x["tvl_usd"]
+            ),
             axis=1,
         )
         # df_snapshots["period_yield"] = (

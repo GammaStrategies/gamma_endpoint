@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from asyncio import gather
 
 from gql.dsl import DSLQuery
 
@@ -10,6 +11,7 @@ from sources.subgraph.bins.hype_fees.schema import (
     FeesDataRange,
     HypervisorStaticInfo,
 )
+from sources.subgraph.bins.pricing import token_prices
 from sources.subgraph.bins.subgraphs.hype_pool import HypePoolClient
 
 
@@ -21,6 +23,7 @@ class FeeGrowthDataABC(ABC):
         self.time_range = BlockRange(chain, self.hype_pool_client)
         self.data = {}
         self._static_data = {}
+        self.pricing_data = {}
 
     @abstractmethod
     async def init_time(self, *args, **kwargs) -> None:
@@ -43,15 +46,23 @@ class FeeGrowthDataABC(ABC):
         fee_growth_global_0: int,
         fee_growth_global_1: int,
     ) -> FeesData:
-        return FeesData(
+        fees_data = FeesData(
             block=block,
             timestamp=timestamp,
             hypervisor=hypervisor_id,
             symbol=self._static_data[hypervisor_id].symbol,
             current_tick=current_tick,
             fee=hypervisor.get("fee", 10),
-            price0=price_0,
-            price1=price_1,
+            price0=(
+                price_0
+                if float(price_0) != 0
+                else self.pricing_data.get(self._static_data[hypervisor_id].token0, 0)
+            ),
+            price1=(
+                price_1
+                if float(price_1) != 0
+                else self.pricing_data.get(self._static_data[hypervisor_id].token1, 0)
+            ),
             decimals0=self._static_data[hypervisor_id].decimals.value0,
             decimals1=self._static_data[hypervisor_id].decimals.value1,
             tvl0=hypervisor["tvl0"],
@@ -104,11 +115,22 @@ class FeeGrowthDataABC(ABC):
             total_supply=hypervisor.get("totalSupply"),
             total_supply_decimals=18 if hypervisor.get("totalSupply") else 0,
         )
+        if fees_data.tvl_usd == 0 and (
+            fees_data.tvl.value0.adjusted != 0 or fees_data.tvl.value1.adjusted != 0
+        ):
+            fees_data.tvl_usd = (
+                fees_data.tvl.value0.adjusted * fees_data.price.value0
+                + fees_data.tvl.value1.adjusted * fees_data.price.value1
+            )
+
+        return fees_data
 
     def _extract_static_data(self, hypervisor_static_data: dict) -> None:
         self._static_data = {
             hypervisor["id"]: HypervisorStaticInfo(
                 symbol=hypervisor["symbol"],
+                token0=hypervisor["pool"]["token0"]["id"],
+                token1=hypervisor["pool"]["token1"]["id"],
                 decimals0=hypervisor["pool"]["token0"]["decimals"],
                 decimals1=hypervisor["pool"]["token1"]["decimals"],
             )
@@ -121,7 +143,10 @@ class FeeGrowthData(FeeGrowthDataABC):
         await self.time_range.set_end(timestamp)
 
     async def get_data(self, hypervisors: list[str] | None = None) -> None:
-        self.data = self._transform_data(await self._query_data(hypervisors))
+        query_data, self.pricing_data = await gather(
+            self._query_data(hypervisors), token_prices(self.chain, self.protocol)
+        )
+        self.data = self._transform_data(query_data)
 
     async def _query_data(self, hypervisors: list[str] | None = None) -> dict:
         ds = self.hype_pool_client.data_schema
@@ -134,8 +159,8 @@ class FeeGrowthData(FeeGrowthDataABC):
                 ds.Hypervisor.id,
                 ds.Hypervisor.symbol,
                 ds.Hypervisor.pool.select(
-                    ds.Pool.token0.select(ds.Token.decimals),
-                    ds.Pool.token1.select(ds.Token.decimals),
+                    ds.Pool.token0.select(ds.Token.id, ds.Token.decimals),
+                    ds.Pool.token1.select(ds.Token.id, ds.Token.decimals),
                 ),
             ),
             ds.Query.hypervisors(
@@ -174,7 +199,10 @@ class FeeGrowthSnapshotData(FeeGrowthDataABC):
 
     async def get_data(self, hypervisors: list[str] | None = None) -> None:
         """Query data and tranfrom to FeesData Class"""
-        self.data = self._transform_data(await self._query_data(hypervisors))
+        query_data, self.pricing_data = await gather(
+            self._query_data(hypervisors), token_prices(self.chain, self.protocol)
+        )
+        self.data = self._transform_data(query_data)
 
     async def _query_data(self, hypervisors: list[str] | None = None) -> dict:
         ds = self.hype_pool_client.data_schema
@@ -187,8 +215,8 @@ class FeeGrowthSnapshotData(FeeGrowthDataABC):
                 ds.Hypervisor.id,
                 ds.Hypervisor.symbol,
                 ds.Hypervisor.pool.select(
-                    ds.Pool.token0.select(ds.Token.decimals),
-                    ds.Pool.token1.select(ds.Token.decimals),
+                    ds.Pool.token0.select(ds.Token.id, ds.Token.decimals),
+                    ds.Pool.token1.select(ds.Token.id, ds.Token.decimals),
                 ),
             ),
             ds.Query.hypervisors(
@@ -326,7 +354,10 @@ class ImpermanentDivergenceData(FeeGrowthDataABC):
         await self.time_range.set_initial_with_days_ago(days_ago)
 
     async def get_data(self, hypervisors: list[str] | None = None) -> None:
-        self.data = self._transform_data(await self._query_data(hypervisors))
+        query_data, self.pricing_data = await gather(
+            self._query_data(hypervisors), token_prices(self.chain, self.protocol)
+        )
+        self.data = self._transform_data(query_data)
 
     async def _query_data(self, hypervisors: list[str] | None = None) -> dict:
         ds = self.hype_pool_client.data_schema
@@ -338,8 +369,8 @@ class ImpermanentDivergenceData(FeeGrowthDataABC):
                 ds.Hypervisor.id,
                 ds.Hypervisor.symbol,
                 ds.Hypervisor.pool.select(
-                    ds.Pool.token0.select(ds.Token.decimals),
-                    ds.Pool.token1.select(ds.Token.decimals),
+                    ds.Pool.token0.select(ds.Token.id, ds.Token.decimals),
+                    ds.Pool.token1.select(ds.Token.id, ds.Token.decimals),
                 ),
             ),
             ds.Query.hypervisors(

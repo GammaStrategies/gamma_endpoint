@@ -1,7 +1,8 @@
 import re
+
 from fastapi import APIRouter, Response, status
-from fastapi_cache.decorator import cache
 from fastapi.routing import APIRoute
+from fastapi_cache.decorator import cache
 
 
 class router_builder_baseTemplate:
@@ -287,7 +288,7 @@ class router_builder_generalTemplate(router_builder_baseTemplate):
 
     # EXECUTION FUNCTIONS
     def root(self) -> str:
-        return f"Gamma Strategies on {self.chain}'s {self.dex} "
+        return f"Gamma Strategies on {self.chain}'s {self.dex}"
 
     async def hypervisor_basic_stats(self, hypervisor_address: str, response: Response):
         return NotImplementedError(" function defaults not implemented yet")
