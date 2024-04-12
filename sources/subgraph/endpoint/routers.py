@@ -60,6 +60,37 @@ def build_routers() -> list:
 
     # setup dex + chain endpoints
     for protocol, chain in DEPLOYMENTS:
+        routes.append(
+            subgraph_router_builder(
+                dex=protocol,
+                chain=chain,
+                tags=[f"{protocol.fantasy_name} - {chain.fantasy_name}"],
+                prefix=f"/{protocol.api_url}/{chain.api_url}",
+            )
+        )
+
+    # Simulation
+    routes.append(
+        subgraph_router_builder_Simulator(tags=["Simulator"], prefix="/simulator")
+    )
+
+    # Charts
+    routes.append(subgraph_router_builder_Charts(tags=["Charts"], prefix="/charts"))
+
+    return routes
+
+def build_routers_compatible() -> list:
+    routes = []
+
+    # all-deployments
+    routes.append(
+        subgraph_router_builder_allDeployments(
+            tags=["All Deployments"], prefix="/allDeployments"
+        )
+    )
+
+    # setup dex + chain endpoints
+    for protocol, chain in DEPLOYMENTS:
         if protocol == Protocol.UNISWAP:
             if chain == Chain.ETHEREUM:
                 routes.append(
