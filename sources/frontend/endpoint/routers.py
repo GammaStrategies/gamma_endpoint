@@ -27,6 +27,7 @@ from sources.frontend.bins.external_apis import get_ramsesLike_api_data
 from sources.frontend.bins.revenue_stats import get_revenue_stats
 from sources.frontend.bins.users import get_user_positions
 
+from sources.mongo.bins.apps.returns import build_hype_return_analysis_from_database
 from sources.subgraph.bins.enums import Chain, Protocol
 
 
