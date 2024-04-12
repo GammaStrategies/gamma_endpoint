@@ -3,13 +3,13 @@ import logging
 import httpx
 
 from sources.subgraph.bins.config import (
-    DEX_HYPEPOOL_SUBGRAPH_URLS,
-    DEX_SUBGRAPH_URLS,
     ETH_BLOCKS_SUBGRAPH_URL,
-    GAMMA_SUBGRAPH_URLS,
     THEGRAPH_INDEX_NODE_URL,
     UNI_V2_SUBGRAPH_URL,
     XGAMMA_SUBGRAPH_URL,
+    dex_hypepool_subgraph_urls,
+    dex_subgraph_urls,
+    gamma_subgraph_urls,
 )
 from sources.subgraph.bins.enums import Chain, Protocol
 
@@ -87,7 +87,7 @@ class SubgraphClient:
 
 class GammaClient(SubgraphClient):
     def __init__(self, protocol: Protocol, chain: Chain):
-        super().__init__(GAMMA_SUBGRAPH_URLS[protocol][chain], chain)
+        super().__init__(gamma_subgraph_urls[protocol][chain], chain)
 
 
 class UniswapV2Client(SubgraphClient):
@@ -97,12 +97,12 @@ class UniswapV2Client(SubgraphClient):
 
 class UniswapV3Client(SubgraphClient):
     def __init__(self, protocol: Protocol, chain: Chain):
-        super().__init__(DEX_SUBGRAPH_URLS[protocol][chain], chain)
+        super().__init__(dex_subgraph_urls[protocol][chain], chain)
 
 
 class HypePoolClient(SubgraphClient):
     def __init__(self, protocol: Protocol, chain: Chain):
-        super().__init__(DEX_HYPEPOOL_SUBGRAPH_URLS[protocol][chain], chain)
+        super().__init__(dex_hypepool_subgraph_urls[protocol][chain], chain)
 
 
 class EthBlocksClient(SubgraphClient):
@@ -134,7 +134,7 @@ class EthBlocksClient(SubgraphClient):
 class IndexNodeClient(SubgraphClient):
     def __init__(self, protocol: Protocol, chain: Chain):
         super().__init__(THEGRAPH_INDEX_NODE_URL)
-        self.url = GAMMA_SUBGRAPH_URLS[protocol][chain]
+        self.url = gamma_subgraph_urls[protocol][chain]
         self.set_subgraph_name()
 
     def set_subgraph_name(self):
@@ -173,6 +173,7 @@ class XgammaClient(SubgraphClient):
 
 class CoingeckoClient:
     """Client for interacting with Coingecko API"""
+
     def __init__(self):
         self.base = "https://api.coingecko.com/api/v3/"
 
@@ -190,6 +191,7 @@ class CoingeckoClient:
 
 class LlamaClient:
     """Client for interacting with DefiLlama API"""
+
     def __init__(self, chain: Chain):
         self.base = "https://coins.llama.fi"
         self.chain = self._translate_chain_name(chain)

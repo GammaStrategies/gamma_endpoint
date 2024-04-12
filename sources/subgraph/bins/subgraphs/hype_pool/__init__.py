@@ -1,7 +1,8 @@
 """Hype Pool Subgraph for getting fee data"""
+
 from gql.dsl import DSLFragment
 
-from sources.subgraph.bins.config import DEX_HYPEPOOL_SUBGRAPH_URLS
+from sources.subgraph.bins.config import dex_hypepool_subgraph_urls
 from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.subgraphs import SubgraphClient, fragment
 
@@ -14,7 +15,7 @@ class HypePoolClient(SubgraphClient):
         self.chain = chain
 
         super().__init__(
-            url=DEX_HYPEPOOL_SUBGRAPH_URLS[protocol][chain],
+            url=dex_hypepool_subgraph_urls[protocol][chain],
             schema_path="sources/subgraph/bins/subgraphs/hype_pool/schema.graphql",
         )
 

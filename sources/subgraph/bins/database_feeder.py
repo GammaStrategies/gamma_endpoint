@@ -22,8 +22,8 @@ from sources.common.general.enums import Chain, Period
 from sources.subgraph.bins import utils
 from sources.subgraph.bins.config import (
     EXCLUDED_HYPERVISORS,
-    GAMMA_SUBGRAPH_URLS,
     MONGO_DB_URL,
+    gamma_subgraph_urls,
 )
 from sources.subgraph.bins.database.managers import (
     db_aggregateStats_manager,
@@ -47,8 +47,8 @@ logger = logging.getLogger(__name__)
 CHAINS_PROTOCOLS = [
     (chain, protocol)
     for protocol in Protocol
-    if protocol in GAMMA_SUBGRAPH_URLS
-    for chain in GAMMA_SUBGRAPH_URLS[protocol].keys()
+    if protocol in gamma_subgraph_urls
+    for chain in gamma_subgraph_urls[protocol].keys()
 ]
 
 # Rewards managed by gamma utilities ( 3rd party rewards not in subgraph)

@@ -27,9 +27,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Create root
-app = create_subgraph_endpoint(
-    title="Gamma API", backwards_compatible=True, version=get_version_info()
-)  # legacy endpoint
+app = create_subgraph_endpoint(title="Gamma API", version=get_version_info())  # legacy endpoint
 
 # Allow CORS
 app.add_middleware(
@@ -43,9 +41,7 @@ app.add_middleware(BaseMiddleware)
 app.mount(
     path="/subgraph",
     app=create_subgraph_endpoint(
-        title="Gamma API - Subgraph data",
-        backwards_compatible=False,
-        version=get_version_info(),
+        title="Gamma API - Subgraph data", version=get_version_info(),
     ),
     name="subgraph",
 )

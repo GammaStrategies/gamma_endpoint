@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from sources.common.general.config import get_config
 from sources.subgraph.bins.enums import Chain, Protocol, QueryType
 
@@ -13,13 +15,14 @@ DEPLOYMENTS = [
     (Protocol.UNISWAP, Chain.BASE),
     (Protocol.UNISWAP, Chain.BLAST),
     (Protocol.UNISWAP, Chain.SCROLL),
+    (Protocol.UNISWAP, Chain.LINEA),
+    (Protocol.UNISWAP, Chain.MANTLE),
+    (Protocol.UNISWAP, Chain.POLYGON_ZKEVM),
     (Protocol.QUICKSWAP, Chain.POLYGON),
-    (Protocol.ZYBERSWAP, Chain.ARBITRUM),
-    (Protocol.THENA, Chain.BSC),
-    (Protocol.THENA, Chain.OPBNB),
     (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
     (Protocol.QUICKSWAP, Chain.ASTAR_ZKEVM),
     (Protocol.QUICKSWAP, Chain.IMMUTABLE_ZKEVM),
+    (Protocol.QUICKSWAP, Chain.MANTA),
     (Protocol.QUICKSWAP_UNISWAP, Chain.POLYGON_ZKEVM),
     (Protocol.CAMELOT, Chain.ARBITRUM),
     (Protocol.GLACIER, Chain.AVALANCHE),
@@ -39,16 +42,18 @@ DEPLOYMENTS = [
     (Protocol.BASEX, Chain.BASE),
     (Protocol.PANCAKESWAP, Chain.ARBITRUM),
     (Protocol.APERTURE, Chain.MANTA),
-    (Protocol.QUICKSWAP, Chain.MANTA),
     (Protocol.HERCULES, Chain.METIS),
     (Protocol.BASESWAP, Chain.BASE),
     (Protocol.SWAPBASED, Chain.BASE),
     (Protocol.PHARAOH, Chain.AVALANCHE),
     (Protocol.SWAPR, Chain.GNOSIS),
+    (Protocol.THENA, Chain.BSC),
+    (Protocol.THENA, Chain.OPBNB),
     (Protocol.THICK, Chain.BASE),
     (Protocol.CLEOPATRA, Chain.MANTLE),
     (Protocol.BLASTER, Chain.BLAST),
     (Protocol.THRUSTER, Chain.BLAST),
+    (Protocol.ZYBERSWAP, Chain.ARBITRUM),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -64,335 +69,21 @@ ETH_BLOCKS_SUBGRAPH_URL = (
 UNI_V2_SUBGRAPH_URL = "https://api.thegraph.com/subgraphs/name/ianlapham/uniswapv2"
 
 
-DEX_SUBGRAPH_URLS = {
-    Protocol.UNISWAP: {
-        Chain.ETHEREUM: get_config("UNISWAP_MAINNET_SUBGRAPH_URL"),
-        Chain.POLYGON: get_config("UNISWAP_POLYGON_SUBGRAPH_URL"),
-        Chain.ARBITRUM: get_config("UNISWAP_ARBITRUM_SUBGRAPH_URL"),
-        Chain.OPTIMISM: get_config("UNISWAP_OPTIMISM_SUBGRAPH_URL"),
-        Chain.CELO: get_config("UNISWAP_CELO_SUBGRAPH_URL"),
-        Chain.BSC: get_config("UNISWAP_BSC_SUBGRAPH_URL"),
-        Chain.MOONBEAM: get_config("UNISWAP_MOONBEAM_SUBGRAPH_URL"),
-        Chain.AVALANCHE: get_config("UNISWAP_AVALANCHE_SUBGRAPH_URL"),
-        Chain.BASE: get_config("UNISWAP_BASE_SUBGRAPH_URL"),
-        Chain.BLAST: get_config("UNISWAP_BLAST_SUBGRAPH_URL"),
-        Chain.SCROLL: get_config("UNISWAP_SCROLL_SUBGRAPH_URL"),
-    },
-    Protocol.QUICKSWAP: {
-        Chain.POLYGON: get_config("QUICKSWAP_POLYGON_SUBGRAPH_URL"),
-        Chain.POLYGON_ZKEVM: get_config("QUICKSWAP_POLYGON_ZKEVM_SUBGRAPH_URL"),
-        Chain.MANTA: get_config("QUICKSWAP_MANTA_SUBGRAPH_URL"),
-        Chain.ASTAR_ZKEVM: get_config("QUICKSWAP_ASTAR_ZKEVM_SUBGRAPH_URL"),
-        Chain.IMMUTABLE_ZKEVM: get_config("QUICKSWAP_IMMUTABLE_SUBGRAPH_URL")
-    },
-    Protocol.QUICKSWAP_UNISWAP: {
-        Chain.POLYGON_ZKEVM: get_config("QUICKSWAP_UNISWAP_POLYGON_ZKEVM_SUBGRAPH_URL"),
-    },
-    Protocol.ZYBERSWAP: {
-        Chain.ARBITRUM: get_config("ZYBERSWAP_ARBITRUM_SUBGRAPH_URL"),
-    },
-    Protocol.THENA: {
-        Chain.BSC: get_config("THENA_BSC_SUBGRAPH_URL"),
-        Chain.OPBNB: get_config("THENA_OPBNB_SUBGRAPH_URL"),
-    },
-    Protocol.CAMELOT: {
-        Chain.ARBITRUM: get_config("CAMELOT_ARBITRUM_SUBGRAPH_URL"),
-    },
-    Protocol.GLACIER: {
-        Chain.AVALANCHE: get_config("GLACIER_AVALANCHE_SUBGRAPH_URL"),
-    },
-    Protocol.RETRO: {
-        Chain.POLYGON: get_config("RETRO_POLYGON_SUBGRAPH_URL"),
-    },
-    Protocol.STELLASWAP: {
-        Chain.MOONBEAM: get_config("STELLASWAP_MOONBEAM_SUBGRAPH_URL"),
-    },
-    Protocol.BEAMSWAP: {
-        Chain.MOONBEAM: get_config("BEAMSWAP_MOONBEAM_SUBGRAPH_URL"),
-    },
-    Protocol.SPIRITSWAP: {
-        Chain.FANTOM: get_config("SPIRITSWAP_FANTOM_SUBGRAPH_URL"),
-    },
-    Protocol.SUSHI: {
-        Chain.POLYGON: get_config("SUSHI_POLYGON_SUBGRAPH_URL"),
-        Chain.ARBITRUM: get_config("SUSHI_ARBITRUM_SUBGRAPH_URL"),
-        Chain.BASE: get_config("SUSHI_BASE_SUBGRAPH_URL"),
-    },
-    Protocol.RAMSES: {
-        Chain.ARBITRUM: get_config("RAMSES_ARBITRUM_SUBGRAPH_URL"),
-    },
-    Protocol.ASCENT: {
-        Chain.POLYGON: get_config("ASCENT_POLYGON_SUBGRAPH_URL"),
-    },
-    Protocol.FUSIONX: {
-        Chain.MANTLE: get_config("FUSIONX_MANTLE_SUBGRAPH_URL"),
-    },
-    Protocol.SYNTHSWAP: {
-        Chain.BASE: get_config("SYNTHSWAP_BASE_SUBGRAPH_URL"),
-    },
-    Protocol.LYNEX: {
-        Chain.LINEA: get_config("LYNEX_LINEA_SUBGRAPH_URL"),
-    },
-    Protocol.PEGASYS: {
-        Chain.ROLLUX: get_config("PEGASYS_ROLLUX_SUBGRAPH_URL"),
-    },
-    Protocol.BASEX: {
-        Chain.BASE: get_config("BASEX_BASE_SUBGRAPH_URL"),
-    },
-    Protocol.PANCAKESWAP: {
-        Chain.ARBITRUM: get_config("PANCAKESWAP_ARBITRUM_SUBGRAPH_URL"),
-    },
-    Protocol.APERTURE: {
-        Chain.MANTA: get_config("APERTURE_MANTA_SUBGRAPH_URL"),
-    },
-    Protocol.HERCULES: {
-        Chain.METIS: get_config("HERCULES_METIS_SUBGRAPH_URL"),
-    },
-    Protocol.BASESWAP: {
-        Chain.BASE: get_config("BASESWAP_BASE_SUBGRAPH_URL"),
-    },
-    Protocol.SWAPBASED: {
-        Chain.BASE: get_config("SWAPBASED_BASE_SUBGRAPH_URL"),
-    },
-    Protocol.PHARAOH: {
-        Chain.AVALANCHE: get_config("PHARAOH_AVALANCHE_SUBGRAPH_URL"),
-    },
-    Protocol.SWAPR: {
-        Chain.GNOSIS: get_config("SWAPR_GNOSIS_SUBGRAPH_URL"),
-    },
-    Protocol.THICK: {
-        Chain.BASE: get_config("THICK_BASE_SUBGRAPH_URL"),
-    },
-    Protocol.CLEOPATRA: {
-        Chain.MANTLE: get_config("CLEOPATRA_MANTLE_SUBGRAPH_URL"),
-    },
-    Protocol.BLASTER: {
-        Chain.BLAST: get_config("BLASTER_BLAST_SUBGRAPH_URL"),
-    },
-    Protocol.THRUSTER: {
-        Chain.BLAST: get_config("THRUSTER_BLAST_SUBGRAPH_URL"),
-    },
-}
+dex_subgraph_urls = defaultdict(dict)
+dex_hypepool_subgraph_urls = defaultdict(dict)
+gamma_subgraph_urls = defaultdict(dict)
 
-DEX_HYPEPOOL_SUBGRAPH_URLS = {
-    Protocol.UNISWAP: {
-        Chain.ETHEREUM: get_config("UNISWAP_MAINNET_HP_SUBGRAPH_URL"),
-        Chain.POLYGON: get_config("UNISWAP_POLYGON_HP_SUBGRAPH_URL"),
-        Chain.ARBITRUM: get_config("UNISWAP_ARBITRUM_HP_SUBGRAPH_URL"),
-        Chain.OPTIMISM: get_config("UNISWAP_OPTIMISM_HP_SUBGRAPH_URL"),
-        Chain.CELO: get_config("UNISWAP_CELO_HP_SUBGRAPH_URL"),
-        Chain.BSC: get_config("UNISWAP_BSC_HP_SUBGRAPH_URL"),
-        Chain.MOONBEAM: get_config("UNISWAP_MOONBEAM_HP_SUBGRAPH_URL"),
-        Chain.AVALANCHE: get_config("UNISWAP_AVALANCHE_HP_SUBGRAPH_URL"),
-        Chain.BASE: get_config("UNISWAP_BASE_HP_SUBGRAPH_URL"),
-        Chain.BLAST: get_config("UNISWAP_BLAST_HP_SUBGRAPH_URL"),
-        Chain.SCROLL: get_config("UNISWAP_SCROLL_HP_SUBGRAPH_URL"),
-    },
-    Protocol.QUICKSWAP: {
-        Chain.POLYGON: get_config("QUICKSWAP_POLYGON_HP_SUBGRAPH_URL"),
-        Chain.POLYGON_ZKEVM: get_config("QUICKSWAP_POLYGON_ZKEVM_HP_SUBGRAPH_URL"),
-        Chain.MANTA: get_config("QUICKSWAP_MANTA_HP_SUBGRAPH_URL"),
-        Chain.ASTAR_ZKEVM: get_config("QUICKSWAP_ASTAR_ZKEVM_HP_SUBGRAPH_URL"),
-        Chain.IMMUTABLE_ZKEVM: get_config("QUICKSWAP_IMMUTABLE_HP_SUBGRAPH_URL"),
-    },
-    Protocol.QUICKSWAP_UNISWAP: {
-        Chain.POLYGON_ZKEVM: get_config("QUICKSWAP_UNISWAP_POLYGON_ZKEVM_HP_SUBGRAPH_URL"),
-    },
-    Protocol.ZYBERSWAP: {
-        Chain.ARBITRUM: get_config("ZYBERSWAP_ARBITRUM_HP_SUBGRAPH_URL"),
-    },
-    Protocol.THENA: {
-        Chain.BSC: get_config("THENA_BSC_HP_SUBGRAPH_URL"),
-        Chain.OPBNB: get_config("THENA_OPBNB_HP_SUBGRAPH_URL"),
-    },
-    Protocol.CAMELOT: {
-        Chain.ARBITRUM: get_config("CAMELOT_ARBITRUM_HP_SUBGRAPH_URL"),
-    },
-    Protocol.GLACIER: {
-        Chain.AVALANCHE: get_config("GLACIER_AVALANCHE_HP_SUBGRAPH_URL"),
-    },
-    Protocol.RETRO: {
-        Chain.POLYGON: get_config("RETRO_POLYGON_HP_SUBGRAPH_URL"),
-    },
-    Protocol.STELLASWAP: {
-        Chain.MOONBEAM: get_config("STELLASWAP_MOONBEAM_HP_SUBGRAPH_URL"),
-    },
-    Protocol.BEAMSWAP: {
-        Chain.MOONBEAM: get_config("BEAMSWAP_MOONBEAM_HP_SUBGRAPH_URL"),
-    },
-    Protocol.SPIRITSWAP: {
-        Chain.FANTOM: get_config("SPIRITSWAP_FANTOM_HP_SUBGRAPH_URL"),
-    },
-    Protocol.SUSHI: {
-        Chain.POLYGON: get_config("SUSHI_POLYGON_HP_SUBGRAPH_URL"),
-        Chain.ARBITRUM: get_config("SUSHI_ARBITRUM_HP_SUBGRAPH_URL"),
-        Chain.BASE: get_config("SUSHI_BASE_HP_SUBGRAPH_URL"),
-    },
-    Protocol.RAMSES: {
-        Chain.ARBITRUM: get_config("RAMSES_ARBITRUM_HP_SUBGRAPH_URL"),
-    },
-    Protocol.ASCENT: {
-        Chain.POLYGON: get_config("ASCENT_POLYGON_HP_SUBGRAPH_URL"),
-    },
-    Protocol.FUSIONX: {
-        Chain.MANTLE: get_config("FUSIONX_MANTLE_HP_SUBGRAPH_URL"),
-    },
-    Protocol.SYNTHSWAP: {
-        Chain.BASE: get_config("SYNTHSWAP_BASE_HP_SUBGRAPH_URL"),
-    },
-    Protocol.LYNEX: {
-        Chain.LINEA: get_config("LYNEX_LINEA_HP_SUBGRAPH_URL"),
-    },
-    Protocol.PEGASYS: {
-        Chain.ROLLUX: get_config("PEGASYS_ROLLUX_HP_SUBGRAPH_URL"),
-    },
-    Protocol.BASEX: {
-        Chain.BASE: get_config("BASEX_BASE_HP_SUBGRAPH_URL"),
-    },
-    Protocol.PANCAKESWAP: {
-        Chain.ARBITRUM: get_config("PANCAKESWAP_ARBITRUM_HP_SUBGRAPH_URL"),
-    },
-    Protocol.APERTURE: {
-        Chain.MANTA: get_config("APERTURE_MANTA_HP_SUBGRAPH_URL"),
-    },
-    Protocol.HERCULES: {
-        Chain.METIS: get_config("HERCULES_METIS_HP_SUBGRAPH_URL"),
-    },
-    Protocol.BASESWAP: {
-        Chain.BASE: get_config("BASESWAP_BASE_HP_SUBGRAPH_URL"),
-    },
-    Protocol.SWAPBASED: {
-        Chain.BASE: get_config("SWAPBASED_BASE_HP_SUBGRAPH_URL"),
-    },
-    Protocol.PHARAOH: {
-        Chain.AVALANCHE: get_config("PHARAOH_AVALANCHE_HP_SUBGRAPH_URL"),
-    },
-    Protocol.SWAPR: {
-        Chain.GNOSIS: get_config("SWAPR_GNOSIS_HP_SUBGRAPH_URL"),
-    },
-    Protocol.THICK: {
-        Chain.BASE: get_config("THICK_BASE_HP_SUBGRAPH_URL"),
-    },
-    Protocol.CLEOPATRA: {
-        Chain.MANTLE: get_config("CLEOPATRA_MANTLE_HP_SUBGRAPH_URL"),
-    },
-    Protocol.BLASTER: {
-        Chain.BLAST: get_config("BLASTER_BLAST_HP_SUBGRAPH_URL"),
-    },
-    Protocol.THRUSTER: {
-        Chain.BLAST: get_config("THRUSTER_BLAST_HP_SUBGRAPH_URL"),
-    },
-}
+for protocol, chain in DEPLOYMENTS:
+    dex_subgraph_urls[protocol][chain] = get_config(
+        f"{protocol.value.upper()}_{chain.value.upper()}_SUBGRAPH_URL"
+    )
+    dex_hypepool_subgraph_urls[protocol][chain] = get_config(
+        f"{protocol.value.upper()}_{chain.value.upper()}_HP_SUBGRAPH_URL"
+    )
+    gamma_subgraph_urls[protocol][chain] = get_config(
+        f"{protocol.value.upper()}_{chain.value.upper()}_GAMMA_SUBGRAPH_URL"
+    )
 
-GAMMA_SUBGRAPH_URLS = {
-    Protocol.UNISWAP: {
-        Chain.ETHEREUM: get_config("UNISWAP_MAINNET_GAMMA_SUBGRAPH_URL"),
-        Chain.POLYGON: get_config("UNISWAP_POLYGON_GAMMA_SUBGRAPH_URL"),
-        Chain.ARBITRUM: get_config("UNISWAP_ARBITRUM_GAMMA_SUBGRAPH_URL"),
-        Chain.OPTIMISM: get_config("UNISWAP_OPTIMISM_GAMMA_SUBGRAPH_URL"),
-        Chain.CELO: get_config("UNISWAP_CELO_GAMMA_SUBGRAPH_URL"),
-        Chain.BSC: get_config("UNISWAP_BSC_GAMMA_SUBGRAPH_URL"),
-        Chain.MOONBEAM: get_config("UNISWAP_MOONBEAM_GAMMA_SUBGRAPH_URL"),
-        Chain.AVALANCHE: get_config("UNISWAP_AVALANCHE_GAMMA_SUBGRAPH_URL"),
-        Chain.BASE: get_config("UNISWAP_BASE_GAMMA_SUBGRAPH_URL"),
-        Chain.BLAST: get_config("UNISWAP_BLAST_GAMMA_SUBGRAPH_URL"),
-        Chain.SCROLL: get_config("UNISWAP_SCROLL_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.QUICKSWAP: {
-        Chain.POLYGON: get_config("QUICKSWAP_POLYGON_GAMMA_SUBGRAPH_URL"),
-        Chain.POLYGON_ZKEVM: get_config("QUICKSWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH_URL"),
-        Chain.MANTA: get_config("QUICKSWAP_MANTA_GAMMA_SUBGRAPH_URL"),
-        Chain.ASTAR_ZKEVM: get_config("QUICKSWAP_ASTAR_ZKEVM_GAMMA_SUBGRAPH_URL"),
-        Chain.IMMUTABLE_ZKEVM: get_config("QUICKSWAP_IMMUTABLE_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.QUICKSWAP_UNISWAP: {
-        Chain.POLYGON_ZKEVM: get_config("QUICKSWAP_UNISWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.ZYBERSWAP: {
-        Chain.ARBITRUM: get_config("ZYBERSWAP_ARBITRUM_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.THENA: {
-        Chain.BSC: get_config("THENA_BSC_GAMMA_SUBGRAPH_URL"),
-        Chain.OPBNB: get_config("THENA_OPBNB_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.CAMELOT: {
-        Chain.ARBITRUM: get_config("CAMELOT_ARBITRUM_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.GLACIER: {
-        Chain.AVALANCHE: get_config("GLACIER_AVALANCHE_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.RETRO: {
-        Chain.POLYGON: get_config("RETRO_POLYGON_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.STELLASWAP: {
-        Chain.MOONBEAM: get_config("STELLASWAP_MOONBEAM_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.BEAMSWAP: {
-        Chain.MOONBEAM: get_config("BEAMSWAP_MOONBEAM_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.SPIRITSWAP: {
-        Chain.FANTOM: get_config("SPIRITSWAP_FANTOM_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.SUSHI: {
-        Chain.POLYGON: get_config("SUSHI_POLYGON_GAMMA_SUBGRAPH_URL"),
-        Chain.ARBITRUM: get_config("SUSHI_ARBITRUM_GAMMA_SUBGRAPH_URL"),
-        Chain.BASE: get_config("SUSHI_BASE_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.RAMSES: {
-        Chain.ARBITRUM: get_config("RAMSES_ARBITRUM_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.ASCENT: {
-        Chain.POLYGON: get_config("ASCENT_POLYGON_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.FUSIONX: {
-        Chain.MANTLE: get_config("FUSIONX_MANTLE_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.SYNTHSWAP: {
-        Chain.BASE: get_config("SYNTHSWAP_BASE_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.LYNEX: {
-        Chain.LINEA: get_config("LYNEX_LINEA_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.PEGASYS: {
-        Chain.ROLLUX: get_config("PEGASYS_ROLLUX_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.BASEX: {
-        Chain.BASE: get_config("BASEX_BASE_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.PANCAKESWAP: {
-        Chain.ARBITRUM: get_config("PANCAKESWAP_ARBITRUM_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.APERTURE: {
-        Chain.MANTA: get_config("APERTURE_MANTA_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.HERCULES: {
-        Chain.METIS: get_config("HERCULES_METIS_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.BASESWAP: {
-        Chain.BASE: get_config("BASESWAP_BASE_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.SWAPBASED: {
-        Chain.BASE: get_config("SWAPBASED_BASE_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.PHARAOH: {
-        Chain.AVALANCHE: get_config("PHARAOH_AVALANCHE_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.SWAPR: {
-        Chain.GNOSIS: get_config("SWAPR_GNOSIS_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.THICK: {
-        Chain.BASE: get_config("THICK_BASE_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.CLEOPATRA: {
-        Chain.MANTLE: get_config("CLEOPATRA_MANTLE_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.BLASTER: {
-        Chain.BLAST: get_config("BLASTER_BLAST_GAMMA_SUBGRAPH_URL"),
-    },
-    Protocol.THRUSTER: {
-        Chain.BLAST: get_config("THRUSTER_BLAST_GAMMA_SUBGRAPH_URL"),
-    },
-}
 
 XGAMMA_SUBGRAPH_URL = "https://api.thegraph.com/subgraphs/name/l0c4t0r/xgamma"
 RECOVERY_POOL_URL = (

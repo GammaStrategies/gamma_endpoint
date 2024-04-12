@@ -3,13 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.inmemory import InMemoryBackend
 
-from endpoint.config.cache import CHARTS_CACHE_TIMEOUT
-from sources.subgraph.endpoint.routers import build_routers, build_routers_compatible
+from sources.subgraph.endpoint.routers import build_routers
 
 
 def create_app(
     title: str,
-    backwards_compatible: bool = False,
     version="0.1",
 ):
     app = FastAPI(
@@ -19,9 +17,7 @@ def create_app(
     )
 
     # Add subgraph routes to app
-    for route_builder in (
-        build_routers() if not backwards_compatible else build_routers_compatible()
-    ):
+    for route_builder in build_routers():
         app.include_router(route_builder.router(), tags=route_builder.tags)
 
     # Allow CORS

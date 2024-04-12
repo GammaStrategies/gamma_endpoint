@@ -135,12 +135,12 @@ class Protocol(str, Enum):
 
     QUICKSWAP = ("quickswap", None, None, None, "quickswap", "QuickSwap")
     QUICKSWAP_UNISWAP = (
+        "quickswap_uniswap",
         "quickswap-uniswap",
         None,
         None,
-        None,
         "quickswap-uniswap",
-        "QuickSwap-uniswap",
+        "QuickSwap-Uniswap",
     )
     UNISWAP = ("uniswap", None, None, None, "uniswapv3", "Uniswap")
     ZYBERSWAP = ("zyberswap", None, None, None, "zyberswap", "Zyberswap")
