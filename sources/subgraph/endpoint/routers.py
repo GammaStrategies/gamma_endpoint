@@ -60,14 +60,33 @@ def build_routers() -> list:
 
     # setup dex + chain endpoints
     for protocol, chain in DEPLOYMENTS:
-        routes.append(
-            subgraph_router_builder(
-                dex=protocol,
-                chain=chain,
-                tags=[f"{protocol.fantasy_name} - {chain.fantasy_name}"],
-                prefix=f"/{protocol.api_url}/{chain.api_url}",
+        if protocol == Protocol.UNISWAP:
+            if chain == Chain.ETHEREUM:
+                routes.append(
+                    subgraph_router_builder_compatible(
+                        dex=protocol,
+                        chain=chain,
+                        tags=["Mainnet"],
+                    )
+                )
+            else:
+                routes.append(
+                    subgraph_router_builder(
+                        dex=protocol,
+                        chain=chain,
+                        tags=[f"{protocol.fantasy_name} - {chain.fantasy_name}"],
+                        prefix=f"/{chain.api_url}",
+                    )
+                )
+        else:
+            routes.append(
+                subgraph_router_builder(
+                    dex=protocol,
+                    chain=chain,
+                    tags=[f"{protocol.fantasy_name} - {chain.fantasy_name}"],
+                    prefix=f"/{protocol.api_url}/{chain.api_url}",
+                )
             )
-        )
 
     # Simulation
     routes.append(
