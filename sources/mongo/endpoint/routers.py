@@ -20,6 +20,7 @@ from sources.mongo.bins.apps import user
 
 # from sources.mongo.bins.apps import prices
 from sources.mongo.bins.apps import rewards
+from sources.mongo.bins.apps.brevis_api import build_brevisQueryRequest
 
 
 DEPLOYED: list[tuple[Protocol, Chain]] = [
@@ -177,6 +178,8 @@ class mongo_router_builder(router_builder_baseTemplate):
 
         router = self._create_routes_user(router=router)
 
+        router = self._create_routes_brevis(router=router)
+
         router.add_api_route(
             path=f"{self.prefix}{'/prices'}",
             endpoint=self.prices,
@@ -297,6 +300,17 @@ class mongo_router_builder(router_builder_baseTemplate):
         router.add_api_route(
             path=f"{self.prefix}{'/user/{user_address}/shares'}",
             endpoint=self.user_shares,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
+        return router
+
+    def _create_routes_brevis(self, router: APIRouter) -> APIRouter:
+
+        router.add_api_route(
+            path=f"{self.prefix}{'/zkproof/brevis'}",
+            endpoint=self.brevis_query_request,
             methods=["GET"],
             generate_unique_id_function=self.generate_unique_id,
         )
@@ -554,4 +568,45 @@ class mongo_router_builder(router_builder_baseTemplate):
             block_end=block_end,
             hypervisor_address=hypervisor_address,
             include_operations=include_operations,
+        )
+
+    # BREVIS
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def brevis_query_request(
+        self,
+        response: Response,
+        user_address: str | None = Query(None, description="use address"),
+        hypervisor_address: str | None = Query(None, description="hypervisor address"),
+        timestamp_ini: int | None = Query(
+            None, description="will limit the data returned from this value."
+        ),
+        timestamp_end: int | None = Query(
+            None, description="will limit the data returned to this value."
+        ),
+        block_ini: int | None = Query(
+            None, description="will limit the data returned from this value."
+        ),
+        block_end: int | None = Query(
+            None, description="will limit the data returned to this value."
+        ),
+    ):
+        """Returns the information to handle to Brevis API to create zkproofs of user operations"""
+
+        user_address = filter_addresses(user_address)
+        hypervisor_address = filter_addresses(hypervisor_address)
+
+        # user must supply either timestamp ini end or blocks
+        if not (timestamp_ini and timestamp_end) and not (block_ini and block_end):
+            # return error message
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return "Please provide timestamp_ini and timestamp_end or block_ini and block_end"
+
+        return await build_brevisQueryRequest(
+            network=self.chain,
+            user_address=user_address,
+            timestamp_ini=timestamp_ini,
+            timestamp_end=timestamp_end,
+            block_ini=block_ini,
+            block_end=block_end,
+            hypervisor_address=hypervisor_address,
         )
