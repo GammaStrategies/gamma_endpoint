@@ -56,9 +56,53 @@ def query_user_operations_brevis_GammaQueryRequest(
 
     _query = [
         {
+            "$lookup": {
+                "from": "transaction_receipts",
+                "let": {
+                    "op_txHash": "$transactionHash",
+                    "op_topic": "$topic",
+                    "op_user": "$user_address",
+                    "op_logIndex": "$logIndex",
+                },
+                "pipeline": [
+                    {"$match": {"$expr": {"$and": [{"$eq": ["$id", "$$op_txHash"]}]}}},
+                    {
+                        "$project": {
+                            "logIndex": "$$op_logIndex",
+                            "value_index": {
+                                "$cond": [
+                                    {"$eq": ["$$op_topic", "withdraw"]},
+                                    1,
+                                    {
+                                        "$cond": [
+                                            {"$eq": ["$$op_topic", "deposit"]},
+                                            2,
+                                            {
+                                                "$cond": [
+                                                    {"$eq": ["$$op_user", "dst"]},
+                                                    2,
+                                                    1,
+                                                ]
+                                            },
+                                        ]
+                                    },
+                                ]
+                            },
+                            "logIndex_tx": {
+                                "$indexOfArray": ["$logs.logIndex", "$$op_logIndex"]
+                            },
+                        }
+                    },
+                ],
+                "as": "transaction_info",
+            }
+        },
+        {"$sort": {"block": 1, "logIndex": 1, "customIndex": 1}},
+        {
             "$group": {
                 "_id": {"user": "$user_address", "hype": "$hypervisor_address"},
                 "user_address": {"$first": "$user_address"},
+                "hypervisor_address": {"$first": "$hypervisor_address"},
                 "start_block_number": {"$first": "$block"},
                 "end_block_number": {"$last": "$block"},
                 "receiptInfos": {
@@ -67,12 +111,26 @@ def query_user_operations_brevis_GammaQueryRequest(
                             {"$eq": ["$customIndex", 0]},
                             {
                                 "transaction_hash": "$transactionHash",
-                                "log_extract_infos": {
-                                    "value_from_topic": False,
-                                    "log_index": "$logIndex",
-                                    "log_index_tx": -1,
-                                    "value_index": 0,
-                                },
+                                "log_extract_infos": [
+                                    {
+                                        "value_from_topic": True,
+                                        "log_index": "$logIndex",
+                                        "log_index_tx": {
+                                            "$first": "$transaction_info.logIndex_tx"
+                                        },
+                                        "value_index": {
+                                            "$first": "$transaction_info.value_index"
+                                        },
+                                    },
+                                    {
+                                        "value_from_topic": False,
+                                        "log_index": "$logIndex",
+                                        "log_index_tx": {
+                                            "$first": "$transaction_info.logIndex_tx"
+                                        },
+                                        "value_index": 0,
+                                    },
+                                ],
                             },
                             None,
                         ]
@@ -81,17 +139,13 @@ def query_user_operations_brevis_GammaQueryRequest(
             }
         },
         {
-            "$group": {
-                "_id": "$_id.hype",
-                "hypervisor_address": {"$first": "$_id.hype"},
-                "users_data": {
-                    "$push": {
-                        "user_address": "$user_address",
-                        "start_block_number": "$start_block_number",
-                        "end_block_number": "$end_block_number",
-                        "receiptInfos": {"$setDifference": ["$receiptInfos", [None]]},
-                    }
-                },
+            "$project": {
+                "_id": 0,
+                "user_address": 1,
+                "hypervisor_address": 1,
+                "start_block_number": 1,
+                "end_block_number": 1,
+                "receiptInfos": {"$setDifference": ["$receiptInfos", [None]]},
             }
         },
     ]
