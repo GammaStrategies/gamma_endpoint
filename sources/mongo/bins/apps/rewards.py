@@ -132,7 +132,7 @@ async def rewrite_mfd_with_api(data: dict, chain: Chain) -> dict:
                         )
                     except Exception as e:
                         logging.getLogger(__name__).error(
-                            f"Error getting ramses api data: {e}"
+                            f"Error getting ramses api data for pol {hypervisors_static[hype_address]['pool']['address']}: {e}"
                         )
                         continue
 
