@@ -27,6 +27,8 @@ class ramses_api_helper:
             return "https://pharaoh-api-production.up.railway.app/mixed-pairs"
         elif chain == Chain.MANTLE:
             return "https://cleopatra-api-production.up.railway.app/mixed-pairs"
+        elif chain == Chain.LINEA:
+            return "https://nile-api-production.up.railway.app/mixed-pairs"
         else:
             raise ValueError(f"Chain {chain} not supported")
 
