@@ -34,6 +34,7 @@ DEPLOYMENTS = [
     (Protocol.SUSHI, Chain.ARBITRUM),
     (Protocol.SUSHI, Chain.BASE),
     (Protocol.RAMSES, Chain.ARBITRUM),
+    (Protocol.NILE, Chain.LINEA),
     (Protocol.ASCENT, Chain.POLYGON),
     (Protocol.FUSIONX, Chain.MANTLE),
     (Protocol.SYNTHSWAP, Chain.BASE),

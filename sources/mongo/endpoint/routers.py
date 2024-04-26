@@ -1,27 +1,25 @@
 import asyncio
 import re
 import typing
-from fastapi import Query, Response, APIRouter, status
+
+from fastapi import APIRouter, Query, Response, status
 from fastapi.responses import StreamingResponse
 from fastapi.routing import APIRoute
 from fastapi_cache.decorator import cache
-from endpoint.config.cache import DB_CACHE_TIMEOUT, DAILY_CACHE_TIMEOUT
 
+from endpoint.config.cache import DAILY_CACHE_TIMEOUT, DB_CACHE_TIMEOUT
 from endpoint.routers.template import (
-    router_builder_generalTemplate,
     router_builder_baseTemplate,
+    router_builder_generalTemplate,
 )
 from sources.common.general.enums import Chain, Protocol, int_to_chain
 from sources.common.general.utils import filter_addresses
 from sources.common.prices.helpers import get_current_prices, get_prices
 from sources.internal.bins.user import get_user_addresses, get_user_shares
-from sources.mongo.bins.apps import hypervisor
-from sources.mongo.bins.apps import user
 
 # from sources.mongo.bins.apps import prices
-from sources.mongo.bins.apps import rewards
+from sources.mongo.bins.apps import hypervisor, rewards, user
 from sources.mongo.bins.apps.brevis_api import build_brevisQueryRequest
-
 
 DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.UNISWAP, Chain.ETHEREUM),
@@ -53,6 +51,7 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.SUSHI, Chain.ARBITRUM),
     (Protocol.SUSHI, Chain.BASE),
     (Protocol.RAMSES, Chain.ARBITRUM),
+    (Protocol.NILE, Chain.LINEA),
     (Protocol.ASCENT, Chain.POLYGON),
     (Protocol.FUSIONX, Chain.MANTLE),
     (Protocol.SYNTHSWAP, Chain.BASE),

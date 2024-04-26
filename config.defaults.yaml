@@ -130,6 +130,10 @@ RAMSES_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4
 RAMSES_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-ramses-arbitrum
 RAMSES_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ramsesexchange/concentrated-liquidity-graph
 
+NILE_LINEA_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-nile-linea/version/latest
+NILE_LINEA_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-nile-linea/version/latest
+NILE_LINEA_SUBGRAPH_URL: _
+
 ASCENT_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-ascent-polygon
 ASCENT_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-ascent-polygon
 ASCENT_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/seme0801/ascent-v3

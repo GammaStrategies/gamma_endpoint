@@ -106,6 +106,7 @@ class Dex(str, Enum):
     STELLASWAP = "stellaswap"
     SUSHI = "sushi"
     RAMSES = "ramses"
+    NILE = "nile"
     BEAMSWAP = "beamswap"
     ASCENT = "ascent"
     FUSIONX = "fusionx"
@@ -152,6 +153,7 @@ class Protocol(str, Enum):
     STELLASWAP = ("stellaswap", None, None, None, "stellaswap", "Stellaswap")
     BEAMSWAP = ("beamswap", None, None, None, "beamswap", "Beamswap")
     RAMSES = ("ramses", None, None, None, "ramses", "Ramses")
+    NILE = ("nile", None, None, None, "nile", "Nile")
     VEZARD = ("vezard", None, None, None, "vezard", "veZard")
     SUSHI = ("sushi", None, None, None, "sushi", "Sushi")
     ASCENT = ("ascent", None, None, None, "ascent", "Ascent")
