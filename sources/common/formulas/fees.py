@@ -8,7 +8,7 @@ def calculate_gamma_fee(fee_rate: int, protocol: Protocol) -> float:
         float: gamma fee percentage
     """
 
-    if protocol in [Protocol.CAMELOT, Protocol.RAMSES]:
+    if protocol in [Protocol.CAMELOT, Protocol.RAMSES, Protocol.NILE]:
         return fee_rate / 100
     else:
         return 1 / fee_rate if fee_rate < 100 else 1 / 10
