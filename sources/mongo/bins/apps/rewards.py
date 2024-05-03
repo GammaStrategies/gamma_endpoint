@@ -95,6 +95,7 @@ async def latest_multifeeDistributor(network: Chain, protocol: Protocol):
             "boostApr"
         ] += boostApr
 
+    return result
     return await rewrite_mfd_with_api(result, network)
 
 
