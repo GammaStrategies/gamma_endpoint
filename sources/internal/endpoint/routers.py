@@ -744,6 +744,17 @@ class internal_router_builder_reports(router_builder_baseTemplate):
     async def galxe_report(
         self,
         response: Response,
+        chain: Chain | int = Query(
+            Chain.MANTLE,
+            enum=[
+                Chain.MANTLE,
+                Chain.ARBITRUM,
+                Chain.POLYGON,
+                Chain.MANTLE.id,
+                Chain.ARBITRUM.id,
+                Chain.POLYGON.id,
+            ],
+        ),
         user_address: str | None = Query(
             None, description="User address to filter the report"
         ),
@@ -756,11 +767,11 @@ class internal_router_builder_reports(router_builder_baseTemplate):
         ),
     ) -> dict:
         """Returns unique list of user addresses complying with the parameters defined (net position | deposits) and within a list of predefined pools between start and end time:
-        * **Start time**:  November 20th, 17:00 UTC
-        * **End time**:  February 19th, 17:00 UTC
         * **Pools**:
             * ARBITRUM:
-                0xd7Ef5Ac7fd4AAA7994F3bc1D273eAb1d1013530E
+                * **Start time**:  November 20th, 17:00 UTC
+                * **End time**:  February 19th, 17:00 UTC
+                * 0xd7Ef5Ac7fd4AAA7994F3bc1D273eAb1d1013530E
                 0x29237292F15BC3615BFCc0D958C265Aa64527FB2
                 0x9330e26b5Fc0b7c417C6bD901528d5c65BE5cdf2
                 0x863cb3E55526Fa2F7e6b04ecf21Ea39143AC8056
@@ -784,12 +795,36 @@ class internal_router_builder_reports(router_builder_baseTemplate):
                 0x08A61A58ab10db054fBbE57996e89A69DdEba2F3
                 0xdaB1dA56965B1aaaBE38774E8B74C3Ade8fc439E
                 0x2FD6FD1E3f1fE24cC1422D22e62884A4528d1A24
-
+            * MANTLE:
+                * **Start time**:  May 6th, 16:00 UTC
+                * **End time**:  June 17th, 16:00 UTC
+                * 0x6e9d701fb6478ed5972a37886c2ba6c82a4cbb4c
+                0xd6cc4a33da7557a629e819c68fb805ddb225f517
+                0x1ee3ae551188661553882fdc75f8f62eaa6726ad
+                0xf8a02496bd84bd7f7ab9f1a000044fc482d729ca
+                0xde7421f870ffb2b99998d9ed07c4d9b22e783922
+                0xfe4bb996926aca85c9747bbec886ec2a3f510c66
+                0x2e18b825b049c4994370b0db6c35d0100295b96c
+                0xa18d3073441b0774a1efa45ba9d2e7da3441da2f
+                0x561f5cf838429586d1f8d3826526891b289270ee
+                0xfa81e2922b084ab260f7f8abd1d455d1235688d0
+                0xc0766ff871c6c8e72c110100d0120829dc017d38
+                0x78727b60f684f753152990dfa67e5c3940692279
+                0x099dd23eaab20f5ec43f50055d6e3030c66cc182
+                0x89bd0737f2b860535711678259b7fb931f493344
+            * POLYGON:
+                * **Start time**:  May 6th, 16:00 UTC
+                * **End time**:  June 17th, 16:00 UTC
+                * 0x3974fbdc22741a1632e024192111107b202f214f
+                0x39f223B2E0405FA62CeC7DC476FC5A307B435069
+                0x953e523eA34E85AC55D40Be1Ff71D52aa62497b7
+                0x1cf4293125913cb3dea4ad7f2bb4795b9e896ce9
 
         All usd values are calculated using prices at operation block ( at the time the operation happened).
         """
 
         return await report_galaxe(
+            chain=chain,
             user_address=filter_addresses(user_address),
             net_position_usd_threshold=net_position_usd_threshold,
             deposits_usd_threshold=deposits_usd_threshold,

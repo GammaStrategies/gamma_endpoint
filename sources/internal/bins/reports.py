@@ -17,6 +17,7 @@ from sources.mongo.bins.helpers import local_database_helper, global_database_he
 
 
 async def report_galaxe(
+    chain: Chain,
     user_address: str | None = None,
     net_position_usd_threshold: int | None = None,
     deposits_usd_threshold: int | None = None,
@@ -24,15 +25,14 @@ async def report_galaxe(
     """Custom report for Galaxe
 
     Args:
-        net_position_usd_threshold (int | None, optional): _description_. Defaults to None.
-        deposits_usd_threshold (int | None, optional): _description_. Defaults to None.
+        chain (Chain):
+        net_position_usd_threshold (int | None, optional): . Defaults to any.
+        deposits_usd_threshold (int | None, optional): . Defaults to any.
 
     """
-    full_report = await local_database_helper(
-        network=Chain.ARBITRUM
-    ).get_items_from_database(
+    full_report = await local_database_helper(network=chain).get_items_from_database(
         collection_name="reports",
-        find={"id": "usersActivity_arbitrum_users_net_position_Galxe"},
+        find={"id": f"usersActivity_{chain.database_name}_users_net_position_Galxe"},
         projection={"_id": 0},
     )
     full_report = full_report[0]
