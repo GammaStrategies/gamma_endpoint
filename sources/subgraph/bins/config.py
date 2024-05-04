@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from sources.common.general.config import get_config
+from sources.common.general.config import get_config, get_subgraph_studio_url
 from sources.subgraph.bins.enums import Chain, Protocol, QueryType
 
 DEPLOYMENTS = [
@@ -55,6 +55,7 @@ DEPLOYMENTS = [
     (Protocol.BLASTER, Chain.BLAST),
     (Protocol.THRUSTER, Chain.BLAST),
     (Protocol.ZYBERSWAP, Chain.ARBITRUM),
+    (Protocol.FENIX, Chain.BLAST),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -75,14 +76,15 @@ dex_hypepool_subgraph_urls = defaultdict(dict)
 gamma_subgraph_urls = defaultdict(dict)
 
 for protocol, chain in DEPLOYMENTS:
-    dex_subgraph_urls[protocol][chain] = get_config(
-        f"{protocol.value.upper()}_{chain.value.upper()}_SUBGRAPH_URL"
+    subgraph_prefix = f"{protocol.value.upper()}_{chain.value.upper()}"
+    dex_subgraph_urls[protocol][chain] = get_subgraph_studio_url(
+        get_config(f"{subgraph_prefix}_SUBGRAPH")
     )
-    dex_hypepool_subgraph_urls[protocol][chain] = get_config(
-        f"{protocol.value.upper()}_{chain.value.upper()}_HP_SUBGRAPH_URL"
+    dex_hypepool_subgraph_urls[protocol][chain] = get_subgraph_studio_url(
+        get_config(f"{subgraph_prefix}_HP_SUBGRAPH")
     )
-    gamma_subgraph_urls[protocol][chain] = get_config(
-        f"{protocol.value.upper()}_{chain.value.upper()}_GAMMA_SUBGRAPH_URL"
+    gamma_subgraph_urls[protocol][chain] = get_subgraph_studio_url(
+        get_config(f"{subgraph_prefix}_GAMMA_SUBGRAPH")
     )
 
 

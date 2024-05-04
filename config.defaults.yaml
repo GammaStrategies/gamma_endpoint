@@ -1,206 +1,212 @@
-UNISWAP_MAINNET_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/gamma
-UNISWAP_MAINNET_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-mainnet
-UNISWAP_MAINNET_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3
+SUBGRAPH_STUDIO_KEY: ""
 
-UNISWAP_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/polygon
-UNISWAP_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-polygon
-UNISWAP_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-polygon
+UNISWAP_MAINNET_GAMMA_SUBGRAPH: 9paB7Eptzq98R9K7L5QQTixSxFLXuDzKwmSKkn8ddEWU
+UNISWAP_MAINNET_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-mainnet
+UNISWAP_MAINNET_SUBGRAPH: https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3
 
-UNISWAP_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/arbitrum
-UNISWAP_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-arbitrum
-UNISWAP_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-dev
+UNISWAP_POLYGON_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/polygon
+UNISWAP_POLYGON_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-polygon
+UNISWAP_POLYGON_SUBGRAPH: https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-polygon
 
-UNISWAP_OPTIMISM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/optimism
-UNISWAP_OPTIMISM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-optimism
-UNISWAP_OPTIMISM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis
+UNISWAP_ARBITRUM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/arbitrum
+UNISWAP_ARBITRUM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-arbitrum
+UNISWAP_ARBITRUM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-dev
 
-UNISWAP_CELO_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/celo
-UNISWAP_CELO_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-celo
-UNISWAP_CELO_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/jesse-sawa/uniswap-celo
+UNISWAP_OPTIMISM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/optimism
+UNISWAP_OPTIMISM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-optimism
+UNISWAP_OPTIMISM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis
 
-UNISWAP_BSC_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/uniswap-bsc
-UNISWAP_BSC_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-bsc
-UNISWAP_BSC_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-bsc
+UNISWAP_CELO_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/celo
+UNISWAP_CELO_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-celo
+UNISWAP_CELO_SUBGRAPH: https://api.thegraph.com/subgraphs/name/jesse-sawa/uniswap-celo
 
-UNISWAP_MOONBEAM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-moonbeam
-UNISWAP_MOONBEAM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-moonbeam
-UNISWAP_MOONBEAM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-moonbeam
+UNISWAP_BSC_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/uniswap-bsc
+UNISWAP_BSC_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-bsc
+UNISWAP_BSC_SUBGRAPH: https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-bsc
 
-UNISWAP_AVALANCHE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-uniswap-avax/version/latest
-UNISWAP_AVALANCHE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-avax/version/latest
-UNISWAP_AVALANCHE_SUBGRAPH_URL: _
+UNISWAP_MOONBEAM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-moonbeam
+UNISWAP_MOONBEAM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-moonbeam
+UNISWAP_MOONBEAM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-moonbeam
 
-UNISWAP_BASE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-uniswap-base/version/latest
-UNISWAP_BASE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-base/version/latest
-UNISWAP_BASE_SUBGRAPH_URL: _
+UNISWAP_AVALANCHE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-uniswap-avax/version/latest
+UNISWAP_AVALANCHE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-avax/version/latest
+UNISWAP_AVALANCHE_SUBGRAPH: _
 
-UNISWAP_BLAST_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-uniswap-blast/version/latest
-UNISWAP_BLAST_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-blast/version/latest
-UNISWAP_BLAST_SUBGRAPH_URL: _
+UNISWAP_BASE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-uniswap-base/version/latest
+UNISWAP_BASE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-base/version/latest
+UNISWAP_BASE_SUBGRAPH: _
 
-UNISWAP_SCROLL_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-uniswap-scroll/version/latest
-UNISWAP_SCROLL_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-scroll/version/latest
-UNISWAP_SCROLL_SUBGRAPH_URL: _
+UNISWAP_BLAST_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-uniswap-blast/version/latest
+UNISWAP_BLAST_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-blast/version/latest
+UNISWAP_BLAST_SUBGRAPH: _
 
-UNISWAP_LINEA_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-uniswap-linea/version/latest
-UNISWAP_LINEA_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-linea/version/latest
-UNISWAP_LINEA_SUBGRAPH_URL: _
+UNISWAP_SCROLL_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-uniswap-scroll/version/latest
+UNISWAP_SCROLL_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-scroll/version/latest
+UNISWAP_SCROLL_SUBGRAPH: _
 
-UNISWAP_MANTLE_GAMMA_SUBGRAPH_URL: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-uniswap-mantle
-UNISWAP_MANTLE_HP_SUBGRAPH_URL: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-hp-uniswap-mantle
-UNISWAP_MANTLE_SUBGRAPH_URL: _
+UNISWAP_LINEA_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-uniswap-linea/version/latest
+UNISWAP_LINEA_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-linea/version/latest
+UNISWAP_LINEA_SUBGRAPH: _
 
-UNISWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-uniswap-pzke/version/latest
-UNISWAP_POLYGON_ZKEVM_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-pzke/version/latest
-UNISWAP_POLYGON_ZKEVM_SUBGRAPH_URL: _
+UNISWAP_MANTLE_GAMMA_SUBGRAPH: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-uniswap-mantle
+UNISWAP_MANTLE_HP_SUBGRAPH: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-hp-uniswap-mantle
+UNISWAP_MANTLE_SUBGRAPH: _
 
-QUICKSWAP_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/algebra-polygon
-QUICKSWAP_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-quickswap-polygon
-QUICKSWAP_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/sameepsi/quickswap-v3
+UNISWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-uniswap-pzke/version/latest
+UNISWAP_POLYGON_ZKEVM_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-pzke/version/latest
+UNISWAP_POLYGON_ZKEVM_SUBGRAPH: _
 
-QUICKSWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-quickswap-pzke/version/latest
-QUICKSWAP_POLYGON_ZKEVM_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-pzke/version/latest
-QUICKSWAP_POLYGON_ZKEVM_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44554/quickswap-v3-02/0.0.7
+QUICKSWAP_POLYGON_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/algebra-polygon
+QUICKSWAP_POLYGON_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-quickswap-polygon
+QUICKSWAP_POLYGON_SUBGRAPH: https://api.thegraph.com/subgraphs/name/sameepsi/quickswap-v3
 
-QUICKSWAP_MANTA_GAMMA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-quickswap-manta/latest/gn
-QUICKSWAP_MANTA_HP_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-quickswap-manta/latest/gn
-QUICKSWAP_MANTA_SUBGRAPH_URL: _
+QUICKSWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-quickswap-pzke/version/latest
+QUICKSWAP_POLYGON_ZKEVM_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-pzke/version/latest
+QUICKSWAP_POLYGON_ZKEVM_SUBGRAPH: https://api.studio.thegraph.com/query/44554/quickswap-v3-02/0.0.7
 
-QUICKSWAP_IMMUTABLE_ZKEVM_GAMMA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-quickswap-imtblzke/latest/gn
-QUICKSWAP_IMMUTABLE_ZKEVM_HP_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-quickswap-imtblzke/latest/gn
-QUICKSWAP_IMMUTABLE_ZKEVM_SUBGRAPH_URL: _
+QUICKSWAP_MANTA_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-quickswap-manta/latest/gn
+QUICKSWAP_MANTA_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-quickswap-manta/latest/gn
+QUICKSWAP_MANTA_SUBGRAPH: _
 
-QUICKSWAP_ASTAR_ZKEVM_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-quickswap-azke/version/latest
-QUICKSWAP_ASTAR_ZKEVM_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-azke/version/latest
-QUICKSWAP_ASTAR_ZKEVM_SUBGRAPH_URL: _
+QUICKSWAP_IMMUTABLE_ZKEVM_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-quickswap-imtblzke/latest/gn
+QUICKSWAP_IMMUTABLE_ZKEVM_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-quickswap-imtblzke/latest/gn
+QUICKSWAP_IMMUTABLE_ZKEVM_SUBGRAPH: _
 
-QUICKSWAP_UNISWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-quickswap-uni-pzke/version/latest
-QUICKSWAP_UNISWAP_POLYGON_ZKEVM_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-uni-pzke/version/latest
-QUICKSWAP_UNISWAP_POLYGON_ZKEVM_SUBGRAPH_URL: _
+QUICKSWAP_ASTAR_ZKEVM_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-quickswap-azke/version/latest
+QUICKSWAP_ASTAR_ZKEVM_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-azke/version/latest
+QUICKSWAP_ASTAR_ZKEVM_SUBGRAPH: _
 
-ZYBERSWAP_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/zyberswap-arbitrum
-ZYBERSWAP_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-zyberswap-arbitrum
-ZYBERSWAP_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/iliaazhel/zyberswap-info
+QUICKSWAP_UNISWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-quickswap-uni-pzke/version/latest
+QUICKSWAP_UNISWAP_POLYGON_ZKEVM_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-uni-pzke/version/latest
+QUICKSWAP_UNISWAP_POLYGON_ZKEVM_SUBGRAPH: _
 
-THENA_BSC_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/gammastrategies/thena
-THENA_BSC_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-thena-bsc
-THENA_BSC_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/iliaazhel/thena-info
+ZYBERSWAP_ARBITRUM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/zyberswap-arbitrum
+ZYBERSWAP_ARBITRUM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-zyberswap-arbitrum
+ZYBERSWAP_ARBITRUM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/iliaazhel/zyberswap-info
 
-THENA_OPBNB_GAMMA_SUBGRAPH_URL: https://opbnb-mainnet-graph.nodereal.io/subgraphs/name/gamma-thena-opbnb
-THENA_OPBNB_HP_SUBGRAPH_URL: https://opbnb-mainnet-graph.nodereal.io/subgraphs/name/gamma-hp-thena-opbnb
-THENA_OPBNB_SUBGRAPH_URL: _
+THENA_BSC_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/thena
+THENA_BSC_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-thena-bsc
+THENA_BSC_SUBGRAPH: https://api.thegraph.com/subgraphs/name/iliaazhel/thena-info
 
-CAMELOT_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-camelot-arbitrum
-CAMELOT_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-camelot-arbitrum
-CAMELOT_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/camelotlabs/camelot-amm-v3
+THENA_OPBNB_GAMMA_SUBGRAPH: https://opbnb-mainnet-graph.nodereal.io/subgraphs/name/gamma-thena-opbnb
+THENA_OPBNB_HP_SUBGRAPH: https://opbnb-mainnet-graph.nodereal.io/subgraphs/name/gamma-hp-thena-opbnb
+THENA_OPBNB_SUBGRAPH: _
 
-GLACIER_AVALANCHE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-glacier-avax
-GLACIER_AVALANCHE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-glacier-avax
-GLACIER_AVALANCHE_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/iliaazhel/glacier-info
+CAMELOT_ARBITRUM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-camelot-arbitrum
+CAMELOT_ARBITRUM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-camelot-arbitrum
+CAMELOT_ARBITRUM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/camelotlabs/camelot-amm-v3
 
-RETRO_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-retro-polygon
-RETRO_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-retro-polygon
-RETRO_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ruvlol/univ3-test
+GLACIER_AVALANCHE_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-glacier-avax
+GLACIER_AVALANCHE_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-glacier-avax
+GLACIER_AVALANCHE_SUBGRAPH: https://api.thegraph.com/subgraphs/name/iliaazhel/glacier-info
 
-STELLASWAP_MOONBEAM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-stellaswap-moonbeam
-STELLASWAP_MOONBEAM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-stellaswap-moonbeam
-STELLASWAP_MOONBEAM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/stellaswap/pulsar
+RETRO_POLYGON_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-retro-polygon
+RETRO_POLYGON_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-retro-polygon
+RETRO_POLYGON_SUBGRAPH: https://api.thegraph.com/subgraphs/name/ruvlol/univ3-test
 
-BEAMSWAP_MOONBEAM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-beamswap-moonbeam
-BEAMSWAP_MOONBEAM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-beamswap-moonbeam
-BEAMSWAP_MOONBEAM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/rock-n-block/beamswap-v3-subgraph
+STELLASWAP_MOONBEAM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-stellaswap-moonbeam
+STELLASWAP_MOONBEAM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-stellaswap-moonbeam
+STELLASWAP_MOONBEAM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/stellaswap/pulsar
 
-SPIRITSWAP_FANTOM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-spiritswap-fantom
-SPIRITSWAP_FANTOM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-spiritswap-fantom
-SPIRITSWAP_FANTOM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/iliaazhel/spirit-info
+BEAMSWAP_MOONBEAM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-beamswap-moonbeam
+BEAMSWAP_MOONBEAM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-beamswap-moonbeam
+BEAMSWAP_MOONBEAM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/rock-n-block/beamswap-v3-subgraph
 
-SUSHI_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-sushi-polygon
-SUSHI_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-sushi-polygon
-SUSHI_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/sushi-v3/v3-polygon
+SPIRITSWAP_FANTOM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-spiritswap-fantom
+SPIRITSWAP_FANTOM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-spiritswap-fantom
+SPIRITSWAP_FANTOM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/iliaazhel/spirit-info
 
-SUSHI_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-sushi-arbitrum
-SUSHI_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-sushi-arbitrum
-SUSHI_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/sushi-v3/v3-arbitrum
+SUSHI_POLYGON_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-sushi-polygon
+SUSHI_POLYGON_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-sushi-polygon
+SUSHI_POLYGON_SUBGRAPH: https://api.thegraph.com/subgraphs/name/sushi-v3/v3-polygon
 
-SUSHI_BASE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-sushi-base
-SUSHI_BASE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-sushi-base
-SUSHI_BASE_SUBGRAPH_URL: https://api.studio.thegraph.com/query/32073/v3-base/version/latest
+SUSHI_ARBITRUM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-sushi-arbitrum
+SUSHI_ARBITRUM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-sushi-arbitrum
+SUSHI_ARBITRUM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/sushi-v3/v3-arbitrum
 
-RAMSES_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-ramses-arbitrum
-RAMSES_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-ramses-arbitrum
-RAMSES_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/ramsesexchange/concentrated-liquidity-graph
+SUSHI_BASE_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-sushi-base
+SUSHI_BASE_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-sushi-base
+SUSHI_BASE_SUBGRAPH: https://api.studio.thegraph.com/query/32073/v3-base/version/latest
 
-NILE_LINEA_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-nile-linea/version/latest
-NILE_LINEA_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-nile-linea/version/latest
-NILE_LINEA_SUBGRAPH_URL: _
+RAMSES_ARBITRUM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-ramses-arbitrum
+RAMSES_ARBITRUM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-ramses-arbitrum
+RAMSES_ARBITRUM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/ramsesexchange/concentrated-liquidity-graph
 
-ASCENT_POLYGON_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-ascent-polygon
-ASCENT_POLYGON_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-ascent-polygon
-ASCENT_POLYGON_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/seme0801/ascent-v3
+NILE_LINEA_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-nile-linea/version/latest
+NILE_LINEA_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-nile-linea/version/latest
+NILE_LINEA_SUBGRAPH: _
 
-FUSIONX_MANTLE_GAMMA_SUBGRAPH_URL: https://graphv3.fusionx.finance/subgraphs/name/gamma-fusionx-mantle
-FUSIONX_MANTLE_HP_SUBGRAPH_URL: https://graphv3.fusionx.finance/subgraphs/name/gamma-hp-fusionx-mantle
-FUSIONX_MANTLE_SUBGRAPH_URL: https://graphv3.fusionx.finance/subgraphs/name/fusionx/exchange-v3
+ASCENT_POLYGON_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-ascent-polygon
+ASCENT_POLYGON_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-ascent-polygon
+ASCENT_POLYGON_SUBGRAPH: https://api.thegraph.com/subgraphs/name/seme0801/ascent-v3
 
-SYNTHSWAP_BASE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-synthswap-base
-SYNTHSWAP_BASE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-synthswap-base
-SYNTHSWAP_BASE_SUBGRAPH_URL: https://api.studio.thegraph.com/query/45189/synthswap-v3-analytics-base/version/latest/
+FUSIONX_MANTLE_GAMMA_SUBGRAPH: https://graphv3.fusionx.finance/subgraphs/name/gamma-fusionx-mantle
+FUSIONX_MANTLE_HP_SUBGRAPH: https://graphv3.fusionx.finance/subgraphs/name/gamma-hp-fusionx-mantle
+FUSIONX_MANTLE_SUBGRAPH: https://graphv3.fusionx.finance/subgraphs/name/fusionx/exchange-v3
 
-LYNEX_LINEA_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-lynex-linea/version/latest
-LYNEX_LINEA_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-lynex-linea/version/latest
-LYNEX_LINEA_SUBGRAPH_URL: https://graph-query.linea.build/subgraphs/name/cryptoalgebra/analytics
+SYNTHSWAP_BASE_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-synthswap-base
+SYNTHSWAP_BASE_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-synthswap-base
+SYNTHSWAP_BASE_SUBGRAPH: https://api.studio.thegraph.com/query/45189/synthswap-v3-analytics-base/version/latest/
 
-PEGASYS_ROLLUX_GAMMA_SUBGRAPH_URL: https://rollux.graph.pegasys.fi/subgraphs/name/gammastrategies/pegasys-rollux
-PEGASYS_ROLLUX_HP_SUBGRAPH_URL: https://rollux.graph.pegasys.fi/subgraphs/name/gammastrategies/hype-pool-pegasys-rollux
-PEGASYS_ROLLUX_SUBGRAPH_URL: https://rollux.graph.pegasys.fi/subgraphs/name/pollum-io/pegasys-v3
+LYNEX_LINEA_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-lynex-linea/version/latest
+LYNEX_LINEA_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-lynex-linea/version/latest
+LYNEX_LINEA_SUBGRAPH: https://graph-query.linea.build/subgraphs/name/cryptoalgebra/analytics
 
-BASEX_BASE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-basex-base
-BASEX_BASE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-basex-base
-BASEX_BASE_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/basex/base
+PEGASYS_ROLLUX_GAMMA_SUBGRAPH: https://rollux.graph.pegasys.fi/subgraphs/name/gammastrategies/pegasys-rollux
+PEGASYS_ROLLUX_HP_SUBGRAPH: https://rollux.graph.pegasys.fi/subgraphs/name/gammastrategies/hype-pool-pegasys-rollux
+PEGASYS_ROLLUX_SUBGRAPH: https://rollux.graph.pegasys.fi/subgraphs/name/pollum-io/pegasys-v3
 
-PANCAKESWAP_ARBITRUM_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-pancakeswap-arbitrum
-PANCAKESWAP_ARBITRUM_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-pancakeswap-arbitrum
-PANCAKESWAP_ARBITRUM_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/pancakeswap/exchange-v3-arb
+BASEX_BASE_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-basex-base
+BASEX_BASE_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-basex-base
+BASEX_BASE_SUBGRAPH: https://api.thegraph.com/subgraphs/name/basex/base
 
-APERTURE_MANTA_GAMMA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-aperture-manta/latest/gn
-APERTURE_MANTA_HP_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-aperture-manta/latest/gn
-APERTURE_MANTA_SUBGRAPH_URL: https://api.goldsky.com/api/public/project_clnz7akg41cv72ntv0uhyd3ai/subgraphs/aperture/uniswap-v3/gn
+PANCAKESWAP_ARBITRUM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-pancakeswap-arbitrum
+PANCAKESWAP_ARBITRUM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-pancakeswap-arbitrum
+PANCAKESWAP_ARBITRUM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/pancakeswap/exchange-v3-arb
 
-HERCULES_METIS_GAMMA_SUBGRAPH_URL: https://metisapi.0xgraph.xyz/subgraphs/name/gamma-hercules-metis
-HERCULES_METIS_HP_SUBGRAPH_URL: https://metisapi.0xgraph.xyz/subgraphs/name/gamma-hp-hercules-metis
-HERCULES_METIS_SUBGRAPH_URL: _
+APERTURE_MANTA_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-aperture-manta/latest/gn
+APERTURE_MANTA_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-aperture-manta/latest/gn
+APERTURE_MANTA_SUBGRAPH: https://api.goldsky.com/api/public/project_clnz7akg41cv72ntv0uhyd3ai/subgraphs/aperture/uniswap-v3/gn
 
-BASESWAP_BASE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-baseswap-base/version/latest
-BASESWAP_BASE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-baseswap-base/version/latest
-BASESWAP_BASE_SUBGRAPH_URL: _
+HERCULES_METIS_GAMMA_SUBGRAPH: https://metisapi.0xgraph.xyz/subgraphs/name/gamma-hercules-metis
+HERCULES_METIS_HP_SUBGRAPH: https://metisapi.0xgraph.xyz/subgraphs/name/gamma-hp-hercules-metis
+HERCULES_METIS_SUBGRAPH: _
 
-SWAPBASED_BASE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-swapbased-base/version/latest
-SWAPBASED_BASE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-swapbased-base/version/latest
-SWAPBASED_BASE_SUBGRAPH_URL: _
+BASESWAP_BASE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-baseswap-base/version/latest
+BASESWAP_BASE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-baseswap-base/version/latest
+BASESWAP_BASE_SUBGRAPH: _
 
-PHARAOH_AVALANCHE_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-pharaoh-avax
-PHARAOH_AVALANCHE_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-hp-pharaoh-avax
-PHARAOH_AVALANCHE_SUBGRAPH_URL: _
+SWAPBASED_BASE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-swapbased-base/version/latest
+SWAPBASED_BASE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-swapbased-base/version/latest
+SWAPBASED_BASE_SUBGRAPH: _
 
-SWAPR_GNOSIS_GAMMA_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-swapr-gnosis
-SWAPR_GNOSIS_HP_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-hp-swapr-gnosis
-SWAPR_GNOSIS_SUBGRAPH_URL: _
+PHARAOH_AVALANCHE_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-pharaoh-avax
+PHARAOH_AVALANCHE_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-hp-pharaoh-avax
+PHARAOH_AVALANCHE_SUBGRAPH: _
 
-THICK_BASE_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-thick-base/version/latest
-THICK_BASE_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-thick-base/version/latest
-THICK_BASE_SUBGRAPH_URL: _
+SWAPR_GNOSIS_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-swapr-gnosis
+SWAPR_GNOSIS_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-hp-swapr-gnosis
+SWAPR_GNOSIS_SUBGRAPH: _
 
-CLEOPATRA_MANTLE_GAMMA_SUBGRAPH_URL: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-cleopatra-mantle
-CLEOPATRA_MANTLE_HP_SUBGRAPH_URL: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-hp-cleopatra-mantle
-CLEOPATRA_MANTLE_SUBGRAPH_URL: _
+THICK_BASE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-thick-base/version/latest
+THICK_BASE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-thick-base/version/latest
+THICK_BASE_SUBGRAPH: _
 
-BLASTER_BLAST_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-blaster-blast/version/latest
-BLASTER_BLAST_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-blaster-blast/version/latest
-BLASTER_BLAST_SUBGRAPH_URL: _
+CLEOPATRA_MANTLE_GAMMA_SUBGRAPH: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-cleopatra-mantle
+CLEOPATRA_MANTLE_HP_SUBGRAPH: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-hp-cleopatra-mantle
+CLEOPATRA_MANTLE_SUBGRAPH: _
 
-THRUSTER_BLAST_GAMMA_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-thruster-blast/version/latest
-THRUSTER_BLAST_HP_SUBGRAPH_URL: https://api.studio.thegraph.com/query/44730/gamma-hp-thruster-blast/version/latest
-THRUSTER_BLAST_SUBGRAPH_URL: _
+BLASTER_BLAST_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-blaster-blast/version/latest
+BLASTER_BLAST_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-blaster-blast/version/latest
+BLASTER_BLAST_SUBGRAPH: _
+
+THRUSTER_BLAST_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-thruster-blast/version/latest
+THRUSTER_BLAST_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-thruster-blast/version/latest
+THRUSTER_BLAST_SUBGRAPH: _
+
+FENIX_BLAST_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-fenix-blast/version/latest
+FENIX_BLAST_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-fenix-blast/version/latest
+FENIX_BLAST_SUBGRAPH: _
 
 
 # Masterchef addresses

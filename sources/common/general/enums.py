@@ -125,6 +125,7 @@ class Dex(str, Enum):
     CLEOPATRA = "cleopatra"
     BLASTER = "blaster"
     THRUSTER = "thruster"
+    FENIX: "fenix"
 
 
 class Protocol(str, Enum):
@@ -173,6 +174,7 @@ class Protocol(str, Enum):
     CLEOPATRA = ("cleopatra", None, None, None, "cleopatra", "Cleopatra")
     BLASTER = ("blaster", None, None, None, "blaster", "Blaster")
     THRUSTER = ("thruster", None, None, None, "thruster", "Thruster")
+    FENIX = ("fenix", None, None, None, "fenix", "Fenix")
 
     # extra properties
     api_url: str
