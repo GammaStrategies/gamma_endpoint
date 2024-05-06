@@ -47,7 +47,7 @@ def convert_feeProtocol(
         # https://vscode.blockscan.com/bsc/0x1b9a1120a17617D8eC4dC80B921A9A1C50Caef7d
         protocol_fee_0 = (feeProtocol0 / 10) // 1
         protocol_fee_1 = (feeProtocol1 / 10) // 1
-    elif pool_protocol == Protocol.CAMELOT:
+    elif pool_protocol in [Protocol.CAMELOT, Protocol.HERCULES]:
         # factory
         # https://vscode.blockscan.com/arbitrum-one/0x521aa84ab3fcc4c05cabac24dc3682339887b126
         protocol_fee_0 = (feeProtocol0 / 10) // 1
