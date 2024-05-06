@@ -110,6 +110,7 @@ def query_user_operations_brevis_GammaQueryRequest(
                         "$cond": [
                             {"$eq": ["$isReal", True]},
                             {
+                                "block_number": "$block",
                                 "transaction_hash": "$transactionHash",
                                 "log_extract_infos": [
                                     {
