@@ -61,7 +61,7 @@ def query_user_operations_brevis_GammaQueryRequest(
                 "let": {
                     "op_txHash": "$transactionHash",
                     "op_topic": "$topic",
-                    "op_user": "$user_address",
+                    "op_shares": {"$toDecimal": "$shares.flow"},
                     "op_logIndex": "$logIndex",
                 },
                 "pipeline": [
@@ -77,9 +77,10 @@ def query_user_operations_brevis_GammaQueryRequest(
                                         "$cond": [
                                             {"$eq": ["$$op_topic", "deposit"]},
                                             2,
+                                            # 3 is for the case of a transfer: 1 for the sender (negative share flow), 2 for the receiver ( positive flow)
                                             {
                                                 "$cond": [
-                                                    {"$eq": ["$$op_user", "dst"]},
+                                                    {"$gt": ["$$op_shares", 0]},
                                                     2,
                                                     1,
                                                 ]
