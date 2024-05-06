@@ -108,7 +108,7 @@ def query_user_operations_brevis_GammaQueryRequest(
                 "receiptInfos": {
                     "$push": {
                         "$cond": [
-                            {"$eq": ["$customIndex", 0]},
+                            {"$eq": ["$isReal", True]},
                             {
                                 "transaction_hash": "$transactionHash",
                                 "log_extract_infos": [
