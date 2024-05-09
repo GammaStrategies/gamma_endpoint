@@ -238,3 +238,130 @@ def query_user_shares_merkl(
     ]
 
     return _query
+
+
+# TODO: in development
+def query_user_shares_from_user_operations(
+    user_address: str,
+    timestamp_ini: int | None = None,
+    timestamp_end: int | None = None,
+    block_ini: int | None = None,
+    block_end: int | None = None,
+    hypervisor_address: str | None = None,
+) -> list[dict]:
+
+    # block ini and block end or timestamp ini and timestamp end should be set together
+    if (block_ini or block_end) and not (block_ini and block_end):
+        raise ValueError("block_ini and block_end should be set together")
+    if (timestamp_ini or timestamp_end) and not (timestamp_ini and timestamp_end):
+        raise ValueError("timestamp_ini and timestamp_end should be set together")
+    # any of the block or timestamp should be set
+    if not (block_ini or block_end or timestamp_ini or timestamp_end):
+        raise ValueError(
+            "block_ini, block_end, timestamp_ini or timestamp_end should be set"
+        )
+
+    _and_first_match = []
+    _first_shares_balance_lt = []
+    _operations_match = []
+
+    # user address
+    if user_address:
+        _and_first_match.append({"user_address": user_address})
+
+    # add hypervisor address to match if set
+    if hypervisor_address:
+        _and_first_match.append({"address": hypervisor_address})
+
+    if _and_first_match:
+        _and_first_match = [{"$match": {"$and": _and_first_match}}]
+
+    # add timestamp to match if set
+    if timestamp_ini and timestamp_end:
+        _first_shares_balance_lt = ["$timestamp", timestamp_ini]
+        _operations_match.append({"$gte": ["$timestamp", timestamp_ini]})
+        _operations_match.append({"$lte": ["$timestamp", timestamp_end]})
+    elif timestamp_ini:
+        _first_shares_balance_lt = ["$timestamp", timestamp_ini]
+        _operations_match.append({"$gte": ["$timestamp", timestamp_ini]})
+    elif timestamp_end:
+        _first_shares_balance_lt = ["$timestamp", 0]
+        _operations_match.append({"$lte": ["$timestamp", timestamp_end]})
+    # add block to match if set
+    if block_ini and block_end:
+        _first_shares_balance_lt = ["$block", block_ini]
+        _operations_match.append({"$gte": ["$block", block_ini]})
+        _operations_match.append({"$lte": ["$block", block_end]})
+    elif block_ini:
+        _first_shares_balance_lt = ["$block", block_ini]
+        _operations_match.append({"$gte": ["$block", block_ini]})
+    elif block_end:
+        _first_shares_balance_lt = ["$block", 0]
+        _operations_match.append({"$lte": ["$block", block_end]})
+
+    query = [
+        {"$sort": {"block": 1}},
+        {
+            "$group": {
+                "_id": {"user": "$user_address", "hype": "$hypervisor_address"},
+                "user_address": {"$first": "$user_address"},
+                "hypervisor_address": {"$first": "$hypervisor_address"},
+                "first_shares_balance": {
+                    "$push": {
+                        "$cond": {
+                            "if": {
+                                "$lt": (
+                                    _first_shares_balance_lt
+                                    if _first_shares_balance_lt
+                                    else ["$block", 0]
+                                )
+                            },
+                            "then": "$shares.balance",
+                            "else": "$$REMOVE",
+                        }
+                    }
+                },
+                "operations": {
+                    "$push": {
+                        "$cond": {
+                            "if": {
+                                "$and": (
+                                    _operations_match if _operations_match else [True]
+                                )
+                            },
+                            "then": {
+                                "id": "$id",
+                                "block": "$block",
+                                "timestamp": "$timestamp",
+                                "user_address": "$user_address",
+                                "hypervisor_address": "$hypervisor_address",
+                                "shares": "$shares",
+                                "tokens_flow": "$tokens_flow",
+                                "prices": "$prices",
+                                "topic": "$topic",
+                                "transactionHash": "$transactionHash",
+                                "logIndex": "$logIndex",
+                                "customIndex": "$customIndex",
+                            },
+                            "else": "$$REMOVE",
+                        }
+                    }
+                },
+            }
+        },
+        {
+            "$addFields": {
+                "first_shares_balance": {
+                    "$ifNull": [{"$last": "$first_shares_balance"}, "0"]
+                },
+                "last_shares_balance": {
+                    "$ifNull": [
+                        {"$last": "$operations.shares.balance"},
+                        "$first_shares_balance",
+                    ]
+                },
+            }
+        },
+    ]
+
+    return query
