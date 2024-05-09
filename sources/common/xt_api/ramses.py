@@ -192,8 +192,9 @@ class ramses_api_helper:
             "rewardToken_decimals": tmp_price["decimals"],
             "rewardsPerSecond": rewards_per_second,
             "usdPerSecond": rewards_per_second * tmp_price["price"],
-            "totalValueLockedUSD": tmp_data["totalValueLockedUSD"],
+            "totalValueLockedUSD": float(tmp_data["totalValueLockedUSD"]),
             "apr": (usd_per_day * 365) / float(tmp_data["totalValueLockedUSD"]),
+            "liquidity": tmp_data["liquidity"],
         }
 
     async def get_apr(self, pool: str):
