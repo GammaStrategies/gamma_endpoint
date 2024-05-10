@@ -142,7 +142,7 @@ async def rewrite_mfd_with_api(data: dict, chain: Chain, protocol: Protocol) -> 
                         )
                     except Exception as e:
                         logging.getLogger(__name__).error(
-                            f"Error getting ramses api data for pol {hypervisors_static[hype_address]['pool']['address']}: {e}"
+                            f"Error getting ramses api data for pool {hypervisors_static[hype_address]['pool']['address']}: {e}"
                         )
                         continue
 
@@ -161,7 +161,8 @@ async def rewrite_mfd_with_api(data: dict, chain: Chain, protocol: Protocol) -> 
                         rewarder_data["rewardPerSecond"] = (
                             tmp_data["rewardRate"] * gamma_liquidity_inrange_percentage
                         )
-
+                        rewarder_data["emissionRate"] = tmp_data["rewardRate"]
+                        rewarder_data["emissionRateUSD"] = tmp_data["usdPerSecond"]
                         rewarder_data["apr"] = (
                             (
                                 (
