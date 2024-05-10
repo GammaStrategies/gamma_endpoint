@@ -69,7 +69,7 @@ def query_all_user_addresses(hypervisor_address: str | None = None) -> list[dict
     ]
 
     if hypervisor_address:
-        _query[0]["$match"]["address"] = {"$in": hypervisor_address}
+        _query[0]["$match"]["address"] = {"$ne": hypervisor_address}
 
     return _query
 
