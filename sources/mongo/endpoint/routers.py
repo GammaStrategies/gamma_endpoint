@@ -272,6 +272,13 @@ class mongo_router_builder(router_builder_baseTemplate):
             generate_unique_id_function=self.generate_unique_id,
         )
 
+        router.add_api_route(
+            path=f"{self.prefix}{'/hypervisors/users'}",
+            endpoint=self.hypervisors_users,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
         return router
 
     def _create_routes_user(self, router: APIRouter) -> APIRouter:
@@ -495,6 +502,48 @@ class mongo_router_builder(router_builder_baseTemplate):
         """
         return await rewards.latest_multifeeDistributor(
             network=self.chain, protocol=self.protocol
+        )
+
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def hypervisors_users(
+        self,
+        response: Response,
+        user_address: str | None = Query(None, description="user address"),
+        hypervisors: typing.List[str] | None = Query(
+            None, description="list of hypervisor addresses"
+        ),
+        block_ini: int | None = Query(
+            None, description="will limit the data returned from this value."
+        ),
+        block_end: int | None = Query(
+            None, description="will limit the data returned to this value."
+        ),
+        timestamp_ini: int | None = Query(
+            None, description="will limit the data returned from this value."
+        ),
+        timestamp_end: int | None = Query(
+            None, description="will limit the data returned to this value."
+        ),
+        net_position_usd_threshold: float | None = Query(
+            None, description="will limit the data returned to this value."
+        ),
+        deposits_usd_threshold: float | None = Query(
+            None, description="will limit the data returned to this value."
+        ),
+    ):
+        """Returns users shares related data for a given hypervisor address"""
+
+        return await user.get_user_operations(
+            chain=self.chain,
+            protocol=self.protocol,
+            user_address=user_address,
+            hypervisor_address_list=hypervisors,
+            block_ini=block_ini,
+            block_end=block_end,
+            timestamp_ini=timestamp_ini,
+            timestamp_end=timestamp_end,
+            net_position_usd_threshold=net_position_usd_threshold,
+            deposits_usd_threshold=deposits_usd_threshold,
         )
 
     # User

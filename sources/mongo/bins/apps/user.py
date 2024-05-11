@@ -1,10 +1,14 @@
+import asyncio
+import time
 from decimal import Decimal
+import itertools
 import logging
 from math import prod
-from sources.common.general.enums import Chain
+from sources.common.general.enums import Chain, Protocol
 from sources.common.database.collection_endpoint import database_local
 
 # TODO: restruct global config and local config
+from sources.mongo.bins.helpers import global_database_helper, local_database_helper
 from sources.subgraph.bins.config import MONGO_DB_URL
 
 
@@ -296,192 +300,6 @@ async def get_user_analytic_data(
     )
 
 
-# async def get_user_analytic_data2(
-#     chain: Chain,
-#     address: str,
-#     block_ini: int = 0,
-#     block_end: int = 0,
-# ):
-#     db_name = f"{chain.database_name}_gamma"
-#     local_db_helper = database_local(mongo_url=MONGO_DB_URL, db_name=db_name)
-#     return await local_db_helper.get_user_status(
-#         address=address, block_ini=block_ini, block_end=block_end
-#     )
-
-
-# async def get_user_analytic_data3(
-#     chain: Chain,
-#     address: str,
-#     block_ini: int = 0,
-#     block_end: int = 0,
-# ):
-#     result = {}
-
-#     # build query
-#     find = {"user_address": address}
-#     if block_ini:
-#         find["block"] = {"$gte": block_ini}
-#     if block_end:
-#         find["block"] = {"$lte": block_end}
-#     # loop thru operations
-#     for operation in await database_local(
-#         mongo_url=MONGO_DB_URL, db_name=f"{chain.database_name}_gamma"
-#     ).get_items_from_database(
-#         collection_name="user_operations",
-#         find=find,
-#         sort=[("block", 1)],
-#     ):
-#         operation = database_local.convert_d128_to_decimal(operation)
-#         if operation["hypervisor_address"] not in result:
-#             result[operation["hypervisor_address"]] = []
-
-#         # add to result
-#         result[operation["hypervisor_address"]].append(
-#             user_analytic_data_helper(
-#                 result[operation["hypervisor_address"]], operation
-#             )
-#         )
-
-#     return result
-
-
-# def user_analytic_data_helper(hypervisor_result: list, operation: dict) -> dict:
-#     # get last values
-#     last_shares_qtty = Decimal("0")
-#     last_operation_timestamp = operation["timestamp"]
-#     last_fees_token0_qtty = Decimal("0")
-#     last_fees_token1_qtty = Decimal("0")
-#     last_shares_value_usd = Decimal("0")
-#     last_pnl = Decimal("0")
-#     last_pnl_token0 = Decimal("0")
-#     last_pnl_token1 = Decimal("0")
-#     if hypervisor_result:
-#         last_shares_qtty = hypervisor_result[-1]["shares"]
-#         last_operation_timestamp = hypervisor_result[-1]["timestamp"]
-#         last_fees_token0_qtty = hypervisor_result[-1]["fees_token0_qtty"]
-#         last_fees_token1_qtty = hypervisor_result[-1]["fees_token1_qtty"]
-#         last_shares_value_usd = hypervisor_result[-1]["shares_value_usd"]
-#         last_pnl = hypervisor_result[-1]["pnl_usd"]
-#         last_pnl_token0 = hypervisor_result[-1]["pnl_token0"]
-#         last_pnl_token1 = hypervisor_result[-1]["pnl_token1"]
-
-#     # start building user operation result
-#     user_operation_result = {
-#         "operation": operation["topic"],
-#         "block": operation["block"],
-#         "timestamp": operation["timestamp"],
-#         "period_seconds": operation["timestamp"] - last_operation_timestamp,
-#         "pnl_usd": 0,
-#         "pnl_token0": 0,
-#         "pnl_token1": 0,
-#         "shares": operation["shares_in"] - operation["shares_out"] + last_shares_qtty,
-#         "shares_value_usd": 0,
-#         "underlying_token0_qtty": 0,
-#         "underlying_token1_qtty": 0,
-#         "fees_token0_qtty": 0,
-#         "fees_token1_qtty": 0,
-#         "fees_value_usd": 0,
-#         "fees_period_yield": 0,
-#         "fees_apr": 0,
-#         "fees_apy": 0,
-#     }
-
-#     user_operation_result["shares_value_usd"] = (
-#         user_operation_result["shares"]
-#         * operation["underlying_token0_per_share"]
-#         * operation["price_usd_token0"]
-#         + user_operation_result["shares"]
-#         * operation["underlying_token1_per_share"]
-#         * operation["price_usd_token1"]
-#     )
-
-#     user_operation_result["underlying_token0_qtty"] = (
-#         user_operation_result["shares"] * operation["underlying_token0_per_share"]
-#     )
-#     user_operation_result["underlying_token1_qtty"] = (
-#         user_operation_result["shares"] * operation["underlying_token1_per_share"]
-#     )
-
-#     user_operation_result["fees_token0_qtty"] = (
-#         operation["fees_token0_in"] + last_fees_token0_qtty
-#     )
-#     user_operation_result["fees_token1_qtty"] = (
-#         operation["fees_token1_in"] + last_fees_token1_qtty
-#     )
-#     user_operation_result["fees_value_usd"] = (
-#         user_operation_result["fees_token0_qtty"] * operation["price_usd_token0"]
-#         + user_operation_result["fees_token1_qtty"] * operation["price_usd_token1"]
-#     )
-
-#     period_fees_usd = (
-#         operation["fees_token0_in"] * operation["price_usd_token0"]
-#         + operation["fees_token1_in"] * operation["price_usd_token1"]
-#     )
-#     user_operation_result["fees_period_yield"] = (
-#         (period_fees_usd / user_operation_result["period_seconds"])
-#         if user_operation_result["period_seconds"]
-#         else 0
-#     )
-
-#     # apr n apy
-#     cum_fee_return = prod([1 + x["fees_period_yield"] for x in hypervisor_result])
-#     total_period_seconds = sum(
-#         [Decimal(x["period_seconds"]) for x in hypervisor_result]
-#     )
-#     day_in_seconds = Decimal("86400")
-#     year_in_seconds = Decimal("365") * day_in_seconds
-#     user_operation_result["fees_apr"] = (
-#         ((cum_fee_return - 1) * (year_in_seconds / total_period_seconds))
-#         if total_period_seconds
-#         else 0
-#     )
-#     user_operation_result["fees_apy"] = (
-#         (
-#             (1 + (cum_fee_return - 1) * (day_in_seconds / total_period_seconds)) ** 365
-#             - 1
-#         )
-#         if total_period_seconds
-#         else 0
-#     )
-
-#     # pnl = (current shares * current tokenX per share) - (current shares *  - last tokenX per share))
-#     if last_shares_value_usd > 0:
-#         user_operation_result["pnl_usd"] = (
-#             last_pnl + user_operation_result["shares_value_usd"] - last_shares_value_usd
-#         )
-
-#         user_operation_result["pnl_token0"] = last_pnl_token0 + (
-#             user_operation_result["underlying_token0_qtty"]
-#             - hypervisor_result[-1]["underlying_token0_qtty"]
-#         )
-
-#         user_operation_result["pnl_token1"] = last_pnl_token1 + (
-#             user_operation_result["underlying_token1_qtty"]
-#             - hypervisor_result[-1]["underlying_token1_qtty"]
-#         )
-#         # withdraw
-#         if user_operation_result["operation"] == "withdraw":
-#             shares_to_withdraw = operation["shares_out"] - operation["shares_in"]
-#             share_to_withdraw_percent = shares_to_withdraw / last_shares_qtty
-#             # add withraw value to pnl
-#             user_operation_result["pnl_usd"] += (
-#                 operation["token0_out"] - operation["token0_in"]
-#             ) * operation["price_usd_token0"] + (
-#                 operation["token1_out"] - operation["token1_in"]
-#             ) * operation[
-#                 "price_usd_token1"
-#             ]
-#             user_operation_result["pnl_token0"] += (
-#                 operation["token0_out"] - operation["token0_in"]
-#             )
-#             user_operation_result["pnl_token1"] += (
-#                 operation["token1_out"] - operation["token1_in"]
-#             )
-#             # substract withdraw share % from fees
-
-#     return user_operation_result
-
-
 async def get_user_historic_info(
     chain: Chain, address: str, timestamp_ini: int = 0, timestamp_end: int = 0
 ):
@@ -491,3 +309,408 @@ async def get_user_historic_info(
     return await local_db_helper.get_user_operations_status(
         user_address=address, timestamp_ini=timestamp_ini, timestamp_end=timestamp_end
     )
+
+
+# user operations collection
+async def get_user_operations(
+    chain: Chain,
+    protocol: Protocol | None = None,
+    user_address: str | None = None,
+    hypervisor_address_list: list[str] | None = None,
+    block_ini: int | None = None,
+    block_end: int | None = None,
+    timestamp_ini: int | None = None,
+    timestamp_end: int | None = None,
+    net_position_usd_threshold: float | None = None,
+    deposits_usd_threshold: float | None = None,
+) -> list[dict]:
+
+    # TODO: filter net_position_usd_threshold and deposits_usd_threshold
+
+    try:
+        # create queries to execute
+
+        if protocol and not hypervisor_address_list:
+            # get hype addresses for this particular protocol
+            hypervisor_address_list = [
+                x["address"]
+                for x in await local_database_helper(
+                    network=chain
+                ).get_items_from_database(
+                    collection_name="static",
+                    find={"dex": protocol.database_name},
+                )
+            ]
+
+        return [
+            global_database_helper().convert_d128_to_decimal(x)
+            for x in await local_database_helper(network=chain).get_items_from_database(
+                collection_name="user_operations",
+                aggregate=query_user_operations(
+                    user_address=user_address,
+                    hypervisor_address_list=hypervisor_address_list,
+                    block_ini=block_ini,
+                    block_end=block_end,
+                    timestamp_ini=timestamp_ini,
+                    timestamp_end=timestamp_end,
+                ),
+            )
+        ]
+    except Exception as e:
+        logging.getLogger(__name__).exception(f"Error in get_user_operations: {e}")
+        return [{"error": " An error occurred while processing the data"}]
+
+
+# Queries:
+def query_user_operations(
+    user_address: str | None = None,
+    hypervisor_address_list: list[str] | None = None,
+    block_ini: int | None = None,
+    block_end: int | None = None,
+    timestamp_ini: int | None = None,
+    timestamp_end: int | None = None,
+) -> list[dict]:
+    """Return a query to get user operations and balances
+
+    Args:
+        chain (Chain): _description_
+        user_address (str | None, optional): _description_. Defaults to None.
+        hypervisor_address_list (list[str] | None, optional): _description_. Defaults to None.
+        block_ini (int | None, optional): _description_. Defaults to None.
+        block_end (int | None, optional): _description_. Defaults to None.
+        timestamp_ini (int | None, optional): _description_. Defaults to None.
+        timestamp_end (int | None, optional): _description_. Defaults to None.
+
+    Returns:
+        list[dict]: {
+            "user_address": str,
+            "hypervisor_address": str,
+            "shares_balance_ini": str,
+            "shares_balance_end": str,
+            "operations": list[dict]
+                    {
+                        "block": int,
+                        "timestamp": int,
+                        "shares": dict,
+                        "tokens_flow": dict,
+                        "prices": dict,
+                        "topic": str,
+                        "transactionHash": str,
+                        "shadowed_user_address": str
+                }
+    """
+
+    _match = {}
+
+    if block_ini:
+        _match["block"] = {"$lt": block_ini}
+    if timestamp_ini:
+        _match["timestamp"] = {"$lt": timestamp_ini}
+    if user_address:
+        _match["user_address"] = user_address
+    if hypervisor_address_list:
+        _match["hypervisor_address"] = {"$in": hypervisor_address_list}
+
+    # build query
+    _query = [
+        {"$sort": {"block": 1}},
+        {
+            "$group": {
+                "_id": {"user": "$user_address", "hype": "$hypervisor_address"},
+                "starting_block": {"$last": "$block"},
+            }
+        },
+        {
+            "$lookup": {
+                "from": "user_operations",
+                "let": {
+                    "op_hype": "$_id.hype",
+                    "op_user": "$_id.user",
+                    "op_block": "$starting_block",
+                },
+                "pipeline": [
+                    {
+                        "$match": {
+                            "$expr": {
+                                "$and": [
+                                    {"$eq": ["$hypervisor_address", "$$op_hype"]},
+                                    {"$eq": ["$user_address", "$$op_user"]},
+                                    {"$gte": ["$block", "$$op_block"]},
+                                    {"$lte": ["$block", 205967681]},
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "$project": {
+                            "_id": 0,
+                            "isReal": 0,
+                            "logIndex": 0,
+                            "customIndex": 0,
+                            "id": 0,
+                        }
+                    },
+                    {
+                        "$lookup": {
+                            "from": "status",
+                            "let": {
+                                "op_hype": "$hypervisor_address",
+                                "op_block": "$block",
+                            },
+                            "pipeline": [
+                                {
+                                    "$match": {
+                                        "$expr": {
+                                            "$and": [
+                                                {"$eq": ["$address", "$$op_hype"]},
+                                                {"$eq": ["$block", "$$op_block"]},
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "$project": {
+                                        "_id": 0,
+                                        "hypervisor_decimals": "$decimals",
+                                        "token0_decimals": "$pool.token0.decimals",
+                                        "token1_decimals": "$pool.token1.decimals",
+                                        "totalSupply": {"$toDecimal": "$totalSupply"},
+                                        "underlying_value": {
+                                            "token0": {
+                                                "$sum": [
+                                                    {
+                                                        "$toDecimal": "$totalAmounts.total0"
+                                                    },
+                                                    {
+                                                        "$toDecimal": "$fees_uncollected.lps_qtty_token0"
+                                                    },
+                                                ]
+                                            },
+                                            "token1": {
+                                                "$sum": [
+                                                    {
+                                                        "$toDecimal": "$totalAmounts.total1"
+                                                    },
+                                                    {
+                                                        "$toDecimal": "$fees_uncollected.lps_qtty_token1"
+                                                    },
+                                                ]
+                                            },
+                                        },
+                                    }
+                                },
+                            ],
+                            "as": "hypervisor_status",
+                        }
+                    },
+                    {
+                        "$addFields": {
+                            "hypervisor_status": {"$first": "$hypervisor_status"},
+                            "shares": {
+                                "flow": {"$toDecimal": "$shares.flow"},
+                                "balance": {"$toDecimal": "$shares.balance"},
+                            },
+                            "tokens_flow": {
+                                "token0": {"$toDecimal": "$tokens_flow.token0"},
+                                "token1": {"$toDecimal": "$tokens_flow.token1"},
+                            },
+                        }
+                    },
+                    {
+                        "$addFields": {
+                            "shares.balance_percentage": {
+                                "$divide": [
+                                    "$shares.balance",
+                                    "$hypervisor_status.totalSupply",
+                                ]
+                            },
+                            "shares.balance_token0": {
+                                "$cond": [
+                                    {"$gt": ["$shares.balance", 0]},
+                                    {
+                                        "$multiply": [
+                                            {
+                                                "$divide": [
+                                                    "$shares.balance",
+                                                    "$hypervisor_status.totalSupply",
+                                                ]
+                                            },
+                                            "$hypervisor_status.underlying_value.token0",
+                                        ]
+                                    },
+                                    0,
+                                ]
+                            },
+                            "shares.balance_token1": {
+                                "$cond": [
+                                    {"$gt": ["$shares.balance", 0]},
+                                    {
+                                        "$multiply": [
+                                            {
+                                                "$divide": [
+                                                    "$shares.balance",
+                                                    "$hypervisor_status.totalSupply",
+                                                ]
+                                            },
+                                            "$hypervisor_status.underlying_value.token1",
+                                        ]
+                                    },
+                                    0,
+                                ]
+                            },
+                            "hypervisor_status.underlying_value.usd": {
+                                "$sum": [
+                                    {
+                                        "$multiply": [
+                                            "$prices.token0",
+                                            {
+                                                "$divide": [
+                                                    "$hypervisor_status.underlying_value.token0",
+                                                    {
+                                                        "$pow": [
+                                                            10,
+                                                            "$hypervisor_status.token0_decimals",
+                                                        ]
+                                                    },
+                                                ]
+                                            },
+                                        ]
+                                    },
+                                    {
+                                        "$multiply": [
+                                            "$prices.token1",
+                                            {
+                                                "$divide": [
+                                                    "$hypervisor_status.underlying_value.token1",
+                                                    {
+                                                        "$pow": [
+                                                            10,
+                                                            "$hypervisor_status.token1_decimals",
+                                                        ]
+                                                    },
+                                                ]
+                                            },
+                                        ]
+                                    },
+                                ]
+                            },
+                            "tokens_flow.usd": {
+                                "$sum": [
+                                    {
+                                        "$multiply": [
+                                            "$prices.token0",
+                                            {
+                                                "$divide": [
+                                                    "$tokens_flow.token0",
+                                                    {
+                                                        "$pow": [
+                                                            10,
+                                                            "$hypervisor_status.token0_decimals",
+                                                        ]
+                                                    },
+                                                ]
+                                            },
+                                        ]
+                                    },
+                                    {
+                                        "$multiply": [
+                                            "$prices.token1",
+                                            {
+                                                "$divide": [
+                                                    "$tokens_flow.token1",
+                                                    {
+                                                        "$pow": [
+                                                            10,
+                                                            "$hypervisor_status.token1_decimals",
+                                                        ]
+                                                    },
+                                                ]
+                                            },
+                                        ]
+                                    },
+                                ]
+                            },
+                            "prices.share": {
+                                "$cond": [
+                                    {
+                                        "$and": [
+                                            {"$gt": ["$tokens_flow.token0", 0]},
+                                            {"$gt": ["$tokens_flow.token1", 0]},
+                                        ]
+                                    },
+                                    {
+                                        "$divide": [
+                                            {
+                                                "$divide": [
+                                                    "$hypervisor_status.totalSupply",
+                                                    {
+                                                        "$pow": [
+                                                            10,
+                                                            "$hypervisor_status.hypervisor_decimals",
+                                                        ]
+                                                    },
+                                                ]
+                                            },
+                                            {
+                                                "$sum": [
+                                                    {
+                                                        "$multiply": [
+                                                            "$prices.token0",
+                                                            {
+                                                                "$divide": [
+                                                                    "$hypervisor_status.underlying_value.token0",
+                                                                    {
+                                                                        "$pow": [
+                                                                            10,
+                                                                            "$hypervisor_status.token0_decimals",
+                                                                        ]
+                                                                    },
+                                                                ]
+                                                            },
+                                                        ]
+                                                    },
+                                                    {
+                                                        "$multiply": [
+                                                            "$prices.token1",
+                                                            {
+                                                                "$divide": [
+                                                                    "$hypervisor_status.underlying_value.token1",
+                                                                    {
+                                                                        "$pow": [
+                                                                            10,
+                                                                            "$hypervisor_status.token1_decimals",
+                                                                        ]
+                                                                    },
+                                                                ]
+                                                            },
+                                                        ]
+                                                    },
+                                                ]
+                                            },
+                                        ]
+                                    },
+                                    0,
+                                ]
+                            },
+                        }
+                    },
+                    {"$sort": {"block": 1}},
+                ],
+                "as": "operations",
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "user": "$_id.user",
+                "hypervisor_address": "$_id.hype",
+                "operations": "$operations",
+            }
+        },
+    ]
+
+    if _match:
+        _query.insert(0, {"$match": _match})
+
+    #  query
+    return _query
