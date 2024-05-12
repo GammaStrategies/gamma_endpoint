@@ -115,7 +115,8 @@ class TopLevelData:
 
         variables = {"grossFeesMax": GROSS_FEES_MAX}
         response = await self.gamma_client.query(query, variables)
-        self.all_stats_data = response["data"]
+
+        self.all_stats_data = response.get("data", {})
 
     async def get_recent_rebalance_data(self, hours=24):
         query = """
@@ -143,6 +144,9 @@ class TopLevelData:
         Should add entity to subgraph to track top level stats
         """
         data = self.all_stats_data
+
+        if not data:
+            raise ValueError("Missing subgraph data")
 
         total_tvl = 0
 

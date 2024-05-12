@@ -42,22 +42,28 @@ class SubgraphClient:
 
         if response.status_code == 200:
             try:
-                return response.json()
+                response_json = response.json()
+
+                if error_messages := response_json.get("errors"):
+                    logger.error("Error while querying %s", self._url)
+                    for n, msg in enumerate(error_messages):
+                        logger.error("Error #%s - %s", n, msg.get("message", ""))
+                    raise ValueError
+                return response_json
             except Exception:
                 logger.error(
-                    " Unexpected error while converting response to json. resp.text: {} ".format(
-                        response.text
-                    )
+                    " Unexpected error while converting response to json. resp.text: %s",
+                    response.text,
                 )
         else:
             # handle bad status code
             # Can expand this to handle specific codes once we have specific examples
             logger.error(
-                " Unexpected response code {} received  resp.text: {} ".format(
-                    response.status_code,
-                    response.text,
-                )
+                "Unexpected response code %s received  resp.text: %s ",
+                response.status_code,
+                response.text,
             )
+
         # error return
         return {}
 

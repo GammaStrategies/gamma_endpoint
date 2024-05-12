@@ -338,6 +338,7 @@ class subgraph_router_builder(router_builder_generalTemplate):
         )
 
     #    hypervisors
+    @cache(expire=ALLDATA_CACHE_TIMEOUT)
     async def hypervisors_aggregate_stats(self, response: Response):
         result = aggregate_stats.AggregateStats(
             protocol=self.dex, chain=self.chain, response=response
@@ -368,6 +369,7 @@ class subgraph_router_builder(router_builder_generalTemplate):
         )
         return await all_data.run(RUN_FIRST)
 
+    @cache(expire=APY_CACHE_TIMEOUT)
     async def hypervisors_uncollected_fees(
         self,
         response: Response,
@@ -377,6 +379,7 @@ class subgraph_router_builder(router_builder_generalTemplate):
             chain=self.chain,
         )
 
+    @cache(expire=APY_CACHE_TIMEOUT)
     async def hypervisors_collected_fees(
         self,
         response: Response,
@@ -442,9 +445,11 @@ class subgraph_router_builder(router_builder_generalTemplate):
         return await impermanent.run(first=RUN_FIRST)
 
     # others
+    @cache(expire=ALLDATA_CACHE_TIMEOUT)
     async def hypervisors_rewards(self, response: Response):
         return await masterchef.info(protocol=self.dex, chain=self.chain)
 
+    @cache(expire=ALLDATA_CACHE_TIMEOUT)
     async def hypervisors_rewards2(self, response: Response):
         masterchef_v2_info = masterchef_v2.AllRewards2(
             protocol=self.dex, chain=self.chain, response=response
@@ -487,6 +492,7 @@ class subgraph_router_builder(router_builder_generalTemplate):
             protocol=self.dex, chain=self.chain, address=address
         )
 
+    @cache(expire=APY_CACHE_TIMEOUT)
     async def recovery_stats(self, days: int = 7, timezone: str = "UTC-5"):
         return await recovery.recovery_stats(days, timezone)
 
