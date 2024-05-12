@@ -400,12 +400,24 @@ def query_user_operations(
                 }
     """
 
+    # if no block or no timestamp is provided, return raise error
+    if not block_ini and not timestamp_ini:
+        raise Exception("block_ini or timestamp_ini must be provided")
+
     _match = {}
 
+    # choose between blocks or timestamps
     if block_ini:
-        _match["block"] = {"$lt": block_ini}
-    if timestamp_ini:
-        _match["timestamp"] = {"$lt": timestamp_ini}
+        _var = "$block"
+        _value = block_ini
+    elif timestamp_ini:
+        _var = "$timestamp"
+        _value = timestamp_ini
+    if block_end:
+        _match["block"] = {"$lte": block_end}
+    elif timestamp_end:
+        _match["timestamp"] = {"$lte": timestamp_end}
+    # add user_address and hypervisor_address to match
     if user_address:
         _match["user_address"] = user_address
     if hypervisor_address_list:
@@ -413,11 +425,50 @@ def query_user_operations(
 
     # build query
     _query = [
-        {"$sort": {"block": 1}},
+        {"$sort": {"block": -1}},
         {
             "$group": {
                 "_id": {"user": "$user_address", "hype": "$hypervisor_address"},
-                "starting_block": {"$last": "$block"},
+                "end_block": {"$first": _var},
+                "ini_block": {
+                    "$max": {
+                        "$cond": {
+                            "if": {"$lt": [_var, _value]},
+                            "then": _var,
+                            "else": _value,
+                        }
+                    }
+                },
+                "ini_balance": {
+                    "$push": {
+                        "$cond": {
+                            "if": {"$lt": [_var, _value]},
+                            "then": "$shares.balance",
+                            "else": 0,
+                        }
+                    }
+                },
+            }
+        },
+        {
+            "$match": {
+                "$expr": {
+                    "$or": [
+                        {
+                            "$and": [
+                                {"$eq": ["$end_block", "$ini_block"]},
+                                {"$eq": [{"$size": "$ini_balance"}, 1]},
+                                {"$ne": [{"$first": "$ini_balance"}, "0"]},
+                            ]
+                        },
+                        {
+                            "$and": [
+                                {"$ne": ["$end_block", "$ini_block"]},
+                                {"$gt": [{"$size": "$ini_balance"}, 1]},
+                            ]
+                        },
+                    ]
+                }
             }
         },
         {
@@ -426,7 +477,8 @@ def query_user_operations(
                 "let": {
                     "op_hype": "$_id.hype",
                     "op_user": "$_id.user",
-                    "op_block": "$starting_block",
+                    "op_block_ini": "$ini_block",
+                    "op_block_end": "$end_block",
                 },
                 "pipeline": [
                     {
@@ -435,8 +487,8 @@ def query_user_operations(
                                 "$and": [
                                     {"$eq": ["$hypervisor_address", "$$op_hype"]},
                                     {"$eq": ["$user_address", "$$op_user"]},
-                                    {"$gte": ["$block", "$$op_block"]},
-                                    {"$lte": ["$block", 205967681]},
+                                    {"$gte": [_var, "$$op_block_ini"]},
+                                    {"$lte": [_var, "$$op_block_end"]},
                                 ]
                             }
                         }
@@ -595,47 +647,59 @@ def query_user_operations(
                                 ]
                             },
                             "tokens_flow.usd": {
-                                "$sum": [
-                                    {
-                                        "$multiply": [
-                                            "$prices.token0",
-                                            {
-                                                "$divide": [
-                                                    "$tokens_flow.token0",
-                                                    {
-                                                        "$pow": [
-                                                            10,
-                                                            "$hypervisor_status.token0_decimals",
-                                                        ]
-                                                    },
-                                                ]
-                                            },
-                                        ]
-                                    },
-                                    {
-                                        "$multiply": [
-                                            "$prices.token1",
-                                            {
-                                                "$divide": [
-                                                    "$tokens_flow.token1",
-                                                    {
-                                                        "$pow": [
-                                                            10,
-                                                            "$hypervisor_status.token1_decimals",
-                                                        ]
-                                                    },
-                                                ]
-                                            },
-                                        ]
-                                    },
-                                ]
+                                "$toDouble": {
+                                    "$sum": [
+                                        {
+                                            "$multiply": [
+                                                "$prices.token0",
+                                                {
+                                                    "$divide": [
+                                                        "$tokens_flow.token0",
+                                                        {
+                                                            "$pow": [
+                                                                10,
+                                                                "$hypervisor_status.token0_decimals",
+                                                            ]
+                                                        },
+                                                    ]
+                                                },
+                                            ]
+                                        },
+                                        {
+                                            "$multiply": [
+                                                "$prices.token1",
+                                                {
+                                                    "$divide": [
+                                                        "$tokens_flow.token1",
+                                                        {
+                                                            "$pow": [
+                                                                10,
+                                                                "$hypervisor_status.token1_decimals",
+                                                            ]
+                                                        },
+                                                    ]
+                                                },
+                                            ]
+                                        },
+                                    ]
+                                }
                             },
                             "prices.share": {
                                 "$cond": [
                                     {
                                         "$and": [
-                                            {"$gt": ["$tokens_flow.token0", 0]},
-                                            {"$gt": ["$tokens_flow.token1", 0]},
+                                            {
+                                                "$gt": [
+                                                    "$hypervisor_status.underlying_value.token0",
+                                                    0,
+                                                ]
+                                            },
+                                            {
+                                                "$gt": [
+                                                    "$hypervisor_status.underlying_value.token1",
+                                                    0,
+                                                ]
+                                            },
                                         ]
                                     },
                                     {
