@@ -39,6 +39,7 @@ class SubgraphClient:
         # [SSL: SSLV3_ALERT_HANDSHAKE_FAILURE] sslv3 alert handshake failure
         #
         response = await async_client.post(self._url, json=params)
+        logger.info("Subgraph call to %s", self._url)
 
         if response.status_code == 200:
             try:
