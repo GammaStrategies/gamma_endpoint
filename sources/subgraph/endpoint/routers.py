@@ -619,6 +619,7 @@ class subgraph_router_builder_allDeployments(router_builder_baseTemplate):
 
         return router
 
+    @cache(expire=DASHBOARD_CACHE_TIMEOUT)
     async def aggregate_stats(
         self,
         response: Response,
