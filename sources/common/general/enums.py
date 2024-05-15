@@ -49,6 +49,7 @@ class Chain(str, Enum):
     GNOSIS = ("gnosis", 100, "gnosis", "Gnosis", None, None, "Gnosis")
     BLAST = ("blast", 81457, "blast", "Blast", None, None, "Blast")
     SCROLL = ("scroll", 534352, "scroll", "Scroll", None, None, "Scroll")
+    XLAYER = ("xlayer", 	196, "xlayer", "XLayer", None, None, "XLayer")
 
     # extra properties
     id: int
@@ -126,6 +127,7 @@ class Dex(str, Enum):
     BLASTER = "blaster"
     THRUSTER = "thruster"
     FENIX: "fenix"
+    XTRADE: "xtrade"
 
 
 class Protocol(str, Enum):
@@ -175,6 +177,7 @@ class Protocol(str, Enum):
     BLASTER = ("blaster", None, None, None, "blaster", "Blaster")
     THRUSTER = ("thruster", None, None, None, "thruster", "Thruster")
     FENIX = ("fenix", None, None, None, "fenix", "Fenix")
+    XTRADE = ("xtrade", None, None, None, "xtrade", "Xtrade")
 
     # extra properties
     api_url: str

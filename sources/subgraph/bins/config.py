@@ -23,6 +23,7 @@ DEPLOYMENTS = [
     (Protocol.QUICKSWAP, Chain.ASTAR_ZKEVM),
     (Protocol.QUICKSWAP, Chain.IMMUTABLE_ZKEVM),
     (Protocol.QUICKSWAP, Chain.MANTA),
+    (Protocol.QUICKSWAP, Chain.XLAYER),
     (Protocol.QUICKSWAP_UNISWAP, Chain.POLYGON_ZKEVM),
     (Protocol.CAMELOT, Chain.ARBITRUM),
     (Protocol.GLACIER, Chain.AVALANCHE),
@@ -56,6 +57,7 @@ DEPLOYMENTS = [
     (Protocol.THRUSTER, Chain.BLAST),
     (Protocol.ZYBERSWAP, Chain.ARBITRUM),
     (Protocol.FENIX, Chain.BLAST),
+    (Protocol.XTRADE, Chain.XLAYER),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api

@@ -36,4 +36,5 @@ BLOCK_TIME_SECONDS = {
     Chain.IMMUTABLE_ZKEVM: 2,
     Chain.BLAST: 2,
     Chain.SCROLL: 3,
+    Chain.XLAYER: 3,
 }

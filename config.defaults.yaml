@@ -208,6 +208,13 @@ FENIX_BLAST_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-fe
 FENIX_BLAST_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-fenix-blast/version/latest
 FENIX_BLAST_SUBGRAPH: _
 
+QUICKSWAP_XLAYER_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-quickswap-xlayer/version/latest
+QUICKSWAP_XLAYER_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-quickswap-xlayer/version/latest
+QUICKSWAP_XLAYER_SUBGRAPH: _
+
+XTRADE_XLAYER_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-xtrade-xlayer/version/latest
+XTRADE_XLAYER_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-xtrade-xlayer/version/latest
+XTRADE_XLAYER_SUBGRAPH: _
 
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {
