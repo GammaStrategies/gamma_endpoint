@@ -1,6 +1,35 @@
 from typing import MutableMapping
 
 
+# def filter_addresses(addresses: list[str] | str) -> list[str] | str | None:
+#     """Discard any non address str from addresses.
+
+#     Args:
+#         addresses (list[str] or str): list of addresses or one address
+
+#     Returns:
+#         list[str] | str | None: addresses or None
+#     """
+#     # remove any non address str
+#     if addresses:
+#         if isinstance(addresses, str):
+#             return (
+#                 addresses.lower()
+#                 if addresses
+#                 and addresses.startswith("0x")
+#                 and len(addresses) == 42
+#                 and addresses[2:].isalnum()
+#                 else None
+#             )
+#         else:
+#             return [
+#                 h.lower()
+#                 for h in addresses
+#                 if h and h.startswith("0x") and len(h) == 42 and h[2:].isalnum()
+#             ]
+#     return None
+
+
 def filter_addresses(addresses: list[str] | str) -> list[str] | str | None:
     """Discard any non address str from addresses.
 
@@ -13,20 +42,30 @@ def filter_addresses(addresses: list[str] | str) -> list[str] | str | None:
     # remove any non address str
     if addresses:
         if isinstance(addresses, str):
-            return (
-                addresses.lower()
-                if addresses
-                and addresses.startswith("0x")
-                and len(addresses) == 42
-                and addresses[2:].isalnum()
-                else None
-            )
+            # Remove spaces from the address
+            address = addresses.replace(" ", "")
+            # Check if the address is valid
+            if (
+                address
+                and address.startswith("0x")
+                and len(address) == 42
+                and address[2:].isalnum()
+            ):
+                return address.lower()
+            else:
+                return None
         else:
-            return [
-                h.lower()
+            # Remove spaces from each address in the list
+            filtered_addresses = [
+                h.replace(" ", "").lower()
                 for h in addresses
-                if h and h.startswith("0x") and len(h) == 42 and h[2:].isalnum()
+                if h.replace(" ", "")
+                and h.replace(" ", "").startswith("0x")
+                and len(h.replace(" ", "")) == 42
+                and h.replace(" ", "")[2:].isalnum()
             ]
+            # Return the filtered list, or None if it's empty
+            return filtered_addresses if filtered_addresses else None
     return None
 
 
