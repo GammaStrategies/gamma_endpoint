@@ -323,6 +323,8 @@ async def get_user_operations(
     timestamp_end: int | None = None,
     net_position_usd_threshold: float | None = None,
     deposits_usd_threshold: float | None = None,
+    shadowed_user_address: str | None = None,
+    group_by_shadowed: bool = False,
 ) -> list[dict]:
 
     # TODO: filter net_position_usd_threshold and deposits_usd_threshold
@@ -353,12 +355,14 @@ async def get_user_operations(
                     block_end=block_end,
                     timestamp_ini=timestamp_ini,
                     timestamp_end=timestamp_end,
+                    shadowed_user_address=shadowed_user_address,
+                    group_by_shadowed=group_by_shadowed,
                 ),
             )
         ]
     except Exception as e:
         logging.getLogger(__name__).exception(f"Error in get_user_operations: {e}")
-        return [{"error": " An error occurred while processing the data"}]
+        return [{"error": f" An error occurred while processing the data. {e}"}]
 
 
 # Queries:
@@ -369,17 +373,21 @@ def query_user_operations(
     block_end: int | None = None,
     timestamp_ini: int | None = None,
     timestamp_end: int | None = None,
+    shadowed_user_address: str | None = None,
+    group_by_shadowed: bool = False,
 ) -> list[dict]:
     """Return a query to get user operations and balances
 
     Args:
-        chain (Chain): _description_
-        user_address (str | None, optional): _description_. Defaults to None.
-        hypervisor_address_list (list[str] | None, optional): _description_. Defaults to None.
-        block_ini (int | None, optional): _description_. Defaults to None.
-        block_end (int | None, optional): _description_. Defaults to None.
-        timestamp_ini (int | None, optional): _description_. Defaults to None.
-        timestamp_end (int | None, optional): _description_. Defaults to None.
+        chain (Chain): chain
+        user_address (str | None, optional): filter by user address. Defaults to None.
+        hypervisor_address_list (list[str] | None, optional): filter by hypes. Defaults to None.
+        block_ini (int | None, optional): . Defaults to None.
+        block_end (int | None, optional): . Defaults to None.
+        timestamp_ini (int | None, optional): . Defaults to None.
+        timestamp_end (int | None, optional): . Defaults to None.
+        shadowed_user_address (str | None, optional): filter by shadowed address. Defaults to None.
+        group_by_shadowed (bool, optional): Will group by shadow address instead of user address. Defaults to False.
 
     Returns:
         list[dict]: {
@@ -420,15 +428,20 @@ def query_user_operations(
     # add user_address and hypervisor_address to match
     if user_address:
         _match["user_address"] = user_address
+    if shadowed_user_address:
+        _match["shadowed_user_address"] = shadowed_user_address
     if hypervisor_address_list:
         _match["hypervisor_address"] = {"$in": hypervisor_address_list}
+
+    # group by user_address or shadowed_user_address
+    _group_by = "$user_address" if not group_by_shadowed else "$shadowed_user_address"
 
     # build query
     _query = [
         {"$sort": {"block": -1}},
         {
             "$group": {
-                "_id": {"user": "$user_address", "hype": "$hypervisor_address"},
+                "_id": {"user": _group_by, "hype": "$hypervisor_address"},
                 "end_block": {"$first": _var},
                 "ini_block": {
                     "$max": {
@@ -486,7 +499,7 @@ def query_user_operations(
                             "$expr": {
                                 "$and": [
                                     {"$eq": ["$hypervisor_address", "$$op_hype"]},
-                                    {"$eq": ["$user_address", "$$op_user"]},
+                                    {"$eq": [_group_by, "$$op_user"]},
                                     {"$gte": [_var, "$$op_block_ini"]},
                                     {"$lte": [_var, "$$op_block_end"]},
                                 ]

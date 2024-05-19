@@ -526,11 +526,18 @@ class mongo_router_builder(router_builder_baseTemplate):
         timestamp_end: int | None = Query(
             None, description="will limit the data returned to this value."
         ),
-        net_position_usd_threshold: float | None = Query(
-            None, description="will limit the data returned to this value."
+        # net_position_usd_threshold: float | None = Query(
+        #     None, description="will limit the data returned to this value."
+        # ),
+        # deposits_usd_threshold: float | None = Query(
+        #     None, description="will limit the data returned to this value."
+        # ),
+        shadowed_user_address: str | None = Query(
+            None, description="filter by shadowed user address"
         ),
-        deposits_usd_threshold: float | None = Query(
-            None, description="will limit the data returned to this value."
+        group_by_shadowed: bool = Query(
+            False,
+            description="will group by shadowed user address, instead of user address",
         ),
     ):
         """Returns users shares related data for a given hypervisor address"""
@@ -544,8 +551,10 @@ class mongo_router_builder(router_builder_baseTemplate):
             block_end=block_end,
             timestamp_ini=timestamp_ini,
             timestamp_end=timestamp_end,
-            net_position_usd_threshold=net_position_usd_threshold,
-            deposits_usd_threshold=deposits_usd_threshold,
+            # net_position_usd_threshold=net_position_usd_threshold,
+            # deposits_usd_threshold=deposits_usd_threshold,
+            shadowed_user_address=shadowed_user_address,
+            group_by_shadowed=group_by_shadowed,
         )
 
     # User
