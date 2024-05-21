@@ -37,4 +37,5 @@ BLOCK_TIME_SECONDS = {
     Chain.BLAST: 2,
     Chain.SCROLL: 3,
     Chain.XLAYER: 3,
+    Chain.MODE: 2,
 }

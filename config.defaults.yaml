@@ -216,6 +216,10 @@ XTRADE_XLAYER_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-
 XTRADE_XLAYER_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-xtrade-xlayer/version/latest
 XTRADE_XLAYER_SUBGRAPH: _
 
+KIM_MODE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-kim-mode/version/latest
+KIM_MODE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-kim-mode/version/latest
+KIM_MODE_SUBGRAPH: _
+
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {
   "ethereum":{},

@@ -58,6 +58,7 @@ DEPLOYMENTS = [
     (Protocol.ZYBERSWAP, Chain.ARBITRUM),
     (Protocol.FENIX, Chain.BLAST),
     (Protocol.XTRADE, Chain.XLAYER),
+    (Protocol.KIM, Chain.MODE),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
