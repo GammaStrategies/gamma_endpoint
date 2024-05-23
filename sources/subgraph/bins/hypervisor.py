@@ -3,11 +3,9 @@ import logging
 
 from sources.subgraph.bins import GammaClient, UniswapV3Client
 from sources.subgraph.bins.config import EXCLUDED_HYPERVISORS
-from sources.subgraph.bins.constants import DAYS_IN_PERIOD
 from sources.subgraph.bins.data import BlockRange
 from sources.subgraph.bins.enums import Chain, Protocol
-from sources.subgraph.bins.hype_fees.fees_yield import fee_returns_all
-from sources.subgraph.bins.utils import filter_address_by_chain, timestamp_to_date
+from sources.subgraph.bins.utils import filter_address_by_chain
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +15,7 @@ class HypervisorData:
         self.protocol = protocol
         self.chain = chain
         self.gamma_client = GammaClient(protocol, chain)
-        self.uniswap_client = UniswapV3Client(protocol, chain)
+        # self.uniswap_client = UniswapV3Client(protocol, chain)
         self.basics_data = {}
         self.pools_data = {}
         self.fees_data = {}
@@ -138,34 +136,34 @@ class HypervisorData:
                 )
 
         basics = basics_response["data"]["uniswapV3Hypervisors"]
-        pool_addresses = [hypervisor["pool"]["id"] for hypervisor in basics]
+        # pool_addresses = [hypervisor["pool"]["id"] for hypervisor in basics]
 
-        query_pool = """
-        query slot0($pools: [String!]!){
-            pools(
-                where: {
-                    id_in: $pools
-                }
-            ) {
-                id
-                sqrtPrice
-                tick
-                observationIndex
-                feesUSD
-                totalValueLockedUSD
-            }
-        }
-        """
-        variables = {"pools": pool_addresses}
-        pools_response = await self.uniswap_client.query(query_pool, variables)
-        if pools_response.get("data"):
-            pools_data = pools_response["data"]["pools"]
-            pools = {pool.pop("id"): pool for pool in pools_data}
-        else:
-            pools = {}
+        # query_pool = """
+        # query slot0($pools: [String!]!){
+        #     pools(
+        #         where: {
+        #             id_in: $pools
+        #         }
+        #     ) {
+        #         id
+        #         sqrtPrice
+        #         tick
+        #         observationIndex
+        #         feesUSD
+        #         totalValueLockedUSD
+        #     }
+        # }
+        # """
+        # variables = {"pools": pool_addresses}
+        # pools_response = await self.uniswap_client.query(query_pool, variables)
+        # if pools_response.get("data"):
+        #     pools_data = pools_response["data"]["pools"]
+        #     pools = {pool.pop("id"): pool for pool in pools_data}
+        # else:
+        #     pools = {}
 
         self.basics_data = basics
-        self.pools_data = pools
+        self.pools_data = {}
 
     async def _get_collected_fees(
         self,
