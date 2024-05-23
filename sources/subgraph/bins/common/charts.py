@@ -1,10 +1,10 @@
 from fastapi_cache.decorator import cache
 
 from sources.subgraph.bins.charts.base_range import BaseLimit
-from sources.subgraph.bins.charts.benchmark import Benchmark
+# from sources.subgraph.bins.charts.benchmark import Benchmark
 from sources.subgraph.bins.config import CHARTS_CACHE_TIMEOUT
 from sources.subgraph.bins.enums import Chain, Protocol
-from sources.subgraph.bins.utils import parse_date
+# from sources.subgraph.bins.utils import parse_date
 
 
 @cache(expire=CHARTS_CACHE_TIMEOUT)
@@ -26,16 +26,16 @@ async def base_range_chart(
     return {hypervisor_address: chart_data} if chart_data else {}
 
 
-async def benchmark_chart(
-    protocol: Protocol,
-    chain: Chain,
-    hypervisor_address: str,
-    startDate: str = "",
-    endDate: str = "",
-):
-    start_date = parse_date(startDate)
-    end_date = parse_date(endDate)
-    hypervisor_address = hypervisor_address.lower()
-    benchmark = Benchmark(protocol, chain, hypervisor_address, start_date, end_date)
-    chart_data = await benchmark.chart()
-    return {hypervisor_address: chart_data} if chart_data else {}
+# async def benchmark_chart(
+#     protocol: Protocol,
+#     chain: Chain,
+#     hypervisor_address: str,
+#     startDate: str = "",
+#     endDate: str = "",
+# ):
+#     start_date = parse_date(startDate)
+#     end_date = parse_date(endDate)
+#     hypervisor_address = hypervisor_address.lower()
+#     benchmark = Benchmark(protocol, chain, hypervisor_address, start_date, end_date)
+#     chart_data = await benchmark.chart()
+#     return {hypervisor_address: chart_data} if chart_data else {}

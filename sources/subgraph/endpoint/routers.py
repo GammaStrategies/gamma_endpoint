@@ -187,13 +187,13 @@ class subgraph_router_builder(router_builder_generalTemplate):
         )
 
         # create only on Mainnet
-        if self.chain == Chain.ETHEREUM:
-            router.add_api_route(
-                path=f"{self.prefix}{'/charts/benchmark/{hypervisor_address}'}",
-                endpoint=self.benchmark_chart,
-                methods=["GET"],
-                generate_unique_id_function=self.generate_unique_id,
-            )
+        # if self.chain == Chain.ETHEREUM:
+        #     router.add_api_route(
+        #         path=f"{self.prefix}{'/charts/benchmark/{hypervisor_address}'}",
+        #         endpoint=self.benchmark_chart,
+        #         methods=["GET"],
+        #         generate_unique_id_function=self.generate_unique_id,
+        #     )
 
         if self.chain == Chain.ARBITRUM:
             router.add_api_route(
@@ -234,16 +234,16 @@ class subgraph_router_builder(router_builder_generalTemplate):
             self.dex, self.chain, hypervisor_address, days
         )
 
-    async def benchmark_chart(
-        self,
-        response: Response,
-        hypervisor_address: str,
-        startDate: str = "",
-        endDate: str = "",
-    ):
-        return await charts.benchmark_chart(
-            self.dex, self.chain, hypervisor_address, startDate, endDate
-        )
+    # async def benchmark_chart(
+    #     self,
+    #     response: Response,
+    #     hypervisor_address: str,
+    #     startDate: str = "",
+    #     endDate: str = "",
+    # ):
+    #     return await charts.benchmark_chart(
+    #         self.dex, self.chain, hypervisor_address, startDate, endDate
+    #     )
 
     async def hypervisor_basic_stats(self, hypervisor_address: str, response: Response):
         return await basic_stats_output(
