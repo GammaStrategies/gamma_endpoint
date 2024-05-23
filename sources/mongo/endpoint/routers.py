@@ -448,7 +448,9 @@ class mongo_router_builder(router_builder_baseTemplate):
         response: Response,
         address: str | None = Query(None, description="hypervisor address"),
     ):
-        """Returns the hypervisor found in the database"""
+        """Returns the latest hypervisor snapshot and its rewards.
+        Snapshots are created regularly, but in order to check its update time use the 'timestamp' or 'block' fields returned.
+        """
 
         if address:
             address = filter_addresses(address)

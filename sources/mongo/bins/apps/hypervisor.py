@@ -24,33 +24,56 @@ async def hypervisors_last_snapshot(
     network: Chain,
     protocol: Protocol | None = None,
     hypervisor_address: str | None = None,
-):
+) -> list[dict]:
+    """Get the last snapshot for all hypervisors and their rewards.
+
+    This function retrieves the last snapshot for all hypervisors and their rewards.
+    It uses the latest_hypervisor_snapshots and latest_reward_snapshots collections.
+
+    Args:
+        network (Chain): The network to retrieve the snapshots from.
+        protocol (Protocol | None, optional): The protocol to filter the snapshots by. Defaults to None.
+        hypervisor_address (str | None, optional): The address of the hypervisor to filter the snapshots by. Defaults to None.
+
+    Returns:
+        List[dict]: A list of dictionaries representing the last snapshot for each hypervisor and their rewards.
+    """
+
+    _match = {}
     _query = [
+        {"$project": {"_id": 0, "id": 0, "rpc_costs": 0, "fees_collected": 0}},
         {
             "$lookup": {
-                "from": "status",
+                "from": "latest_reward_snapshots",
                 "let": {"op_address": "$address"},
                 "pipeline": [
-                    {"$match": {"$expr": {"$eq": ["$address", "$$op_address"]}}},
-                    {"$sort": {"block": -1}},
-                    {"$limit": 1},
-                    {"$unset": ["_id", "id"]},
+                    {
+                        "$match": {
+                            "$expr": {
+                                "$and": [
+                                    {"$eq": ["$hypervisor_address", "$$op_address"]}
+                                ]
+                            }
+                        }
+                    },
+                    {"$project": {"_id": 0, "id": 0, "rpc_costs": 0}},
                 ],
-                "as": "status",
+                "as": "rewards",
             }
         },
-        {"$unwind": {"path": "$status", "preserveNullAndEmptyArrays": False}},
-        {"$replaceRoot": {"newRoot": "$status"}},
     ]
 
     if hypervisor_address:
-        _query.insert(0, {"$match": {"address": hypervisor_address.lower()}})
+        _match["address"] = hypervisor_address.lower()
     elif protocol:
-        _query.insert(0, {"$match": {"dex": protocol.database_name}})
+        _match["dex"] = protocol.database_name
+
+    if _match:
+        _query.insert(0, {"$match": _match})
 
     return await local_database_helper(network=network).get_items_from_database(
-        collection_name="static",
-        aggregate=_query,
+        aggregation=_query,
+        collection_name="latest_hypervisor_snapshots",
     )
 
 
