@@ -72,7 +72,7 @@ async def hypervisors_last_snapshot(
         _query.insert(0, {"$match": _match})
 
     return await local_database_helper(network=network).get_items_from_database(
-        aggregation=_query,
+        aggregate=_query,
         collection_name="latest_hypervisor_snapshots",
     )
 
