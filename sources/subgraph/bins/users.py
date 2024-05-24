@@ -10,7 +10,7 @@ class UserData:
     def __init__(self, protocol: Protocol, chain: Chain, user_address: str):
         self.protocol = protocol
         self.chain = chain
-        self.gamma_client = GammaClient(protocol, chain)
+        self.gamma_client = GammaClient(protocol, chain, "gamma_users")
         self.gamma_client_mainnet = GammaClient(Protocol.UNISWAP, Chain.ETHEREUM)
         self.address = user_address.lower()
         self.decimal_factor = 10**18

@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from sources.common.general.config import get_config, get_subgraph_studio_url
+from sources.common.general.config import get_config
 from sources.subgraph.bins.enums import Chain, Protocol, QueryType
 
 DEPLOYMENTS = [
@@ -73,6 +73,9 @@ ETH_BLOCKS_SUBGRAPH_URL = (
 )
 UNI_V2_SUBGRAPH_URL = "https://api.thegraph.com/subgraphs/name/ianlapham/uniswapv2"
 
+SUBGRAPH_STUDIO_KEY = get_config("SUBGRAPH_STUDIO_KEY")
+SUBGRAPH_STUDIO_KEY_DEV = get_config("SUBGRAPH_STUDIO_KEY_DEV")
+SUBGRAPH_STUDIO_USER_KEY = get_config("SUBGRAPH_STUDIO_USER_KEY")
 
 dex_subgraph_urls = defaultdict(dict)
 dex_hypepool_subgraph_urls = defaultdict(dict)
@@ -80,14 +83,12 @@ gamma_subgraph_urls = defaultdict(dict)
 
 for protocol, chain in DEPLOYMENTS:
     subgraph_prefix = f"{protocol.value.upper()}_{chain.value.upper()}"
-    dex_subgraph_urls[protocol][chain] = get_subgraph_studio_url(
-        get_config(f"{subgraph_prefix}_SUBGRAPH")
+    dex_subgraph_urls[protocol][chain] = get_config(f"{subgraph_prefix}_SUBGRAPH")
+    dex_hypepool_subgraph_urls[protocol][chain] = get_config(
+        f"{subgraph_prefix}_HP_SUBGRAPH"
     )
-    dex_hypepool_subgraph_urls[protocol][chain] = get_subgraph_studio_url(
-        get_config(f"{subgraph_prefix}_HP_SUBGRAPH")
-    )
-    gamma_subgraph_urls[protocol][chain] = get_subgraph_studio_url(
-        get_config(f"{subgraph_prefix}_GAMMA_SUBGRAPH")
+    gamma_subgraph_urls[protocol][chain] = get_config(
+        f"{subgraph_prefix}_GAMMA_SUBGRAPH"
     )
 
 

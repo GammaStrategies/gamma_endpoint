@@ -12,6 +12,7 @@ from sources.subgraph.bins.config import (
     gamma_subgraph_urls,
 )
 from sources.subgraph.bins.enums import Chain, Protocol
+from sources.subgraph.bins.subgraphs.gamma import get_subgraph_studio_key
 
 logger = logging.getLogger(__name__)
 async_client = httpx.AsyncClient(
@@ -27,6 +28,14 @@ class SubgraphClient:
         self._url = url
         self.chain = chain
 
+    def studio_url(self, subgraph_id: str, api_key):
+        if subgraph_id.startswith("http"):
+            return subgraph_id
+
+        base_url = "https://gateway-arbitrum.network.thegraph.com/api/"
+
+        return f"{base_url}{api_key}/subgraphs/id/{subgraph_id}"
+
     async def query(self, query: str, variables=None) -> dict:
         """Make graphql query to subgraph"""
         if variables:
@@ -39,8 +48,8 @@ class SubgraphClient:
         # [SSL: SSLV3_ALERT_HANDSHAKE_FAILURE] sslv3 alert handshake failure
         #
         response = await async_client.post(self._url, json=params)
-        
-        # logger.info("Subgraph call to %s", self._url)
+
+        logger.debug("Subgraph call to %s", self._url)
 
         if response.status_code == 200:
             try:
@@ -94,8 +103,13 @@ class SubgraphClient:
 
 
 class GammaClient(SubgraphClient):
-    def __init__(self, protocol: Protocol, chain: Chain):
-        super().__init__(gamma_subgraph_urls[protocol][chain], chain)
+    def __init__(self, protocol: Protocol, chain: Chain, api_key: str = "prod"):
+        super().__init__(
+            self.studio_url(
+                gamma_subgraph_urls[protocol][chain], get_subgraph_studio_key(api_key)
+            ),
+            chain,
+        )
 
 
 class UniswapV2Client(SubgraphClient):

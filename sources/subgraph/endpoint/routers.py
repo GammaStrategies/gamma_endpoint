@@ -9,6 +9,7 @@ from endpoint.config.cache import (
     CHARTS_CACHE_TIMEOUT,
     DASHBOARD_CACHE_TIMEOUT,
     DB_CACHE_TIMEOUT,
+    USER_CACHE_TIMEOUT,
 )
 from endpoint.routers.template import (
     router_builder_baseTemplate,
@@ -41,12 +42,11 @@ from sources.subgraph.bins.dashboard import Dashboard
 from sources.subgraph.bins.enums import Chain, Protocol, QueryType
 from sources.subgraph.bins.eth import EthDistribution
 from sources.subgraph.bins.gamma import GammaDistribution, GammaInfo, GammaYield
-from sources.subgraph.bins.simulator import SimulatorInfo
 
 RUN_FIRST = RUN_FIRST_QUERY_TYPE
 
-
 # Route builders
+
 
 def build_routers() -> list:
     routes = []
@@ -69,15 +69,11 @@ def build_routers() -> list:
             )
         )
 
-    # Simulation
-    routes.append(
-        subgraph_router_builder_Simulator(tags=["Simulator"], prefix="/simulator")
-    )
-
     # Charts
     routes.append(subgraph_router_builder_Charts(tags=["Charts"], prefix="/charts"))
 
     return routes
+
 
 def build_routers_compatible() -> list:
     routes = []
@@ -118,11 +114,6 @@ def build_routers_compatible() -> list:
                     prefix=f"/{protocol.api_url}/{chain.api_url}",
                 )
             )
-
-    # Simulation
-    routes.append(
-        subgraph_router_builder_Simulator(tags=["Simulator"], prefix="/simulator")
-    )
 
     # Charts
     routes.append(subgraph_router_builder_Charts(tags=["Charts"], prefix="/charts"))
@@ -186,15 +177,6 @@ class subgraph_router_builder(router_builder_generalTemplate):
             generate_unique_id_function=self.generate_unique_id,
         )
 
-        # create only on Mainnet
-        # if self.chain == Chain.ETHEREUM:
-        #     router.add_api_route(
-        #         path=f"{self.prefix}{'/charts/benchmark/{hypervisor_address}'}",
-        #         endpoint=self.benchmark_chart,
-        #         methods=["GET"],
-        #         generate_unique_id_function=self.generate_unique_id,
-        #     )
-
         if self.chain == Chain.ARBITRUM:
             router.add_api_route(
                 path=f"{self.prefix}{'/recoveryDistribution'}",
@@ -233,17 +215,6 @@ class subgraph_router_builder(router_builder_generalTemplate):
         return await charts.base_range_chart(
             self.dex, self.chain, hypervisor_address, days
         )
-
-    # async def benchmark_chart(
-    #     self,
-    #     response: Response,
-    #     hypervisor_address: str,
-    #     startDate: str = "",
-    #     endDate: str = "",
-    # ):
-    #     return await charts.benchmark_chart(
-    #         self.dex, self.chain, hypervisor_address, startDate, endDate
-    #     )
 
     async def hypervisor_basic_stats(self, hypervisor_address: str, response: Response):
         return await basic_stats_output(
@@ -461,11 +432,13 @@ class subgraph_router_builder(router_builder_generalTemplate):
             else RUN_FIRST
         )
 
+    @cache(expire=USER_CACHE_TIMEOUT)
     async def user_rewards(self, user_address: str, response: Response):
         return await masterchef.user_rewards(
             protocol=self.dex, chain=self.chain, user_address=user_address
         )
 
+    @cache(expire=USER_CACHE_TIMEOUT)
     async def user_rewards2(self, user_address: str, response: Response):
         if (self.dex, self.chain) in THIRD_PARTY_REWARDERS:
             # return database content
@@ -477,16 +450,19 @@ class subgraph_router_builder(router_builder_generalTemplate):
             protocol=self.dex, chain=self.chain, user_address=user_address
         )
 
+    @cache(expire=USER_CACHE_TIMEOUT)
     async def user_data(self, address: str, response: Response):
         return await users.user_data(
             protocol=self.dex, chain=self.chain, address=address
         )
 
+    @cache(expire=USER_CACHE_TIMEOUT)
     async def user_analytics(self, address: str, response: Response):
         return await users.get_user_analytic_data(
             chain=self.chain, address=address.lower()
         )
 
+    @cache(expire=USER_CACHE_TIMEOUT)
     async def vault_data(self, address: str, response: Response):
         return await users.account_data(
             protocol=self.dex, chain=self.chain, address=address
@@ -666,61 +642,6 @@ class subgraph_router_builder_allDeployments(router_builder_baseTemplate):
         result = Dashboard(period.lower())
 
         return await result.info("UTC")
-
-
-class subgraph_router_builder_Simulator(router_builder_baseTemplate):
-    # ROUTEs BUILD FUNCTIONS
-    def router(self) -> APIRouter:
-        router = APIRouter(prefix=self.prefix)
-
-        #
-        router.add_api_route(
-            path="/tokenList",
-            endpoint=self.token_list,
-            methods=["GET"],
-        )
-        router.add_api_route(
-            path="/poolTicks",
-            endpoint=self.pool_ticks,
-            methods=["GET"],
-        )
-        router.add_api_route(
-            path="/poolFromTokens",
-            endpoint=self.pool_from_tokens,
-            methods=["GET"],
-        )
-        router.add_api_route(
-            path="/pool24HrVolume",
-            endpoint=self.pool_24hr_volume,
-            methods=["GET"],
-        )
-        return router
-
-    async def token_list(self):
-        tokens = await SimulatorInfo(Protocol.UNISWAP, Chain.ETHEREUM).token_list()
-
-        return tokens
-
-    async def pool_ticks(self, poolAddress: str):
-        ticks = await SimulatorInfo(Protocol.UNISWAP, Chain.ETHEREUM).pool_ticks(
-            poolAddress
-        )
-
-        return ticks
-
-    async def pool_from_tokens(self, token0: str, token1: str):
-        pools = await SimulatorInfo(Protocol.UNISWAP, Chain.ETHEREUM).pools_from_tokens(
-            token0, token1
-        )
-
-        return pools
-
-    async def pool_24hr_volume(self, poolAddress: str):
-        volume = await SimulatorInfo(Protocol.UNISWAP, Chain.ETHEREUM).pool_volume(
-            poolAddress
-        )
-
-        return volume
 
 
 class subgraph_router_builder_Charts(router_builder_baseTemplate):

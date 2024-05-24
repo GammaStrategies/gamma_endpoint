@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 class HypervisorBasicInfoOutput(BaseModel):
     """Output schema for Hypervisor Basic Stats"""
+
     createDate: str
     poolAddress: str
     name: str
@@ -71,7 +72,7 @@ class AllData:
     def __init__(self, chain: Chain, protocol: Protocol):
         self.hype_data: dict[str, Hypervisor]
         self.fee_yield: dict[str, dict]
-        self.hypervisors: list[str] | None  = None
+        self.hypervisors: list[str] | None = None
         self.prices: dict
         self.chain = chain
         self.protocol = protocol
@@ -96,7 +97,6 @@ class AllData:
         )
 
         self.fee_yield = fee_yield["lp"]
-
 
     async def _process(self):
         await self.get_data()
@@ -126,11 +126,12 @@ class AllData:
             tvl0 = hype.tvl.value0.adjusted
             tvl1 = hype.tvl.value1.adjusted
 
-            if (hype.tvl_usd == 0 and (tvl0 > 0 or tvl1 > 0)) or (hype.tvl_usd > HYPE_TVL_MAX):
-                tvl_usd = (
-                    tvl0 * self.prices.get(hype.token_0.address, 0)
-                    + tvl1 * self.prices.get(hype.token_1.address, 0)
-                )
+            if (hype.tvl_usd == 0 and (tvl0 > 0 or tvl1 > 0)) or (
+                hype.tvl_usd > HYPE_TVL_MAX
+            ):
+                tvl_usd = tvl0 * self.prices.get(
+                    hype.token_0.address, 0
+                ) + tvl1 * self.prices.get(hype.token_1.address, 0)
             else:
                 tvl_usd = hype.tvl_usd
 
@@ -155,9 +156,11 @@ class AllData:
                 tvlUSD=tvl_usd,
                 totalSupply=hype.total_supply,
                 maxTotalSupply=hype.max_total_supply,
-                capacityUsed=hype.total_supply / hype.max_total_supply
-                if hype.max_total_supply > 0
-                else "No cap",
+                capacityUsed=(
+                    hype.total_supply / hype.max_total_supply
+                    if hype.max_total_supply > 0
+                    else "No cap"
+                ),
                 sqrtPrice=hype.pool_price,
                 tick=tick,
                 baseLower=hype.base_lower,
@@ -209,5 +212,5 @@ class AllData:
             inRange=hype.inRange,
             observationIndex=hype.observationIndex,
             poolTvlUSD=hype.poolTvlUSD,
-            poolFeesUSD=hype.poolFeesUSD
+            poolFeesUSD=hype.poolFeesUSD,
         )

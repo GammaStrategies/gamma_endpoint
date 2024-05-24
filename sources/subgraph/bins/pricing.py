@@ -519,7 +519,7 @@ async def token_prices(chain: Chain, protocol: Protocol) -> dict:
 
 
 class TokenData(SubgraphData):
-    """Class to get xGamma staking relateed data"""
+    """Class to get xGamma staking related data"""
 
     def __init__(self, chain: Chain, protocol: Protocol):
         super().__init__()

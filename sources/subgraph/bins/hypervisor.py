@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from sources.subgraph.bins import GammaClient, UniswapV3Client
+from sources.subgraph.bins import GammaClient
 from sources.subgraph.bins.config import EXCLUDED_HYPERVISORS
 from sources.subgraph.bins.data import BlockRange
 from sources.subgraph.bins.enums import Chain, Protocol
@@ -15,7 +15,6 @@ class HypervisorData:
         self.protocol = protocol
         self.chain = chain
         self.gamma_client = GammaClient(protocol, chain)
-        # self.uniswap_client = UniswapV3Client(protocol, chain)
         self.basics_data = {}
         self.pools_data = {}
         self.fees_data = {}
@@ -136,31 +135,6 @@ class HypervisorData:
                 )
 
         basics = basics_response["data"]["uniswapV3Hypervisors"]
-        # pool_addresses = [hypervisor["pool"]["id"] for hypervisor in basics]
-
-        # query_pool = """
-        # query slot0($pools: [String!]!){
-        #     pools(
-        #         where: {
-        #             id_in: $pools
-        #         }
-        #     ) {
-        #         id
-        #         sqrtPrice
-        #         tick
-        #         observationIndex
-        #         feesUSD
-        #         totalValueLockedUSD
-        #     }
-        # }
-        # """
-        # variables = {"pools": pool_addresses}
-        # pools_response = await self.uniswap_client.query(query_pool, variables)
-        # if pools_response.get("data"):
-        #     pools_data = pools_response["data"]["pools"]
-        #     pools = {pool.pop("id"): pool for pool in pools_data}
-        # else:
-        #     pools = {}
 
         self.basics_data = basics
         self.pools_data = {}

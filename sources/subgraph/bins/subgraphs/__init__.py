@@ -11,6 +11,7 @@ from gql.transport.aiohttp import log as requests_logger
 from sources.subgraph.bins.config import GQL_CLIENT_TIMEOUT
 
 requests_logger.setLevel(logging.WARNING)
+logger = logging.getLogger(__name__)
 
 
 def fragment(fragment_function):
@@ -56,9 +57,19 @@ class SubgraphClient:
         self._fragment_dependencies: list[DSLFragment] = []
         self._fragments_used: list[str] = []
 
+    def studio_url(self, subgraph_id: str, api_key: str) -> str:
+        print(subgraph_id)
+        if subgraph_id.startswith("http"):
+            return subgraph_id
+
+        base_url = "https://gateway-arbitrum.network.thegraph.com/api/"
+
+        return f"{base_url}{api_key}/subgraphs/id/{subgraph_id}"
+
     async def execute(self, query: DSLQuery) -> dict:
         """Executes query and returns result"""
         gql = dsl_gql(*self._fragment_dependencies, query)
+        logger.debug("Subgraph call to %s", self.client.url)
         async with self.client as session:
             result = await session.execute(gql)
             return result

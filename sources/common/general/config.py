@@ -20,12 +20,3 @@ def get_config(key: str) -> str:
     if not value:
         value = YAML_CONFIG_DEFAULTS[key]
     return value
-
-
-def get_subgraph_studio_url(subgraph_id: str) -> str:
-    if subgraph_id.startswith("http"):
-        return subgraph_id
-
-    base_url = "https://gateway-arbitrum.network.thegraph.com/api/"
-    api_key = get_config("SUBGRAPH_STUDIO_KEY")
-    return f"{base_url}{api_key}/subgraphs/id/{subgraph_id}"

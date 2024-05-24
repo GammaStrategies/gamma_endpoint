@@ -17,16 +17,16 @@ UNISWAP_OPTIMISM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammast
 UNISWAP_OPTIMISM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-optimism
 UNISWAP_OPTIMISM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis
 
-UNISWAP_CELO_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/celo
-UNISWAP_CELO_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-celo
+UNISWAP_CELO_GAMMA_SUBGRAPH: CyPUiRH5yLudcRGZir1hpEuFTxNxBDA49BAwLABpMSjq
+UNISWAP_CELO_HP_SUBGRAPH: EeXTSTHprVcqEis8JEbvxAGkpvC9RfqQJJVr5p8vZjs4
 UNISWAP_CELO_SUBGRAPH: https://api.thegraph.com/subgraphs/name/jesse-sawa/uniswap-celo
 
 UNISWAP_BSC_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/uniswap-bsc
 UNISWAP_BSC_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-bsc
 UNISWAP_BSC_SUBGRAPH: https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-bsc
 
-UNISWAP_MOONBEAM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-moonbeam
-UNISWAP_MOONBEAM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-moonbeam
+UNISWAP_MOONBEAM_GAMMA_SUBGRAPH: CZLXkws4xAa56Ff8TJmfsuMygKX1zZ9ept7H9EeFHhVG
+UNISWAP_MOONBEAM_HP_SUBGRAPH: B5TD2aMB6KEQkeSF3QFHoLGRVJCSCuR4KLLM5qZGdb9R
 UNISWAP_MOONBEAM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-moonbeam
 
 UNISWAP_AVALANCHE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-uniswap-avax/version/latest
@@ -57,8 +57,8 @@ UNISWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/4473
 UNISWAP_POLYGON_ZKEVM_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-pzke/version/latest
 UNISWAP_POLYGON_ZKEVM_SUBGRAPH: _
 
-QUICKSWAP_POLYGON_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/algebra-polygon
-QUICKSWAP_POLYGON_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-quickswap-polygon
+QUICKSWAP_POLYGON_GAMMA_SUBGRAPH: AJvGW3nwG9tgQp1e44GK7mxtYxYTwmxw9GPX761oJFmB
+QUICKSWAP_POLYGON_HP_SUBGRAPH: 9c3yP2PUn3vCkAg36qyDpZebF38nKEgbeDC1FAiCFmGf
 QUICKSWAP_POLYGON_SUBGRAPH: https://api.thegraph.com/subgraphs/name/sameepsi/quickswap-v3
 
 QUICKSWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-quickswap-pzke/version/latest
@@ -244,6 +244,7 @@ CHARTS_CACHE_TIMEOUT: 600
 APY_CACHE_TIMEOUT: 600
 DASHBOARD_CACHE_TIMEOUT: 600
 ALLDATA_CACHE_TIMEOUT: 600
+USER_CACHE_TIMEOUT: 60
 DB_CACHE_TIMEOUT: 160
 DAILY_CACHE_TIMEOUT: 7200 # 2hours
 LONG_CACHE_TIMEOUT: 345600 # 4day
