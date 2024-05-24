@@ -1,4 +1,5 @@
 SUBGRAPH_STUDIO_KEY: ""
+SUGBRAPH_STUDIO_USER_KEY: ""
 
 UNISWAP_MAINNET_GAMMA_SUBGRAPH: 9paB7Eptzq98R9K7L5QQTixSxFLXuDzKwmSKkn8ddEWU
 UNISWAP_MAINNET_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-mainnet

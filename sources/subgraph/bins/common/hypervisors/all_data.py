@@ -1,12 +1,8 @@
 import asyncio
 import logging
 
-from aiohttp.client_exceptions import InvalidURL
-from gql.transport.exceptions import TransportQueryError
 from pydantic import BaseModel
 
-from sources.subgraph.bins.dex_pools.data import PoolData
-from sources.subgraph.bins.dex_pools.schema import DexPool
 from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.hype_fees.fees_yield import fee_returns_all
 from sources.subgraph.bins.hypervisors.data import HypervisorAllData
@@ -74,7 +70,6 @@ class AllDataOutput(HypervisorBasicInfoOutput):
 class AllData:
     def __init__(self, chain: Chain, protocol: Protocol):
         self.hype_data: dict[str, Hypervisor]
-        self.pool_data: dict[str, DexPool]
         self.fee_yield: dict[str, dict]
         self.hypervisors: list[str] | None  = None
         self.prices: dict
@@ -83,21 +78,9 @@ class AllData:
 
     async def _get_subgraph_data(self):
         hype_data = HypervisorAllData(self.chain, self.protocol)
-        pool_data = PoolData(self.chain, self.protocol)
 
         await hype_data.get_data(hypervisors=self.hypervisors)
         self.hype_data = hype_data.data
-
-        pools = [hype.pool for hype in hype_data.data.values()]
-        try:
-            await pool_data.get_data(pools=pools)
-        except (InvalidURL, TransportQueryError):
-            self.pool_data = {}
-            logger.warning(
-                "Failed to get Pool Data for %s - %s", self.protocol.value, self.chain.value
-            )
-        else:
-            self.pool_data = pool_data.data
 
     async def get_data(self):
         self.prices, fee_yield, _ = await asyncio.gather(
@@ -120,8 +103,7 @@ class AllData:
 
         all_hypes = {}
         for hype_address, hype in self.hype_data.items():
-            pool = self.pool_data.get(hype.pool)
-            tick = pool.tick if pool else 0
+            tick = 0
 
             hype_returns = self.fee_yield.get(hype_address, {})
 
@@ -181,9 +163,9 @@ class AllData:
                 baseLower=hype.base_lower,
                 baseUpper=hype.base_upper,
                 inRange=bool(hype.base_lower <= tick <= hype.base_upper),
-                observationIndex=pool.observation_index if pool else 0,
-                poolTvlUSD=pool.total_value_locked_usd if pool else 0,
-                poolFeesUSD=pool.fees_usd if pool else 0,
+                observationIndex=0,
+                poolTvlUSD=0,
+                poolFeesUSD=0,
                 returns=returns,
             )
 
