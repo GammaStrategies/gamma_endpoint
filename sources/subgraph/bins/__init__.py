@@ -123,8 +123,14 @@ class UniswapV3Client(SubgraphClient):
 
 
 class HypePoolClient(SubgraphClient):
-    def __init__(self, protocol: Protocol, chain: Chain):
-        super().__init__(dex_hypepool_subgraph_urls[protocol][chain], chain)
+    def __init__(self, protocol: Protocol, chain: Chain, api_key: str = "prod"):
+        super().__init__(
+            self.studio_url(
+                dex_hypepool_subgraph_urls[protocol][chain],
+                get_subgraph_studio_key(api_key),
+            ),
+            chain,
+        )
 
 
 class EthBlocksClient(SubgraphClient):

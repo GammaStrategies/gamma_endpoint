@@ -58,7 +58,6 @@ class SubgraphClient:
         self._fragments_used: list[str] = []
 
     def studio_url(self, subgraph_id: str, api_key: str) -> str:
-        print(subgraph_id)
         if subgraph_id.startswith("http"):
             return subgraph_id
 

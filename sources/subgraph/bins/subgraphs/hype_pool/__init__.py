@@ -5,17 +5,21 @@ from gql.dsl import DSLFragment
 from sources.subgraph.bins.config import dex_hypepool_subgraph_urls
 from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.subgraphs import SubgraphClient, fragment
+from sources.subgraph.bins.subgraphs.gamma import get_subgraph_studio_key
 
 
 class HypePoolClient(SubgraphClient):
     """Client for accessing Hype Pool Subgraphs for different deployments"""
 
-    def __init__(self, protocol: Protocol, chain: Chain) -> None:
+    def __init__(self, protocol: Protocol, chain: Chain, api_key: str = "prod") -> None:
         self.protocol = protocol
         self.chain = chain
 
         super().__init__(
-            url=dex_hypepool_subgraph_urls[protocol][chain],
+            url=self.studio_url(
+                dex_hypepool_subgraph_urls[protocol][chain],
+                get_subgraph_studio_key(api_key),
+            ),
             schema_path="sources/subgraph/bins/subgraphs/hype_pool/schema.graphql",
         )
 
