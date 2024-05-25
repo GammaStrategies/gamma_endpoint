@@ -74,7 +74,6 @@ ETH_BLOCKS_SUBGRAPH_URL = (
 UNI_V2_SUBGRAPH_URL = "https://api.thegraph.com/subgraphs/name/ianlapham/uniswapv2"
 
 SUBGRAPH_STUDIO_KEY = get_config("SUBGRAPH_STUDIO_KEY")
-SUBGRAPH_STUDIO_KEY_DEV = get_config("SUBGRAPH_STUDIO_KEY_DEV")
 SUBGRAPH_STUDIO_USER_KEY = get_config("SUBGRAPH_STUDIO_USER_KEY")
 
 dex_subgraph_urls = defaultdict(dict)

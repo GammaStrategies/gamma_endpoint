@@ -115,7 +115,6 @@ class TopLevelData:
 
         variables = {"grossFeesMax": GROSS_FEES_MAX}
         response = await self.gamma_client.query(query, variables)
-
         self.all_stats_data = response.get("data", {})
 
     async def get_recent_rebalance_data(self, hours=24):
