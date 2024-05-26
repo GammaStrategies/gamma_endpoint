@@ -130,6 +130,7 @@ class Dex(str, Enum):
     FENIX: "fenix"
     XTRADE: "xtrade"
     KIM: "kim"
+    LINEHUB: "linehub"
 
 
 class Protocol(str, Enum):
@@ -181,6 +182,7 @@ class Protocol(str, Enum):
     FENIX = ("fenix", None, None, None, "fenix", "Fenix")
     XTRADE = ("xtrade", None, None, None, "xtrade", "Xtrade")
     KIM = ("kim", None, None, None, "kim", "Kim")
+    LINEHUB = ("linehub", None, None, None, "linehub", "Linehub")
 
     # extra properties
     api_url: str

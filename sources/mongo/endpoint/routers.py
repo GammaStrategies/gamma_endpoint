@@ -74,6 +74,7 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.FENIX, Chain.BLAST),
     (Protocol.XTRADE, Chain.XLAYER),
     (Protocol.KIM, Chain.MODE),
+    (Protocol.LINEHUB, Chain.LINEA),
 ]
 
 
