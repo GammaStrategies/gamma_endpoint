@@ -5,24 +5,24 @@ UNISWAP_MAINNET_GAMMA_SUBGRAPH: 9paB7Eptzq98R9K7L5QQTixSxFLXuDzKwmSKkn8ddEWU
 UNISWAP_MAINNET_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-mainnet
 UNISWAP_MAINNET_SUBGRAPH: https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3
 
-UNISWAP_POLYGON_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/polygon
-UNISWAP_POLYGON_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-polygon
+UNISWAP_POLYGON_GAMMA_SUBGRAPH: FDuN2vxwvkGkqhdhXCwe9JdL4YhT3XJUY1HeF6gHvb2V
+UNISWAP_POLYGON_HP_SUBGRAPH: 3kZRJEAhTy4itVFUxzhuhhu1jKyaJuPkSqZJGfcTp5zw
 UNISWAP_POLYGON_SUBGRAPH: https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-polygon
 
-UNISWAP_ARBITRUM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/arbitrum
-UNISWAP_ARBITRUM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-arbitrum
+UNISWAP_ARBITRUM_GAMMA_SUBGRAPH: DXYNeNKyHXwhqSYyLjbz7XbrLYaCAk4JfS2TgT9yTwvJ
+UNISWAP_ARBITRUM_HP_SUBGRAPH: EruCeV5tvp4D8CNzjx4eVK9MEonExK8yMfQRxC9X5rDB
 UNISWAP_ARBITRUM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-dev
 
-UNISWAP_OPTIMISM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/optimism
-UNISWAP_OPTIMISM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-optimism
+UNISWAP_OPTIMISM_GAMMA_SUBGRAPH: EYh1LvGZHtZ2a1rUaivHgupBgXu4DfDjU2pvizQNxjC2
+UNISWAP_OPTIMISM_HP_SUBGRAPH: 5dLGrVu99RufCPmLBj9kqdMiDFhCchdwrjndpgt8movV
 UNISWAP_OPTIMISM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis
 
 UNISWAP_CELO_GAMMA_SUBGRAPH: CyPUiRH5yLudcRGZir1hpEuFTxNxBDA49BAwLABpMSjq
 UNISWAP_CELO_HP_SUBGRAPH: EeXTSTHprVcqEis8JEbvxAGkpvC9RfqQJJVr5p8vZjs4
 UNISWAP_CELO_SUBGRAPH: https://api.thegraph.com/subgraphs/name/jesse-sawa/uniswap-celo
 
-UNISWAP_BSC_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/uniswap-bsc
-UNISWAP_BSC_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-bsc
+UNISWAP_BSC_GAMMA_SUBGRAPH: 5nqvxVNKr2HhZ93GXVt2hNXLk2JTr1aBewXQ9j76VJi7
+UNISWAP_BSC_HP_SUBGRAPH: 5SHKKkaSTdTiShSS19kKKNnXg65rmc91q6t9FWsw2vX2
 UNISWAP_BSC_SUBGRAPH: https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-bsc
 
 UNISWAP_MOONBEAM_GAMMA_SUBGRAPH: CZLXkws4xAa56Ff8TJmfsuMygKX1zZ9ept7H9EeFHhVG
@@ -81,36 +81,36 @@ QUICKSWAP_UNISWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/
 QUICKSWAP_UNISWAP_POLYGON_ZKEVM_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-uni-pzke/version/latest
 QUICKSWAP_UNISWAP_POLYGON_ZKEVM_SUBGRAPH: _
 
-ZYBERSWAP_ARBITRUM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/zyberswap-arbitrum
-ZYBERSWAP_ARBITRUM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-zyberswap-arbitrum
+ZYBERSWAP_ARBITRUM_GAMMA_SUBGRAPH: 5dxHedFfwTc5NrYCexvnBZeQfYfhF1ToszY1UzGTEJQt
+ZYBERSWAP_ARBITRUM_HP_SUBGRAPH: FbBKbvbCtVX4hYKq8a6F9V2oBmJNapR973mJQXrPAAVn
 ZYBERSWAP_ARBITRUM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/iliaazhel/zyberswap-info
 
-THENA_BSC_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/gammastrategies/thena
-THENA_BSC_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-thena-bsc
+THENA_BSC_GAMMA_SUBGRAPH: GnWd9rd9zeY9mwDcrPg7awpChS3hcb9DPxChpvVeo8wf
+THENA_BSC_HP_SUBGRAPH: 8uZK8MHRFoK9kAzXgBppfzHMX4H6gnQafxhNUXkBL5fB
 THENA_BSC_SUBGRAPH: https://api.thegraph.com/subgraphs/name/iliaazhel/thena-info
 
 THENA_OPBNB_GAMMA_SUBGRAPH: https://opbnb-mainnet-graph.nodereal.io/subgraphs/name/gamma-thena-opbnb
 THENA_OPBNB_HP_SUBGRAPH: https://opbnb-mainnet-graph.nodereal.io/subgraphs/name/gamma-hp-thena-opbnb
 THENA_OPBNB_SUBGRAPH: _
 
-CAMELOT_ARBITRUM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-camelot-arbitrum
-CAMELOT_ARBITRUM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-camelot-arbitrum
+CAMELOT_ARBITRUM_GAMMA_SUBGRAPH: 2dHwRTxJrYEuSAZwNzR2f4LZFKrn1TkbYrTAPXKBCFA1
+CAMELOT_ARBITRUM_HP_SUBGRAPH: HXLePNeFGrHD6M9VKBgoMTQCFH2NLhyN91YottUafKC8
 CAMELOT_ARBITRUM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/camelotlabs/camelot-amm-v3
 
-GLACIER_AVALANCHE_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-glacier-avax
-GLACIER_AVALANCHE_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-glacier-avax
+GLACIER_AVALANCHE_GAMMA_SUBGRAPH: 8sweKTGChYypWWoQKxgGboXqduUPFCdDjZC44hcYaU6u
+GLACIER_AVALANCHE_HP_SUBGRAPH: 4tAq5syFhrnk63g5GTbLAbCgof339jW2FuebcfBTkiiX
 GLACIER_AVALANCHE_SUBGRAPH: https://api.thegraph.com/subgraphs/name/iliaazhel/glacier-info
 
-RETRO_POLYGON_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-retro-polygon
-RETRO_POLYGON_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-retro-polygon
+RETRO_POLYGON_GAMMA_SUBGRAPH: 8qsgHPjrDiYtQx5gHpnBMjB7BSNt64uDo4pV6ut5pCe2
+RETRO_POLYGON_HP_SUBGRAPH: 7JKVLQLhBtWHx5KKew2GBHWVHsgnSPETJ9tzrvdLYTbo
 RETRO_POLYGON_SUBGRAPH: https://api.thegraph.com/subgraphs/name/ruvlol/univ3-test
 
-STELLASWAP_MOONBEAM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-stellaswap-moonbeam
-STELLASWAP_MOONBEAM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-stellaswap-moonbeam
+STELLASWAP_MOONBEAM_GAMMA_SUBGRAPH: GHodrFdE3zerRKYk7D8HUmUr6Q9rsAEnaBytiNUZR4GN
+STELLASWAP_MOONBEAM_HP_SUBGRAPH: 27djvrccrST7kYMg7N5WvkAcBHxZkE7fmFJsywKuef9E
 STELLASWAP_MOONBEAM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/stellaswap/pulsar
 
-BEAMSWAP_MOONBEAM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-beamswap-moonbeam
-BEAMSWAP_MOONBEAM_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-beamswap-moonbeam
+BEAMSWAP_MOONBEAM_GAMMA_SUBGRAPH: B64rDJtQwKPqjDKUqLx9Gg4qjvttgrxZtGejv7set9f3
+BEAMSWAP_MOONBEAM_HP_SUBGRAPH: EMaTSgAj6ArFmbKuNxeTunz1LCPUDuc81XcJ2DnF4iA6
 BEAMSWAP_MOONBEAM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/rock-n-block/beamswap-v3-subgraph
 
 SPIRITSWAP_FANTOM_GAMMA_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-spiritswap-fantom
