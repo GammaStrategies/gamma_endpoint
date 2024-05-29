@@ -1,12 +1,8 @@
-import json
 import logging
 import sys
-import time
-from fastapi import Request, Response
 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache import FastAPICache
-from starlette.middleware import Middleware
 from endpoint.config.middleware import BaseMiddleware
 
 from endpoint.config.version import GIT_BRANCH, APP_VERSION, get_version_info
@@ -18,6 +14,10 @@ from sources.internal.endpoint.app import create_app as create_internal_endpoint
 from sources.strats.endpoint.app import create_app as create_strats_endpoint
 from sources.frontend.endpoint.app import create_app as create_frontend_endpoint
 
+# Overwrite the return of Decimal type as string ( instead of float )
+# from fastapi import encoders
+# encoders.ENCODERS_BY_TYPE[decimal.Decimal] = str
+
 logging.basicConfig(
     format="[%(asctime)s:%(levelname)s:%(name)s]:%(message)s",
     datefmt="%Y/%m/%d %I:%M:%S",
@@ -28,9 +28,7 @@ logger = logging.getLogger(__name__)
 
 # Create root
 app = create_subgraph_endpoint(
-    title="Gamma API",
-    backwards_compatible=True,
-    version=get_version_info()
+    title="Gamma API", backwards_compatible=True, version=get_version_info()
 )  # legacy endpoint
 
 # Allow CORS
