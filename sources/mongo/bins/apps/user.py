@@ -463,27 +463,27 @@ def query_user_operations(
                 },
             }
         },
-        {
-            "$match": {
-                "$expr": {
-                    "$or": [
-                        {
-                            "$and": [
-                                {"$eq": ["$end_block", "$ini_block"]},
-                                {"$eq": [{"$size": "$ini_balance"}, 1]},
-                                {"$ne": [{"$first": "$ini_balance"}, "0"]},
-                            ]
-                        },
-                        {
-                            "$and": [
-                                {"$ne": ["$end_block", "$ini_block"]},
-                                {"$gt": [{"$size": "$ini_balance"}, 1]},
-                            ]
-                        },
-                    ]
-                }
-            }
-        },
+        # {
+        #     "$match": {
+        #         "$expr": {
+        #             "$or": [
+        #                 {
+        #                     "$and": [
+        #                         {"$eq": ["$end_block", "$ini_block"]},
+        #                         {"$eq": [{"$size": "$ini_balance"}, 1]},
+        #                         {"$ne": [{"$first": "$ini_balance"}, "0"]},
+        #                     ]
+        #                 },
+        #                 {
+        #                     "$and": [
+        #                         {"$ne": ["$end_block", "$ini_block"]},
+        #                         {"$gt": [{"$size": "$ini_balance"}, 1]},
+        #                     ]
+        #                 },
+        #             ]
+        #         }
+        #     }
+        # },
         {
             "$lookup": {
                 "from": "user_operations",
@@ -782,6 +782,16 @@ def query_user_operations(
                 "user": "$_id.user",
                 "hypervisor_address": "$_id.hype",
                 "operations": "$operations",
+            }
+        },
+        {
+            "$match": {
+                "$expr": {
+                    "$and": [
+                        {"$gt": [{"$last": "$operations.shares.balance"}, 0]},
+                        {"$eq": [{"$size": "$operations"}, 1]},
+                    ]
+                }
             }
         },
     ]
