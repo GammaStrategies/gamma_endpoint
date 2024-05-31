@@ -325,6 +325,7 @@ async def get_user_operations(
     deposits_usd_threshold: float | None = None,
     shadowed_user_address: str | None = None,
     group_by_shadowed: bool = False,
+    return_zero_balance: bool = False,
 ) -> list[dict]:
 
     # TODO: filter net_position_usd_threshold and deposits_usd_threshold
@@ -357,6 +358,7 @@ async def get_user_operations(
                     timestamp_end=timestamp_end,
                     shadowed_user_address=shadowed_user_address,
                     group_by_shadowed=group_by_shadowed,
+                    return_zero_balance=return_zero_balance,
                 ),
             )
         ]
@@ -375,6 +377,7 @@ def query_user_operations(
     timestamp_end: int | None = None,
     shadowed_user_address: str | None = None,
     group_by_shadowed: bool = False,
+    return_zero_balance: bool = False,
 ) -> list[dict]:
     """Return a query to get user operations and balances
 
@@ -388,6 +391,7 @@ def query_user_operations(
         timestamp_end (int | None, optional): . Defaults to None.
         shadowed_user_address (str | None, optional): filter by shadowed address. Defaults to None.
         group_by_shadowed (bool, optional): Will group by shadow address instead of user address. Defaults to False.
+        return_zero_balance (bool, optional): Will also return zero balances when enabled. Defaults to False.
 
     Returns:
         list[dict]: {
@@ -784,20 +788,26 @@ def query_user_operations(
                 "operations": "$operations",
             }
         },
-        {
-            "$match": {
-                "$expr": {
-                    "$and": [
-                        {"$gt": [{"$last": "$operations.shares.balance"}, 0]},
-                        {"$eq": [{"$size": "$operations"}, 1]},
-                    ]
-                }
-            }
-        },
     ]
 
+    # add zero address filter if needed
+    if not return_zero_balance:
+        _query.append(
+            {
+                "$match": {
+                    "$expr": {
+                        "$and": [
+                            {"$gt": [{"$last": "$operations.shares.balance"}, 0]},
+                            {"$eq": [{"$size": "$operations"}, 1]},
+                        ]
+                    }
+                }
+            }
+        )
+
+    # add any match defined earlier
     if _match:
         _query.insert(0, {"$match": _match})
 
-    #  query
+    #  return query
     return _query

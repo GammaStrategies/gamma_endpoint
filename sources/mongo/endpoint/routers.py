@@ -543,6 +543,10 @@ class mongo_router_builder(router_builder_baseTemplate):
             False,
             description="will group by shadowed user address, instead of user address",
         ),
+        return_zero_balance: bool = Query(
+            False,
+            description="will include hypervisor zero balances in the return, instead of filtering them out",
+        ),
     ):
         """Returns users shares related data for a given hypervisor address"""
 
@@ -559,6 +563,7 @@ class mongo_router_builder(router_builder_baseTemplate):
             # deposits_usd_threshold=deposits_usd_threshold,
             shadowed_user_address=shadowed_user_address,
             group_by_shadowed=group_by_shadowed,
+            return_zero_balance=return_zero_balance,
         )
 
     # User
