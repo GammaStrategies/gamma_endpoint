@@ -2,7 +2,7 @@ SUBGRAPH_STUDIO_KEY: ""
 SUBGRAPH_STUDIO_USER_KEY: ""
 
 UNISWAP_MAINNET_GAMMA_SUBGRAPH: 9paB7Eptzq98R9K7L5QQTixSxFLXuDzKwmSKkn8ddEWU
-UNISWAP_MAINNET_HP_SUBGRAPH: https://api.thegraph.com/subgraphs/name/l0c4t0r/hype-pool-uniswap-mainnet
+UNISWAP_MAINNET_HP_SUBGRAPH: 3jFJZJzN1drtJN1SdNceVhGKge8uReEjjmhHM2p32StT
 UNISWAP_MAINNET_SUBGRAPH: https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3
 
 UNISWAP_POLYGON_GAMMA_SUBGRAPH: FDuN2vxwvkGkqhdhXCwe9JdL4YhT3XJUY1HeF6gHvb2V
