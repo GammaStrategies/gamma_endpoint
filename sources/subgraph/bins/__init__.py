@@ -34,7 +34,7 @@ class SubgraphClient:
 
         base_url = "https://gateway-arbitrum.network.thegraph.com/api/"
 
-        return f"{base_url}{api_key}/subgraphs/id/{subgraph_id}"
+        return f"{base_url}{api_key}/deployments/id/{subgraph_id}"
 
     async def query(self, query: str, variables=None) -> dict:
         """Make graphql query to subgraph"""

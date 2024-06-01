@@ -145,7 +145,7 @@ class TopLevelData:
         data = self.all_stats_data
 
         if not data:
-            raise ValueError("Missing subgraph data")
+            raise ValueError(f"Missing subgraph data for {self.protocol}/{self.chain}")
 
         total_tvl = 0
 
