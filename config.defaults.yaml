@@ -29,6 +29,10 @@ UNISWAP_MOONBEAM_GAMMA_SUBGRAPH: QmRzEdsdjJHJQgG1FXnLit2VMJUTffWLFERyW47XQh9G4f
 UNISWAP_MOONBEAM_HP_SUBGRAPH: QmXFSqZfMTfRqTsExMvbRSijhCFSC8rVnVdPsJXRV6RaH3
 UNISWAP_MOONBEAM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-moonbeam
 
+UNISWAP_MANTA_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-uniswap-manta/latest/gn
+UNISWAP_MANTA_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-uniswap-manta/latest/gn
+UNISWAP_MANTA_SUBGRAPH: _
+
 UNISWAP_AVALANCHE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-uniswap-avax/version/latest
 UNISWAP_AVALANCHE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-avax/version/latest
 UNISWAP_AVALANCHE_SUBGRAPH: _

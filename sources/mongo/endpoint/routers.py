@@ -33,6 +33,7 @@ DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.UNISWAP, Chain.BASE),
     (Protocol.UNISWAP, Chain.BLAST),
     (Protocol.UNISWAP, Chain.SCROLL),
+    (Protocol.UNISWAP, Chain.MANTA),
     (Protocol.QUICKSWAP, Chain.POLYGON),
     (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
     (Protocol.QUICKSWAP, Chain.ASTAR_ZKEVM),
