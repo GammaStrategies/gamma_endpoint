@@ -100,7 +100,8 @@ async def latest_multifeeDistributor(network: Chain, protocol: Protocol):
         ] += boostApr
 
     # return result
-    return await rewrite_mfd_with_api(result, network, protocol)
+    return await rewrite_mfd_with_latest_reward_snapshots(result, network)
+    # return await rewrite_mfd_with_api(result, network, protocol)
     # return await rewrite_mfd_with_custom(result, network)
 
 
@@ -280,6 +281,144 @@ async def rewrite_mfd_with_custom(data: dict, chain: Chain):
         logging.getLogger(__name__).error(f"Error rewriting mfd with custom: {e}")
 
     return data
+
+
+async def rewrite_mfd_with_latest_reward_snapshots(data: dict, chain: Chain):
+
+    latest_rewards_by_hype = {}
+    try:
+        for item in await retrieve_rewards_from_latest_snapshots(chain=chain):
+            # add hypervisor address to dict
+            if not item["hypervisor_address"] in latest_rewards_by_hype:
+                latest_rewards_by_hype[item["hypervisor_address"]] = {}
+            # add rewardToken to dict
+            if (
+                not item["rewardToken"]
+                in latest_rewards_by_hype[item["hypervisor_address"]]
+            ):
+                latest_rewards_by_hype[item["hypervisor_address"]][
+                    item["rewardToken"]
+                ] = item
+            else:
+                logging.getLogger(__name__).error(
+                    f" rewardToken {item['rewardToken']} already in latest_rewards_by_hype[{item['hypervisor_address']}]"
+                )
+
+        if not latest_rewards_by_hype:
+            logging.getLogger(__name__).warning(
+                f"No rewards apr from hype returns available for {chain.fantasy_name}"
+            )
+            return data
+
+        items_to_remove = []
+        for mfd_address, item in data.items():
+            for hype_address, hype_data in item["hypervisors"].items():
+
+                if hype_address not in latest_rewards_by_hype:
+                    logging.getLogger(__name__).warning(
+                        f"No rewards apr from hype returns available for {hype_address} in {chain.fantasy_name}-. Removing from result"
+                    )
+                    # remove ?
+                    items_to_remove.append(mfd_address)
+                    continue
+
+                # reset hypervisor totals
+                hype_data["apr"] = 0
+                hype_data["baseApr"] = 0
+                hype_data["boostApr"] = 0
+
+                # reset hypervisor rewarders
+                for rewardToken_address, rewarder_data in hype_data[
+                    "rewarders"
+                ].items():
+
+                    # get the reward token from the latest snapshot
+                    if rewardToken_address in latest_rewards_by_hype[hype_address]:
+                        # modify rewarder data
+                        rewarder_data["timestamp"] = latest_rewards_by_hype[
+                            hype_address
+                        ][rewardToken_address]["timestamp"]
+
+                        rewarder_data["rewardPerSecond"] = latest_rewards_by_hype[
+                            hype_address
+                        ][rewardToken_address]["rewards_perSecond"]
+
+                        rewarder_data["apr"] = latest_rewards_by_hype[hype_address][
+                            rewardToken_address
+                        ]["apr"]
+                        rewarder_data["baseApr"] = rewarder_data["apr"]
+                        rewarder_data["boostApr"] = 0
+                        rewarder_data["baseRewardPerSecond"] = rewarder_data[
+                            "rewardPerSecond"
+                        ]
+                        rewarder_data["boostRewardPerSecond"] = 0
+
+                        # modify totals
+                        hype_data["apr"] += rewarder_data["apr"]
+                        hype_data["baseApr"] += rewarder_data["apr"]
+                        # hype_data["boostApr"] = 0
+
+                        # pop item from latest_rewards_by_hype
+                        latest_rewards_by_hype[hype_address].pop(rewardToken_address)
+
+                # add the remaining rewarders from the latest rewards snapshots
+                for rewardToken_address, rewarder_data in latest_rewards_by_hype[
+                    hype_address
+                ].items():
+                    hype_data["rewarders"][rewardToken_address] = {
+                        "timestamp": rewarder_data["timestamp"],
+                        "rewardToken": rewardToken_address,
+                        "rewardTokenDecimals": rewarder_data["rewardTokenDecimals"],
+                        "rewardTokenSymbol": rewarder_data["rewardTokenSymbol"],
+                        "rewardPerSecond": rewarder_data["rewards_perSecond"],
+                        "apr": rewarder_data["apr"],
+                        "baseApr": rewarder_data["apr"],
+                        "boostApr": 0,
+                        "baseRewardPerSecond": rewarder_data["rewards_perSecond"],
+                        "boostRewardPerSecond": 0,
+                    }
+
+                    # modify totals
+                    hype_data["apr"] += rewarder_data["apr"]
+                    hype_data["baseApr"] += rewarder_data["apr"]
+                    # hype_data["boostApr"] = 0
+
+        # remove items
+        for item in items_to_remove:
+            data.pop(item)
+
+    except Exception as e:
+        logging.getLogger(__name__).exception(
+            f"Error rewriting mfd with latest reward snapshots: {e}"
+        )
+
+    return data
+
+
+# Rewards from latest snapshots
+async def retrieve_rewards_from_latest_snapshots(
+    chain: Chain,
+    hypervisor_addresses: list[str] | None = None,
+) -> list[dict]:
+    """Retrieve rewards from the latest rewards snapshots collection
+
+    Args:
+        chain (Chain):
+        hypervisor_addresses (list[str] | None, optional): . Defaults to All available.
+
+    Returns:
+        list[dict]:
+    """
+
+    # get
+    return await local_database_helper(network=chain).get_items_from_database(
+        collection_name="latest_reward_snapshots",
+        find=(
+            {}
+            if not hypervisor_addresses
+            else {"hypervisor_address": {"$in": hypervisor_addresses}}
+        ),
+    )
 
 
 # Retrieve rewards from hypervisor returns
