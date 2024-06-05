@@ -229,6 +229,10 @@ LINEHUB_LINEA_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-
 LINEHUB_LINEA_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-linehub-linea/version/latest
 LINEHUB_LINEA_SUBGRAPH: _
 
+KINETIX_BASE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-kinetix-base/version/latest
+KINETIX_BASE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-kinetix-base/version/latest
+KINETIX_BASE_SUBGRAPH: _
+
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {
   "ethereum":{},

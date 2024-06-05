@@ -61,6 +61,7 @@ DEPLOYMENTS = [
     (Protocol.XTRADE, Chain.XLAYER),
     (Protocol.KIM, Chain.MODE),
     (Protocol.LINEHUB, Chain.LINEA),
+    (Protocol.KINETIX, Chain.BASE),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
