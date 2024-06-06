@@ -20,6 +20,9 @@ from sources.internal.bins.user import get_user_addresses, get_user_shares
 # from sources.mongo.bins.apps import prices
 from sources.mongo.bins.apps import hypervisor, rewards, user
 from sources.mongo.bins.apps.brevis_api import build_brevisQueryRequest
+from sources.mongo.bins.apps.twa.twa_calculations import (
+    gamma_rewards_TWA_calculation,
+)
 
 DEPLOYED: list[tuple[Protocol, Chain]] = [
     (Protocol.UNISWAP, Chain.ETHEREUM),
@@ -225,6 +228,13 @@ class mongo_router_builder(router_builder_baseTemplate):
         router.add_api_route(
             path=f"{self.prefix}{'/hypervisor/{hypervisor_address}/rewards'}",
             endpoint=self.hypervisor_rewards,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
+        router.add_api_route(
+            path=f"{self.prefix}{'/hypervisor/{hypervisor_address}/TWA'}",
+            endpoint=self.TWA_calculation,
             methods=["GET"],
             generate_unique_id_function=self.generate_unique_id,
         )
@@ -680,4 +690,42 @@ class mongo_router_builder(router_builder_baseTemplate):
             block_ini=block_ini,
             block_end=block_end,
             hypervisor_address=hypervisor_address,
+        )
+
+    # GAMMA REWARD TWA
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def TWA_calculation(
+        self,
+        response: Response,
+        hypervisor_address: str,
+        timestamp_ini: int | None = Query(
+            None, description="will limit the data returned from this value."
+        ),
+        timestamp_end: int | None = Query(
+            None, description="will limit the data returned to this value."
+        ),
+        block_ini: int | None = Query(
+            None, description="will limit the data returned from this value."
+        ),
+        block_end: int | None = Query(
+            None, description="will limit the data returned to this value."
+        ),
+    ):
+        """Returns the TWA rewards for a given user address"""
+
+        # filter addresses
+        hypervisor_address = filter_addresses(hypervisor_address)
+
+        # check that block_ini or timestamp_ini are provided
+        if not block_ini and not timestamp_ini:
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return "Please provide block_ini or timestamp_ini"
+
+        return await gamma_rewards_TWA_calculation(
+            chain=self.chain,
+            hypervisor_address=hypervisor_address,
+            timestamp_end=timestamp_end,
+            timestamp_ini=timestamp_ini,
+            block_end=block_end,
+            block_ini=block_ini,
         )
