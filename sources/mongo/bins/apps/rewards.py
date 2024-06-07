@@ -6,6 +6,7 @@ from sources.common.database.collection_endpoint import database_global
 from sources.common.general.enums import Chain, Protocol
 from sources.common.xt_api.ramses import ramses_api_helper
 from sources.internal.bins.user import query_user_shares_from_user_operations
+from sources.mongo.bins.apps.user import get_user_operations
 from ..helpers import local_database_helper
 
 
@@ -628,6 +629,290 @@ async def retrieve_liquidity_in_range(
 
 
 # Gamma Merkl Rewards
+
+
+async def gamma_rewards_TWA_calculation(
+    chain: Chain,
+    protocol: Protocol | None = None,
+    hypervisors: list[str] | None = None,
+    timestamp_ini: int | None = None,
+    timestamp_end: int | None = None,
+    block_ini: int | None = None,
+    block_end: int | None = None,
+):
+    # one of block or timestamp should be provided ( including end)
+
+    # decide whether to use timestamp or block
+    timevar_txt = "timestamp"
+    timevar_ini = timestamp_ini
+    timevar_end = timestamp_end
+    if block_ini:
+        timevar_txt = "block"
+        timevar_ini = block_ini
+        timevar_end = block_end
+
+    # get user data ( do not filter by user yet as we need all users to calculate TWA)
+    user_hypervisor_data = await get_user_operations(
+        chain=chain,
+        protocol=protocol,
+        hypervisor_address_list=hypervisors,
+        block_ini=block_ini,
+        block_end=block_end,
+        timestamp_ini=timestamp_ini,
+        timestamp_end=timestamp_end,
+        # important to include zero balances
+        return_zero_balance=True,
+    )
+    if not user_hypervisor_data:
+        return "No user data found"
+
+    # hypervisor helper variable {
+    #             <hype_address>: {
+    #                   "users": { <user>: { "initial_balance": <initial_balance>, "final_balance": <final_balance>, "operations":[]}}
+    #                   f"{timevar_txt}s":{ <block/timestamp>: <hypervisor_status> } }
+    #                       }
+    hype_data = {}
+    for user_hype_item in user_hypervisor_data:
+        # check if hypervisor is in the dict
+        if user_hype_item["hypervisor_address"] not in hype_data:
+            hype_data[user_hype_item["hypervisor_address"]] = {
+                f"{timevar_txt}_ini": timevar_ini,
+                f"{timevar_txt}_end": timevar_end,
+                "total_twa": 0,
+                "total_twa_percent": 0,
+                "users": {
+                    user_hype_item["user"]: {
+                        "initial_balance": 0,
+                        "final_balance": 0,
+                        "twa": 0,
+                        "twa_percent": 0,
+                        "operations": [],
+                    }
+                },
+                f"{timevar_txt}s": {},
+            }
+        else:
+            # check if user is in the dict
+            if (
+                user_hype_item["user"]
+                not in hype_data[user_hype_item["hypervisor_address"]]["users"]
+            ):
+                hype_data[user_hype_item["hypervisor_address"]]["users"][
+                    user_hype_item["user"]
+                ] = {
+                    "initial_balance": 0,
+                    "final_balance": 0,
+                    "twa": 0,
+                    "twa_percent": 0,
+                    "operations": [],
+                }
+
+        last_time = timevar_ini
+        for operation in user_hype_item["operations"]:
+
+            # check if block/timestamp is in the dict
+            if (
+                operation[timevar_txt]
+                not in hype_data[user_hype_item["hypervisor_address"]][
+                    f"{timevar_txt}s"
+                ]
+            ):
+                hype_data[user_hype_item["hypervisor_address"]][f"{timevar_txt}s"][
+                    operation[timevar_txt]
+                ] = operation["hypervisor_status"]
+
+            # check if block/timestamp is lower than initial block/timestamp
+            if operation[timevar_txt] < timevar_ini:
+                # this is the user's initial balance.
+                hype_data[user_hype_item["hypervisor_address"]]["users"][
+                    user_hype_item["user"]
+                ]["initial_balance"] = operation["shares"]["balance"]
+                hype_data[user_hype_item["hypervisor_address"]]["users"][
+                    user_hype_item["user"]
+                ]["final_balance"] = operation["shares"]["balance"]
+            else:
+                # total supply before the operation
+                hype_totalSupply_denominator = (
+                    operation["hypervisor_status"]["totalSupply"]
+                    + operation["shares"]["flow"]
+                )
+
+                user_twa_numerator = calculate_twa(
+                    hype_data[user_hype_item["hypervisor_address"]]["users"][
+                        user_hype_item["user"]
+                    ]["final_balance"],
+                    hype_totalSupply_denominator,
+                    operation[timevar_txt],
+                    last_time,
+                )
+
+                # append operation to the operations list
+                hype_data[user_hype_item["hypervisor_address"]]["users"][
+                    user_hype_item["user"]
+                ]["operations"].append(
+                    {
+                        f"{timevar_txt}": operation[timevar_txt],
+                        "time_passed": operation[timevar_txt] - last_time,
+                        "totalSupply": hype_totalSupply_denominator,
+                        "balance": hype_data[user_hype_item["hypervisor_address"]][
+                            "users"
+                        ][user_hype_item["user"]]["final_balance"],
+                        "twa": user_twa_numerator,
+                    }
+                )
+
+                hype_data[user_hype_item["hypervisor_address"]]["users"][
+                    user_hype_item["user"]
+                ]["twa"] += user_twa_numerator
+
+                hype_data[user_hype_item["hypervisor_address"]][
+                    "total_twa"
+                ] += user_twa_numerator
+
+                hype_data[user_hype_item["hypervisor_address"]]["users"][
+                    user_hype_item["user"]
+                ]["twa_percent"] = hype_data[user_hype_item["hypervisor_address"]][
+                    "users"
+                ][
+                    user_hype_item["user"]
+                ][
+                    "twa"
+                ] / (
+                    timevar_end - timevar_ini
+                )
+
+                hype_data[user_hype_item["hypervisor_address"]]["total_twa_percent"] = (
+                    hype_data[user_hype_item["hypervisor_address"]]["total_twa"]
+                    / (timevar_end - timevar_ini)
+                )
+
+                # this is an operation after the initial block/timestamp
+                # set final balance as current balance
+                hype_data[user_hype_item["hypervisor_address"]]["users"][
+                    user_hype_item["user"]
+                ]["final_balance"] = operation["shares"]["balance"]
+                # append operation to the operations list
+                # hype_data[user_hype_item["hypervisor_address"]]["users"][
+                #     user_hype_item["user"]
+                # ]["operations"].append(operation)
+                last_time = operation[timevar_txt]
+    return hype_data
+    # calculate TWA from hype_data created
+    for hype_address, hype_data_item in hype_data.items():
+        # get initial/end hypervisor supply ( filter blocks lower than initial block from f"{timevar_txt}s" and get the max one)
+        initial_hypervisor_supply = max(
+            [
+                status["totalSupply"]
+                for block, status in hype_data_item[f"{timevar_txt}s"].items()
+                if block < timevar_ini
+            ]
+        )
+        end_hypervisor_supply = max(
+            [
+                status["totalSupply"]
+                for block, status in hype_data_item[f"{timevar_txt}s"].items()
+                if block > timevar_ini
+            ]
+        )
+        hype_data_item["initial_hypervisor_supply"] = initial_hypervisor_supply
+        hype_data_item["end_hypervisor_supply"] = end_hypervisor_supply
+        hype_data_item["total_twa"] = 0
+
+        # delete_zero balances
+        users_to_remove = []
+        for user_address, user_data in hype_data_item["users"].items():
+            last_time = timevar_ini
+            user_twa_numerator = 0
+            # denominator is time1 - time0
+            # check if no block_end or timestamp_end, use last block or timestamp from f"{timevar_txt}s"
+            timevar_end = (
+                block_end
+                or timestamp_end
+                or max(list(hype_data_item[f"{timevar_txt}s"].keys()))
+            )
+            user_twa_denominator = timevar_end - timevar_ini
+            # loop thu all operations
+            for operation in user_data["operations"]:
+
+                # this operation should be after the initial block/timestamp
+                if operation[timevar_txt] < timevar_ini:
+                    # error should never happen
+                    continue
+
+                # if this is the first operation, use the initial balance
+                if last_time == timevar_ini:
+                    user_twa_numerator += calculate_twa(
+                        user_data["initial_balance"],
+                        initial_hypervisor_supply,
+                        operation[timevar_txt],
+                        last_time,
+                    )
+                else:
+                    user_twa_numerator += calculate_twa(
+                        operation["shares"]["balance"] - operation["shares"]["flow"],
+                        operation["hypervisor_status"]["totalSupply"],
+                        operation[timevar_txt],
+                        last_time,
+                    )
+
+                # change last time
+                last_time = operation[timevar_txt]
+
+            # calculate final step ( from last operation to end)
+            # check if last operation is the same as the initial block/timestamp
+            if last_time == timevar_ini:
+                # if so, use initial balance
+                user_twa_numerator += calculate_twa(
+                    user_data["final_balance"],
+                    end_hypervisor_supply,
+                    timevar_end,
+                    last_time,
+                )
+            else:
+                # else, use final balance
+                user_twa_numerator += calculate_twa(
+                    user_data["final_balance"],
+                    end_hypervisor_supply,
+                    timevar_end,
+                    last_time,
+                )
+            last_time = timevar_end
+
+            # calculate TWA
+            user_twa = user_twa_numerator / user_twa_denominator
+            # add to user_data
+            user_data["twa"] = user_twa
+            # add to total_twa
+            hype_data_item["total_twa"] += user_twa
+
+            # check if user_twa is zero
+            if user_twa == 0:
+                users_to_remove.append(user_address)
+
+        # remove users with zero TWA
+        for user_address in users_to_remove:
+            hype_data_item["users"].pop(user_address)
+        # remove f"{timevar_txt}s" from hype_data_item
+        hype_data_item.pop(f"{timevar_txt}s")
+
+    # by adding all twas
+
+    return hype_data
+
+
+def calculate_twa(b, s, t1, t0):
+    """Helper function to calculate TWA
+
+    Args:
+        b :
+        s :
+        t1:
+        t0:
+
+    Returns:
+
+    """
+    return (b / s) * (t1 - t0)
 
 
 # TODO: in devtest

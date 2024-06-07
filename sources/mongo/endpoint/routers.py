@@ -296,6 +296,13 @@ class mongo_router_builder(router_builder_baseTemplate):
             generate_unique_id_function=self.generate_unique_id,
         )
 
+        router.add_api_route(
+            path=f"{self.prefix}{'/hypervisors/TWA'}",
+            endpoint=self.TWA_calculation2,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
         return router
 
     def _create_routes_user(self, router: APIRouter) -> APIRouter:
@@ -743,6 +750,41 @@ class mongo_router_builder(router_builder_baseTemplate):
                 block_end=block_end,
                 block_ini=block_ini,
             )
+
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def TWA_calculation2(
+        self,
+        response: Response,
+        hypervisors: typing.List[str] | None = Query(
+            None, description="list of hypervisor addresses"
+        ),
+        timestamp_ini: int | None = Query(
+            None, description="will limit the data returned from this value."
+        ),
+        timestamp_end: int | None = Query(
+            None, description="will limit the data returned to this value."
+        ),
+        block_ini: int | None = Query(
+            None, description="will limit the data returned from this value."
+        ),
+        block_end: int | None = Query(
+            None, description="will limit the data returned to this value."
+        ),
+    ):
+        """Returns the TWA rewards for a given user address"""
+
+        # filter addresses
+        hypervisors = filter_addresses(hypervisors)
+
+        # check that block_ini or timestamp_ini are provided
+        if not block_ini and not timestamp_ini:
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return "Please provide block_ini or timestamp_ini"
+
+        return await rewards.gamma_rewards_TWA_calculation(
+            chain=self.chain,
+            protocol=self.protocol,
+            hypervisors=hypervisors,
             timestamp_end=timestamp_end,
             timestamp_ini=timestamp_ini,
             block_end=block_end,

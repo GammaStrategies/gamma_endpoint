@@ -41,8 +41,19 @@ class database_global(db_collections_common):
                     "multi_indexes": [],
                 },
                 "usd_prices": {
-                    "mono_indexes": {"id": True, "address": False},
-                    "multi_indexes": [],
+                    "mono_indexes": {
+                        "id": True,
+                        "address": False,
+                        "block": False,
+                        "network": False,
+                    },
+                    "multi_indexes": [
+                        [
+                            ("address", ASCENDING),
+                            ("block", ASCENDING),
+                            ("network", ASCENDING),
+                        ],
+                    ],
                 },
                 "current_usd_prices": {
                     "mono_indexes": {"id": True, "address": False},
@@ -52,6 +63,30 @@ class database_global(db_collections_common):
                             ("network", ASCENDING),
                         ],
                     ],
+                },
+                "configuration": {
+                    "mono_indexes": {"id": True},
+                    "multi_indexes": [],
+                },
+                "frontend": {
+                    "mono_indexes": {
+                        "id": True,
+                        "timestamp": False,
+                        "protocol": False,
+                        "chain": False,
+                        "frontend_type": False,
+                    },
+                    "multi_indexes": [
+                        [
+                            ("chain", ASCENDING),
+                            ("protocol", ASCENDING),
+                            ("timestamp", ASCENDING),
+                        ],
+                    ],
+                },
+                "reports": {
+                    "mono_indexes": {"id": True},
+                    "multi_indexes": [],
                 },
             }
         super().__init__(
@@ -339,11 +374,19 @@ class database_local(db_collections_common):
                         "blockNumber": False,
                         "address": False,
                         "timestamp": False,
+                        "topic": False,
                     },
                     "multi_indexes": [
                         [("blockNumber", ASCENDING), ("logIndex", ASCENDING)],
+                        [
+                            ("dst", ASCENDING),
+                            ("src", ASCENDING),
+                            ("sender", ASCENDING),
+                            ("to", ASCENDING),
+                        ],
                     ],
                 },
+                # hypervisor snapshots
                 "status": {
                     "mono_indexes": {
                         "id": True,
@@ -360,11 +403,18 @@ class database_local(db_collections_common):
                         "user_address": False,
                         "hypervisor_address": False,
                         "timestamp": False,
-                        "logIndex": False,
                         "topic": False,
+                        "transactionHash": False,
+                        "logIndex": False,
+                        "customIndex": False,
                     },
                     "multi_indexes": [
                         [("block", DESCENDING), ("logIndex", DESCENDING)],
+                        [
+                            ("transactionHash", DESCENDING),
+                            ("logIndex", DESCENDING),
+                            ("customIndex", DESCENDING),
+                        ],
                     ],
                 },
                 "rewards_static": {
@@ -390,7 +440,13 @@ class database_local(db_collections_common):
                         "id": True,
                         "type": False,
                     },
-                    "multi_indexes": [],
+                    "multi_indexes": [
+                        [
+                            ("count", ASCENDING),
+                            ("processing", ASCENDING),
+                            ("creation", ASCENDING),
+                        ],
+                    ],
                 },
                 "hypervisor_returns": {
                     "mono_indexes": {
@@ -416,6 +472,55 @@ class database_local(db_collections_common):
                     "mono_indexes": {
                         "id": True,
                         "type": False,
+                    },
+                    "multi_indexes": [],
+                },
+                "revenue_operations": {
+                    "mono_indexes": {
+                        "id": True,
+                        "blockNumber": False,
+                        "address": False,
+                        "timestamp": False,
+                    },
+                    "multi_indexes": [
+                        [("blockNumber", ASCENDING), ("logIndex", ASCENDING)],
+                    ],
+                },
+                # latest hypervisor snapshots
+                "latest_hypervisor_snapshots": {
+                    "mono_indexes": {
+                        "id": True,
+                        "block": False,
+                        "address": True,
+                        "timestamp": False,
+                    },
+                    "multi_indexes": [],
+                },
+                "latest_reward_snapshots": {
+                    "mono_indexes": {
+                        "id": True,
+                        "block": False,
+                        "address": False,
+                        "timestamp": False,
+                    },
+                    "multi_indexes": [],
+                },
+                "latest_hypervisor_returns": {
+                    "mono_indexes": {
+                        "id": True,
+                        "address": False,
+                        "ini_block": False,
+                        "end_block": False,
+                        "ini_timestamp": False,
+                        "end_timestamp": False,
+                    },
+                    "multi_indexes": [],
+                },
+                "transaction_receipts": {
+                    "mono_indexes": {
+                        "id": True,
+                        "block": False,
+                        "timestamp": False,
                     },
                     "multi_indexes": [],
                 },
@@ -657,7 +762,9 @@ class database_local(db_collections_common):
             collection_name="operations", query=query
         )
 
-    async def get_grouped_user_current_status(self, user_address: str, chain:Chain) -> list:
+    async def get_grouped_user_current_status(
+        self, user_address: str, chain: Chain
+    ) -> list:
         """Get a grouped by hypervisor picture of a user, with regards shares and operations.
 
         Args:
@@ -823,9 +930,9 @@ class database_local(db_collections_common):
             data (dict):
         """
         # define database id
-        data[
-            "id"
-        ] = f"{data['address']}_{data['block']}_{data['logIndex']}_{data['hypervisor_address']}"
+        data["id"] = (
+            f"{data['address']}_{data['block']}_{data['logIndex']}_{data['hypervisor_address']}"
+        )
 
         # convert decimal to bson compatible and save
         await self.replace_item_to_database(data=data, collection_name="user_status")
