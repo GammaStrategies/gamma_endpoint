@@ -113,6 +113,7 @@ def query_user_operations_brevis_GammaQueryRequest(
                             {
                                 "block_number": "$block",
                                 "transaction_hash": "$transactionHash",
+                                "topic": "$topic",
                                 "log_extract_infos": [
                                     {
                                         "value_from_topic": True,
