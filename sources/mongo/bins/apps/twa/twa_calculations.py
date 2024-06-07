@@ -172,8 +172,17 @@ async def gamma_rewards_TWA_calculation_test(
 
             # append operation to the user's operations list
             result_data["users"][operation["user_address"]]["operations"].append(
-                operation
+                {
+                    "block": operation["block"],
+                    "timestamp": operation["timestamp"],
+                    "shares": operation["shares"],
+                    "topic": operation["topic"],
+                    "hypervisor_totalSupply": operation["hypervisor_status"][
+                        "totalSupply"
+                    ],
+                }
             )
+
             result_data["users"][operation["user_address"]]["calculations"].append(
                 {
                     f"{timevar_txt}": operation[timevar_txt],
@@ -266,6 +275,8 @@ async def gamma_rewards_TWA_calculation_test(
 
     # remove users with zero TWA
     for user_address in users_to_remove:
+        if user_address == "0x65c434cda98bb76c1f85e5d6ea7508867a47038f":
+            poi = 9
         result_data["users"].pop(user_address)
 
     # total_TWA should never be greater than end total supply * total time passed
@@ -374,6 +385,9 @@ async def gamma_rewards_TWA_calculation(
             result_data["totalSupply_ini"] = operation["hypervisor_status"][
                 "totalSupply"
             ]
+            result_data["totalSupply_end"] = operation["hypervisor_status"][
+                "totalSupply"
+            ]
         else:
             # this is an operation after the initial block
 
@@ -405,26 +419,36 @@ async def gamma_rewards_TWA_calculation(
                     ) * user_data["final_balance"]
 
             # append operation to the user's operations list
-            _calculation_to_append = {
-                f"{timevar_txt}": operation[timevar_txt],
-                "time_passed": current_timevar - last_timevar,
-                "TWB": (current_timevar - last_timevar)
-                * result_data["users"][operation["user_address"]]["final_balance"],
-            }
-            if _calculation_to_append["TWB"] != 0:
-                result_data["users"][operation["user_address"]]["calculations"].append(
-                    _calculation_to_append
-                )
+            result_data["users"][operation["user_address"]]["operations"].append(
+                {
+                    "block": operation["block"],
+                    "timestamp": operation["timestamp"],
+                    "shares": operation["shares"],
+                    "topic": operation["topic"],
+                    "hypervisor_totalSupply": operation["hypervisor_status"][
+                        "totalSupply"
+                    ],
+                }
+            )
 
-                # set user's time weighted balance
-                result_data["users"][operation["user_address"]]["TWB"] += (
-                    current_timevar - last_timevar
-                ) * result_data["users"][operation["user_address"]]["final_balance"]
+            result_data["users"][operation["user_address"]]["calculations"].append(
+                {
+                    f"{timevar_txt}": operation[timevar_txt],
+                    "time_passed": current_timevar - last_timevar,
+                    "TWB": (current_timevar - last_timevar)
+                    * result_data["users"][operation["user_address"]]["final_balance"],
+                }
+            )
 
-                # add to hypervisor total TWB
-                result_data["total TWB"] += (
-                    current_timevar - last_timevar
-                ) * result_data["users"][operation["user_address"]]["final_balance"]
+            # set user's time weighted balance
+            result_data["users"][operation["user_address"]]["TWB"] += (
+                current_timevar - last_timevar
+            ) * result_data["users"][operation["user_address"]]["final_balance"]
+
+            # add to hypervisor total TWB
+            result_data["total TWB"] += (current_timevar - last_timevar) * result_data[
+                "users"
+            ][operation["user_address"]]["final_balance"]
 
             # set user's final balance as current balance
             result_data["users"][operation["user_address"]]["final_balance"] = (
