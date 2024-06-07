@@ -711,7 +711,7 @@ class mongo_router_builder(router_builder_baseTemplate):
         block_end: int | None = Query(
             None, description="will limit the data returned to this value."
         ),
-        type: str | None = Query(
+        type_str: str | None = Query(
             "formula", enum=["formula", "spreadsheet"], description="calculation type"
         ),
     ):
@@ -725,7 +725,7 @@ class mongo_router_builder(router_builder_baseTemplate):
             response.status_code = status.HTTP_400_BAD_REQUEST
             return "Please provide block_ini or timestamp_ini"
 
-        if type == "spreadsheet":
+        if type_str == "spreadsheet":
             return await gamma_rewards_TWA_calculation(
                 chain=self.chain,
                 hypervisor_address=hypervisor_address,
