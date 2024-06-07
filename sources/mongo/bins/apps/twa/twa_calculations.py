@@ -112,6 +112,7 @@ async def gamma_rewards_TWA_calculation_test(
                 "initial_balance": 0,
                 "final_balance": 0,  # this is the current user balance at any point
                 "operations": [],
+                "calculations": [],
             }
 
         # if block is lower than initial block, this is the initial balance for the user
@@ -127,6 +128,10 @@ async def gamma_rewards_TWA_calculation_test(
             result_data["totalSupply_ini"] = operation["hypervisor_status"][
                 "totalSupply"
             ]
+            result_data["totalSupply_end"] = operation["hypervisor_status"][
+                "totalSupply"
+            ]
+            last_total_supply = result_data["totalSupply_ini"]
         else:
             # this is an operation after the initial block
             last_total_supply = last_total_supply or result_data["totalSupply_ini"]
@@ -140,7 +145,7 @@ async def gamma_rewards_TWA_calculation_test(
                     # if final balance is zero, do not calculate TWA
                     continue
 
-                _operation_to_append = {
+                _calculation_to_append = {
                     f"{timevar_txt}": operation[timevar_txt],
                     "time_passed": current_timevar - last_timevar,
                     "TWA": (current_timevar - last_timevar)
@@ -148,8 +153,8 @@ async def gamma_rewards_TWA_calculation_test(
                     "totalSupply": last_total_supply,
                     "balance": user_data["final_balance"],
                 }
-                if _operation_to_append["TWA"] != 0:
-                    user_data["operations"].append(_operation_to_append)
+                if _calculation_to_append["TWA"] != 0:
+                    user_data["calculations"].append(_calculation_to_append)
 
                     # add to users total TWA
                     user_data["TWA"] += (current_timevar - last_timevar) * (
@@ -166,41 +171,42 @@ async def gamma_rewards_TWA_calculation_test(
                     )
 
             # append operation to the user's operations list
-            _operation_to_append = {
-                f"{timevar_txt}": operation[timevar_txt],
-                "time_passed": current_timevar - last_timevar,
-                "TWA": (current_timevar - last_timevar)
-                * (
-                    result_data["users"][operation["user_address"]]["final_balance"]
-                    / last_total_supply
-                ),
-                "totalSupply": last_total_supply,
-                "balance": result_data["users"][operation["user_address"]][
-                    "final_balance"
-                ],
-            }
-            if _operation_to_append["TWA"] != 0:
-                result_data["users"][operation["user_address"]]["operations"].append(
-                    _operation_to_append
-                )
+            result_data["users"][operation["user_address"]]["operations"].append(
+                operation
+            )
+            result_data["users"][operation["user_address"]]["calculations"].append(
+                {
+                    f"{timevar_txt}": operation[timevar_txt],
+                    "time_passed": current_timevar - last_timevar,
+                    "TWA": (current_timevar - last_timevar)
+                    * (
+                        result_data["users"][operation["user_address"]]["final_balance"]
+                        / last_total_supply
+                    ),
+                    "totalSupply": last_total_supply,
+                    "balance": result_data["users"][operation["user_address"]][
+                        "final_balance"
+                    ],
+                }
+            )
 
-                # set user's time weighted balance
-                result_data["users"][operation["user_address"]]["TWA"] += (
-                    current_timevar - last_timevar
-                ) * (
-                    result_data["users"][operation["user_address"]]["final_balance"]
-                    / last_total_supply
-                )
-                # calculate user's TWA percentage
-                result_data["users"][operation["user_address"]]["TWA_percentage"] = (
-                    user_data["TWA"] / result_data["total_time_passed"]
-                )
+            # set user's time weighted balance
+            result_data["users"][operation["user_address"]]["TWA"] += (
+                current_timevar - last_timevar
+            ) * (
+                result_data["users"][operation["user_address"]]["final_balance"]
+                / last_total_supply
+            )
+            # calculate user's TWA percentage
+            result_data["users"][operation["user_address"]]["TWA_percentage"] = (
+                user_data["TWA"] / result_data["total_time_passed"]
+            )
 
-                # add to hypervisor total TWA
-                result_data["total_TWA"] += (current_timevar - last_timevar) * (
-                    result_data["users"][operation["user_address"]]["final_balance"]
-                    / last_total_supply
-                )
+            # add to hypervisor total TWA
+            result_data["total_TWA"] += (current_timevar - last_timevar) * (
+                result_data["users"][operation["user_address"]]["final_balance"]
+                / last_total_supply
+            )
 
             # set user's final balance as current balance
             result_data["users"][operation["user_address"]]["final_balance"] = (
@@ -220,7 +226,7 @@ async def gamma_rewards_TWA_calculation_test(
     # last calculation if last operation is not the end
     if last_timevar < timevar_end:
         for user_address, user_data in result_data["users"].items():
-            _operation_to_append = {
+            _calculation_to_append = {
                 f"{timevar_txt}": timevar_end,
                 "time_passed": timevar_end - last_timevar,
                 "TWA": (timevar_end - last_timevar)
@@ -228,8 +234,8 @@ async def gamma_rewards_TWA_calculation_test(
                 "totalSupply": last_total_supply,
                 "balance": user_data["final_balance"],
             }
-            if _operation_to_append["TWA"] != 0:
-                user_data["operations"].append(_operation_to_append)
+            if _calculation_to_append["TWA"] != 0:
+                user_data["calculations"].append(_calculation_to_append)
 
                 # add to users total TWA
                 user_data["TWA"] += (timevar_end - last_timevar) * (
@@ -249,7 +255,9 @@ async def gamma_rewards_TWA_calculation_test(
     for user_address, user_data in result_data["users"].items():
         # force a 1
         user_data["TWA_percentage"] = (
-            user_data["TWA"] / result_data["total_time_passed"]
+            (user_data["TWA"] / result_data["total_time_passed"])
+            if result_data["total_time_passed"] != 0
+            else 0
         )
         if user_data["TWA"] == 0:
             users_to_remove.append(user_address)
@@ -350,6 +358,7 @@ async def gamma_rewards_TWA_calculation(
                 "initial_balance": 0,
                 "final_balance": 0,  # this is the current user balance at any point
                 "operations": [],
+                "calculations": [],
             }
 
         # if block is lower than initial block, this is the initial balance for the user
@@ -377,14 +386,14 @@ async def gamma_rewards_TWA_calculation(
                     # if final balance is zero, do not calculate TWB
                     continue
 
-                _operation_to_append = {
+                _calculation_to_append = {
                     f"{timevar_txt}": operation[timevar_txt],
                     "time_passed": current_timevar - last_timevar,
                     "TWB": (current_timevar - last_timevar)
                     * user_data["final_balance"],
                 }
-                if _operation_to_append["TWB"] != 0:
-                    user_data["operations"].append(_operation_to_append)
+                if _calculation_to_append["TWB"] != 0:
+                    user_data["calculations"].append(_calculation_to_append)
 
                     # add to users total TWB
                     user_data["TWB"] += (current_timevar - last_timevar) * user_data[
@@ -396,15 +405,15 @@ async def gamma_rewards_TWA_calculation(
                     ) * user_data["final_balance"]
 
             # append operation to the user's operations list
-            _operation_to_append = {
+            _calculation_to_append = {
                 f"{timevar_txt}": operation[timevar_txt],
                 "time_passed": current_timevar - last_timevar,
                 "TWB": (current_timevar - last_timevar)
                 * result_data["users"][operation["user_address"]]["final_balance"],
             }
-            if _operation_to_append["TWB"] != 0:
-                result_data["users"][operation["user_address"]]["operations"].append(
-                    _operation_to_append
+            if _calculation_to_append["TWB"] != 0:
+                result_data["users"][operation["user_address"]]["calculations"].append(
+                    _calculation_to_append
                 )
 
                 # set user's time weighted balance
@@ -433,13 +442,13 @@ async def gamma_rewards_TWA_calculation(
     # last calculation if last operation is not the end
     if last_timevar < timevar_end:
         for user_address, user_data in result_data["users"].items():
-            _operation_to_append = {
+            _calculation_to_append = {
                 f"{timevar_txt}": timevar_end,
                 "time_passed": timevar_end - last_timevar,
                 "TWB": (timevar_end - last_timevar) * user_data["final_balance"],
             }
-            if _operation_to_append["TWB"] != 0:
-                user_data["operations"].append(_operation_to_append)
+            if _calculation_to_append["TWB"] != 0:
+                user_data["calculations"].append(_calculation_to_append)
 
                 # add to users total TWB
                 user_data["TWB"] += (timevar_end - last_timevar) * user_data[
