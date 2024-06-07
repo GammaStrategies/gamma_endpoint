@@ -22,6 +22,7 @@ from sources.mongo.bins.apps import hypervisor, rewards, user
 from sources.mongo.bins.apps.brevis_api import build_brevisQueryRequest
 from sources.mongo.bins.apps.twa.twa_calculations import (
     gamma_rewards_TWA_calculation,
+    gamma_rewards_TWA_calculation_test,
 )
 
 DEPLOYED: list[tuple[Protocol, Chain]] = [
@@ -710,6 +711,9 @@ class mongo_router_builder(router_builder_baseTemplate):
         block_end: int | None = Query(
             None, description="will limit the data returned to this value."
         ),
+        type: str | None = Query(
+            "formula", enum=["formula", "spreadsheet"], description="calculation type"
+        ),
     ):
         """Returns the TWA rewards for a given user address"""
 
@@ -721,9 +725,24 @@ class mongo_router_builder(router_builder_baseTemplate):
             response.status_code = status.HTTP_400_BAD_REQUEST
             return "Please provide block_ini or timestamp_ini"
 
-        return await gamma_rewards_TWA_calculation(
-            chain=self.chain,
-            hypervisor_address=hypervisor_address,
+        if type == "spreadsheet":
+            return await gamma_rewards_TWA_calculation(
+                chain=self.chain,
+                hypervisor_address=hypervisor_address,
+                timestamp_end=timestamp_end,
+                timestamp_ini=timestamp_ini,
+                block_end=block_end,
+                block_ini=block_ini,
+            )
+        else:
+            return await gamma_rewards_TWA_calculation_test(
+                chain=self.chain,
+                hypervisor_address=hypervisor_address,
+                timestamp_end=timestamp_end,
+                timestamp_ini=timestamp_ini,
+                block_end=block_end,
+                block_ini=block_ini,
+            )
             timestamp_end=timestamp_end,
             timestamp_ini=timestamp_ini,
             block_end=block_end,
