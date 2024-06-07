@@ -394,11 +394,26 @@ class mongo_router_builder(router_builder_baseTemplate):
         self,
         hypervisor_address: str,
         response: Response,
+        block: int | None = Query(
+            None, description="get the prices close to this block number"
+        ),
+        timestamp: int | None = Query(
+            None, description="get the prices close to this timestamp"
+        ),
     ):
-        """ """
-        return await hypervisor.get_hypervisor_prices(
-            network=self.chain, hypervisor_address=hypervisor_address
-        )
+        """When no block nor timestamp are provided, it returns the current prices for the hypervisor."""
+
+        if block is not None or timestamp is not None:
+            return await hypervisor.get_hypervisor_prices_historical(
+                chain=self.chain,
+                hypervisor_address=hypervisor_address,
+                block=block,
+                timestamp=timestamp,
+            )
+        else:
+            return await hypervisor.get_hypervisor_prices(
+                network=self.chain, hypervisor_address=hypervisor_address
+            )
 
     @cache(expire=DB_CACHE_TIMEOUT)
     async def hypervisor_rewards(

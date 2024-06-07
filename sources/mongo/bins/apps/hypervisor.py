@@ -293,6 +293,110 @@ async def get_hypervisor_prices(hypervisor_address: str, network: Chain) -> dict
     }
 
 
+async def get_hypervisor_prices_historical(
+    chain: Chain,
+    hypervisor_address: str,
+    block: int | None = None,
+    timestamp: int | None = None,
+) -> dict:
+    """Get hypervisor share prices close to a timestamp or block from hypervisor returns collection.
+
+    Args:
+        chain (Chain): _description_
+        hypervisor_address (str): _description_
+        block (int | None, optional): _description_. Defaults to None.
+        timestamp (int | None, optional): _description_. Defaults to None.
+
+    Raises:
+        ValueError: _description_
+
+    Returns:
+        dict: _description_
+    """
+
+    # either block or timestamp should be provided
+    if not block and not timestamp:
+        raise ValueError("Either block or timestamp should be provided")
+
+    timevar_txt = "block" if block else "timestamp"
+    timevar = block or timestamp
+
+    _query = [
+        {
+            "$match": {
+                "address": hypervisor_address.lower(),
+                f"timeframe.end.{timevar_txt}": {"$lte": timevar},
+            }
+        },
+        {"$sort": {"timeframe.ini.block": -1}},
+        {"$limit": 1},
+        {
+            "$project": {
+                "_id": 0,
+                "address": "$address",
+                # "as_close_as": {
+                #     "$subtract": [timevar, f"$timeframe.end.{timevar_txt}"]
+                # },
+                "timeframe": "$timeframe",
+                "share_price_usd_ini": {
+                    "$divide": [
+                        {
+                            "$sum": [
+                                {
+                                    "$multiply": [
+                                        "$status.ini.prices.token0",
+                                        "$status.ini.underlying.qtty.token0",
+                                    ]
+                                },
+                                {
+                                    "$multiply": [
+                                        "$status.ini.prices.token1",
+                                        "$status.ini.underlying.qtty.token1",
+                                    ]
+                                },
+                            ]
+                        },
+                        "$status.ini.supply",
+                    ]
+                },
+                "share_price_usd_end": {
+                    "$divide": [
+                        {
+                            "$sum": [
+                                {
+                                    "$multiply": [
+                                        "$status.end.prices.token0",
+                                        "$status.end.underlying.qtty.token0",
+                                    ]
+                                },
+                                {
+                                    "$multiply": [
+                                        "$status.end.prices.token1",
+                                        "$status.end.underlying.qtty.token1",
+                                    ]
+                                },
+                            ]
+                        },
+                        "$status.end.supply",
+                    ]
+                },
+                "token0_prce_usd_ini": "$status.ini.prices.token0",
+                "token1_prce_usd_ini": "$status.ini.prices.token1",
+                "token0_prce_usd_end": "$status.end.prices.token0",
+                "token1_prce_usd_end": "$status.end.prices.token1",
+            }
+        },
+    ]
+
+    return [
+        global_database_helper().convert_d128_to_decimal(x)
+        for x in await local_database_helper(chain).get_items_from_database(
+            collection_name="hypervisor_returns",
+            aggregate=_query,
+        )
+    ]
+
+
 async def get_hypervisor_rewards_status(
     network: Chain,
     hypervisor_address: str,
