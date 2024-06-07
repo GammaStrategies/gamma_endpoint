@@ -37,20 +37,20 @@ def query_hypervisor_operations_twa(
     elif timestamp_end:
         _match["timestamp"] = {"$lte": timestamp_end}
 
-    return [
+    _query = [
         {"$match": _match},
         {"$sort": {"block": -1}},
         {
             "$group": {
                 "_id": {"user": "$user_address"},
                 "hypervisor_address": {"$first": "$hypervisor_address"},
-                "end_block": {"$first": "$block"},
+                "end_block": {"$first": _var},
                 "ini_block": {
                     "$max": {
                         "$cond": {
                             "if": {"$lt": [_var, _value]},
                             "then": _var,
-                            "else": _value,
+                            "else": 1,
                         }
                     }
                 },
@@ -361,3 +361,5 @@ def query_hypervisor_operations_twa(
         {"$sort": {"operations.block": 1}},
         {"$replaceRoot": {"newRoot": "$operations"}},
     ]
+
+    return _query
