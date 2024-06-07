@@ -452,7 +452,7 @@ def query_user_operations(
                         "$cond": {
                             "if": {"$lt": [_var, _value]},
                             "then": _var,
-                            "else": _value,
+                            "else": 1,
                         }
                     }
                 },
