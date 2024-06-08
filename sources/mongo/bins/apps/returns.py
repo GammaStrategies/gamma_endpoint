@@ -20,6 +20,21 @@ async def build_hype_return_analysis_from_database(
     hypervisor_address: str | None = None,
     use_latest_collection: bool = False,
 ) -> period_yield_analyzer | None:
+    """Build a period yield analysis object from the database
+
+    Args:
+        chain (Chain): _description_
+        ini_timestamp (int | None, optional): _description_. Defaults to None.
+        end_timestamp (int | None, optional): _description_. Defaults to None.
+        ini_block (int | None, optional): _description_. Defaults to None.
+        end_block (int | None, optional): _description_. Defaults to None.
+        hypervisor_address (str | None, optional): _description_. Defaults to None.
+        use_latest_collection (bool, optional): Will try to fallback to the latest hypervisor return data if needed. Defaults to False.
+
+    Returns:
+        period_yield_analyzer | None: _description_
+    """
+
     # build query
     find = {"$and": []}
     if ini_block:
@@ -37,20 +52,25 @@ async def build_hype_return_analysis_from_database(
     yield_items = []
 
     # get yield items and static hype info
-    db_yield_items, hype_static = await asyncio.gather(
+    db_yield_items, hype_static, db_yield_items_latest = await asyncio.gather(
         local_database_helper(network=chain).get_items_from_database(
-            collection_name=(
-                "hypervisor_returns"
-                if not use_latest_collection
-                else "latest_hypervisor_returns"
-            ),
+            collection_name=("hypervisor_returns"),
             find=find,
         ),
         local_database_helper(network=chain).get_items_from_database(
             collection_name="static",
             find={"address": hypervisor_address},
         ),
+        local_database_helper(network=chain).get_items_from_database(
+            collection_name=("latest_hypervisor_returns"),
+            find=find,
+        ),
     )
+
+    # check if we need to use latest collection
+    if not db_yield_items and use_latest_collection:
+        # use latest collection
+        db_yield_items = db_yield_items_latest
 
     # convert yield items to objects
     for item in db_yield_items:

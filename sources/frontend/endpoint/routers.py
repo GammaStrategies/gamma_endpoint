@@ -318,20 +318,13 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
             else period.days * 24 * 2 * 60 * 60
         )
 
-        # try get data
+        # try get data ( from either the main or the latest collection )
         hype_return_analysis = await build_hype_return_analysis_from_database(
             chain=chain,
             hypervisor_address=hypervisor_address,
             ini_timestamp=ini_timestamp,
+            use_latest_collection=True,
         )
-        if not hype_return_analysis:
-            # try get data using the latest collection
-            hype_return_analysis = await build_hype_return_analysis_from_database(
-                chain=chain,
-                hypervisor_address=hypervisor_address,
-                ini_timestamp=ini_timestamp,
-                use_latest_collection=True,
-            )
         if not hype_return_analysis:
             response.status_code = status.HTTP_404_NOT_FOUND
             return {"detail": "No data found for the given parameters"}
