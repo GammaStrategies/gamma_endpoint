@@ -201,8 +201,8 @@ CLEOPATRA_MANTLE_GAMMA_SUBGRAPH: https://subgraph-api.mantle.xyz/subgraphs/name/
 CLEOPATRA_MANTLE_HP_SUBGRAPH: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-hp-cleopatra-mantle
 CLEOPATRA_MANTLE_SUBGRAPH: _
 
-BLASTER_BLAST_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-blaster-blast/version/latest
-BLASTER_BLAST_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-blaster-blast/version/latest
+BLASTER_BLAST_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-blaster-blast/version/latest
+BLASTER_BLAST_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-blaster-blast/version/latest
 BLASTER_BLAST_SUBGRAPH: _
 
 THRUSTER_BLAST_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-thruster-blast/version/latest
