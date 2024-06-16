@@ -61,6 +61,10 @@ UNISWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/4473
 UNISWAP_POLYGON_ZKEVM_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-pzke/version/latest
 UNISWAP_POLYGON_ZKEVM_SUBGRAPH: _
 
+UNISWAP_TAIKO_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-uniswap-taiko/latest/gn
+UNISWAP_TAIKO_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-uniswap-taiko/latest/gn
+UNISWAP_TAIKO_SUBGRAPH: _
+
 QUICKSWAP_POLYGON_GAMMA_SUBGRAPH: QmbDJ5SCoU4ZiZ3S6CRSqx2eg3WEcBkL1eDpTwJ1FSPqj8
 QUICKSWAP_POLYGON_HP_SUBGRAPH: Qmdkr3eLKxVoPxV6wcsh8KhoDUKDAAuYiBQLQYWjpGWetv
 QUICKSWAP_POLYGON_SUBGRAPH: https://api.thegraph.com/subgraphs/name/sameepsi/quickswap-v3

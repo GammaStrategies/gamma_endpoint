@@ -19,6 +19,7 @@ DEPLOYMENTS = [
     (Protocol.UNISWAP, Chain.MANTLE),
     (Protocol.UNISWAP, Chain.POLYGON_ZKEVM),
     (Protocol.UNISWAP, Chain.MANTA),
+    (Protocol.UNISWAP, Chain.TAIKO),
     (Protocol.QUICKSWAP, Chain.POLYGON),
     (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
     (Protocol.QUICKSWAP, Chain.ASTAR_ZKEVM),
