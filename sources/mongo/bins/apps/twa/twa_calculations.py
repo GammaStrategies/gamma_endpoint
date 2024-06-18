@@ -232,6 +232,10 @@ async def gamma_rewards_TWA_calculation_test(
                 "totalSupply"
             ]
 
+    # set timevar end as last operation timevar if not set
+    if not timevar_end:
+        timevar_end = hypervisor_operations[-1][timevar_txt]
+
     # last calculation if last operation is not the end
     if last_timevar < timevar_end:
         for user_address, user_data in result_data["users"].items():
