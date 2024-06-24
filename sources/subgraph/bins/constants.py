@@ -38,5 +38,6 @@ BLOCK_TIME_SECONDS = {
     Chain.SCROLL: 3,
     Chain.XLAYER: 3,
     Chain.MODE: 2,
+    Chain.ROOTSTOCK: 30,
     Chain.TAIKO: 24,
 }

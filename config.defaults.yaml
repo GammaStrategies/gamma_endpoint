@@ -33,6 +33,10 @@ UNISWAP_MANTA_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c
 UNISWAP_MANTA_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-uniswap-manta/latest/gn
 UNISWAP_MANTA_SUBGRAPH: _
 
+UNISWAP_ROOTSTOCK_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-uniswap-rootstock/latest/gn
+UNISWAP_ROOTSTOCK_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-uniswap-rootstock/latest/gn
+UNISWAP_ROOTSTOCK_SUBGRAPH: _
+
 UNISWAP_AVALANCHE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-uniswap-avax/version/latest
 UNISWAP_AVALANCHE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-avax/version/latest
 UNISWAP_AVALANCHE_SUBGRAPH: _
@@ -136,6 +140,10 @@ SUSHI_ARBITRUM_SUBGRAPH: https://api.thegraph.com/subgraphs/name/sushi-v3/v3-arb
 SUSHI_BASE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-sushi-base/version/latest
 SUSHI_BASE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/hype-pool-sushi-base/version/latest
 SUSHI_BASE_SUBGRAPH: https://api.studio.thegraph.com/query/32073/v3-base/version/latest
+
+SUSHI_ROOTSTOCK_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-sushi-rootstock/latest/gn
+SUSHI_ROOTSTOCK_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-sushi-rootstock/latest/gn
+SUSHI_ROOTSTOCK_SUBGRAPH: _
 
 RAMSES_ARBITRUM_GAMMA_SUBGRAPH: QmXMpBJcoVhX7HV2NHEVYofY86JcDV2kAGvR8EgcxhH2eR
 RAMSES_ARBITRUM_HP_SUBGRAPH: QmTVeazQoE8VujSsLqFuKK9s2ujsvco1ydAs2seZeDqbYf

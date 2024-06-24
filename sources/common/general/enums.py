@@ -1,4 +1,4 @@
-from enum import Enum, unique
+from enum import Enum
 
 
 class Chain(str, Enum):
@@ -51,7 +51,8 @@ class Chain(str, Enum):
     SCROLL = ("scroll", 534352, "scroll", "Scroll", None, None, "Scroll")
     XLAYER = ("xlayer", 196, "xlayer", "XLayer", None, None, "XLayer")
     MODE = ("mode", 34443, "mode", "Mode", None, None, "Mode")
-    TAIKO = ("taiko", 34443, "taiko", "Taiko", None, None, "Taiko")
+    ROOTSTOCK = ("rootstock", 30, "rootstock", "Rootstock", None, None, "Rootstock")
+    TAIKO = ("taiko", 167000, "taiko", "Taiko", None, None, "Taiko")
 
     # extra properties
     id: int
