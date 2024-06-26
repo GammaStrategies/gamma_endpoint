@@ -101,12 +101,12 @@ async def latest_multifeeDistributor(network: Chain, protocol: Protocol):
         ] += boostApr
 
     # return result
-    if not network == Chain.LINEA:
-        return await rewrite_mfd_with_latest_reward_snapshots(result, network)
+    # if not network == Chain.LINEA:
+    return await rewrite_mfd_with_latest_reward_snapshots(result, network)
     # return await rewrite_mfd_with_api(result, network, protocol)
     # return await rewrite_mfd_with_custom(result, network)
-    else:
-        return result
+    # else:
+    #    return result
 
 
 async def rewrite_mfd_with_api(data: dict, chain: Chain, protocol: Protocol) -> dict:
