@@ -49,7 +49,7 @@ async def get_hypervisor_operations_for_twa(
     return None
 
 
-async def gamma_rewards_TWA_calculation_test(
+async def gamma_rewards_TWA_calculation(
     chain: Chain,
     hypervisor_address: str,
     timestamp_ini: int | None = None,
@@ -57,6 +57,16 @@ async def gamma_rewards_TWA_calculation_test(
     block_ini: int | None = None,
     block_end: int | None = None,
 ):
+    """Get the time weighted average balances of users for a given hypervisor address in a given range of blocks or timestamps
+
+    Args:
+        chain (Chain):
+        hypervisor_address (str):
+        timestamp_ini (int | None, optional): . Defaults to None.
+        timestamp_end (int | None, optional): _description_. Defaults to None.
+        block_ini (int | None, optional): _description_. Defaults to None.
+        block_end (int | None, optional): _description_. Defaults to None.
+    """
 
     # decide whether to use timestamp or block
     timevar_txt = "timestamp"
@@ -311,7 +321,7 @@ def calculate_TWpercentage(b, s, t1, t0):
 
 
 ##### SPREADSHEET CALCULATION #####
-async def gamma_rewards_TWA_calculation(
+async def gamma_rewards_TWA_spreadsheet_calculation(
     chain: Chain,
     hypervisor_address: str,
     timestamp_ini: int | None = None,
@@ -319,6 +329,19 @@ async def gamma_rewards_TWA_calculation(
     block_ini: int | None = None,
     block_end: int | None = None,
 ):
+    """This is not limiting the amount of liquitity per block, so its not accurate bc can lead to one block liquidity attack ( 1 block liquidity could have the same value as 1000 blocks liquidity)
+
+    Args:
+        chain (Chain): _description_
+        hypervisor_address (str): _description_
+        timestamp_ini (int | None, optional): _description_. Defaults to None.
+        timestamp_end (int | None, optional): _description_. Defaults to None.
+        block_ini (int | None, optional): _description_. Defaults to None.
+        block_end (int | None, optional): _description_. Defaults to None.
+
+    Returns:
+        _type_: _description_
+    """
 
     # decide whether to use timestamp or block
     timevar_txt = "timestamp"
