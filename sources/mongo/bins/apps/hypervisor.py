@@ -149,7 +149,7 @@ async def hypervisors_rewards_status(network: Chain, protocol: Protocol):
         {"$project": {"_id": 0, "id": 0, "rpc_costs": 0, "network": 0}},
     ]
     return await local_database_helper(network=network).get_items_from_database(
-        collection_name="latest_reward_status",
+        collection_name="latest_reward_snapshot",
         aggregate=query,
     )
 
