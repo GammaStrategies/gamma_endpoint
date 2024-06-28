@@ -408,23 +408,14 @@ async def get_hypervisor_rewards_status(
     find = {"hypervisor_address": hypervisor_address.lower()}
 
     if not start_timestamp and not end_timestamp and not start_block and not end_block:
-        # DEFAULT RETURN LAST REWARDS STATUS GROUPED BY BLOCK
+        # DEFAULT RETURN LATEST REWARDS STATUS
         query = [
             {"$match": find},
-            {
-                "$group": {
-                    "_id": "$block",
-                    "data": {"$push": "$$ROOT"},
-                },
-            },
             {"$sort": {"_id": -1}},
-            {"$limit": 1},
-            {"$unwind": "$data"},
-            {"$replaceRoot": {"newRoot": "$data"}},
-            {"$project": {"_id": 0, "id": 0}},
+            {"$project": {"_id": 0, "id": 0, "rpc_costs": 0, "network": 0}},
         ]
         return await local_database_helper(network=network).get_items_from_database(
-            collection_name="rewards_status",
+            collection_name="latest_reward_status",
             aggregate=query,
         )
     else:
