@@ -127,29 +127,13 @@ async def hypervisors_collected_fees(
 
 async def hypervisors_rewards_status(network: Chain, protocol: Protocol):
     """Get the rewards status for all hypervisors."""
-    # query = [
-    #     {"$match": {"dex": protocol.database_name}},
-    #     {"$sort": {"block": -1}},
-    #     {
-    #         "$group": {
-    #             "_id": {
-    #                 "hypervisor_address": "$hypervisor_address",
-    #                 "rewardToken": "$rewardToken",
-    #             },
-    #             "data": {"$first": "$$ROOT"},
-    #         },
-    #     },
-    #     {"$sort": {"hypervisor_address": 1}},
-    #     {"$replaceRoot": {"newRoot": "$data"}},
-    #     {"$unset": ["_id", "id"]},
-    # ]
     query = [
         {"$match": {"dex": protocol.database_name}},
         {"$sort": {"_id": -1}},
         {"$project": {"_id": 0, "id": 0, "rpc_costs": 0, "network": 0}},
     ]
     return await local_database_helper(network=network).get_items_from_database(
-        collection_name="latest_reward_snapshot",
+        collection_name="latest_reward_snapshots",
         aggregate=query,
     )
 
