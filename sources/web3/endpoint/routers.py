@@ -9,43 +9,17 @@ import typing
 
 from sources.common.general.enums import Dex, Chain, Protocol
 
+from sources.subgraph.bins.config import DEPLOYMENTS
 from sources.web3.bins.apps import hypervisors, rewards
 
 # Route builders
-
-DEPLOYED: list[tuple[Protocol, Chain]] = [
-    (Protocol.UNISWAP, Chain.ETHEREUM),
-    (Protocol.UNISWAP, Chain.POLYGON),
-    (Protocol.UNISWAP, Chain.ARBITRUM),
-    (Protocol.UNISWAP, Chain.OPTIMISM),
-    (Protocol.UNISWAP, Chain.CELO),
-    (Protocol.UNISWAP, Chain.BSC),
-    (Protocol.QUICKSWAP, Chain.POLYGON),
-    (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
-    (Protocol.ZYBERSWAP, Chain.ARBITRUM),
-    (Protocol.THENA, Chain.BSC),
-    (Protocol.CAMELOT, Chain.ARBITRUM),
-    (Protocol.GLACIER, Chain.AVALANCHE),
-    (Protocol.RETRO, Chain.POLYGON),
-    (Protocol.STELLASWAP, Chain.MOONBEAM),
-    (Protocol.BEAMSWAP, Chain.MOONBEAM),
-    (Protocol.SPIRITSWAP, Chain.FANTOM),
-    (Protocol.SUSHI, Chain.POLYGON),
-    (Protocol.SUSHI, Chain.ARBITRUM),
-    (Protocol.SUSHI, Chain.BASE),
-    (Protocol.RAMSES, Chain.ARBITRUM),
-    (Protocol.ASCENT, Chain.POLYGON),
-    (Protocol.FUSIONX, Chain.MANTLE),
-    (Protocol.SYNTHSWAP, Chain.BASE),
-    (Protocol.LYNEX, Chain.LINEA)
-]
 
 
 def build_routers() -> list:
     routes = []
 
     # setup dex + chain endpoints
-    for protocol, chain in DEPLOYED:
+    for protocol, chain in DEPLOYMENTS:
         routes.append(
             web3_router_builder(
                 dex=protocol,

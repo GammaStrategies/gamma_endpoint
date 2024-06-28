@@ -23,67 +23,7 @@ from sources.mongo.bins.apps.brevis_api import build_brevisQueryRequest
 from sources.mongo.bins.apps.twa.twa_calculations import (
     gamma_rewards_TWA_calculation,
 )
-
-DEPLOYED: list[tuple[Protocol, Chain]] = [
-    (Protocol.UNISWAP, Chain.ETHEREUM),
-    (Protocol.UNISWAP, Chain.POLYGON),
-    (Protocol.UNISWAP, Chain.ARBITRUM),
-    (Protocol.UNISWAP, Chain.OPTIMISM),
-    (Protocol.UNISWAP, Chain.CELO),
-    (Protocol.UNISWAP, Chain.BSC),
-    (Protocol.UNISWAP, Chain.MOONBEAM),
-    (Protocol.UNISWAP, Chain.AVALANCHE),
-    (Protocol.UNISWAP, Chain.BASE),
-    (Protocol.UNISWAP, Chain.BLAST),
-    (Protocol.UNISWAP, Chain.SCROLL),
-    (Protocol.UNISWAP, Chain.MANTA),
-    (Protocol.UNISWAP, Chain.ROOTSTOCK),
-    (Protocol.UNISWAP, Chain.TAIKO),
-    (Protocol.QUICKSWAP, Chain.POLYGON),
-    (Protocol.QUICKSWAP, Chain.POLYGON_ZKEVM),
-    (Protocol.QUICKSWAP, Chain.ASTAR_ZKEVM),
-    (Protocol.QUICKSWAP, Chain.IMMUTABLE_ZKEVM),
-    (Protocol.QUICKSWAP_UNISWAP, Chain.POLYGON_ZKEVM),
-    (Protocol.QUICKSWAP, Chain.XLAYER),
-    (Protocol.ZYBERSWAP, Chain.ARBITRUM),
-    (Protocol.THENA, Chain.BSC),
-    (Protocol.THENA, Chain.OPBNB),
-    (Protocol.CAMELOT, Chain.ARBITRUM),
-    (Protocol.GLACIER, Chain.AVALANCHE),
-    (Protocol.RETRO, Chain.POLYGON),
-    (Protocol.STELLASWAP, Chain.MOONBEAM),
-    (Protocol.BEAMSWAP, Chain.MOONBEAM),
-    (Protocol.SPIRITSWAP, Chain.FANTOM),
-    (Protocol.SUSHI, Chain.POLYGON),
-    (Protocol.SUSHI, Chain.ARBITRUM),
-    (Protocol.SUSHI, Chain.BASE),
-    (Protocol.SUSHI, Chain.ROOTSTOCK),
-    (Protocol.RAMSES, Chain.ARBITRUM),
-    (Protocol.NILE, Chain.LINEA),
-    (Protocol.ASCENT, Chain.POLYGON),
-    (Protocol.FUSIONX, Chain.MANTLE),
-    (Protocol.SYNTHSWAP, Chain.BASE),
-    (Protocol.LYNEX, Chain.LINEA),
-    (Protocol.PEGASYS, Chain.ROLLUX),
-    (Protocol.BASEX, Chain.BASE),
-    (Protocol.PANCAKESWAP, Chain.ARBITRUM),
-    (Protocol.APERTURE, Chain.MANTA),
-    (Protocol.QUICKSWAP, Chain.MANTA),
-    (Protocol.HERCULES, Chain.METIS),
-    (Protocol.BASESWAP, Chain.BASE),
-    (Protocol.SWAPBASED, Chain.BASE),
-    (Protocol.PHARAOH, Chain.AVALANCHE),
-    (Protocol.SWAPR, Chain.GNOSIS),
-    (Protocol.THICK, Chain.BASE),
-    (Protocol.CLEOPATRA, Chain.MANTLE),
-    (Protocol.BLASTER, Chain.BLAST),
-    (Protocol.THRUSTER, Chain.BLAST),
-    (Protocol.FENIX, Chain.BLAST),
-    (Protocol.XTRADE, Chain.XLAYER),
-    (Protocol.KIM, Chain.MODE),
-    (Protocol.LINEHUB, Chain.LINEA),
-    (Protocol.KINETIX, Chain.BASE),
-]
+from sources.subgraph.bins.config import DEPLOYMENTS
 
 
 def build_routers() -> list:
@@ -92,7 +32,7 @@ def build_routers() -> list:
     # add global route
 
     # setup protocol + chain endpoints
-    for protocol, chain in DEPLOYED:
+    for protocol, chain in DEPLOYMENTS:
         routes.append(
             mongo_router_builder(
                 protocol=protocol,
