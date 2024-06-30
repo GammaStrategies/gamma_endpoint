@@ -1134,8 +1134,21 @@ class period_yield_analyzer:
 
         self._net_roi_usd_total_aggregated += self._net_roi_usd_total_period
         self._net_roi_per_share_aggregated += self._net_roi_per_share_period
+
+        # this should be current share price + fees per share - initial share price / initial share price
+        # self._net_roi_per_share_yield_aggregated = (
+        #     self._net_roi_per_share_aggregated / self._ini_price_per_share
+        #     if self._ini_price_per_share
+        #     else Decimal("0")
+        # )
         self._net_roi_per_share_yield_aggregated = (
-            self._net_roi_per_share_aggregated / self._ini_price_per_share
+            (
+                (
+                    (yield_item.price_per_share + self._rewards_per_share_aggregated)
+                    - self._ini_price_per_share
+                )
+                / self._ini_price_per_share
+            )
             if self._ini_price_per_share
             else Decimal("0")
         )
