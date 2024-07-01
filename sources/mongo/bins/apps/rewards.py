@@ -292,6 +292,8 @@ async def rewrite_mfd_with_latest_reward_snapshots(data: dict, chain: Chain):
     latest_rewards_by_hype = {}
     try:
         for item in await retrieve_rewards_from_latest_snapshots(chain=chain):
+            if not "hypervisor_address" in item:
+                continue
             # add hypervisor address to dict
             if not item["hypervisor_address"] in latest_rewards_by_hype:
                 latest_rewards_by_hype[item["hypervisor_address"]] = {}
@@ -372,8 +374,8 @@ async def rewrite_mfd_with_latest_reward_snapshots(data: dict, chain: Chain):
                     hype_data["rewarders"][rewardToken_address] = {
                         "timestamp": rewarder_data["timestamp"],
                         "rewardToken": rewardToken_address,
-                        "rewardTokenDecimals": rewarder_data["rewardTokenDecimals"],
-                        "rewardTokenSymbol": rewarder_data["rewardTokenSymbol"],
+                        "rewardTokenDecimals": rewarder_data["rewardToken_decimals"],
+                        "rewardTokenSymbol": rewarder_data["rewardToken_symbol"],
                         "rewardPerSecond": rewarder_data["rewards_perSecond"],
                         "apr": rewarder_data["apr"],
                         "baseApr": rewarder_data["apr"],
