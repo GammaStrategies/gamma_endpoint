@@ -33,9 +33,9 @@ UNISWAP_MANTA_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c
 UNISWAP_MANTA_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-uniswap-manta/latest/gn
 UNISWAP_MANTA_SUBGRAPH: _
 
-SUSHI_ROOTSTOCK_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-uniswap-rootstock/version/latest
-SUSHI_ROOTSTOCK_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-uniswap-rootstock/version/latest
-SUSHI_ROOTSTOCK_SUBGRAPH: _
+UNISWAP_ROOTSTOCK_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-uniswap-rootstock/version/latest
+UNISWAP_ROOTSTOCK_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-uniswap-rootstock/version/latest
+UNISWAP_ROOTSTOCK_SUBGRAPH: _
 
 UNISWAP_AVALANCHE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-uniswap-avax/version/latest
 UNISWAP_AVALANCHE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-avax/version/latest
