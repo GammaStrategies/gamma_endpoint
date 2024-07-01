@@ -345,18 +345,22 @@ async def rewrite_mfd_with_latest_reward_snapshots(data: dict, chain: Chain):
                             hype_address
                         ][rewardToken_address]["timestamp"]
 
-                        rewarder_data["rewardPerSecond"] = latest_rewards_by_hype[
-                            hype_address
-                        ][rewardToken_address]["rewards_perSecond"]
+                        rewarder_data["rewardPerSecond"] = int(
+                            float(
+                                latest_rewards_by_hype[hype_address][
+                                    rewardToken_address
+                                ]["rewards_perSecond"]
+                            )
+                        )
 
                         rewarder_data["apr"] = latest_rewards_by_hype[hype_address][
                             rewardToken_address
                         ]["apr"]
                         rewarder_data["baseApr"] = rewarder_data["apr"]
                         rewarder_data["boostApr"] = 0
-                        rewarder_data["baseRewardPerSecond"] = rewarder_data[
-                            "rewardPerSecond"
-                        ]
+                        rewarder_data["baseRewardPerSecond"] = int(
+                            float(rewarder_data["rewardPerSecond"])
+                        )
                         rewarder_data["boostRewardPerSecond"] = 0
 
                         # modify totals
@@ -376,11 +380,15 @@ async def rewrite_mfd_with_latest_reward_snapshots(data: dict, chain: Chain):
                         "rewardToken": rewardToken_address,
                         "rewardTokenDecimals": rewarder_data["rewardToken_decimals"],
                         "rewardTokenSymbol": rewarder_data["rewardToken_symbol"],
-                        "rewardPerSecond": rewarder_data["rewards_perSecond"],
+                        "rewardPerSecond": int(
+                            float(rewarder_data["rewards_perSecond"])
+                        ),
                         "apr": rewarder_data["apr"],
                         "baseApr": rewarder_data["apr"],
                         "boostApr": 0,
-                        "baseRewardPerSecond": rewarder_data["rewards_perSecond"],
+                        "baseRewardPerSecond": int(
+                            float(rewarder_data["rewards_perSecond"])
+                        ),
                         "boostRewardPerSecond": 0,
                     }
 
