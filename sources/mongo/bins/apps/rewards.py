@@ -390,6 +390,8 @@ async def rewrite_mfd_with_latest_reward_snapshots(data: dict, chain: Chain):
                             float(rewarder_data["rewards_perSecond"])
                         ),
                         "boostRewardPerSecond": 0,
+                        "baseRewardsSinceLastUpdateTime": 0,
+                        "boostRewardsSinceLastUpdateTime": 0,
                         "seconds_sinceLastUpdateTime": 0,
                     }
 
