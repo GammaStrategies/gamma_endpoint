@@ -8,7 +8,7 @@ from sources.subgraph.bins.config import (
     UNI_V2_SUBGRAPH_URL,
     XGAMMA_SUBGRAPH_URL,
     dex_hypepool_subgraph_urls,
-    dex_subgraph_urls,
+    # dex_subgraph_urls,
     gamma_subgraph_urls,
 )
 from sources.subgraph.bins.enums import Chain, Protocol
@@ -117,9 +117,9 @@ class UniswapV2Client(SubgraphClient):
         super().__init__(UNI_V2_SUBGRAPH_URL)
 
 
-class UniswapV3Client(SubgraphClient):
-    def __init__(self, protocol: Protocol, chain: Chain):
-        super().__init__(dex_subgraph_urls[protocol][chain], chain)
+# class UniswapV3Client(SubgraphClient):
+#     def __init__(self, protocol: Protocol, chain: Chain):
+#         super().__init__(dex_subgraph_urls[protocol][chain], chain)
 
 
 class HypePoolClient(SubgraphClient):
