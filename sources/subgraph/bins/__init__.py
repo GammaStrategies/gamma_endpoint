@@ -8,7 +8,6 @@ from sources.subgraph.bins.config import (
     UNI_V2_SUBGRAPH_URL,
     XGAMMA_SUBGRAPH_URL,
     dex_hypepool_subgraph_urls,
-    # dex_subgraph_urls,
     gamma_subgraph_urls,
 )
 from sources.subgraph.bins.enums import Chain, Protocol

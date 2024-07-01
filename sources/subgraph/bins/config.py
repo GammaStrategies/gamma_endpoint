@@ -96,9 +96,7 @@ for protocol, chain in DEPLOYMENTS:
 
 
 XGAMMA_SUBGRAPH_URL = "https://api.thegraph.com/subgraphs/name/l0c4t0r/xgamma"
-RECOVERY_POOL_URL = (
-    "https://api.thegraph.com/subgraphs/name/l0c4t0r/gamma-recovery-pool"
-)
+RECOVERY_POOL_URL = "QmQihpnUES8m7zXNUcMRunsfYLimRFRuFyv61nQN3fi3iR"
 
 DEFAULT_TIMEZONE = get_config("TIMEZONE")
 
