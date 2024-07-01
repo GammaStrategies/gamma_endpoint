@@ -21,7 +21,6 @@ from sources.subgraph.bins.common import (
     SubgraphStatusOutput,
     aggregate_stats,
     analytics,
-    charts,
     hypervisor,
     masterchef,
     masterchef_v2,
@@ -163,20 +162,6 @@ class subgraph_router_builder(router_builder_generalTemplate):
             generate_unique_id_function=self.generate_unique_id,
         )
 
-        # router.add_api_route(
-        #     path=f"{self.prefix}{'/charts/baseRange/all'}",
-        #     endpoint=self.base_range_chart_all,
-        #     methods=["GET"],
-        #     generate_unique_id_function=self.generate_unique_id,
-        # )
-
-        # router.add_api_route(
-        #     path=f"{self.prefix}{'/charts/baseRange/{hypervisor_address}'}",
-        #     endpoint=self.base_range_chart,
-        #     methods=["GET"],
-        #     generate_unique_id_function=self.generate_unique_id,
-        # )
-
         if self.chain == Chain.ARBITRUM:
             router.add_api_route(
                 path=f"{self.prefix}{'/recoveryDistribution'}",
@@ -205,16 +190,6 @@ class subgraph_router_builder(router_builder_generalTemplate):
 
     async def subgraph_status(self, response: Response) -> SubgraphStatusOutput:
         return await subgraph_status(self.dex, self.chain)
-
-    # async def base_range_chart_all(self, response: Response, days: int = 20):
-    #     return await charts.base_range_chart_all(self.dex, self.chain, days)
-
-    # async def base_range_chart(
-    #     self, response: Response, hypervisor_address: str, days: int = 20
-    # ):
-    #     return await charts.base_range_chart(
-    #         self.dex, self.chain, hypervisor_address, days
-    #     )
 
     async def hypervisor_basic_stats(self, hypervisor_address: str, response: Response):
         return await basic_stats_output(

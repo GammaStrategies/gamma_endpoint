@@ -82,13 +82,11 @@ UNI_V2_SUBGRAPH_URL = "https://api.thegraph.com/subgraphs/name/ianlapham/uniswap
 SUBGRAPH_STUDIO_KEY = get_config("SUBGRAPH_STUDIO_KEY")
 SUBGRAPH_STUDIO_USER_KEY = get_config("SUBGRAPH_STUDIO_USER_KEY")
 
-# dex_subgraph_urls = defaultdict(dict)
 dex_hypepool_subgraph_urls = defaultdict(dict)
 gamma_subgraph_urls = defaultdict(dict)
 
 for protocol, chain in DEPLOYMENTS:
     subgraph_prefix = f"{protocol.value.upper()}_{chain.value.upper()}"
-    # dex_subgraph_urls[protocol][chain] = get_config(f"{subgraph_prefix}_SUBGRAPH")
     dex_hypepool_subgraph_urls[protocol][chain] = get_config(
         f"{subgraph_prefix}_HP_SUBGRAPH"
     )

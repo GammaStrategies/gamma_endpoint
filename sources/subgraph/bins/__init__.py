@@ -117,11 +117,6 @@ class UniswapV2Client(SubgraphClient):
         super().__init__(UNI_V2_SUBGRAPH_URL)
 
 
-# class UniswapV3Client(SubgraphClient):
-#     def __init__(self, protocol: Protocol, chain: Chain):
-#         super().__init__(dex_subgraph_urls[protocol][chain], chain)
-
-
 class HypePoolClient(SubgraphClient):
     def __init__(self, protocol: Protocol, chain: Chain, api_key: str = "prod"):
         super().__init__(
