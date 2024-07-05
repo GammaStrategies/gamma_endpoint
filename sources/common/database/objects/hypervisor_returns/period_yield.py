@@ -1251,6 +1251,9 @@ class period_yield_analyzer:
             if yield_item.status.end.supply
             else 0
         )
+        # remove details from underlying data ( leave it empty )
+        _status_ini["underlying"]["details"] = {}
+        _status_end["underlying"]["details"] = {}
 
         # add to graph data
         self._graph_data.append(
