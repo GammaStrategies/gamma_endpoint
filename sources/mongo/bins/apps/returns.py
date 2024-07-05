@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import time
 from sources.common.database.objects.hypervisor_returns.period_yield import (
     period_yield_analyzer,
@@ -70,6 +71,9 @@ async def build_hype_return_analysis_from_database(
     # check if we need to use latest collection
     if not db_yield_items and use_latest_collection:
         # use latest collection
+        logging.getLogger(__name__).warning(
+            f" Using latest hypervisor return data for {chain.database_name} {hypervisor_address}"
+        )
         db_yield_items = db_yield_items_latest
 
     # convert yield items to objects
