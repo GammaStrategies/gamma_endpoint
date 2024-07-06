@@ -40,4 +40,5 @@ BLOCK_TIME_SECONDS = {
     Chain.MODE: 2,
     Chain.ROOTSTOCK: 30,
     Chain.TAIKO: 24,
+    Chain.SEI: 0.4,
 }

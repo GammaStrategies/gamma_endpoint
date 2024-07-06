@@ -53,6 +53,7 @@ class Chain(str, Enum):
     MODE = ("mode", 34443, "mode", "Mode", None, None, "Mode")
     ROOTSTOCK = ("rootstock", 30, "rootstock", "Rootstock", None, None, "Rootstock")
     TAIKO = ("taiko", 167000, "taiko", "Taiko", None, None, "Taiko")
+    SEI = ("sei", 1329, "sei", "Sei", None, None, "Sei")
 
     # extra properties
     id: int
