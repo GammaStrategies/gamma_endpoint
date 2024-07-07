@@ -54,6 +54,7 @@ class Chain(str, Enum):
     ROOTSTOCK = ("rootstock", 30, "rootstock", "Rootstock", None, None, "Rootstock")
     TAIKO = ("taiko", 167000, "taiko", "Taiko", None, None, "Taiko")
     SEI = ("sei", 1329, "sei", "Sei", None, None, "Sei")
+    IOTA = ("iota", 8822, "iota", "Iota", None, None, "Iota")
 
     # extra properties
     id: int
@@ -135,6 +136,7 @@ class Dex(str, Enum):
     KIM: "kim"
     LINEHUB: "linehub"
     KINETIX: "kinetix"
+    WAGMI: "wagmi"
 
 
 class Protocol(str, Enum):
@@ -188,6 +190,7 @@ class Protocol(str, Enum):
     KIM = ("kim", None, None, None, "kim", "Kim")
     LINEHUB = ("linehub", None, None, None, "linehub", "Linehub")
     KINETIX = ("kinetix", None, None, None, "kinetix", "Kinetix")
+    WAGMI = ("wagmi", None, None, None, "wagmi", "Wagmi")
 
     # extra properties
     api_url: str

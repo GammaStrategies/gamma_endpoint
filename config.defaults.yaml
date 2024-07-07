@@ -187,6 +187,9 @@ LINEHUB_LINEA_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-
 KINETIX_BASE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-kinetix-base/version/latest
 KINETIX_BASE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-kinetix-base/version/latest
 
+WAGMI_IOTA_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-wagmi-iota/latest/gn
+WAGMI_IOTA_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-wagmi-iota/latest/gn
+
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {
   "ethereum":{},

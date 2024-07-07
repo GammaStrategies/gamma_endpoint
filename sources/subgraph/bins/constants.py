@@ -41,4 +41,5 @@ BLOCK_TIME_SECONDS = {
     Chain.ROOTSTOCK: 30,
     Chain.TAIKO: 24,
     Chain.SEI: 0.4,
+    Chain.IOTA: 10,
 }
