@@ -135,16 +135,16 @@ async def gamma_rewards_TWA_calculation(
                 operation["shares"]["balance"]
             )
             # set initial total supply
-            result_data["totalSupply_ini"] = operation["hypervisor_status"][
-                "totalSupply"
-            ]
+            result_data["totalSupply_ini"] = (
+                operation["hypervisor_status"]["totalSupply"]
+            ) or 0
             result_data["totalSupply_end"] = operation["hypervisor_status"][
                 "totalSupply"
             ]
             last_total_supply = result_data["totalSupply_ini"]
         else:
             # this is an operation after the initial block
-            last_total_supply = last_total_supply or result_data["totalSupply_ini"]
+            last_total_supply = last_total_supply or result_data["totalSupply_ini"] or 0
 
             # set all users time weighted averages
             for user_address, user_data in result_data["users"].items():
@@ -199,10 +199,16 @@ async def gamma_rewards_TWA_calculation(
                     "time_passed": current_timevar - last_timevar,
                     "TWA": (current_timevar - last_timevar)
                     * (
-                        result_data["users"][operation["user_address"]]["final_balance"]
-                        / last_total_supply
+                        (
+                            result_data["users"][operation["user_address"]][
+                                "final_balance"
+                            ]
+                            / last_total_supply
+                        )
+                        if last_total_supply
+                        else 0
                     ),
-                    "totalSupply": last_total_supply,
+                    "totalSupply": last_total_supply or 0,
                     "balance": result_data["users"][operation["user_address"]][
                         "final_balance"
                     ],
@@ -213,18 +219,29 @@ async def gamma_rewards_TWA_calculation(
             result_data["users"][operation["user_address"]]["TWA"] += (
                 current_timevar - last_timevar
             ) * (
-                result_data["users"][operation["user_address"]]["final_balance"]
-                / last_total_supply
+                (
+                    result_data["users"][operation["user_address"]]["final_balance"]
+                    / last_total_supply
+                )
+                if last_total_supply
+                else 0
             )
             # calculate user's TWA percentage
             result_data["users"][operation["user_address"]]["TWA_percentage"] = (
-                user_data["TWA"] / result_data["total_time_passed"]
+                (user_data["TWA"] / result_data["total_time_passed"])
+                if result_data["total_time_passed"]
+                else 0
             )
 
             # add to hypervisor total TWA
-            result_data["total_TWA"] += (current_timevar - last_timevar) * (
-                result_data["users"][operation["user_address"]]["final_balance"]
-                / last_total_supply
+            result_data["total_TWA"] += (
+                (current_timevar - last_timevar)
+                * (
+                    result_data["users"][operation["user_address"]]["final_balance"]
+                    / last_total_supply
+                )
+                if last_total_supply
+                else 0
             )
 
             # set user's final balance as current balance
@@ -289,8 +306,6 @@ async def gamma_rewards_TWA_calculation(
 
     # remove users with zero TWA
     for user_address in users_to_remove:
-        if user_address == "0x65c434cda98bb76c1f85e5d6ea7508867a47038f":
-            poi = 9
         result_data["users"].pop(user_address)
 
     # total_TWA should never be greater than end total supply * total time passed
@@ -301,6 +316,9 @@ async def gamma_rewards_TWA_calculation(
         logging.getLogger(__name__).error(
             f"Total TWA is greater than total supply * total time passed"
         )
+
+    # if total supply ini is None, set it to 0
+    result_data["totalSupply_ini"] = result_data["totalSupply_ini"] or 0
 
     return result_data
 
