@@ -2,6 +2,7 @@
 # Positions analysis / price vs Order Range
 #
 import asyncio
+from decimal import Decimal
 from sources.common.general.enums import Chain
 from sources.common.prices.helpers import get_current_prices
 from sources.mongo.bins.apps.returns import build_hype_return_analysis_from_database
@@ -174,3 +175,84 @@ async def build_hypervisor_returns_graph(
         return hype_return_analysis.get_graph(level="simple", points_every=points_every)
 
     return []
+
+
+async def explain_hypervisor_returns(row1, row2) -> list[str]:
+    """Create a LIST of strings to explain the graph returns of a hypervisor using two points of data representing a period
+
+    Args:
+        row1 (dict):
+        row2 (dict):
+
+    Returns:
+        list[str]:
+    """
+    result = []
+    # vars to use
+    _days = (row2["timestamp"] - row1["timestamp"]) / (60 * 60 * 24)
+    _price_token0 = (
+        row2["status"]["end"]["prices"]["token0"]
+        - row1["status"]["ini"]["prices"]["token0"]
+    )
+    _price_token1 = (
+        row2["status"]["end"]["prices"]["token1"]
+        - row1["status"]["ini"]["prices"]["token1"]
+    )
+    _share_price_ini = row1["status"]["ini"]["prices"]["share"]
+    _share_price_end = (
+        row2["status"]["end"]["prices"]["share"]
+        + row2["rewards"]["period"]["per_share"]
+    )
+    _share_price_difference = _share_price_end - _share_price_ini
+    _share_price_difference_percent = _share_price_difference / _share_price_ini
+    ############ calc asset price move #############################################
+    _share_price_asset_move = (
+        _share_price_difference
+        - row2["fees"]["period"]["per_share"]
+        - row2["rewards"]["period"]["per_share"]
+    )
+    _share_price_asset_move_percent = _share_price_asset_move / _share_price_ini
+    _share_price_fees_move = row2["fees"]["period"]["per_share"]
+    _share_price_fees_move_percent = _share_price_fees_move / _share_price_ini
+    _share_price_rewards_move = row2["rewards"]["period"]["per_share"]
+    _share_price_rewards_move_percent = _share_price_rewards_move / _share_price_ini
+
+    # during the X.X day period from xxx to xxx
+    result.append(
+        f" during the {_days:,.2f} day period from {row1['datetime_from']} to {row2['datetime_to']}"
+    )
+    result.append(
+        f" {row1['chain']}'s {row1['symbol']} share price {'increased' if _share_price_difference>0 else 'decreased' if _share_price_difference<0 else 'stayed the same'} from ${_share_price_ini:,.2f} to ${_share_price_end:,.2f} [{_share_price_difference_percent:,.1%} ${_share_price_difference:,.2f}]"
+    )
+    # the price of token0 decreased X%
+    result.append(
+        f"      the price of token0 {'decreased' if _price_token0<0 else 'increased' if _price_token0>0 else 'stayed at'} {_price_token0/row1['status']['ini']['prices']['token0']:,.1%} [${_price_token0:,.2f}, from ${row1['status']['ini']['prices']['token0']:,.2f} to ${row2['status']['end']['prices']['token0']:,.2f}]"
+    )
+    # the price of token1 decreased X%
+    result.append(
+        f"      the price of token1 {'decreased' if _price_token1<0 else 'increased' if _price_token1>0 else 'stayed at'} {_price_token1/row1['status']['ini']['prices']['token1']:,.1%} [${_price_token1:,.2f}, from ${row1['status']['ini']['prices']['token1']:,.2f} to ${row2['status']['end']['prices']['token1']:,.2f}]"
+    )
+    ##############################################################
+    # the underlying asset prices in USD moved the share price XXX
+    result.append(
+        f"      the underlying asset prices moved the share price {_share_price_asset_move_percent:,.1%} [${_share_price_asset_move:,.2f}]"
+    )
+    # the fees harvested by the position moved the share price XXX
+    result.append(
+        f"      the fees harvested by the position moved the share price {_share_price_fees_move_percent:,.1%} [${_share_price_fees_move:,.2f}]"
+    )
+    # the calculated rewards moved the share price XXX
+    result.append(
+        f"      the calculated rewards moved the share price {_share_price_rewards_move_percent:,.1%} [${_share_price_rewards_move:,.2f}]"
+    )
+
+    ### anualized data
+    result.append(
+        f"     the projected anual fee APR is {(_share_price_fees_move_percent/Decimal(str(_days)))*365:,.1%} [${(_share_price_fees_move/Decimal(str(_days)))*365:,.2f}]"
+    )
+    result.append(
+        f"     the projected anual reward APR is {(_share_price_rewards_move_percent/Decimal(str(_days)))*365:,.1%} [${(_share_price_rewards_move/Decimal(str(_days)))*365:,.2f}]"
+    )
+
+    #
+    return result

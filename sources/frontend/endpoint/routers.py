@@ -18,6 +18,7 @@ from sources.common.general.enums import Period, int_to_chain, int_to_period
 from sources.common.general.utils import filter_addresses
 from sources.frontend.bins.analytics import (
     build_hypervisor_returns_graph,
+    explain_hypervisor_returns,
     get_positions_analysis,
 )
 from sources.frontend.bins.correlation import (
@@ -130,6 +131,12 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         router.add_api_route(
             path="/analytics/returns/csv",
             endpoint=self.hypervisor_analytics_return_detail,
+            methods=["GET"],
+        )
+
+        router.add_api_route(
+            path="/analytics/returns/xplain",
+            endpoint=self.hypervisor_analytics_return_xplanation,
             methods=["GET"],
         )
 
@@ -337,6 +344,57 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
             media_type="text/csv",
             headers={f"Content-Disposition": f"attachment; filename={_filename}"},
         )
+
+    @cache(expire=DAILY_CACHE_TIMEOUT)
+    async def hypervisor_analytics_return_xplanation(
+        self,
+        response: Response,
+        hypervisor_address: str,
+        chain: Chain | int = Query(
+            Chain.ARBITRUM, enum=[*Chain, *[x.id for x in Chain]]
+        ),
+        period: Period | int = Query(
+            Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]
+        ),
+    ):
+        """Explain the hypervisor return details with respect to the specified period"""
+        # convert
+        if isinstance(chain, int):
+            chain = int_to_chain(chain)
+        if isinstance(period, int):
+            period = int_to_period(period)
+        hypervisor_address = filter_addresses(hypervisor_address)
+
+        # convert period to timestamp: current timestamp in utc timezone
+        ini_timestamp = int(datetime.now(tz=timezone.utc).timestamp()) - (
+            (period.days * 24 * 60 * 60)
+            if period != Period.DAILY
+            else period.days * 24 * 2 * 60 * 60
+        )
+
+        try:
+
+            # try get data ( from either the main or the latest collection )
+            hype_return_analysis = await build_hype_return_analysis_from_database(
+                chain=chain,
+                hypervisor_address=hypervisor_address,
+                ini_timestamp=ini_timestamp,
+                use_latest_collection=True,
+            )
+            if not hype_return_analysis:
+                response.status_code = status.HTTP_404_NOT_FOUND
+                return {"detail": "No data found for the given parameters"}
+
+            #
+            return await explain_hypervisor_returns(
+                hype_return_analysis._graph_data[0],
+                hype_return_analysis._graph_data[-1],
+            )
+        except Exception as e:
+            logging.error(e)
+            raise HTTPException(
+                status_code=500, detail="Error getting hypervisor return explanation"
+            )
 
 
 class frontend_user_router_builder_main(router_builder_baseTemplate):
