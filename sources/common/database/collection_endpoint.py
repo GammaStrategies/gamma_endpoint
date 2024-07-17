@@ -2390,7 +2390,7 @@ class database_perps(db_collections_common):
         timeframe: str | None = None,
         strategy: str | None = None,
         lookback: int | None = None,
-        start_datertime: datetime | None = None,
+        start_datetime: datetime | None = None,
         end_datetime: datetime | None = None,
     ):
         """Get backtests"""
