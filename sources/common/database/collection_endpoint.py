@@ -32,7 +32,10 @@ class database_global(db_collections_common):
     """
 
     def __init__(
-        self, mongo_url: str, db_name: str = "global", db_collections: dict | None = None
+        self,
+        mongo_url: str,
+        db_name: str = "global",
+        db_collections: dict | None = None,
     ):
         if db_collections is None:
             db_collections = {
@@ -361,7 +364,9 @@ class database_local(db_collections_common):
                 }
     """
 
-    def __init__(self, mongo_url: str, db_name: str, db_collections: dict | None = None):
+    def __init__(
+        self, mongo_url: str, db_name: str, db_collections: dict | None = None
+    ):
         if db_collections is None:
             db_collections = {
                 "static": {
@@ -2377,4 +2382,35 @@ class database_perps(db_collections_common):
 
         super().__init__(
             mongo_url=mongo_url, db_name=db_name, db_collections=db_collections
+        )
+
+    async def get_backtests(
+        self,
+        token: str | None = None,
+        timeframe: str | None = None,
+        strategy: str | None = None,
+        lookback: int | None = None,
+        start_datertime: datetime | None = None,
+        end_datetime: datetime | None = None,
+    ):
+        """Get backtests"""
+        #
+        find = {}
+        if token:
+            find["token"] = token
+        if timeframe:
+            find["timeframe"] = timeframe
+        if strategy:
+            find["strategy"] = strategy
+        if lookback:
+            find["lookback"] = lookback
+        if start_datertime and end_datetime:
+            find["timestamp"] = {"$gte": start_datertime, "$lte": end_datetime}
+        elif start_datertime:
+            find["timestamp"] = {"$gte": start_datertime}
+        elif end_datetime:
+            find["timestamp"] = {"$lte": end_datetime}
+
+        return await self.get_items_from_database(
+            collection_name="backtests", find=find
         )
