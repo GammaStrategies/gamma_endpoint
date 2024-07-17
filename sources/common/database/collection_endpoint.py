@@ -32,7 +32,7 @@ class database_global(db_collections_common):
     """
 
     def __init__(
-        self, mongo_url: str, db_name: str = "global", db_collections: dict = None
+        self, mongo_url: str, db_name: str = "global", db_collections: dict | None = None
     ):
         if db_collections is None:
             db_collections = {
@@ -361,7 +361,7 @@ class database_local(db_collections_common):
                 }
     """
 
-    def __init__(self, mongo_url: str, db_name: str, db_collections: dict = None):
+    def __init__(self, mongo_url: str, db_name: str, db_collections: dict | None = None):
         if db_collections is None:
             db_collections = {
                 "static": {
@@ -2332,3 +2332,49 @@ class database_local(db_collections_common):
             query.insert(0, {"$match": match})
 
         return query
+
+
+class database_perps(db_collections_common):
+    """Perps database class"""
+
+    def __init__(
+        self, mongo_url: str, db_name: str, db_collections: dict | None = None
+    ):
+        if db_collections is None:
+            db_collections = {
+                "ohlcv": {
+                    "mono_indexes": {
+                        "id": True,
+                    },
+                    "multi_indexes": [
+                        [
+                            ("timestamp", ASCENDING),
+                            ("token", ASCENDING),
+                            ("timeframe", ASCENDING),
+                        ],
+                    ],
+                },
+                "backtests": {
+                    "mono_indexes": {
+                        "id": True,
+                    },
+                    "multi_indexes": [
+                        [
+                            ("timestamp", ASCENDING),
+                            ("strategy", ASCENDING),
+                            ("token", ASCENDING),
+                            ("timeframe", ASCENDING),
+                            ("lookback", ASCENDING),
+                        ],
+                    ],
+                },
+            }
+
+        else:
+            logging.getLogger(__name__).warning(
+                f" using custom db_collections on local dbatabase class for {db_name}:  {db_collections} "
+            )
+
+        super().__init__(
+            mongo_url=mongo_url, db_name=db_name, db_collections=db_collections
+        )

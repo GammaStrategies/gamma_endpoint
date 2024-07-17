@@ -1,5 +1,9 @@
 from sources.common.general.enums import Chain, Protocol
-from sources.common.database.collection_endpoint import database_global, database_local
+from sources.common.database.collection_endpoint import (
+    database_global,
+    database_local,
+    database_perps,
+)
 
 # TODO: restruct global config and local config
 from sources.subgraph.bins.config import MONGO_DB_URL
@@ -18,3 +22,8 @@ def local_database_helper(network: Chain):
 def global_database_helper():
     """Create a global database."""
     return database_global(mongo_url=MONGO_DB_URL)
+
+
+def perps_database_helper():
+    """Create a perps database."""
+    return database_perps(mongo_url=MONGO_DB_URL, db_name="perps_gamma")
