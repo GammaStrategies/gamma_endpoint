@@ -25,7 +25,7 @@ from sources.mongo.bins.apps.brevis_api import build_brevisQueryRequest
 from sources.mongo.bins.apps.twa.twa_calculations import (
     gamma_rewards_TWA_calculation,
 )
-from sources.mongo.bins.apps.perps_backtest import PerpBacktest
+from sources.mongo.bins.apps.perps_backtest import backtests
 from sources.subgraph.bins.config import DEPLOYMENTS
 
 
@@ -45,12 +45,7 @@ def build_routers() -> list:
             )
         )
 
-    routes.append(
-        MongoRouterBuilderPerps(
-            tags=["Perps"],
-            prefix="/perps"
-        )
-    )
+    routes.append(MongoRouterBuilderPerps(tags=["Perps"], prefix="/perps"))
 
     return routes
 
@@ -709,6 +704,7 @@ class MongoRouterBuilderPerps(router_builder_baseTemplate):
         prefix: str = "",
     ):
         super().__init__(tags=tags, prefix=prefix)
+
     # ROUTEs BUILD FUNCTIONS
     def router(self) -> APIRouter:
         router = APIRouter(prefix=self.prefix)
@@ -723,17 +719,15 @@ class MongoRouterBuilderPerps(router_builder_baseTemplate):
         return router
 
     async def backtest(self):
-        pbt = PerpBacktest(strategy="macd", token="ETH", timeframe="8h", lookback=7)
-
-        pbt.run(
-            start=datetime.strptime("2022-01-01", "%Y-%m-%d"),
+        results = await backtests(
+            strategy="MACD",
+            token="ETH",
+            timeframe="8h",
+            lookback=7,
+            start=datetime.strptime("2024-01-01", "%Y-%m-%d"),
             end=datetime.strptime("2024-06-15", "%Y-%m-%d"),
-            leverage=1,
-            trade_cost=0.001,
         )
 
-        print(pbt.results)
-
-        chart_data = pbt.results.to_dict("records")
-
-        return chart_data
+        return {
+            "backtest": results
+        }
