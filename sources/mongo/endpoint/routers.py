@@ -412,10 +412,31 @@ class mongo_router_builder(router_builder_baseTemplate):
 
     # Hypervisors
     @cache(expire=DB_CACHE_TIMEOUT)
-    async def hypervisors_list(self, response: Response):
-        """Returns the hypervisor found in the database"""
+    async def hypervisors_list(
+        self,
+        response: Response,
+        hypervisor_address: str | None = None,
+        block: int | None = None,
+        timestamp: int | None = None,
+    ):
+        """
+        Retrieve a list of hypervisors.
+
+        Args:
+            hypervisor_address (str | None, optional): The hypervisor address. Defaults to All.
+            block (int | None, optional): The block number. Defaults to last available in db.
+            timestamp (int | None, optional): The timestamp. Defaults to last available in db.
+
+
+        Returns:
+            List: A list of hypervisors.
+        """
         return await hypervisor.hypervisors_list(
-            network=self.chain, protocol=self.protocol
+            network=self.chain,
+            protocol=self.protocol,
+            hypervisor_address=hypervisor_address,
+            block=block,
+            timestamp=timestamp,
         )
 
     @cache(expire=DAILY_CACHE_TIMEOUT)
@@ -728,6 +749,4 @@ class MongoRouterBuilderPerps(router_builder_baseTemplate):
             end=datetime.strptime("2024-06-15", "%Y-%m-%d"),
         )
 
-        return {
-            "backtest": results
-        }
+        return {"backtest": results}

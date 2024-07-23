@@ -12,11 +12,88 @@ from ..helpers import local_database_helper, global_database_helper
 # Hypervisors
 
 
-async def hypervisors_list(network: Chain, protocol: Protocol):
+async def hypervisors_list(
+    network: Chain,
+    protocol: Protocol | None = None,
+    hypervisor_address: str | None = None,
+    block: int | None = None,
+    timestamp: int | None = None,
+) -> list[dict]:
+    """Return a list of hypervisor(s) snapshots closest to the blocks indicated. When no block nor timestamp is provided, a static snapshot is returned.
+
+    Args:
+        network (Chain): chain to retrieve the snapshots from.
+        protocol (Protocol | None, optional): protocol to filter the snapshots by.
+        block (int | None, optional): block close to return the hype list to. Defaults to None.
+        timestamp (int | None, optional): timestamp close to return the hype list to. Defaults to None.
+
+    Returns:
+        list[dict]: list of hypervisor(s) snapshots.
+    """
+    _collection_name = "static"
+
+    _query = []
+    if protocol:
+        _query.append({"$match": {"dex": protocol.database_name}})
+
+    if hypervisor_address:
+        _query[0]["$match"]["address"] = hypervisor_address.lower()
+
+    _filter_data = (
+        [block, "$block"] if block else [timestamp, "$timestamp"] if timestamp else None
+    )
+
+    if _filter_data:
+        # closest to block or timestamp hype status found in database
+        _query += [
+            {
+                "$lookup": {
+                    "from": "status",
+                    "let": {"op_address": "$address"},
+                    "pipeline": [
+                        {"$match": {"$expr": {"$eq": ["$address", "$$op_address"]}}},
+                        {
+                            "$addFields": {
+                                "diff": {"$abs": {"$subtract": [block, "$block"]}}
+                            }
+                        },
+                        {"$sort": {"diff": 1}},
+                        {"$limit": 1},
+                        {"$unset": ["_id"]},
+                    ],
+                    "as": "status",
+                }
+            },
+            {"$unwind": {"path": "$status", "preserveNullAndEmptyArrays": False}},
+            {"$replaceRoot": {"newRoot": "$status"}},
+        ]
+    else:
+        # last hype status found in database
+        _query += [
+            {
+                "$lookup": {
+                    "from": "status",
+                    "let": {"op_address": "$address"},
+                    "pipeline": [
+                        {"$match": {"$expr": {"$eq": ["$address", "$$op_address"]}}},
+                        {"$sort": {"block": -1}},
+                        {"$limit": 1},
+                        {"$unset": ["_id"]},
+                    ],
+                    "as": "status",
+                }
+            },
+            {"$unwind": {"path": "$status", "preserveNullAndEmptyArrays": False}},
+            {"$replaceRoot": {"newRoot": "$status"}},
+        ]
+
+    # remove ids from result
+    _query.append({"$project": {"_id": 0, "id": 0}})
+
+    # return the result
     return await local_database_helper(network=network).get_items_from_database(
-        collection_name="static",
-        find={"dex": protocol.database_name},
-        projection={"_id": 0},
+        collection_name=_collection_name,
+        aggregate=_query,
     )
 
 
