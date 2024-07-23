@@ -415,21 +415,21 @@ class mongo_router_builder(router_builder_baseTemplate):
     async def hypervisors_list(
         self,
         response: Response,
-        hypervisor_address: str | None = None,
-        block: int | None = None,
-        timestamp: int | None = None,
+        hypervisor_address: str | None = Query(
+            None, description="The hypervisor address. Defaults to All"
+        ),
+        block: int | None = Query(
+            None, description="The block number. Defaults to last available in db."
+        ),
+        timestamp: int | None = Query(
+            None, description="The timestamp. Defaults to last available in db"
+        ),
     ):
         """
         Retrieve a list of hypervisors.
-
-        Args:
-            hypervisor_address (str | None, optional): The hypervisor address. Defaults to All.
-            block (int | None, optional): The block number. Defaults to last available in db.
-            timestamp (int | None, optional): The timestamp. Defaults to last available in db.
-
-
-        Returns:
-            List: A list of hypervisors.
+        * If hypervisor_address is provided, it will return the hypervisor data for that address.
+        * When no hypervisor_address is provided, it will return all hypervisors in the network.
+        * The block and timestamp fields will limit the data returned to the closest available to the provided values.
         """
         return await hypervisor.hypervisors_list(
             network=self.chain,
