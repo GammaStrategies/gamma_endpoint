@@ -54,7 +54,7 @@ class Chain(str, Enum):
     ROOTSTOCK = ("rootstock", 30, "rootstock", "Rootstock", None, None, "Rootstock")
     TAIKO = ("taiko", 167000, "taiko", "Taiko", None, None, "Taiko")
     SEI = ("sei", 1329, "sei", "Sei", None, None, "Sei")
-    IOTA = ("iota", 8822, "iota", "Iota", None, None, "Iota")
+    IOTA = ("iota", 8822, "iota", "Iota", None, "iota_evm", "Iota")
 
     # extra properties
     id: int
