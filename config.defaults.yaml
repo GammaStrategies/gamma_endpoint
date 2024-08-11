@@ -190,6 +190,15 @@ KINETIX_BASE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-k
 WAGMI_IOTA_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-wagmi-iota/latest/gn
 WAGMI_IOTA_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-wagmi-iota/latest/gn
 
+SCRIBE_SCROLL_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-scribe-scroll/version/latest
+SCRIBE_SCROLL_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-scribe-scroll/version/latest
+
+GMEOW_ZIRCUIT_GAMMA_SUBGRAPH: https://app.sentio.xyz/api/v1/graphql/loc/gamma-gmeow-zircuit
+GMEOW_ZIRCUIT_HP_SUBGRAPH: https://app.sentio.xyz/api/v1/graphql/loc/gamma-hp-gmeow-zircuit
+
+CIRCUIT_ZIRCUIT_GAMMA_SUBGRAPH: https://app.sentio.xyz/api/v1/graphql/loc/gamma-circuit-zircuit
+CIRCUIT_ZIRCUIT_HP_SUBGRAPH: https://app.sentio.xyz/api/v1/graphql/loc/gamma-hp-circuit-zircuit
+
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {
   "ethereum":{},

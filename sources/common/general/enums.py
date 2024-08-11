@@ -55,6 +55,7 @@ class Chain(str, Enum):
     TAIKO = ("taiko", 167000, "taiko", "Taiko", None, None, "Taiko")
     SEI = ("sei", 1329, "sei", "Sei", None, None, "Sei")
     IOTA = ("iota", 8822, "iota", "Iota", None, "iota_evm", "Iota")
+    ZIRCUIT = ("zircuit", 48900, "zircuit", "Zircuit", None, None, "Zircuit")
 
     # extra properties
     id: int
@@ -137,6 +138,9 @@ class Dex(str, Enum):
     LINEHUB: "linehub"
     KINETIX: "kinetix"
     WAGMI: "wagmi"
+    SCRIBE: "scribe"
+    CIRCUIT: "circuit"
+    GMEOW: "gmeow"
 
 
 class Protocol(str, Enum):
@@ -191,6 +195,9 @@ class Protocol(str, Enum):
     LINEHUB = ("linehub", None, None, None, "linehub", "Linehub")
     KINETIX = ("kinetix", None, None, None, "kinetix", "Kinetix")
     WAGMI = ("wagmi", None, None, None, "wagmi", "Wagmi")
+    SCRIBE = ("scribe", None, None, None, "scribe", "Scribe")
+    GMEOW = ("gmeow", None, None, None, "gmeow", "Gmeow")
+    CIRCUIT = ("circuit", None, None, None, "circuit", "Circuit")
 
     # extra properties
     api_url: str
