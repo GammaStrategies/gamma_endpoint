@@ -25,6 +25,9 @@ def query_hypervisor_operations_twa(
 
     _match = {"hypervisor_address": hypervisor_address}
 
+    # we only need user operations affecting supply, so we filter by these topics
+    _match["topic"] = {"$in": ["transfer", "withdraw", "deposit"]}
+
     # choose between blocks or timestamps
     if block_ini:
         _var = "$block"
@@ -80,6 +83,13 @@ def query_hypervisor_operations_twa(
                             "$expr": {
                                 "$and": [
                                     {"$eq": ["$hypervisor_address", "$$op_hype"]},
+                                    # only get user operations of a given topic list ( supply change topics )
+                                    {
+                                        "$in": [
+                                            "$topic",
+                                            ["transfer", "withdraw", "deposit"],
+                                        ]
+                                    },
                                     {"$eq": ["$user_address", "$$op_user"]},
                                     {"$gte": [_var, "$$op_block_ini"]},
                                     {"$lte": [_var, "$$op_block_end"]},

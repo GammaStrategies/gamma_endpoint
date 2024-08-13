@@ -34,7 +34,14 @@ def query_user_operations_brevis_GammaQueryRequest(
     hypervisor_address: str | None = None,
 ) -> list[dict]:
 
-    _and = []
+    # make sure we only get the topics we need
+    _and = [
+        {
+            "topic": {
+                "$in": ["transfer", "withdraw", "deposit"],
+            },
+        }
+    ]
     if user_address:
         _and.append({"user_address": user_address})
     if block_ini and block_end:
