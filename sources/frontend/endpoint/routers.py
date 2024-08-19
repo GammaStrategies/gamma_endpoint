@@ -26,7 +26,7 @@ from sources.frontend.bins.correlation import (
 )
 from sources.frontend.bins.external_apis import (
     get_ramsesLike_api_data,
-    get_xpoints_xtrade,
+    get_leaderboard,
 )
 from sources.frontend.bins.revenue_stats import get_revenue_stats
 from sources.frontend.bins.users import get_user_positions
@@ -449,8 +449,8 @@ class frontend_externalApis_router_builder_main(router_builder_baseTemplate):
         )
 
         router.add_api_route(
-            path="/externalApis/xpointsLeaderboard",
-            endpoint=self.get_xpoints_leaderboard,
+            path="/externalApis/leaderboard",
+            endpoint=self.get_leaderboard,
             methods=["GET"],
         )
 
@@ -491,9 +491,14 @@ class frontend_externalApis_router_builder_main(router_builder_baseTemplate):
             raise HTTPException(status_code=500, detail="Error getting rewards APR")
 
     @cache(expire=DB_CACHE_TIMEOUT)
-    async def get_xpoints_leaderboard(
+    async def get_leaderboard(
         self,
         response: Response,
+        chain: Chain | int = Query(
+            Chain.XLAYER,
+            enum=[Chain.XLAYER, Chain.XLAYER.id],
+            description="Chain to filter by",
+        ),
         contracts: bool = Query(
             True,
             description="Include contracts in the leaderboard",
@@ -502,12 +507,19 @@ class frontend_externalApis_router_builder_main(router_builder_baseTemplate):
             True,
             description="Include each user balance justification",
         ),
+        token_address: str = Query(
+            "0xb3fe9cf380e889edf9ada9443d76f1cee328fd07",
+            description="Token address for the leaderboard",
+        ),
     ):
-        """leaderBoard for xLayer's 0x9d2e7411b91aff3e88e196a4d3c40420376fbcf9 token"""
+        """xLayer token leaderBoard"""
 
         try:
-            return await get_xpoints_xtrade(
-                include_contracts=contracts, include_transfers=transfers
+            return await get_leaderboard(
+                chain=chain,
+                include_contracts=contracts,
+                include_transfers=transfers,
+                token_address=token_address,
             )
         except Exception as e:
-            raise HTTPException(status_code=500, detail="Error getting rewards APR")
+            raise HTTPException(status_code=500, detail="Error getting leaderboard")

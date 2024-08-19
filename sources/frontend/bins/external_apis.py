@@ -145,11 +145,18 @@ async def get_ramsesLike_api_data(chain: Chain, protocol: Protocol) -> dict:
     return result
 
 
-async def get_xpoints_xtrade(
-    include_contracts: bool = True, include_transfers: bool = False
+async def get_leaderboard(
+    chain: Chain | None = None,
+    include_contracts: bool = True,
+    include_transfers: bool = False,
+    token_address: str | None = None,
 ) -> list:
 
-    xtoken_address = "0x9d2e7411b91aff3e88e196a4d3c40420376fbcf9".lower()
+    if not chain:
+        chain = Chain.XLAYER
+    if not token_address:
+        token_address = "0xb3fe9cf380e889edf9ada9443d76f1cee328fd07".lower()
+
     _project = {
         "user_address": "$_id",
         "balance": {"$toString": "$balance"},
@@ -159,7 +166,7 @@ async def get_xpoints_xtrade(
         _project["items"] = 1
 
     _query = [
-        {"$match": {"topic": {"$in": ["transfer", "mint"]}, "address": xtoken_address}},
+        {"$match": {"topic": {"$in": ["transfer", "mint"]}, "address": token_address}},
         {"$unset": "_id"},
         {
             "$addFields": {
@@ -209,7 +216,7 @@ async def get_xpoints_xtrade(
     return [
         db_collections_common.convert_d128_to_decimal(x)
         for x in await local_database_helper(
-            network=Chain.XLAYER
+            network=chain,
         ).get_items_from_database(
             collection_name="token_operations",
             aggregate=_query,
