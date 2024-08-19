@@ -4,6 +4,7 @@
 import asyncio
 import logging
 
+from sources.common.database.common.collections_common import db_collections_common
 from sources.common.general.enums import Chain, Protocol
 from sources.common.xt_api.ramses import ramses_api_helper
 from sources.mongo.bins.helpers import local_database_helper
@@ -142,3 +143,75 @@ async def get_ramsesLike_api_data(chain: Chain, protocol: Protocol) -> dict:
         )
 
     return result
+
+
+async def get_xpoints_xtrade(
+    include_contracts: bool = True, include_transfers: bool = False
+) -> list:
+
+    xtoken_address = "0x9d2e7411b91aff3e88e196a4d3c40420376fbcf9".lower()
+    _project = {
+        "user_address": "$_id",
+        "balance": {"$toString": "$balance"},
+        "isContract": 1,
+    }
+    if include_transfers:
+        _project["items"] = 1
+
+    _query = [
+        {"$match": {"topic": {"$in": ["transfer", "mint"]}, "address": xtoken_address}},
+        {"$unset": "_id"},
+        {
+            "$addFields": {
+                "user_address": ["$from", "$to"],
+                "value": {"$cond": [{"$gt": ["$value", None]}, "$value", "$amount"]},
+            }
+        },
+        {"$unwind": {"path": "$user_address", "preserveNullAndEmptyArrays": False}},
+        {"$match": {"user_address": {"$ne": None}}},
+        {
+            "$addFields": {
+                "balance": {
+                    "$cond": [
+                        {"$eq": ["$user_address", "$to"]},
+                        {"$toDecimal": "$value"},
+                        {"$multiply": [{"$toDecimal": "$value"}, -1]},
+                    ]
+                }
+            }
+        },
+        {"$sort": {"blockNumber": 1, "logIndex": 1}},
+        {
+            "$group": {
+                "_id": "$user_address",
+                "items": {"$push": "$$ROOT"},
+                "balance": {"$sum": "$balance"},
+            }
+        },
+        {
+            "$addFields": {
+                "isContract": {
+                    "$cond": [
+                        {"$eq": ["$_id", {"$first": "$items.from"}]},
+                        {"$first": "$items.from_isContract"},
+                        {"$first": "$items.to_isContract"},
+                    ]
+                }
+            }
+        },
+        {"$sort": {"balance": -1}},
+        {"$project": _project},
+    ]
+
+    if not include_contracts:
+        _query.append({"$match": {"isContract": False}})
+
+    return [
+        db_collections_common.convert_d128_to_decimal(x)
+        for x in await local_database_helper(
+            network=Chain.XLAYER
+        ).get_items_from_database(
+            collection_name="token_operations",
+            aggregate=_query,
+        )
+    ]

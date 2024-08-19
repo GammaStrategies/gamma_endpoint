@@ -24,7 +24,10 @@ from sources.frontend.bins.analytics import (
 from sources.frontend.bins.correlation import (
     get_correlation_from_hypervisors,
 )
-from sources.frontend.bins.external_apis import get_ramsesLike_api_data
+from sources.frontend.bins.external_apis import (
+    get_ramsesLike_api_data,
+    get_xpoints_xtrade,
+)
 from sources.frontend.bins.revenue_stats import get_revenue_stats
 from sources.frontend.bins.users import get_user_positions
 
@@ -445,6 +448,12 @@ class frontend_externalApis_router_builder_main(router_builder_baseTemplate):
             methods=["GET"],
         )
 
+        router.add_api_route(
+            path="/externalApis/xpointsLeaderboard",
+            endpoint=self.get_xpoints_leaderboard,
+            methods=["GET"],
+        )
+
         return router
 
     # ROUTE FUNCTIONS
@@ -478,5 +487,27 @@ class frontend_externalApis_router_builder_main(router_builder_baseTemplate):
                 chain = int_to_chain(chain)
 
             return await get_ramsesLike_api_data(chain=chain, protocol=protocol)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail="Error getting rewards APR")
+
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def get_xpoints_leaderboard(
+        self,
+        response: Response,
+        contracts: bool = Query(
+            True,
+            description="Include contracts in the leaderboard",
+        ),
+        transfers: bool = Query(
+            True,
+            description="Include each user balance justification",
+        ),
+    ):
+        """leaderBoard for xLayer's 0x9d2e7411b91aff3e88e196a4d3c40420376fbcf9 token"""
+
+        try:
+            return await get_xpoints_xtrade(
+                include_contracts=contracts, include_transfers=transfers
+            )
         except Exception as e:
             raise HTTPException(status_code=500, detail="Error getting rewards APR")
