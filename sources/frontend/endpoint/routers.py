@@ -501,19 +501,19 @@ class frontend_externalApis_router_builder_main(router_builder_baseTemplate):
         ),
         contracts: bool = Query(
             True,
-            description="Include contracts in the leaderboard",
+            description="Include addresses defined as contracts in the result",
         ),
         transfers: bool = Query(
             False,
-            description="Include each user balance justification",
+            description="Include transfers that make up the balance of each user in the result",
         ),
         token_address: str = Query(
             "0xb3fe9cf380e889edf9ada9443d76f1cee328fd07",
-            description="Token address for the leaderboard",
+            description="Token address to use for building up the leaderboard",
         ),
         exclude_allowedFrom_addresses: bool = Query(
             True,
-            description="Exclude addresses defined in setallowedfrom events",
+            description="Exclude addresses defined in setallowedfrom events in the result",
         ),
     ):
         """xLayer token leaderBoard"""
