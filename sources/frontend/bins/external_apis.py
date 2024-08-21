@@ -150,7 +150,20 @@ async def get_leaderboard(
     include_contracts: bool = True,
     include_transfers: bool = False,
     token_address: str | None = None,
+    exclude_defined_addresses: bool = True,
 ) -> list:
+    """Get leaderboard data
+
+    Args:
+        chain (Chain | None, optional): . Defaults to None.
+        include_contracts (bool, optional): include contract defined addresses in the result. Defaults to True.
+        include_transfers (bool, optional): show transfers related to the user. Defaults to False.
+        token_address (str | None, optional): token to filter leaderboard. Defaults to None.
+        exclude_defined_addresses (bool, optional): Exclude addresses defined in setallowedfrom events. Defaults to True.
+
+    Returns:
+        list: leaderboard data sorted by balance
+    """
 
     if not chain:
         chain = Chain.XLAYER
@@ -166,7 +179,7 @@ async def get_leaderboard(
         _project["items"] = 1
 
     _query = [
-        {"$match": {"topic": {"$in": ["transfer", "mint"]}, "address": token_address}},
+        {"$match": {"topic": {"$in": ["transfer"]}, "address": token_address}},
         {"$unset": "_id"},
         {
             "$addFields": {
@@ -213,12 +226,41 @@ async def get_leaderboard(
     if not include_contracts:
         _query.append({"$match": {"isContract": False}})
 
-    return [
-        db_collections_common.convert_d128_to_decimal(x)
-        for x in await local_database_helper(
+    if exclude_defined_addresses:
+
+        all_balances, addresses_to_xclude = await asyncio.gather(
+            local_database_helper(
+                network=chain,
+            ).get_items_from_database(
+                collection_name="token_operations",
+                aggregate=_query,
+            ),
+            local_database_helper(
+                network=chain,
+            ).get_items_from_database(
+                collection_name="token_operations",
+                find={"topic": "setallowedfrom"},
+                projection={"from": 1, "_id": 0},
+            ),
+        )
+        # convert to set
+        addresses_to_xclude = set([x["from"] for x in addresses_to_xclude])
+        # add Dead address to exclude
+        addresses_to_xclude.add("0x0000000000000000000000000000000000000000")
+
+    else:
+        # do not exclude any address
+        all_balances = await local_database_helper(
             network=chain,
         ).get_items_from_database(
             collection_name="token_operations",
             aggregate=_query,
         )
+        addresses_to_xclude = []
+
+    # convert balances to decimal and return result
+    return [
+        db_collections_common.convert_d128_to_decimal(x)
+        for x in all_balances
+        if x["user_address"] not in addresses_to_xclude
     ]

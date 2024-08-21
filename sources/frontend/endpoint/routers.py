@@ -504,12 +504,16 @@ class frontend_externalApis_router_builder_main(router_builder_baseTemplate):
             description="Include contracts in the leaderboard",
         ),
         transfers: bool = Query(
-            True,
+            False,
             description="Include each user balance justification",
         ),
         token_address: str = Query(
             "0xb3fe9cf380e889edf9ada9443d76f1cee328fd07",
             description="Token address for the leaderboard",
+        ),
+        exclude_allowedFrom_addresses: bool = Query(
+            True,
+            description="Exclude addresses defined in setallowedfrom events",
         ),
     ):
         """xLayer token leaderBoard"""
@@ -520,6 +524,7 @@ class frontend_externalApis_router_builder_main(router_builder_baseTemplate):
                 include_contracts=contracts,
                 include_transfers=transfers,
                 token_address=token_address,
+                exclude_defined_addresses=exclude_allowedFrom_addresses,
             )
         except Exception as e:
             raise HTTPException(status_code=500, detail="Error getting leaderboard")
