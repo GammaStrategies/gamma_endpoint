@@ -2370,6 +2370,7 @@ class database_perps(db_collections_common):
                             ("token", ASCENDING),
                             ("timeframe", ASCENDING),
                             ("lookback", ASCENDING),
+                            ("leverage", ASCENDING),
                         ],
                     ],
                 },
@@ -2390,6 +2391,7 @@ class database_perps(db_collections_common):
         timeframe: str | None = None,
         strategy: str | None = None,
         lookback: int | None = None,
+        leverage: str | None = None,
         start_datetime: datetime | None = None,
         end_datetime: datetime | None = None,
     ):
@@ -2404,6 +2406,8 @@ class database_perps(db_collections_common):
             find["strategy"] = strategy
         if lookback:
             find["lookback"] = lookback
+        if leverage:
+            find["leverage"] = leverage
         if start_datetime and end_datetime:
             find["timestamp"] = {"$gte": start_datetime, "$lte": end_datetime}
         elif start_datetime:

@@ -745,6 +745,7 @@ class MongoRouterBuilderPerps(router_builder_baseTemplate):
             token="ETH",
             timeframe="8h",
             lookback=7,
+            leverage=1,
             start=datetime.strptime("2024-01-01", "%Y-%m-%d"),
             end=datetime.strptime("2024-06-15", "%Y-%m-%d"),
         )
