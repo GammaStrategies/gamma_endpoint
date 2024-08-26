@@ -1,203 +1,206 @@
 SUBGRAPH_STUDIO_KEY: ""
 SUBGRAPH_STUDIO_USER_KEY: ""
+GOLDSKY_PROJECT_NAME: ""
+SENTIO_ACCOUNT: ""
+SENTIO_KEY: ""
 
-UNISWAP_MAINNET_GAMMA_SUBGRAPH: QmS1nPRvYghS9UBrqFWP3W7XNnrrJCk9PR9CwiP82fiUGY
-UNISWAP_MAINNET_HP_SUBGRAPH: QmSBPe8tm6TyEsRsJxyu5PMxpGmpv2VwywMNGiH3b33m7K
+UNISWAP_MAINNET_GAMMA_SUBGRAPH: studio::QmS1nPRvYghS9UBrqFWP3W7XNnrrJCk9PR9CwiP82fiUGY
+UNISWAP_MAINNET_HP_SUBGRAPH: studio::QmSBPe8tm6TyEsRsJxyu5PMxpGmpv2VwywMNGiH3b33m7K
 
-UNISWAP_POLYGON_GAMMA_SUBGRAPH: QmP6taZ7SHx5xkbsfXasjcF6Ja9ZgC8nk1qqyhmBY2wvQf
-UNISWAP_POLYGON_HP_SUBGRAPH: QmSA2Uztf6io4oFepey8hmQhD41FUKpJ1yjjYQJYLmrwHy
+UNISWAP_POLYGON_GAMMA_SUBGRAPH: studio::QmP6taZ7SHx5xkbsfXasjcF6Ja9ZgC8nk1qqyhmBY2wvQf
+UNISWAP_POLYGON_HP_SUBGRAPH: studio::QmSA2Uztf6io4oFepey8hmQhD41FUKpJ1yjjYQJYLmrwHy
 
-UNISWAP_ARBITRUM_GAMMA_SUBGRAPH: QmX3hdSbwuNXGconfQ9rVEocPzhbBDSL4GsdyHPMyKDgpj
-UNISWAP_ARBITRUM_HP_SUBGRAPH: QmdVb28tQGmU2SgoV9KHmv1nc4cHUW5houYKdFh9SXfxrA
+UNISWAP_ARBITRUM_GAMMA_SUBGRAPH: studio::QmX3hdSbwuNXGconfQ9rVEocPzhbBDSL4GsdyHPMyKDgpj
+UNISWAP_ARBITRUM_HP_SUBGRAPH: studio::QmdVb28tQGmU2SgoV9KHmv1nc4cHUW5houYKdFh9SXfxrA
 
-UNISWAP_OPTIMISM_GAMMA_SUBGRAPH: QmRqnB31tYuRx9Fg32DWuGE9W1negR8Pv1jxvspCsyNYVj
-UNISWAP_OPTIMISM_HP_SUBGRAPH: Qmbvpr5svrsEz6rNFY8j5AkjyPfKd3wkiMFcZ2WoLAtW78
+UNISWAP_OPTIMISM_GAMMA_SUBGRAPH: studio::QmRqnB31tYuRx9Fg32DWuGE9W1negR8Pv1jxvspCsyNYVj
+UNISWAP_OPTIMISM_HP_SUBGRAPH: studio::Qmbvpr5svrsEz6rNFY8j5AkjyPfKd3wkiMFcZ2WoLAtW78
 
-UNISWAP_CELO_GAMMA_SUBGRAPH: QmUxko8oaLiiGe9Z2wZfcjqrcZvUFRVWhr9QpcwQ3c2oo8
-UNISWAP_CELO_HP_SUBGRAPH: QmRmsGMVJuasGFXBW6U58PhVG2h4ZctNFim9x1Q52rdn59
+UNISWAP_CELO_GAMMA_SUBGRAPH: studio::QmUxko8oaLiiGe9Z2wZfcjqrcZvUFRVWhr9QpcwQ3c2oo8
+UNISWAP_CELO_HP_SUBGRAPH: studio::QmRmsGMVJuasGFXBW6U58PhVG2h4ZctNFim9x1Q52rdn59
 
-UNISWAP_BSC_GAMMA_SUBGRAPH: Qmco12j4wdc4p8WQVoYNp2Th8VFawWr7bsELMydSEb6XRg
-UNISWAP_BSC_HP_SUBGRAPH: QmPTNAav3BhQib7WoCcnR36ixTGYLiUCkCVrm3fSF1x8Fr
+UNISWAP_BSC_GAMMA_SUBGRAPH: studio::Qmco12j4wdc4p8WQVoYNp2Th8VFawWr7bsELMydSEb6XRg
+UNISWAP_BSC_HP_SUBGRAPH: studio::QmPTNAav3BhQib7WoCcnR36ixTGYLiUCkCVrm3fSF1x8Fr
 
-UNISWAP_MOONBEAM_GAMMA_SUBGRAPH: QmRzEdsdjJHJQgG1FXnLit2VMJUTffWLFERyW47XQh9G4f
-UNISWAP_MOONBEAM_HP_SUBGRAPH: QmXFSqZfMTfRqTsExMvbRSijhCFSC8rVnVdPsJXRV6RaH3
+UNISWAP_MOONBEAM_GAMMA_SUBGRAPH: studio::QmRzEdsdjJHJQgG1FXnLit2VMJUTffWLFERyW47XQh9G4f
+UNISWAP_MOONBEAM_HP_SUBGRAPH: studio::QmXFSqZfMTfRqTsExMvbRSijhCFSC8rVnVdPsJXRV6RaH3
 
-UNISWAP_MANTA_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-uniswap-manta/latest/gn
-UNISWAP_MANTA_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-uniswap-manta/latest/gn
+UNISWAP_MANTA_GAMMA_SUBGRAPH: goldsky::gamma-uniswap-manta
+UNISWAP_MANTA_HP_SUBGRAPH: goldsky::gamma-hp-uniswap-manta
 
-UNISWAP_ROOTSTOCK_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-uniswap-rootstock/version/latest
-UNISWAP_ROOTSTOCK_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-uniswap-rootstock/version/latest
+UNISWAP_ROOTSTOCK_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-uniswap-rootstock/version/latest
+UNISWAP_ROOTSTOCK_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-uniswap-rootstock/version/latest
 
-UNISWAP_SEI_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-uniswap-sei/version/latest
-UNISWAP_SEI_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-uniswap-sei/version/latest
+UNISWAP_SEI_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-uniswap-sei/version/latest
+UNISWAP_SEI_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-uniswap-sei/version/latest
 
-UNISWAP_AVALANCHE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-uniswap-avax/version/latest
-UNISWAP_AVALANCHE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-avax/version/latest
+UNISWAP_AVALANCHE_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-uniswap-avax/version/latest
+UNISWAP_AVALANCHE_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-avax/version/latest
 
-UNISWAP_BASE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-uniswap-base/version/latest
-UNISWAP_BASE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-base/version/latest
+UNISWAP_BASE_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-uniswap-base/version/latest
+UNISWAP_BASE_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-base/version/latest
 
-UNISWAP_BLAST_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-uniswap-blast/version/latest
-UNISWAP_BLAST_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-blast/version/latest
+UNISWAP_BLAST_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-uniswap-blast/version/latest
+UNISWAP_BLAST_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-blast/version/latest
 
-UNISWAP_SCROLL_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-uniswap-scroll/version/latest
-UNISWAP_SCROLL_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-scroll/version/latest
+UNISWAP_SCROLL_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-uniswap-scroll/version/latest
+UNISWAP_SCROLL_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-scroll/version/latest
 
-UNISWAP_LINEA_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-uniswap-linea/version/latest
-UNISWAP_LINEA_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-linea/version/latest
+UNISWAP_LINEA_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-uniswap-linea/version/latest
+UNISWAP_LINEA_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-linea/version/latest
 
-UNISWAP_MANTLE_GAMMA_SUBGRAPH: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-uniswap-mantle
-UNISWAP_MANTLE_HP_SUBGRAPH: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-hp-uniswap-mantle
+UNISWAP_MANTLE_GAMMA_SUBGRAPH: url::https://subgraph-api.mantle.xyz/subgraphs/name/gamma-uniswap-mantle
+UNISWAP_MANTLE_HP_SUBGRAPH: url::https://subgraph-api.mantle.xyz/subgraphs/name/gamma-hp-uniswap-mantle
 
-UNISWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-uniswap-pzke/version/latest
-UNISWAP_POLYGON_ZKEVM_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-pzke/version/latest
+UNISWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-uniswap-pzke/version/latest
+UNISWAP_POLYGON_ZKEVM_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-hp-uniswap-pzke/version/latest
 
-UNISWAP_TAIKO_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-uniswap-taiko/latest/gn
-UNISWAP_TAIKO_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-uniswap-taiko/latest/gn
+UNISWAP_TAIKO_GAMMA_SUBGRAPH: goldsky::gamma-uniswap-taiko
+UNISWAP_TAIKO_HP_SUBGRAPH: goldsky::gamma-hp-uniswap-taiko
 
-QUICKSWAP_POLYGON_GAMMA_SUBGRAPH: QmbDJ5SCoU4ZiZ3S6CRSqx2eg3WEcBkL1eDpTwJ1FSPqj8
-QUICKSWAP_POLYGON_HP_SUBGRAPH: Qmdkr3eLKxVoPxV6wcsh8KhoDUKDAAuYiBQLQYWjpGWetv
+QUICKSWAP_POLYGON_GAMMA_SUBGRAPH: studio::QmbDJ5SCoU4ZiZ3S6CRSqx2eg3WEcBkL1eDpTwJ1FSPqj8
+QUICKSWAP_POLYGON_HP_SUBGRAPH: studio::Qmdkr3eLKxVoPxV6wcsh8KhoDUKDAAuYiBQLQYWjpGWetv
 
-QUICKSWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-quickswap-pzke/version/latest
-QUICKSWAP_POLYGON_ZKEVM_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-pzke/version/latest
+QUICKSWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-quickswap-pzke/version/latest
+QUICKSWAP_POLYGON_ZKEVM_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-pzke/version/latest
 
-QUICKSWAP_MANTA_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-quickswap-manta/latest/gn
-QUICKSWAP_MANTA_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-quickswap-manta/latest/gn
+QUICKSWAP_MANTA_GAMMA_SUBGRAPH: goldsky::gamma-quickswap-manta
+QUICKSWAP_MANTA_HP_SUBGRAPH: goldsky::gamma-hp-quickswap-manta
 
-QUICKSWAP_IMMUTABLE_ZKEVM_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-quickswap-imtblzke/latest/gn
-QUICKSWAP_IMMUTABLE_ZKEVM_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-quickswap-imtblzke/latest/gn
+QUICKSWAP_IMMUTABLE_ZKEVM_GAMMA_SUBGRAPH: goldsky::gamma-quickswap-imtblzke
+QUICKSWAP_IMMUTABLE_ZKEVM_HP_SUBGRAPH: goldsky::gamma-hp-quickswap-imtblzke
 
-QUICKSWAP_ASTAR_ZKEVM_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-quickswap-azke/version/latest
-QUICKSWAP_ASTAR_ZKEVM_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-azke/version/latest
+QUICKSWAP_ASTAR_ZKEVM_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-quickswap-azke/version/latest
+QUICKSWAP_ASTAR_ZKEVM_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-azke/version/latest
 
-QUICKSWAP_UNISWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-quickswap-uni-pzke/version/latest
-QUICKSWAP_UNISWAP_POLYGON_ZKEVM_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-uni-pzke/version/latest
+QUICKSWAP_UNISWAP_POLYGON_ZKEVM_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-quickswap-uni-pzke/version/latest
+QUICKSWAP_UNISWAP_POLYGON_ZKEVM_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-hp-quickswap-uni-pzke/version/latest
 
-ZYBERSWAP_ARBITRUM_GAMMA_SUBGRAPH: QmYsLLfKiMNf8i2rbGaDCZPt8trGRiCfxy7yUr7GRUc8BX
-ZYBERSWAP_ARBITRUM_HP_SUBGRAPH: QmbHX6RfnHd3GLA4RQXpqyofGLb1TH4X7jkkhyNbB4wxxK
+ZYBERSWAP_ARBITRUM_GAMMA_SUBGRAPH: studio::QmYsLLfKiMNf8i2rbGaDCZPt8trGRiCfxy7yUr7GRUc8BX
+ZYBERSWAP_ARBITRUM_HP_SUBGRAPH: studio::QmbHX6RfnHd3GLA4RQXpqyofGLb1TH4X7jkkhyNbB4wxxK
 
-THENA_BSC_GAMMA_SUBGRAPH: QmdfU2H1vLheySc4kiy3a292YVaifbiUHFAHGLN93zVHQC
-THENA_BSC_HP_SUBGRAPH: Qmdse3XvtrR4tPGyruHHM6BhbPJBea1G5vHuwYL2JaUvcu
+THENA_BSC_GAMMA_SUBGRAPH: studio::QmdfU2H1vLheySc4kiy3a292YVaifbiUHFAHGLN93zVHQC
+THENA_BSC_HP_SUBGRAPH: studio::Qmdse3XvtrR4tPGyruHHM6BhbPJBea1G5vHuwYL2JaUvcu
 
-THENA_OPBNB_GAMMA_SUBGRAPH: https://opbnb-mainnet-graph.nodereal.io/subgraphs/name/gamma-thena-opbnb
-THENA_OPBNB_HP_SUBGRAPH: https://opbnb-mainnet-graph.nodereal.io/subgraphs/name/gamma-hp-thena-opbnb
+THENA_OPBNB_GAMMA_SUBGRAPH: url::https://opbnb-mainnet-graph.nodereal.io/subgraphs/name/gamma-thena-opbnb
+THENA_OPBNB_HP_SUBGRAPH: url::https://opbnb-mainnet-graph.nodereal.io/subgraphs/name/gamma-hp-thena-opbnb
 
-CAMELOT_ARBITRUM_GAMMA_SUBGRAPH: QmZ7qiHYkg7q1TXxe8rF9E1q2AbMJCBMpwgZRmFThCyZsm
-CAMELOT_ARBITRUM_HP_SUBGRAPH: QmUKD9FcFTsAk9xmLgaDt8jmznzUewaiPCkGDsmej6LmdV
+CAMELOT_ARBITRUM_GAMMA_SUBGRAPH: studio::QmZ7qiHYkg7q1TXxe8rF9E1q2AbMJCBMpwgZRmFThCyZsm
+CAMELOT_ARBITRUM_HP_SUBGRAPH: studio::QmUKD9FcFTsAk9xmLgaDt8jmznzUewaiPCkGDsmej6LmdV
 
-GLACIER_AVALANCHE_GAMMA_SUBGRAPH: Qmcp8nKGzVP93PxcpuvYfEGCnUh2GmN6ta9mtLtcEKpeVL
-GLACIER_AVALANCHE_HP_SUBGRAPH: QmQvMqAibQu4AUT2wBGGwNtZsLws71sG3hzHo78tj9fi2S
+GLACIER_AVALANCHE_GAMMA_SUBGRAPH: studio::Qmcp8nKGzVP93PxcpuvYfEGCnUh2GmN6ta9mtLtcEKpeVL
+GLACIER_AVALANCHE_HP_SUBGRAPH: studio::QmQvMqAibQu4AUT2wBGGwNtZsLws71sG3hzHo78tj9fi2S
 
-RETRO_POLYGON_GAMMA_SUBGRAPH: QmeGENqS2RuhxgDyejEyLtHUMRL1AGwDdc4iX9fTkxnDZM
-RETRO_POLYGON_HP_SUBGRAPH: Qmb5RqxvPqyUiw6H214cR7uEDhSEEtahTRTHqCxaxW5uZK
+RETRO_POLYGON_GAMMA_SUBGRAPH: studio::QmeGENqS2RuhxgDyejEyLtHUMRL1AGwDdc4iX9fTkxnDZM
+RETRO_POLYGON_HP_SUBGRAPH: studio::Qmb5RqxvPqyUiw6H214cR7uEDhSEEtahTRTHqCxaxW5uZK
 
-STELLASWAP_MOONBEAM_GAMMA_SUBGRAPH: QmR2hYKcdBSChi6UQ554xsg7kQ2UsBEzBNW5qz3Lv35XZs
-STELLASWAP_MOONBEAM_HP_SUBGRAPH: QmQUcgK4jKrtmsEX3eC5f3jVdMXH35fpkQbm9oEEBBmx64
+STELLASWAP_MOONBEAM_GAMMA_SUBGRAPH: studio::QmR2hYKcdBSChi6UQ554xsg7kQ2UsBEzBNW5qz3Lv35XZs
+STELLASWAP_MOONBEAM_HP_SUBGRAPH: studio::QmQUcgK4jKrtmsEX3eC5f3jVdMXH35fpkQbm9oEEBBmx64
 
-BEAMSWAP_MOONBEAM_GAMMA_SUBGRAPH: Qma4upchA2KjbzTVxiX9dzHhso7cJ6zAjnf5tY9fPi7YUL
-BEAMSWAP_MOONBEAM_HP_SUBGRAPH: QmQVVTpEYFdJ5XB6QuAxW8VP4315zJCNZYophSA8cPnXyQ
+BEAMSWAP_MOONBEAM_GAMMA_SUBGRAPH: studio::Qma4upchA2KjbzTVxiX9dzHhso7cJ6zAjnf5tY9fPi7YUL
+BEAMSWAP_MOONBEAM_HP_SUBGRAPH: studio::QmQVVTpEYFdJ5XB6QuAxW8VP4315zJCNZYophSA8cPnXyQ
 
-SPIRITSWAP_FANTOM_GAMMA_SUBGRAPH: QmeXYAtUm2yfcE6KDz1UgQ387JeFyd6i2abGBSdCFuer25
-SPIRITSWAP_FANTOM_HP_SUBGRAPH: Qme6HjTf3cJDNTtADiYdNNxs58iRSpcQ8WJcdZV7C2cd55
+SPIRITSWAP_FANTOM_GAMMA_SUBGRAPH: studio::QmeXYAtUm2yfcE6KDz1UgQ387JeFyd6i2abGBSdCFuer25
+SPIRITSWAP_FANTOM_HP_SUBGRAPH: studio::Qme6HjTf3cJDNTtADiYdNNxs58iRSpcQ8WJcdZV7C2cd55
 
-SUSHI_POLYGON_GAMMA_SUBGRAPH: QmeLHKyx7cEANBznrn9ofVuNJPBVQP197BfEbPNbEMRLMR
-SUSHI_POLYGON_HP_SUBGRAPH: QmZA2HVii7yWMuM7KbESYap2bP4uiHVraXiXxtxmGGgw2m
+SUSHI_POLYGON_GAMMA_SUBGRAPH: studio::QmeLHKyx7cEANBznrn9ofVuNJPBVQP197BfEbPNbEMRLMR
+SUSHI_POLYGON_HP_SUBGRAPH: studio::QmZA2HVii7yWMuM7KbESYap2bP4uiHVraXiXxtxmGGgw2m
 
-SUSHI_ARBITRUM_GAMMA_SUBGRAPH: QmVmywUQBvXu8Ddn4mzf4AXP2U1vzCGt7or2mVJJuogyiF
-SUSHI_ARBITRUM_HP_SUBGRAPH: QmSchYD25ftZDNms2SjtYzFcSie6n2t4oiytPn1NaVxkrQ
+SUSHI_ARBITRUM_GAMMA_SUBGRAPH: studio::QmVmywUQBvXu8Ddn4mzf4AXP2U1vzCGt7or2mVJJuogyiF
+SUSHI_ARBITRUM_HP_SUBGRAPH: studio::QmSchYD25ftZDNms2SjtYzFcSie6n2t4oiytPn1NaVxkrQ
 
-SUSHI_BASE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-sushi-base/version/latest
-SUSHI_BASE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/hype-pool-sushi-base/version/latest
+SUSHI_BASE_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-sushi-base/version/latest
+SUSHI_BASE_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/hype-pool-sushi-base/version/latest
 
-SUSHI_ROOTSTOCK_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-sushi-rootstock/version/latest
-SUSHI_ROOTSTOCK_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-sushi-rootstock/version/latest
+SUSHI_ROOTSTOCK_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-sushi-rootstock/version/latest
+SUSHI_ROOTSTOCK_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-sushi-rootstock/version/latest
 
-RAMSES_ARBITRUM_GAMMA_SUBGRAPH: QmXMpBJcoVhX7HV2NHEVYofY86JcDV2kAGvR8EgcxhH2eR
-RAMSES_ARBITRUM_HP_SUBGRAPH: QmTVeazQoE8VujSsLqFuKK9s2ujsvco1ydAs2seZeDqbYf
+RAMSES_ARBITRUM_GAMMA_SUBGRAPH: studio::QmXMpBJcoVhX7HV2NHEVYofY86JcDV2kAGvR8EgcxhH2eR
+RAMSES_ARBITRUM_HP_SUBGRAPH: studio::QmTVeazQoE8VujSsLqFuKK9s2ujsvco1ydAs2seZeDqbYf
 
-NILE_LINEA_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-nile-linea/version/latest
-NILE_LINEA_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-nile-linea/version/latest
+NILE_LINEA_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-nile-linea/version/latest
+NILE_LINEA_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-hp-nile-linea/version/latest
 
-ASCENT_POLYGON_GAMMA_SUBGRAPH: Qmeh5rmVVcXhZTRP1nXx4DogQxsP6wa7A6eRw9Jcx3panH
-ASCENT_POLYGON_HP_SUBGRAPH: QmegVvp2KxHi47y5N4UBrXy7EpHxNxMyzNpajGNUFtV4i4
+ASCENT_POLYGON_GAMMA_SUBGRAPH: studio::Qmeh5rmVVcXhZTRP1nXx4DogQxsP6wa7A6eRw9Jcx3panH
+ASCENT_POLYGON_HP_SUBGRAPH: studio::QmegVvp2KxHi47y5N4UBrXy7EpHxNxMyzNpajGNUFtV4i4
 
-FUSIONX_MANTLE_GAMMA_SUBGRAPH: https://graphv3.fusionx.finance/subgraphs/name/gamma-fusionx-mantle
-FUSIONX_MANTLE_HP_SUBGRAPH: https://graphv3.fusionx.finance/subgraphs/name/gamma-hp-fusionx-mantle
+FUSIONX_MANTLE_GAMMA_SUBGRAPH: url::https://graphv3.fusionx.finance/subgraphs/name/gamma-fusionx-mantle
+FUSIONX_MANTLE_HP_SUBGRAPH: url::https://graphv3.fusionx.finance/subgraphs/name/gamma-hp-fusionx-mantle
 
-SYNTHSWAP_BASE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-synthswap-base/version/latest
-SYNTHSWAP_BASE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-synthswap-base/version/latest
+SYNTHSWAP_BASE_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-synthswap-base/version/latest
+SYNTHSWAP_BASE_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-synthswap-base/version/latest
 
-LYNEX_LINEA_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-lynex-linea/version/latest
-LYNEX_LINEA_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-lynex-linea/version/latest
+LYNEX_LINEA_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-lynex-linea/version/latest
+LYNEX_LINEA_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-hp-lynex-linea/version/latest
 
-PEGASYS_ROLLUX_GAMMA_SUBGRAPH: https://rollux.graph.pegasys.fi/subgraphs/name/gammastrategies/pegasys-rollux
-PEGASYS_ROLLUX_HP_SUBGRAPH: https://rollux.graph.pegasys.fi/subgraphs/name/gammastrategies/hype-pool-pegasys-rollux
+PEGASYS_ROLLUX_GAMMA_SUBGRAPH: url::https://rollux.graph.pegasys.fi/subgraphs/name/gammastrategies/pegasys-rollux
+PEGASYS_ROLLUX_HP_SUBGRAPH: url::https://rollux.graph.pegasys.fi/subgraphs/name/gammastrategies/hype-pool-pegasys-rollux
 
-BASEX_BASE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-basex-base/version/latest
-BASEX_BASE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-basex-base/version/latest
+BASEX_BASE_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-basex-base/version/latest
+BASEX_BASE_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-basex-base/version/latest
 
-PANCAKESWAP_ARBITRUM_GAMMA_SUBGRAPH: QmUoDodt7d55A7iQGJ2NdVQSmj1Rzx7yLXiL7aAv6Jd3GF
-PANCAKESWAP_ARBITRUM_HP_SUBGRAPH: QmbtS6ps8YFT3cjWZNdv7JgsxVYGbmVBtmZtJbWma2eV76
+PANCAKESWAP_ARBITRUM_GAMMA_SUBGRAPH: studio::QmUoDodt7d55A7iQGJ2NdVQSmj1Rzx7yLXiL7aAv6Jd3GF
+PANCAKESWAP_ARBITRUM_HP_SUBGRAPH: studio::QmbtS6ps8YFT3cjWZNdv7JgsxVYGbmVBtmZtJbWma2eV76
 
-APERTURE_MANTA_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-aperture-manta/latest/gn
-APERTURE_MANTA_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-aperture-manta/latest/gn
+APERTURE_MANTA_GAMMA_SUBGRAPH: goldsky::gamma-aperture-manta
+APERTURE_MANTA_HP_SUBGRAPH: goldsky::gamma-hp-aperture-manta
 
-HERCULES_METIS_GAMMA_SUBGRAPH: https://metisapi.0xgraph.xyz/subgraphs/name/gamma-hercules-metis
-HERCULES_METIS_HP_SUBGRAPH: https://metisapi.0xgraph.xyz/subgraphs/name/gamma-hp-hercules-metis
+HERCULES_METIS_GAMMA_SUBGRAPH: url::https://metisapi.0xgraph.xyz/subgraphs/name/gamma-hercules-metis
+HERCULES_METIS_HP_SUBGRAPH: url::https://metisapi.0xgraph.xyz/subgraphs/name/gamma-hp-hercules-metis
 
-BASESWAP_BASE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-baseswap-base/version/latest
-BASESWAP_BASE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-baseswap-base/version/latest
+BASESWAP_BASE_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-baseswap-base/version/latest
+BASESWAP_BASE_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-hp-baseswap-base/version/latest
 
-SWAPBASED_BASE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-swapbased-base/version/latest
-SWAPBASED_BASE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-swapbased-base/version/latest
+SWAPBASED_BASE_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-swapbased-base/version/latest
+SWAPBASED_BASE_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-hp-swapbased-base/version/latest
 
-PHARAOH_AVALANCHE_GAMMA_SUBGRAPH: QmWSdZ1SrzYmUzHttkvo4RdxEfS6mYTqc4FoZfnAzNLX8g
-PHARAOH_AVALANCHE_HP_SUBGRAPH: QmQy9z24acAJtCDvdTbXrhEk5F7ayj3uFwNMog36XFcaY7
+PHARAOH_AVALANCHE_GAMMA_SUBGRAPH: studio::QmWSdZ1SrzYmUzHttkvo4RdxEfS6mYTqc4FoZfnAzNLX8g
+PHARAOH_AVALANCHE_HP_SUBGRAPH: studio::QmQy9z24acAJtCDvdTbXrhEk5F7ayj3uFwNMog36XFcaY7
 
-SWAPR_GNOSIS_GAMMA_SUBGRAPH: QmVvnZE8QQouB5UbUC2CfVGKVx5C19Kprks7HpDZX3nhQo
-SWAPR_GNOSIS_HP_SUBGRAPH: QmZToUMpH6ZsjVdbQYVLhvZzmMCjXSFK26ehkGutQ3Z7gG
+SWAPR_GNOSIS_GAMMA_SUBGRAPH: studio::QmVvnZE8QQouB5UbUC2CfVGKVx5C19Kprks7HpDZX3nhQo
+SWAPR_GNOSIS_HP_SUBGRAPH: studio::QmZToUMpH6ZsjVdbQYVLhvZzmMCjXSFK26ehkGutQ3Z7gG
 
-THICK_BASE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-thick-base/version/latest
-THICK_BASE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-thick-base/version/latest
+THICK_BASE_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-thick-base/version/latest
+THICK_BASE_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-hp-thick-base/version/latest
 
-CLEOPATRA_MANTLE_GAMMA_SUBGRAPH: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-cleopatra-mantle
-CLEOPATRA_MANTLE_HP_SUBGRAPH: https://subgraph-api.mantle.xyz/subgraphs/name/gamma-hp-cleopatra-mantle
+CLEOPATRA_MANTLE_GAMMA_SUBGRAPH: url::https://subgraph-api.mantle.xyz/subgraphs/name/gamma-cleopatra-mantle
+CLEOPATRA_MANTLE_HP_SUBGRAPH: url::https://subgraph-api.mantle.xyz/subgraphs/name/gamma-hp-cleopatra-mantle
 
-BLASTER_BLAST_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-blaster-blast/version/latest
-BLASTER_BLAST_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-blaster-blast/version/latest
+BLASTER_BLAST_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-blaster-blast/version/latest
+BLASTER_BLAST_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-blaster-blast/version/latest
 
-THRUSTER_BLAST_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-thruster-blast/version/latest
-THRUSTER_BLAST_HP_SUBGRAPH: https://api.studio.thegraph.com/query/44730/gamma-hp-thruster-blast/version/latest
+THRUSTER_BLAST_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-thruster-blast/version/latest
+THRUSTER_BLAST_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/44730/gamma-hp-thruster-blast/version/latest
 
-FENIX_BLAST_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-fenix-blast/version/latest
-FENIX_BLAST_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-fenix-blast/version/latest
+FENIX_BLAST_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-fenix-blast/version/latest
+FENIX_BLAST_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-fenix-blast/version/latest
 
-QUICKSWAP_XLAYER_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-quickswap-xlayer/version/latest
-QUICKSWAP_XLAYER_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-quickswap-xlayer/version/latest
+QUICKSWAP_XLAYER_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-quickswap-xlayer/version/latest
+QUICKSWAP_XLAYER_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-quickswap-xlayer/version/latest
 
-XTRADE_XLAYER_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-xtrade-xlayer/version/latest
-XTRADE_XLAYER_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-xtrade-xlayer/version/latest
+XTRADE_XLAYER_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-xtrade-xlayer/version/latest
+XTRADE_XLAYER_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-xtrade-xlayer/version/latest
 
-KIM_MODE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-kim-mode/version/latest
-KIM_MODE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-kim-mode/version/latest
+KIM_MODE_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-kim-mode/version/latest
+KIM_MODE_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-kim-mode/version/latest
 
-LINEHUB_LINEA_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-linehub-linea/version/latest
-LINEHUB_LINEA_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-linehub-linea/version/latest
+LINEHUB_LINEA_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-linehub-linea/version/latest
+LINEHUB_LINEA_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-linehub-linea/version/latest
 
-KINETIX_BASE_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-kinetix-base/version/latest
-KINETIX_BASE_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-kinetix-base/version/latest
+KINETIX_BASE_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-kinetix-base/version/latest
+KINETIX_BASE_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-kinetix-base/version/latest
 
-WAGMI_IOTA_GAMMA_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-wagmi-iota/latest/gn
-WAGMI_IOTA_HP_SUBGRAPH: https://api.goldsky.com/api/public/project_clols2c0p7fby2nww199i4pdx/subgraphs/gamma-hp-wagmi-iota/latest/gn
+WAGMI_IOTA_GAMMA_SUBGRAPH: goldsky::gamma-wagmi-iota
+WAGMI_IOTA_HP_SUBGRAPH: goldsky::gamma-hp-wagmi-iota
 
-SCRIBE_SCROLL_GAMMA_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-scribe-scroll/version/latest
-SCRIBE_SCROLL_HP_SUBGRAPH: https://api.studio.thegraph.com/query/73506/gamma-hp-scribe-scroll/version/latest
+SCRIBE_SCROLL_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-scribe-scroll/version/latest
+SCRIBE_SCROLL_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-scribe-scroll/version/latest
 
-GMEOW_ZIRCUIT_GAMMA_SUBGRAPH: https://app.sentio.xyz/api/v1/graphql/loc/gamma-gmeow-zircuit
-GMEOW_ZIRCUIT_HP_SUBGRAPH: https://app.sentio.xyz/api/v1/graphql/loc/gamma-hp-gmeow-zircuit
+GMEOW_ZIRCUIT_GAMMA_SUBGRAPH: sentio::gamma-gmeow-zircuit
+GMEOW_ZIRCUIT_HP_SUBGRAPH: sentio::gamma-hp-gmeow-zircuit
 
-CIRCUIT_ZIRCUIT_GAMMA_SUBGRAPH: https://app.sentio.xyz/api/v1/graphql/loc/gamma-circuit-zircuit
-CIRCUIT_ZIRCUIT_HP_SUBGRAPH: https://app.sentio.xyz/api/v1/graphql/loc/gamma-hp-circuit-zircuit
+CIRCUIT_ZIRCUIT_GAMMA_SUBGRAPH: sentio::gamma-circuit-zircuit
+CIRCUIT_ZIRCUIT_HP_SUBGRAPH: sentio::gamma-hp-circuit-zircuit
 
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {

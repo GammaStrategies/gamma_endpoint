@@ -1,5 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
+from enum import Enum
 from functools import wraps
 from typing import Any
 
@@ -8,10 +9,80 @@ from gql.dsl import DSLFragment, DSLQuery, DSLSchema, dsl_gql
 from gql.transport.aiohttp import AIOHTTPTransport
 from gql.transport.aiohttp import log as requests_logger
 
-from sources.subgraph.bins.config import GQL_CLIENT_TIMEOUT
+from sources.subgraph.bins.config import (
+    GQL_CLIENT_TIMEOUT,
+    SUBGRAPH_STUDIO_KEY,
+    SUBGRAPH_STUDIO_USER_KEY,
+    GOLDSKY_PROJECT_NAME,
+    SENTIO_ACCOUNT,
+    SENTIO_KEY,
+)
 
 requests_logger.setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
+
+
+class Service(str, Enum):
+    STUDIO = "studio"
+    GOLDSKY = "goldsky"
+    SENTIO = "sentio"
+    URL = "url"
+
+
+class SubgraphService(ABC):
+    def __init__(self, service: Service, subgraph_id: str, api_key: str | None = None):
+        self.service = service
+        self.subgraph_id = subgraph_id
+        self.api_key = api_key
+
+    @abstractmethod
+    def url(self) -> str:
+        """Returns query endpoint url"""
+
+    def headers(self) -> str | None:
+        """Returns headers"""
+        return None
+
+
+class StudioService(SubgraphService):
+    def __init__(self, subgraph_id: str):
+        super().__init__(Service.STUDIO, subgraph_id, SUBGRAPH_STUDIO_KEY)
+
+    def url(self) -> str:
+        base_url = "https://gateway-arbitrum.network.thegraph.com/api"
+
+        return f"{base_url}/{self.api_key}/deployments/id/{self.subgraph_id}"
+
+
+class GoldskyService(SubgraphService):
+    def __init__(self, subgraph_id: str):
+        super().__init__(Service.STUDIO, subgraph_id)
+
+    def url(self) -> str:
+        base_url = "https://api.goldsky.com/api/public"
+
+        return f"{base_url}/{GOLDSKY_PROJECT_NAME}/subgraphs/{self.subgraph_id}/latest/gn"
+
+
+class SentioService(SubgraphService):
+    def __init__(self, subgraph_id: str):
+        super().__init__(Service.STUDIO, subgraph_id, SENTIO_KEY)
+
+    def url(self) -> str:
+        base_url = "https://app.sentio.xyz/api/v1/graphql"
+
+        return f"{base_url}/{SENTIO_ACCOUNT}/{self.subgraph_id}"
+
+    def headers(self) -> dict:
+        return {"api-key": self.api_key}
+
+
+class UrlService(SubgraphService):
+    def __init__(self, subgraph_id: str):
+        super().__init__(Service.URL, subgraph_id)
+
+    def url(self) -> str:
+        return self.subgraph_id
 
 
 def fragment(fragment_function):
@@ -35,11 +106,13 @@ def fragment(fragment_function):
 class AsyncGqlClient(GqlClient):
     """Subclass of gql Client that defaults to AIOHTTPTransport"""
 
-    def __init__(self, url: str, schema, execute_timeout: int) -> None:
+    def __init__(
+        self, url: str, schema, execute_timeout: int, headers: dict | None = None
+    ) -> None:
         self.url = url
         super().__init__(
             schema=schema,
-            transport=AIOHTTPTransport(url=url),
+            transport=AIOHTTPTransport(url=url, headers=headers),
             execute_timeout=execute_timeout,
         )
 
@@ -47,27 +120,41 @@ class AsyncGqlClient(GqlClient):
 class SubgraphClient:
     """Subgraph base client to manage query execution and shared fragments"""
 
-    def __init__(self, url: str, schema_path: str) -> None:
+    def __init__(self, schema_path: str, subgraph_id: str) -> None:
         with open(schema_path, encoding="utf-8") as schema_file:
             schema = schema_file.read()
+
+        self.parse_subgraph_id(subgraph_id)
+
         self.client = AsyncGqlClient(
-            url=url, schema=schema, execute_timeout=GQL_CLIENT_TIMEOUT
+            url=self.service.url(),
+            schema=schema,
+            execute_timeout=GQL_CLIENT_TIMEOUT,
+            headers=self.service.headers(),
         )
         self.data_schema = DSLSchema(self.client.schema)
         self._fragment_dependencies: list[DSLFragment] = []
         self._fragments_used: list[str] = []
 
-    def studio_url(self, subgraph_id: str, api_key: str) -> str:
-        if subgraph_id.startswith("http"):
-            return subgraph_id
+    def parse_subgraph_id(self, subgraph_id: str) -> None:
+        """Parse out service and subgraph ID"""
+        service, parsed_id = subgraph_id.split("::")
 
-        base_url = "https://gateway-arbitrum.network.thegraph.com/api/"
+        self.subgraph_id = parsed_id
+        if service == Service.STUDIO:
+            self.service = StudioService(self.subgraph_id)
+        elif service == Service.GOLDSKY:
+            self.service = GoldskyService(self.subgraph_id)
+        elif service == Service.SENTIO:
+            self.service = SentioService(self.subgraph_id)
+        else:
+            self.service = UrlService(self.subgraph_id)
 
-        return f"{base_url}{api_key}/deployments/id/{subgraph_id}"
 
     async def execute(self, query: DSLQuery) -> dict:
         """Executes query and returns result"""
         gql = dsl_gql(*self._fragment_dependencies, query)
+
         logger.debug("Subgraph call to %s", self.client.url)
         async with self.client as session:
             result = await session.execute(gql)

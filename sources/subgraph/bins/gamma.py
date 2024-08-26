@@ -112,9 +112,7 @@ class GammaCalculations(GammaData):
         ).set_index("date")
         df_data = df_dist.join(df_rh, how="outer")
         df_data = df_data.sort_values("date")
-        df_data.totalGamma = df_data.totalGamma.fillna(method="ffill").fillna(
-            method="bfill"
-        )
+        df_data.totalGamma = df_data.totalGamma.ffill().bfill()
         df_data[["distributed", "distributedUSD"]] = df_data[
             ["distributed", "distributedUSD"]
         ].fillna(value=0)

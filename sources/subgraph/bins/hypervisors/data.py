@@ -7,7 +7,7 @@ from sources.subgraph.bins.subgraphs.gamma import GammaClient
 
 
 class HypervisorAllData(SubgraphData):
-    """Class to get xGamma staking relateed data"""
+    """Class to get hypervisor related data"""
 
     def __init__(self, chain: Chain, protocol: Protocol):
         super().__init__()

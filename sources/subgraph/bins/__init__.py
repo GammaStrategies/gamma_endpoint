@@ -2,16 +2,16 @@ import logging
 
 import httpx
 
-from sources.subgraph.bins.config import (
-    ETH_BLOCKS_SUBGRAPH_URL,
-    THEGRAPH_INDEX_NODE_URL,
-    UNI_V2_SUBGRAPH_URL,
-    XGAMMA_SUBGRAPH_URL,
-    dex_hypepool_subgraph_urls,
-    gamma_subgraph_urls,
-)
+from sources.subgraph.bins.config import gamma_subgraph_ids
 from sources.subgraph.bins.enums import Chain, Protocol
-from sources.subgraph.bins.subgraphs.gamma import get_subgraph_studio_key
+from sources.subgraph.bins.subgraphs import (
+    Service,
+    StudioService,
+    GoldskyService,
+    SentioService,
+    UrlService,
+)
+
 
 logger = logging.getLogger(__name__)
 async_client = httpx.AsyncClient(
@@ -23,17 +23,25 @@ async_client = httpx.AsyncClient(
 
 
 class SubgraphClient:
-    def __init__(self, url: str, chain: Chain = Chain.ETHEREUM):
-        self._url = url
+    def __init__(self, subgraph_id: str, chain: Chain = Chain.ETHEREUM):
         self.chain = chain
+        self.parse_subgraph_id(subgraph_id)
+        self._url = self.service.url()
 
-    def studio_url(self, subgraph_id: str, api_key):
-        if subgraph_id.startswith("http"):
-            return subgraph_id
+    def parse_subgraph_id(self, subgraph_id: str) -> None:
+        """Parse out service and subgraph ID"""
+        service, parsed_id = subgraph_id.split("::")
 
-        base_url = "https://gateway-arbitrum.network.thegraph.com/api/"
+        self.subgraph_id = parsed_id
 
-        return f"{base_url}{api_key}/deployments/id/{subgraph_id}"
+        if service == Service.STUDIO:
+            self.service = StudioService(self.subgraph_id)
+        elif service == Service.GOLDSKY:
+            self.service = GoldskyService(self.subgraph_id)
+        elif service == Service.SENTIO:
+            self.service = SentioService(self.subgraph_id)
+        else:
+            self.service = UrlService(self.subgraph_id)
 
     async def query(self, query: str, variables=None) -> dict:
         """Make graphql query to subgraph"""
@@ -46,7 +54,9 @@ class SubgraphClient:
         # ssl.SSLError:
         # [SSL: SSLV3_ALERT_HANDSHAKE_FAILURE] sslv3 alert handshake failure
         #
-        response = await async_client.post(self._url, json=params)
+        response = await async_client.post(
+            self._url, json=params, headers=self.service.headers()
+        )
 
         logger.debug("Subgraph call to %s", self._url)
 
@@ -102,95 +112,8 @@ class SubgraphClient:
 
 
 class GammaClient(SubgraphClient):
-    def __init__(self, protocol: Protocol, chain: Chain, api_key: str = "prod"):
-        super().__init__(
-            self.studio_url(
-                gamma_subgraph_urls[protocol][chain], get_subgraph_studio_key(api_key)
-            ),
-            chain,
-        )
-
-
-class UniswapV2Client(SubgraphClient):
-    def __init__(self):
-        super().__init__(UNI_V2_SUBGRAPH_URL)
-
-
-class HypePoolClient(SubgraphClient):
-    def __init__(self, protocol: Protocol, chain: Chain, api_key: str = "prod"):
-        super().__init__(
-            self.studio_url(
-                dex_hypepool_subgraph_urls[protocol][chain],
-                get_subgraph_studio_key(api_key),
-            ),
-            chain,
-        )
-
-
-class EthBlocksClient(SubgraphClient):
-    def __init__(self):
-        super().__init__(ETH_BLOCKS_SUBGRAPH_URL)
-
-    def block_from_timestamp(self, timestamp):
-        """Get closest from timestamp"""
-        ten_minutes_in_seconds = 600
-        query = """
-        query blockQuery($startTime: Int!, $endTime:Int!){
-          blocks(first: 1, orderBy: timestamp, orderDirection: asc,
-                 where: {timestamp_gt: $startTime, timestamp_lt: $endTime}) {
-            id
-            number
-            timestamp
-          }
-        }
-        """
-
-        variables = {
-            "startTime": timestamp,
-            "endTime": timestamp + ten_minutes_in_seconds,
-        }
-
-        return int(self.query(query, variables)["data"]["blocks"][0]["number"])
-
-
-class IndexNodeClient(SubgraphClient):
     def __init__(self, protocol: Protocol, chain: Chain):
-        super().__init__(THEGRAPH_INDEX_NODE_URL)
-        self.url = gamma_subgraph_urls[protocol][chain]
-        self.set_subgraph_name()
-
-    def set_subgraph_name(self):
-        split_subgraph_url = self.url.split("/")
-        if not split_subgraph_url[-1]:
-            split_subgraph_url.pop(-1)
-        self.subgraph_name = f"{split_subgraph_url[-2]}/{split_subgraph_url[-1]}"
-
-    async def status(self):
-        query = f"""
-        {{
-            indexingStatusForCurrentVersion(
-                subgraphName: "{self.subgraph_name}"
-            ){{
-                chains{{
-                    latestBlock {{ hash number }}
-                }}
-            }}
-        }}
-        """
-
-        response = await self.query(query)
-        latestBlock = int(
-            response["data"]["indexingStatusForCurrentVersion"]["chains"][0][
-                "latestBlock"
-            ]["number"]
-        )
-
-        return {"url": self.url, "latestBlock": latestBlock}
-
-
-class XgammaClient(SubgraphClient):
-    def __init__(self):
-        super().__init__(XGAMMA_SUBGRAPH_URL)
+        super().__init__(gamma_subgraph_ids[protocol][chain], chain)
 
 
 class CoingeckoClient:

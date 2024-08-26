@@ -68,8 +68,8 @@ DEPLOYMENTS = [
     (Protocol.KINETIX, Chain.BASE),
     (Protocol.WAGMI, Chain.IOTA),
     (Protocol.SCRIBE, Chain.SCROLL),
-    # (Protocol.GMEOW, Chain.ZIRCUIT),
-    # (Protocol.CIRCUIT, Chain.ZIRCUIT),
+    (Protocol.GMEOW, Chain.ZIRCUIT),
+    (Protocol.CIRCUIT, Chain.ZIRCUIT),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -78,30 +78,25 @@ THIRD_PARTY_REWARDERS = [
     (Protocol.THENA, Chain.BSC),
 ]
 
-THEGRAPH_INDEX_NODE_URL = "https://api.thegraph.com/index-node/graphql"
-ETH_BLOCKS_SUBGRAPH_URL = (
-    "https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks"
-)
-UNI_V2_SUBGRAPH_URL = "https://api.thegraph.com/subgraphs/name/ianlapham/uniswapv2"
-
 SUBGRAPH_STUDIO_KEY = get_config("SUBGRAPH_STUDIO_KEY")
 SUBGRAPH_STUDIO_USER_KEY = get_config("SUBGRAPH_STUDIO_USER_KEY")
+GOLDSKY_PROJECT_NAME = get_config("GOLDSKY_PROJECT_NAME")
+SENTIO_ACCOUNT = get_config("SENTIO_ACCOUNT")
+SENTIO_KEY = get_config("SENTIO_KEY")
 
-dex_hypepool_subgraph_urls = defaultdict(dict)
-gamma_subgraph_urls = defaultdict(dict)
+dex_hypepool_subgraph_ids = defaultdict(dict)
+gamma_subgraph_ids = defaultdict(dict)
 
 for protocol, chain in DEPLOYMENTS:
     subgraph_prefix = f"{protocol.value.upper()}_{chain.value.upper()}"
-    dex_hypepool_subgraph_urls[protocol][chain] = get_config(
+    dex_hypepool_subgraph_ids[protocol][chain] = get_config(
         f"{subgraph_prefix}_HP_SUBGRAPH"
     )
-    gamma_subgraph_urls[protocol][chain] = get_config(
+    gamma_subgraph_ids[protocol][chain] = get_config(
         f"{subgraph_prefix}_GAMMA_SUBGRAPH"
     )
 
-
-XGAMMA_SUBGRAPH_URL = "https://api.thegraph.com/subgraphs/name/l0c4t0r/xgamma"
-RECOVERY_POOL_URL = "QmQihpnUES8m7zXNUcMRunsfYLimRFRuFyv61nQN3fi3iR"
+RECOVERY_POOL = "studio::QmQihpnUES8m7zXNUcMRunsfYLimRFRuFyv61nQN3fi3iR"
 
 DEFAULT_TIMEZONE = get_config("TIMEZONE")
 
