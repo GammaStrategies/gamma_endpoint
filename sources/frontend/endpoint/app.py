@@ -1,17 +1,17 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.inmemory import InMemoryBackend
 
-from fastapi.middleware.cors import CORSMiddleware
-from endpoint.config.cache import CHARTS_CACHE_TIMEOUT
-
-from .routers import build_routers
+from sources.frontend.endpoint.routers import build_routers
 
 
 def create_app(
     title: str,
     version="1",
 ):
+    """Create app for frontend"""
     app = FastAPI(
         title=title,
         swagger_ui_parameters={"docExpansion": "none"},

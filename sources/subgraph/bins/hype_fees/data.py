@@ -142,13 +142,13 @@ class FeeGrowthData(FeeGrowthDataABC):
     async def init_time(self, timestamp: int | None = None):
         await self.time_range.set_end(timestamp)
 
-    async def get_data(self, hypervisors: list[str] | None = None) -> None:
+    async def get_data(self, session = None, hypervisors: list[str] | None = None) -> None:
         query_data, self.pricing_data = await gather(
-            self._query_data(hypervisors), token_prices(self.chain, self.protocol)
+            self._query_data(session, hypervisors), token_prices(self.chain, self.protocol, session)
         )
         self.data = self._transform_data(query_data)
 
-    async def _query_data(self, hypervisors: list[str] | None = None) -> dict:
+    async def _query_data(self, session = None, hypervisors: list[str] | None = None) -> dict:
         ds = self.hype_pool_client.data_schema
         hypervisor_filter = {"where": {"id_in": hypervisors}} if hypervisors else {}
 
@@ -169,7 +169,7 @@ class FeeGrowthData(FeeGrowthDataABC):
             ds.Query._meta.select(self.hype_pool_client.meta_fields_fragment()),
         )
 
-        response = await self.hype_pool_client.execute(query)
+        response = await self.hype_pool_client.execute(query, session)
         return response
 
     def _transform_data(self, query_data) -> dict[str, FeesData]:
@@ -197,14 +197,14 @@ class FeeGrowthSnapshotData(FeeGrowthDataABC):
         await self.time_range.set_end(end_timestamp)
         await self.time_range.set_initial_with_days_ago(days_ago)
 
-    async def get_data(self, hypervisors: list[str] | None = None) -> None:
+    async def get_data(self, session=None, hypervisors: list[str] | None = None) -> None:
         """Query data and tranfrom to FeesData Class"""
         query_data, self.pricing_data = await gather(
-            self._query_data(hypervisors), token_prices(self.chain, self.protocol)
+            self._query_data(hypervisors), token_prices(self.chain, self.protocol, session)
         )
         self.data = self._transform_data(query_data)
 
-    async def _query_data(self, hypervisors: list[str] | None = None) -> dict:
+    async def _query_data(self, session=None, hypervisors: list[str] | None = None) -> dict:
         ds = self.hype_pool_client.data_schema
         hypervisor_filter = {"where": {"id_in": hypervisors}} if hypervisors else {}
 
@@ -259,7 +259,7 @@ class FeeGrowthSnapshotData(FeeGrowthDataABC):
             ds.Query._meta.select(self.hype_pool_client.meta_fields_fragment()),
         )
 
-        response = await self.hype_pool_client.execute(query)
+        response = await self.hype_pool_client.execute(query, session)
         return response
 
     def _transform_data(self, query_data: dict) -> dict[str, list[FeesData]]:
@@ -353,13 +353,13 @@ class ImpermanentDivergenceData(FeeGrowthDataABC):
         await self.time_range.set_end(end_timestamp)
         await self.time_range.set_initial_with_days_ago(days_ago)
 
-    async def get_data(self, hypervisors: list[str] | None = None) -> None:
+    async def get_data(self, session=None, hypervisors: list[str] | None = None) -> None:
         query_data, self.pricing_data = await gather(
-            self._query_data(hypervisors), token_prices(self.chain, self.protocol)
+            self._query_data(session, hypervisors), token_prices(self.chain, self.protocol, session)
         )
         self.data = self._transform_data(query_data)
 
-    async def _query_data(self, hypervisors: list[str] | None = None) -> dict:
+    async def _query_data(self, session=None, hypervisors: list[str] | None = None) -> dict:
         ds = self.hype_pool_client.data_schema
         hypervisor_filter = {"where": {"id_in": hypervisors}} if hypervisors else {}
         query = DSLQuery(
@@ -389,7 +389,7 @@ class ImpermanentDivergenceData(FeeGrowthDataABC):
             ds.Query._meta.select(self.hype_pool_client.meta_fields_fragment()),
         )
 
-        response = await self.hype_pool_client.execute(query)
+        response = await self.hype_pool_client.execute(query, session)
         return response
 
     def _transform_data(self, query_data: dict) -> dict[str, FeesDataRange]:

@@ -8,7 +8,7 @@ from sources.subgraph.bins.constants import XGAMMA_ADDRESS
 from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.schema import ValueWithDecimal
 from sources.subgraph.bins.subgraphs import SubgraphData
-from sources.subgraph.bins.subgraphs.gamma import GammaClient
+from sources.subgraph.bins.subgraphs.gamma import get_gamma_client
 
 
 @dataclass
@@ -32,21 +32,20 @@ class XGammaData(SubgraphData):
 
     def __init__(self):
         super().__init__()
+        protocol = Protocol.UNISWAP
+        chain = Chain.ETHEREUM
         self.data: XGammaInfo
-        self.client = GammaClient(Protocol.UNISWAP, Chain.ETHEREUM)
+        self.client = get_gamma_client(protocol, chain)
 
-    async def _query_data(self) -> dict:
+    async def query(self) -> dict:
         ds = self.client.data_schema
 
-        query = DSLQuery(
+        return DSLQuery(
             ds.Query.rewardHypervisor(id=XGAMMA_ADDRESS).select(
                 ds.RewardHypervisor.totalGamma,
                 ds.RewardHypervisor.totalSupply,
             ),
         )
-
-        response = await self.client.execute(query)
-        self.query_response = response
 
     def _transform_data(self) -> XGammaInfo:
         return XGammaInfo(

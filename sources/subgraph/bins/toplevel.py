@@ -1,15 +1,16 @@
 import asyncio
 from datetime import timedelta
 
+from gql.dsl import DSLQuery
 import numpy as np
 from pandas import DataFrame
 
-from sources.subgraph.bins import GammaClient
 from sources.subgraph.bins.config import EXCLUDED_HYPERVISORS, GROSS_FEES_MAX, TVL_MAX
 from sources.subgraph.bins.constants import DAYS_IN_PERIOD
 from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.hype_fees.fees_yield import fee_returns_all
 from sources.subgraph.bins.pricing import gamma_price
+from sources.subgraph.bins.subgraphs.gamma import get_gamma_client
 from sources.subgraph.bins.utils import filter_address_by_chain, timestamp_ago
 
 
@@ -19,123 +20,110 @@ class TopLevelData:
     def __init__(self, protocol: Protocol, chain: Chain = Chain.ETHEREUM):
         self.protocol = protocol
         self.chain = chain
-        self.gamma_client = GammaClient(protocol, chain)
+        self.client = get_gamma_client(protocol, chain)
         self.all_stats_data = {}
         self.all_returns_data = {}
 
         self.excluded_hypervisors = filter_address_by_chain(EXCLUDED_HYPERVISORS, chain)
 
     async def get_hypervisor_data(self):
+        ds = self.client.data_schema
+
         """Get hypervisor IDs"""
-        query = """
-        {
-            uniswapV3Hypervisors(
-                first: 1000
-            ){
-                id
-                grossFeesClaimedUSD
-                tvlUSD
-            }
-        }
-        """
-        response = await self.gamma_client.query(query)
-        return response["data"]["uniswapV3Hypervisors"]
+        query = DSLQuery(
+            ds.Query.uniswapV3Hypervisors(first=1000).select(
+                ds.UniswapV3Hypervisor.id,
+                ds.UniswapV3Hypervisor.grossFeesClaimedUSD,
+                ds.UniswapV3Hypervisor.tvlUSD
+            )
+        )
+        
+        response = await self.client.execute(query)
+        return response["uniswapV3Hypervisors"]
 
     async def get_pool_data(self):
-        query = """
-        {
-            uniswapV3Pools(
-                first: 1000
-            ){
-                id
-            }
-        }
-        """
-        response = await self.gamma_client.query(query)
-        return response["data"]["uniswapV3Pools"]
+        ds = self.client.data_schema
+
+        query = DSLQuery(
+            ds.Query.uniswapV3Pools(first=1000).select(
+                ds.UniswapV3Pool.id
+            )
+        )
+
+        response = await self.client.execute(query)
+        return response["uniswapV3Pools"]
 
     async def _get_all_stats_data(self):
-        query_rebal = """
-        query allStats($grossFeesMax: Int!) {
-            uniswapV3Hypervisors(
-                first: 1000
-            ){
-                id
-                grossFeesClaimedUSD
-                tvlUSD
-                badRebalances: rebalances(
-                    where: {grossFeesUSD_gte: $grossFeesMax}
-                ) {
-                    grossFeesUSD
-                    protocolFeesUSD
-                    netFeesUSD
-                }
-            }
-            uniswapV3Pools(
-                first: 1000
-            ){
-                id
-            }
-        }
-        """
+        ds = self.client.data_schema
 
-        query_zeroburn = """
-        query allStats($grossFeesMax: Int!) {
-            uniswapV3Hypervisors(
-                first: 1000
-            ){
-                id
-                grossFeesClaimedUSD
-                tvlUSD
-                badRebalances: rebalances(
-                    where: {grossFeesUSD_gte: $grossFeesMax}
-                ) {
-                    grossFeesUSD
-                    protocolFeesUSD
-                    netFeesUSD
-                }
-                badFees: feeUpdates(
-                    where: {feesUSD_gte: $grossFeesMax}
-                ) {
-                    feesUSD
-                }
-            }
-            uniswapV3Pools(
-                first: 1000
-            ){
-                id
-            }
-        }
-        """
+        query_rebal = DSLQuery(
+            ds.Query.uniswapV3Hypervisors(first=1000).select(
+                ds.UniswapV3Hypervisor.id,
+                ds.UniswapV3Hypervisor.grossFeesClaimedUSD,
+                ds.UniswapV3Hypervisor.tvlUSD,
+                ds.UniswapV3Hypervisor.rebalances(
+                    where={"grossFeesUSD_gte": GROSS_FEES_MAX}
+                ).alias("badRebalances").select(
+                    ds.UniswapV3Rebalance.grossFeesUSD,
+                    ds.UniswapV3Rebalance.protocolFeesUSD,
+                    ds.UniswapV3Rebalance.netFeesUSD,
+                ),
+            ),
+            ds.Query.uniswapV3Pools(first=1000).select(
+                ds.UniswapV3Pool.id
+            )
+        )
+
+        query_zeroburn = DSLQuery(
+            ds.Query.uniswapV3Hypervisors(first=1000).select(
+                ds.UniswapV3Hypervisor.id,
+                ds.UniswapV3Hypervisor.grossFeesClaimedUSD,
+                ds.UniswapV3Hypervisor.tvlUSD,
+                ds.UniswapV3Hypervisor.rebalances(
+                    where={"grossFeesUSD_gte": GROSS_FEES_MAX}
+                ).alias("badRebalances").select(
+                    ds.UniswapV3Rebalance.grossFeesUSD,
+                    ds.UniswapV3Rebalance.protocolFeesUSD,
+                    ds.UniswapV3Rebalance.netFeesUSD,
+                ),
+                ds.UniswapV3Hypervisor.feeUpdates(
+                    where={"grossFeesUSD_gte": GROSS_FEES_MAX}
+                ).alias("badFees").select(
+                    ds.UniswapV3FeeUpdate.feesUSD
+                )
+            ),
+            ds.Query.uniswapV3Pools(first=1000).select(
+                ds.UniswapV3Pool.id
+            )
+        )
 
         if self.protocol == Protocol.THENA and self.chain == Chain.BSC:
             query = query_zeroburn
         else:
             query = query_rebal
 
-        variables = {"grossFeesMax": GROSS_FEES_MAX}
-        response = await self.gamma_client.query(query, variables)
-        self.all_stats_data = response.get("data", {})
+        # variables = {"grossFeesMax": GROSS_FEES_MAX}
+        response = await self.client.execute(query)
+        self.all_stats_data = response if response else {}
 
     async def get_recent_rebalance_data(self, hours=24):
-        query = """
-        query rebalances($timestamp_start: Int!){
-            uniswapV3Rebalances(
-                first: 1000
-                where: {
-                    timestamp_gte: $timestamp_start
+        ds = self.client.data_schema
+
+        query = DSLQuery(
+            ds.Query.uniswapV3Rebalances(
+                first=1000,
+                where={
+                    "timestamp_gte": timestamp_ago(timedelta(hours=hours))
                 }
-            ) {
-                grossFeesUSD
-                protocolFeesUSD
-                netFeesUSD
-            }
-        }
-        """
-        timestamp_start = timestamp_ago(timedelta(hours=hours))
-        variables = {"timestamp_start": timestamp_start}
-        response = await self.gamma_client.query(query, variables)
-        return response["data"]["uniswapV3Rebalances"]
+            ).select(
+                ds.UniswapV3Rebalance.grossFeesUSD,
+                ds.UniswapV3Rebalance.protocolFeesUSD,
+                ds.UniswapV3Rebalance.netFeesUSD
+            )
+        )
+
+        response = await self.client.execute(query)
+        return response["uniswapV3Rebalances"]
 
     def _all_stats(self):
         """

@@ -147,11 +147,12 @@ async def fee_returns_all(
     hypervisors: list[str] | None = None,
     current_timestamp: int | None = None,
     return_total: bool = False,
+    session = None,
 ) -> dict[str, dict]:
     """Get fee returns for multiple hypervisors."""
     fees_data = FeeGrowthSnapshotData(protocol, chain)
     await fees_data.init_time(days_ago=days, end_timestamp=current_timestamp)
-    await fees_data.get_data(hypervisors)
+    await fees_data.get_data(session, hypervisors)
 
     results = {"lp": {}, "total": {}}
     for hypervisor_id, fees_data in fees_data.data.items():

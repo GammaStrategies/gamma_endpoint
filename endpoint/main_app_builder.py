@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache import FastAPICache
 from endpoint.config.middleware import BaseMiddleware
 
-from endpoint.config.version import GIT_BRANCH, APP_VERSION, get_version_info
+from endpoint.config.version import get_version_info
 
 from sources.subgraph.endpoint.app import create_app as create_subgraph_endpoint
 from sources.web3.endpoint.app import create_app as create_web3_endpoint

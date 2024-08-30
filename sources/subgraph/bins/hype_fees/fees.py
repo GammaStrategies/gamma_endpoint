@@ -116,10 +116,11 @@ async def fees_all(
     chain: Chain,
     hypervisors: list[str] | None = None,
     current_timestamp: int | None = None,
+    session = None,
 ) -> dict[str, UncollectedFees]:
     fees_data = FeeGrowthData(protocol, chain)
     await fees_data.init_time(current_timestamp)
-    await fees_data.get_data(hypervisors)
+    await fees_data.get_data(session, hypervisors)
 
     results = {}
     for hypervisor_id, fees_data in fees_data.data.items():

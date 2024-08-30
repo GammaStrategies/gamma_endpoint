@@ -5,9 +5,10 @@ from functools import wraps
 from typing import Any
 
 from gql import Client as GqlClient
+from gql.client import ReconnectingAsyncClientSession
 from gql.dsl import DSLFragment, DSLQuery, DSLSchema, dsl_gql
-from gql.transport.aiohttp import AIOHTTPTransport
-from gql.transport.aiohttp import log as requests_logger
+from gql.transport.httpx import HTTPXAsyncTransport
+from gql.transport.httpx import log as requests_logger
 
 from sources.subgraph.bins.config import (
     GQL_CLIENT_TIMEOUT,
@@ -61,7 +62,9 @@ class GoldskyService(SubgraphService):
     def url(self) -> str:
         base_url = "https://api.goldsky.com/api/public"
 
-        return f"{base_url}/{GOLDSKY_PROJECT_NAME}/subgraphs/{self.subgraph_id}/latest/gn"
+        return (
+            f"{base_url}/{GOLDSKY_PROJECT_NAME}/subgraphs/{self.subgraph_id}/latest/gn"
+        )
 
 
 class SentioService(SubgraphService):
@@ -104,7 +107,7 @@ def fragment(fragment_function):
 
 
 class AsyncGqlClient(GqlClient):
-    """Subclass of gql Client that defaults to AIOHTTPTransport"""
+    """Subclass of gql Client that defaults to HTTPX Transport"""
 
     def __init__(
         self, url: str, schema, execute_timeout: int, headers: dict | None = None
@@ -112,7 +115,9 @@ class AsyncGqlClient(GqlClient):
         self.url = url
         super().__init__(
             schema=schema,
-            transport=AIOHTTPTransport(url=url, headers=headers),
+            transport=HTTPXAsyncTransport(
+                url=url, headers=headers, timeout=GQL_CLIENT_TIMEOUT
+            ),
             execute_timeout=execute_timeout,
         )
 
@@ -150,15 +155,21 @@ class SubgraphClient:
         else:
             self.service = UrlService(self.subgraph_id)
 
-
-    async def execute(self, query: DSLQuery) -> dict:
+    async def execute(
+        self, query: DSLQuery, session: AsyncGqlClient | None = None
+    ) -> dict:
         """Executes query and returns result"""
         gql = dsl_gql(*self._fragment_dependencies, query)
 
         logger.debug("Subgraph call to %s", self.client.url)
-        async with self.client as session:
+
+        if session:
             result = await session.execute(gql)
-            return result
+        else:
+            async with self.client as session:
+                result = await session.execute(gql)
+
+        return result
 
     @fragment
     def meta_fields_fragment(self) -> DSLFragment:
@@ -174,6 +185,7 @@ class SubgraphData(ABC):
     """Abstract base class for subgraph data."""
 
     def __init__(self):
+        self.client: SubgraphClient
         self.data: Any
         self.query_response: dict
 
@@ -185,23 +197,29 @@ class SubgraphData(ABC):
         """
         self.query_response = query_response
 
-    async def get_data(self, run_query: bool = True, **kwargs) -> None:
+    async def get_data(
+        self, run_query: bool = True, session: AsyncGqlClient | None = None, **kwargs
+    ) -> None:
         """Get data, transforms it and stores it in self.data.
 
         Args:
             run_query: Defaults to True, set to False if data is already loaded
         """
         if run_query:
-            await self._query_data(**kwargs)
+            self.query_response = await self.client.execute(self.query(**kwargs), session)
 
         self.data = self._transform_data()
 
     @abstractmethod
-    async def _query_data(self) -> dict:
-        """Query subgraph and sets self.query_response."""
-        # query = ""
-        # response = await self.client.execute(query)
-        # self.query_response = response
+    def query(self) -> DSLQuery:
+        """Define query here"""
+
+    # @abstractmethod
+    # async def _query_data(self) -> dict:
+    #     """Query subgraph and sets self.query_response."""
+    #     # query = ""
+    #     # response = await self.client.execute(query)
+    #     # self.query_response = response
 
     @abstractmethod
     def _transform_data(self) -> Any:

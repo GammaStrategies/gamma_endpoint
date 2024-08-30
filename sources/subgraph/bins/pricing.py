@@ -9,7 +9,7 @@ from sources.common.prices.helpers import get_current_prices
 from sources.subgraph.bins import LlamaClient
 from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.subgraphs import SubgraphData
-from sources.subgraph.bins.subgraphs.gamma import GammaClient
+from sources.subgraph.bins.subgraphs.gamma import get_gamma_client
 
 
 async def gamma_price():
@@ -22,11 +22,11 @@ async def gamma_price():
     return price
 
 
-async def token_prices(chain: Chain, protocol: Protocol) -> dict:
+async def token_prices(chain: Chain, protocol: Protocol, session = None) -> dict:
     """Get token prices"""
     token_data = TokenData(chain, protocol)
 
-    await token_data.get_data()
+    await token_data.get_data(session=session)
 
     # Get prices from defillama and database
     llama_client = LlamaClient(chain)
@@ -75,12 +75,12 @@ class TokenData(SubgraphData):
     def __init__(self, chain: Chain, protocol: Protocol):
         super().__init__()
         self.data: {}
-        self.client = GammaClient(protocol, chain)
+        self.client = get_gamma_client(protocol, chain)
 
-    async def _query_data(self) -> dict:
+    def query(self) -> dict:
         ds = self.client.data_schema
 
-        query = DSLQuery(
+        return DSLQuery(
             ds.Query.uniswapV3Hypervisors(first=1000).select(
                 ds.UniswapV3Hypervisor.pool.select(
                     ds.UniswapV3Pool.token0.select(ds.Token.id),
@@ -91,9 +91,6 @@ class TokenData(SubgraphData):
                 ds.MasterChefV2Rewarder.rewardToken.select(ds.Token.id)
             ),
         )
-
-        response = await self.client.execute(query)
-        self.query_response = response
 
     def _transform_data(self) -> dict:
         hype_tokens = []

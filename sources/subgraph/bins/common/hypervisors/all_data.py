@@ -8,6 +8,7 @@ from sources.subgraph.bins.hype_fees.fees_yield import fee_returns_all
 from sources.subgraph.bins.hypervisors.data import HypervisorAllData
 from sources.subgraph.bins.hypervisors.schema import Hypervisor
 from sources.subgraph.bins.pricing import token_prices
+from sources.subgraph.bins.subgraphs.gamma import get_gamma_client
 from sources.subgraph.bins.utils import timestamp_to_date
 
 # from fastapi import Response, status
@@ -50,7 +51,6 @@ class HypervisorBasicInfoOutput(BaseModel):
     poolTvlUSD: str
     poolFeesUSD: str
 
-
 class AllDataReturnsYield(BaseModel):
     feeApr: float
     feeApy: float
@@ -76,25 +76,28 @@ class AllData:
         self.prices: dict
         self.chain = chain
         self.protocol = protocol
+        self.client = get_gamma_client(protocol, chain)
 
-    async def _get_subgraph_data(self):
+    async def _get_subgraph_data(self, session=None):
         hype_data = HypervisorAllData(self.chain, self.protocol)
 
-        await hype_data.get_data(hypervisors=self.hypervisors)
+        await hype_data.get_data(session=session, hypervisors=self.hypervisors)
         self.hype_data = hype_data.data
 
     async def get_data(self):
-        self.prices, fee_yield, _ = await asyncio.gather(
-            token_prices(self.chain, self.protocol),
-            fee_returns_all(
-                protocol=self.protocol,
-                chain=self.chain,
-                days=1,
-                hypervisors=self.hypervisors,
-                current_timestamp=None,
-            ),
-            self._get_subgraph_data(),
-        )
+        async with self.client.client as session:
+            self.prices, fee_yield, _ = await asyncio.gather(
+                token_prices(self.chain, self.protocol, session),
+                fee_returns_all(
+                    protocol=self.protocol,
+                    chain=self.chain,
+                    days=1,
+                    hypervisors=self.hypervisors,
+                    current_timestamp=None,
+                    session=session,
+                ),
+                self._get_subgraph_data(session),
+            )
 
         self.fee_yield = fee_yield["lp"]
 
@@ -147,13 +150,13 @@ class AllData:
                 depositCap1=hype.deposit_max.value1.adjusted,
                 grossFeesClaimed0=hype.gross_fees_claimed.value0.adjusted,
                 grossFeesClaimed1=hype.gross_fees_claimed.value1.adjusted,
-                grossFeesClaimedUSD=hype.gross_fees_claimed_usd,
+                grossFeesClaimedUSD=str(hype.gross_fees_claimed_usd),
                 feesReinvested0=hype.fees_reinvested.value0.adjusted,
                 feesReinvested1=hype.fees_reinvested.value1.adjusted,
-                feesReinvestedUSD=hype.fees_reinvested_usd,
+                feesReinvestedUSD=str(hype.fees_reinvested_usd),
                 tvl0=hype.tvl.value0.adjusted,
                 tvl1=hype.tvl.value1.adjusted,
-                tvlUSD=tvl_usd,
+                tvlUSD=str(tvl_usd),
                 totalSupply=hype.total_supply,
                 maxTotalSupply=hype.max_total_supply,
                 capacityUsed=(
@@ -161,14 +164,14 @@ class AllData:
                     if hype.max_total_supply > 0
                     else "No cap"
                 ),
-                sqrtPrice=hype.pool_price,
+                sqrtPrice=str(hype.pool_price),
                 tick=tick,
                 baseLower=hype.base_lower,
                 baseUpper=hype.base_upper,
                 inRange=bool(hype.base_lower <= tick <= hype.base_upper),
-                observationIndex=0,
-                poolTvlUSD=0,
-                poolFeesUSD=0,
+                observationIndex="0",
+                poolTvlUSD="0",
+                poolFeesUSD="0",
                 returns=returns,
             )
 

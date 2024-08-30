@@ -3,7 +3,7 @@ from gql.dsl import DSLQuery
 from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.hypervisors.schema import Hypervisor
 from sources.subgraph.bins.subgraphs import SubgraphData
-from sources.subgraph.bins.subgraphs.gamma import GammaClient
+from sources.subgraph.bins.subgraphs.gamma import get_gamma_client
 
 
 class HypervisorAllData(SubgraphData):
@@ -14,13 +14,13 @@ class HypervisorAllData(SubgraphData):
         self.chain = chain
         self.protocol = protocol
         self.data: {}
-        self.client = GammaClient(protocol, chain)
+        self.client = get_gamma_client(protocol, chain)
 
-    async def _query_data(self, hypervisors: list[str] | None = None) -> dict:
+    def query(self, hypervisors: list[str] | None = None) -> dict:
         ds = self.client.data_schema
         hypervisor_filter = {"where": {"id_in": hypervisors}} if hypervisors else {}
 
-        query = DSLQuery(
+        return DSLQuery(
             ds.Query.uniswapV3Hypervisors(**({"first": 1000} | hypervisor_filter)).select(
                 ds.UniswapV3Hypervisor.id,
                 ds.UniswapV3Hypervisor.created,
@@ -57,9 +57,6 @@ class HypervisorAllData(SubgraphData):
                 )
             )
         )
-
-        response = await self.client.execute(query)
-        self.query_response = response
 
     def _transform_data(self) -> dict[str, Hypervisor]:
         hypervisors = {

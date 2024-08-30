@@ -68,8 +68,8 @@ DEPLOYMENTS = [
     (Protocol.KINETIX, Chain.BASE),
     (Protocol.WAGMI, Chain.IOTA),
     (Protocol.SCRIBE, Chain.SCROLL),
-    # (Protocol.GMEOW, Chain.ZIRCUIT),
-    # (Protocol.CIRCUIT, Chain.ZIRCUIT),
+    (Protocol.GMEOW, Chain.ZIRCUIT),
+    (Protocol.CIRCUIT, Chain.ZIRCUIT),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
@@ -95,6 +95,8 @@ for protocol, chain in DEPLOYMENTS:
     gamma_subgraph_ids[protocol][chain] = get_config(
         f"{subgraph_prefix}_GAMMA_SUBGRAPH"
     )
+
+gamma_clients = defaultdict(dict)
 
 RECOVERY_POOL = "studio::QmQihpnUES8m7zXNUcMRunsfYLimRFRuFyv61nQN3fi3iR"
 
@@ -145,3 +147,5 @@ GQL_CLIENT_TIMEOUT = int(get_config("GQL_CLIENT_TIMEOUT"))
 RUN_FIRST_QUERY_TYPE = QueryType(get_config("RUN_FIRST_QUERY_TYPE"))
 
 MASTERCHEF_ADDRESSES = get_config("MASTERCHEF_ADDRESSES")
+
+RUN_MODE = get_config("RUN_MODE")

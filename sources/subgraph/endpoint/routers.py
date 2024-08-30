@@ -1,5 +1,5 @@
 import asyncio
-
+from datetime import datetime
 from fastapi import APIRouter, Response, status
 from fastapi_cache.decorator import cache
 
@@ -19,7 +19,7 @@ from sources.common.general.enums import Period
 from sources.subgraph.bins.charts.daily import DailyChart
 from sources.subgraph.bins.common import (
     SubgraphStatusOutput,
-    aggregate_stats,
+    aggregate_stats as agg_stats,
     analytics,
     hypervisor,
     masterchef,
@@ -286,7 +286,7 @@ class subgraph_router_builder(router_builder_generalTemplate):
     #    hypervisors
     @cache(expire=ALLDATA_CACHE_TIMEOUT)
     async def hypervisors_aggregate_stats(self, response: Response):
-        result = aggregate_stats.AggregateStats(
+        result = agg_stats.AggregateStats(
             protocol=self.dex, chain=self.chain, response=response
         )
         return await result.run(RUN_FIRST)
@@ -574,15 +574,18 @@ class subgraph_router_builder_allDeployments(router_builder_baseTemplate):
     async def aggregate_stats(
         self,
         response: Response,
-    ) -> aggregate_stats.AggregateStatsDeploymentInfoOutput:
+    ) -> agg_stats.AggregateStatsDeploymentInfoOutput:
         results = await asyncio.gather(
-            *[
-                aggregate_stats.AggregateStats(
+            *{
+                agg_stats.AggregateStats(
                     deployment[0], deployment[1], response
                 ).run(RUN_FIRST)
                 for deployment in DEPLOYMENTS
-                if deployment[0] != Protocol.GLACIER
-            ],
+                if deployment not in [
+                    (Protocol.GLACIER, Chain.AVALANCHE),
+                    (Protocol.THENA, Chain.OPBNB)
+                ]
+            },
             return_exceptions=True,
         )
 
@@ -597,7 +600,7 @@ class subgraph_router_builder_allDeployments(router_builder_baseTemplate):
 
         aggregated_results = sum(valid_results[1:], valid_results[0])
 
-        return aggregate_stats.AggregateStatsDeploymentInfoOutput(
+        return agg_stats.AggregateStatsDeploymentInfoOutput(
             totalValueLockedUSD=aggregated_results.totalValueLockedUSD,
             pairCount=aggregated_results.pairCount,
             totalFeesClaimedUSD=aggregated_results.totalFeesClaimedUSD,
