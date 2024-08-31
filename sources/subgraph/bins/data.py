@@ -1,3 +1,5 @@
+import time
+
 from gql.dsl import DSLQuery
 from httpx import HTTPStatusError
 
@@ -69,8 +71,9 @@ class BlockRange:
         )
 
         response = await self._subgraph_client.execute(query)
-
+        timestamp = response["_meta"]["block"]["timestamp"]
+        timestamp = timestamp if timestamp else int(time.time())
         return Time(
             block=response["_meta"]["block"]["number"],
-            timestamp=response["_meta"]["block"]["timestamp"],
+            timestamp=timestamp,
         )

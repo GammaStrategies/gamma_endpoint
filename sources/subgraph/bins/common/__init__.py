@@ -51,8 +51,8 @@ class ExecutionOrderWrapper(ABC):
                     # 504 Gateway Timeout : try to get data from second source
                     logger.error(
                         "%s-%s:%s response error for %s",
-                        self.protocol,
-                        self.chain,
+                        self.protocol.value,
+                        self.chain.value,
                         func,
                         self.__class__.__name__,
                     )
@@ -65,8 +65,8 @@ class ExecutionOrderWrapper(ABC):
             except Exception:
                 logger.exception(
                     "%s-%s: %s run failed for %s",
-                    self.protocol,
-                    self.chain,
+                    self.protocol.value,
+                    self.chain.value,
                     func,
                     self.__class__.__name__,
                 )

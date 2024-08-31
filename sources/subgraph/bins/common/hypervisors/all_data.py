@@ -160,7 +160,7 @@ class AllData:
                 totalSupply=hype.total_supply,
                 maxTotalSupply=hype.max_total_supply,
                 capacityUsed=(
-                    hype.total_supply / hype.max_total_supply
+                    f"{hype.total_supply / hype.max_total_supply}"
                     if hype.max_total_supply > 0
                     else "No cap"
                 ),
