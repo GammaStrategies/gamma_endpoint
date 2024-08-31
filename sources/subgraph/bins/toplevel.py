@@ -53,7 +53,7 @@ class TopLevelData:
         response = await self.client.execute(query)
         return response["uniswapV3Pools"]
 
-    async def _get_all_stats_data(self):
+    async def _get_all_stats_data(self, session=None):
         ds = self.client.data_schema
 
         query_rebal = DSLQuery(
@@ -102,8 +102,7 @@ class TopLevelData:
         else:
             query = query_rebal
 
-        # variables = {"grossFeesMax": GROSS_FEES_MAX}
-        response = await self.client.execute(query)
+        response = await self.client.execute(query, session)
         self.all_stats_data = response if response else {}
 
     async def get_recent_rebalance_data(self, hours=24):
@@ -187,8 +186,8 @@ class TopLevelData:
             ),
         }
 
-    async def all_stats(self):
-        await self._get_all_stats_data()
+    async def all_stats(self, session=None):
+        await self._get_all_stats_data(session)
         return self._all_stats()
 
     async def recent_fees(self, hours=24):

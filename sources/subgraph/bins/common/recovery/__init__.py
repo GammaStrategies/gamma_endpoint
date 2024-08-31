@@ -16,10 +16,10 @@ class RecoveryInfo(SubgraphData):
         self.token = tokenAddress
         self.client = RecoveryPoolClient()
 
-    async def _query_data(self, days: int, timezone: str):
+    def query(self, days: int, timezone: str):
         ds = self.client.data_schema
 
-        query = DSLQuery(
+        return DSLQuery(
             ds.Query.dailyDistributions(
                 first=days,
                 where={
@@ -35,9 +35,6 @@ class RecoveryInfo(SubgraphData):
             ),
             ds.Query.token(id=self.token).select(ds.Token.decimals),
         )
-
-        response = await self.client.execute(query)
-        self.query_response = response
 
     def _transform_data(self) -> RecoveryOutput:
         decimals = self.query_response["token"]["decimals"]
