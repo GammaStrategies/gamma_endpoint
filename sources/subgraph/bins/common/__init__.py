@@ -49,7 +49,13 @@ class ExecutionOrderWrapper(ABC):
                 # check resonse
                 if self.response and self.response.status_code == 504:
                     # 504 Gateway Timeout : try to get data from second source
-                    logger.error(f"{func} response error for {self.__class__.__name__}")
+                    logger.error(
+                        "%s-%s:%s response error for %s",
+                        self.protocol,
+                        self.chain,
+                        func,
+                        self.__class__.__name__,
+                    )
                     continue
 
                 # set headers and exit
@@ -57,7 +63,13 @@ class ExecutionOrderWrapper(ABC):
                 break
 
             except Exception:
-                logger.exception(f"{func} run failed for {self.__class__.__name__}")
+                logger.exception(
+                    "%s-%s: %s run failed for %s",
+                    self.protocol,
+                    self.chain,
+                    func,
+                    self.__class__.__name__,
+                )
                 # results = await second_func()
                 # second_headers()
 
