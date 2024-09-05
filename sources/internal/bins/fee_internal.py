@@ -508,7 +508,7 @@ async def get_gross_fees(
         # build output
         output[hype_summary["address"]] = InternalGrossFeesOutput(
             symbol=hype_status["symbol"],
-            days_period=days_period,
+            days_period=int(days_period),
             block=InternalTimeframe(
                 ini=hype_summary["block_ini"],
                 end=hype_summary["block_end"],
