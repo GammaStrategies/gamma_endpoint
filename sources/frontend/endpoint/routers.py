@@ -25,6 +25,7 @@ from sources.frontend.bins.correlation import (
     get_correlation_from_hypervisors,
 )
 from sources.frontend.bins.external_apis import (
+    get_leaderboard_xlayer,
     get_ramsesLike_api_data,
     get_leaderboard,
 )
@@ -450,7 +451,13 @@ class frontend_externalApis_router_builder_main(router_builder_baseTemplate):
 
         router.add_api_route(
             path="/externalApis/leaderboard",
-            endpoint=self.get_leaderboard,
+            endpoint=self.get_leaderboard_from_balances,
+            methods=["GET"],
+        )
+
+        router.add_api_route(
+            path="/externalApis/leaderboard_rewards",
+            endpoint=self.get_leaderboard_from_rewards,
             methods=["GET"],
         )
 
@@ -491,7 +498,7 @@ class frontend_externalApis_router_builder_main(router_builder_baseTemplate):
             raise HTTPException(status_code=500, detail="Error getting rewards APR")
 
     @cache(expire=DB_CACHE_TIMEOUT)
-    async def get_leaderboard(
+    async def get_leaderboard_from_balances(
         self,
         response: Response,
         chain: Chain | int = Query(
@@ -516,7 +523,7 @@ class frontend_externalApis_router_builder_main(router_builder_baseTemplate):
             description="Exclude addresses defined in setallowedfrom events in the result",
         ),
     ):
-        """xLayer token leaderBoard"""
+        """xLayer token leaderBoard using the balances of wallet addresses ( claimed only)"""
 
         try:
             return await get_leaderboard(
@@ -528,3 +535,21 @@ class frontend_externalApis_router_builder_main(router_builder_baseTemplate):
             )
         except Exception as e:
             raise HTTPException(status_code=500, detail="Error getting leaderboard")
+
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def get_leaderboard_from_rewards(
+        self,
+        response: Response,
+        timestamp: int = Query(
+            None,
+            description="Timestamp to filter by. If not set, it will return the latest leaderboard. If set, it will return the leaderboard snapshot closest to the timestamp ( lower than or equal)",
+        ),
+    ):
+        """xTrade token leaderBoard using claimed and claimable xPoints"""
+
+        try:
+            return await get_leaderboard_xlayer(timestamp=timestamp)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500, detail="Error getting xlayer leaderboard"
+            )

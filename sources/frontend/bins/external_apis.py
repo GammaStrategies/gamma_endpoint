@@ -4,10 +4,12 @@
 import asyncio
 import logging
 
+from sources.common.database.collection_endpoint import database_local
 from sources.common.database.common.collections_common import db_collections_common
 from sources.common.general.enums import Chain, Protocol
 from sources.common.xt_api.ramses import ramses_api_helper
-from sources.mongo.bins.helpers import local_database_helper
+from sources.mongo.bins.helpers import local_database_helper, xtrade_database_helper
+from sources.subgraph.bins.config import MONGO_DB_URL
 
 
 async def get_ramsesLike_api_data(chain: Chain, protocol: Protocol) -> dict:
@@ -264,3 +266,24 @@ async def get_leaderboard(
         for x in all_balances
         if x["user_address"] not in addresses_to_xclude
     ]
+
+
+async def get_leaderboard_xlayer(timestamp: int | None = None) -> list:
+    """Get leaderboard data from the leaderboard collection in xTrade database
+
+    Args:
+        chain (Chain | None, optional): . Defaults to None.
+    Returns:
+        list: leaderboard data sorted by balance
+    """
+    find = {"tokenAddress": "0xb3fe9cf380e889edf9ada9443d76f1cee328fd07".lower()}
+    if timestamp:
+        find["timestamp"] = {"$lte": timestamp}
+
+    return await xtrade_database_helper().get_items_from_database(
+        collection_name="leaderboard",
+        find=find,
+        projection={"_id": 0, "id": 0},
+        sort=[("block", -1)],
+        limit=1,
+    )

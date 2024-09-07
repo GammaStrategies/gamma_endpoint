@@ -3,6 +3,7 @@ from sources.common.database.collection_endpoint import (
     database_global,
     database_local,
     database_perps,
+    database_xtrade,
 )
 
 # TODO: restruct global config and local config
@@ -27,3 +28,8 @@ def global_database_helper():
 def perps_database_helper():
     """Create a perps database."""
     return database_perps(mongo_url=MONGO_DB_URL, db_name="perps_gamma")
+
+
+def xtrade_database_helper():
+    """xtrade database helper"""
+    return database_xtrade(mongo_url=MONGO_DB_URL, db_name="xlayer_xtrade")

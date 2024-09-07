@@ -2418,3 +2418,78 @@ class database_perps(db_collections_common):
         return await self.get_items_from_database(
             collection_name="backtests", find=find
         )
+
+
+### special databae for xtrade only
+class database_xtrade(db_collections_common):
+
+    def __init__(
+        self, mongo_url: str, db_name: str, db_collections: dict | None = None
+    ):
+        if db_collections is None:
+            db_collections = {
+                "reward_operations": {
+                    "mono_indexes": {
+                        "id": True,
+                        "blockNumber": False,
+                        "address": False,
+                        "user_address": False,
+                        "timestamp": False,
+                        "topic": False,
+                        "reward_type": False,
+                    },
+                    "multi_indexes": [
+                        [("blockNumber", ASCENDING), ("logIndex", ASCENDING)],
+                    ],
+                },
+                "token_operations": {
+                    "mono_indexes": {
+                        "id": True,
+                        "blockNumber": False,
+                        "to": False,
+                        "from": False,
+                        "to_type": False,
+                        "from_type": False,
+                        "timestamp": False,
+                    },
+                    "multi_indexes": [
+                        [("blockNumber", ASCENDING), ("logIndex", ASCENDING)],
+                    ],
+                },
+                "user_rewards": {
+                    "mono_indexes": {
+                        "id": True,
+                        "block": False,
+                        "timestamp": False,
+                        "user_address": False,
+                        "hypervisor_address": False,
+                        "rewarder_address": False,
+                    },
+                    "multi_indexes": [],
+                },
+                "leaderboard": {
+                    "mono_indexes": {
+                        "id": True,
+                        "block": False,
+                        "user_address": False,
+                        "timestamp": False,
+                        "tokenAddress": False,
+                    },
+                    "multi_indexes": [
+                        [
+                            ("user_address", ASCENDING),
+                            ("timestamp", ASCENDING),
+                            ("tokenAddress", ASCENDING),
+                        ],
+                    ],
+                },
+            }
+
+        else:
+            logging.getLogger(__name__).warning(
+                f" using custom db_collections on xtrade dbatabase class for {db_name}:  {db_collections} "
+            )
+
+        super().__init__(
+            mongo_url=mongo_url, db_name=db_name, db_collections=db_collections
+        )
