@@ -7,6 +7,7 @@ from gql.transport.exceptions import TransportQueryError
 
 from sources.subgraph.bins.common import ExecutionOrderWrapper
 from sources.subgraph.bins.common.hypervisors.all_data import AllData as HypeAllData
+from sources.subgraph.bins.common.hypervisors.basic_stats import BasicStats
 from sources.subgraph.bins.config import MONGO_DB_URL
 from sources.subgraph.bins.database.managers import (
     db_allData_manager,
@@ -23,6 +24,18 @@ from sources.subgraph.bins.toplevel import TopLevelData
 
 logger = logging.getLogger(__name__)
 
+class HypeBasicStats(ExecutionOrderWrapper):
+    async def _database(self):
+        _mngr = db_allData_manager(mongo_url=MONGO_DB_URL)
+        result = await _mngr.get_data(chain=self.chain, protocol=self.protocol)
+        self.database_datetime = result.pop("datetime", "")
+        for hype in result.values():
+            hype.pop("returns")
+        return result
+
+    async def _subgraph(self):
+        basic_stats = BasicStats(chain=self.chain, protocol=self.protocol)
+        return await basic_stats.basic_stats()
 
 class AllData(ExecutionOrderWrapper):
     async def _database(self):

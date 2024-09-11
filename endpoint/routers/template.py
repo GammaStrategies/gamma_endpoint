@@ -145,6 +145,13 @@ class router_builder_generalTemplate(router_builder_baseTemplate):
         )
 
         router.add_api_route(
+            path=f"{self.prefix}{'/hypervisors/basicStats'}",
+            endpoint=self.hypervisors_basic_stats,
+            methods=["GET"],
+            generate_unique_id_function=self.generate_unique_id,
+        )
+
+        router.add_api_route(
             path=f"{self.prefix}{'/hypervisors/returns'}",
             endpoint=self.hypervisors_returns,
             methods=["GET"],
@@ -329,6 +336,9 @@ class router_builder_generalTemplate(router_builder_baseTemplate):
 
     #    hypervisors
     async def hypervisors_aggregate_stats(self, response: Response):
+        return NotImplementedError(" function defaults not implemented yet")
+
+    async def hypervisors_basic_stats(self, response: Response):
         return NotImplementedError(" function defaults not implemented yet")
 
     async def hypervisors_returns(self, response: Response):

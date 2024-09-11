@@ -291,6 +291,13 @@ class subgraph_router_builder(router_builder_generalTemplate):
         )
         return await result.run(RUN_FIRST)
 
+    @cache(expire=ALLDATA_CACHE_TIMEOUT)
+    async def hypervisors_basic_stats(self, response: Response):
+        all_data = hypervisor.HypeBasicStats(
+            protocol=self.dex, chain=self.chain, response=response
+        )
+        return await all_data.run(RUN_FIRST)
+
     @cache(expire=APY_CACHE_TIMEOUT)
     async def hypervisors_returns(self, response: Response):
         """fee's Apr and Apy"""
