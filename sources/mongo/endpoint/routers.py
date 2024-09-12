@@ -365,6 +365,9 @@ class mongo_router_builder(router_builder_baseTemplate):
         start_block: int | None = None,
         end_block: int | None = None,
     ):
+        """Returns the rewards for a given hypervisor address.
+        When no start nor end are provided, it returns the latest known by database rewards.
+        """
         return await hypervisor.get_hypervisor_rewards_status(
             network=self.chain,
             hypervisor_address=hypervisor_address,

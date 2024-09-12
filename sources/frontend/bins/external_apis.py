@@ -276,14 +276,15 @@ async def get_leaderboard_xlayer(timestamp: int | None = None) -> list:
     Returns:
         list: leaderboard data sorted by balance
     """
-    find = {"tokenAddress": "0xb3fe9cf380e889edf9ada9443d76f1cee328fd07".lower()}
-    if timestamp:
-        find["timestamp"] = {"$lte": timestamp}
 
-    return await xtrade_database_helper().get_items_from_database(
-        collection_name="leaderboard",
-        find=find,
-        projection={"_id": 0, "id": 0},
-        sort=[("block", -1)],
-        limit=1,
-    )
+    kwargs = {
+        "collection_name": "leaderboard",
+        "find": {"tokenAddress": "0xb3fe9cf380e889edf9ada9443d76f1cee328fd07".lower()},
+        "projection": {"_id": 0, "id": 0},
+        "sort": [("balance", -1)],
+        "limit": 1,
+    }
+    if timestamp:
+        kwargs["find"]["timestamp"] = {"$lte": timestamp}
+
+    return await xtrade_database_helper().get_items_from_database(**kwargs)
