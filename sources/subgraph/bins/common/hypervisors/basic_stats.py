@@ -26,9 +26,9 @@ class BasicStats:
     async def get_data(self):
         hype_all_data = HypervisorAllData(self.chain, self.protocol)
         async with self.client.client as session:
-            self.prices, _ = await asyncio.gather(
-                token_prices(self.chain, self.protocol, session),
-                hype_all_data.get_data(session=session, hypervisors=self.hypervisors)
+            _, self.prices = await asyncio.gather(
+                hype_all_data.get_data(session=session, hypervisors=self.hypervisors),
+                token_prices(self.chain, self.protocol, session)
             )
 
         self.hype_data = hype_all_data.data

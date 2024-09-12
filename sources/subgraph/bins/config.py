@@ -97,6 +97,7 @@ for protocol, chain in DEPLOYMENTS:
     )
 
 gamma_clients = defaultdict(dict)
+token_prices = defaultdict(dict)
 
 RECOVERY_POOL = "studio::QmQihpnUES8m7zXNUcMRunsfYLimRFRuFyv61nQN3fi3iR"
 
