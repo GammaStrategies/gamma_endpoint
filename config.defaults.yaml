@@ -205,6 +205,12 @@ GMEOW_ZIRCUIT_HP_SUBGRAPH: sentio::gamma-hp-gmeow-zircuit
 CIRCUIT_ZIRCUIT_GAMMA_SUBGRAPH: sentio::gamma-circuit-zircuit
 CIRCUIT_ZIRCUIT_HP_SUBGRAPH: sentio::gamma-hp-circuit-zircuit
 
+GLYPH_CORE_GAMMA_SUBGRAPH: url::https://thegraph.coredao.org/subgraphs/name/gamma-glyph-core
+GLYPH_CORE_HP_SUBGRAPH: url::https://thegraph.coredao.org/subgraphs/name/gamma-hp-glyph-core
+
+COREX_CORE_GAMMA_SUBGRAPH: url::https://thegraph.coredao.org/subgraphs/name/gamma-corex-core
+COREX_CORE_HP_SUBGRAPH: url::https://thegraph.coredao.org/subgraphs/name/gamma-hp-corex-core
+
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {
   "ethereum":{},

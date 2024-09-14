@@ -43,4 +43,5 @@ BLOCK_TIME_SECONDS = {
     Chain.SEI: 0.4,
     Chain.IOTA: 10,
     Chain.ZIRCUIT: 2,
+    Chain.CORE: 3,
 }

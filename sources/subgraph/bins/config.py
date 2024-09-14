@@ -70,6 +70,8 @@ DEPLOYMENTS = [
     (Protocol.SCRIBE, Chain.SCROLL),
     (Protocol.GMEOW, Chain.ZIRCUIT),
     (Protocol.CIRCUIT, Chain.ZIRCUIT),
+    (Protocol.GLYPH, Chain.CORE),
+    (Protocol.COREX, Chain.CORE),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api

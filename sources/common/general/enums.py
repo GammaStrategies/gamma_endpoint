@@ -56,6 +56,7 @@ class Chain(str, Enum):
     SEI = ("sei", 1329, "sei", "Sei", None, None, "Sei")
     IOTA = ("iota", 8822, "iota", "Iota", None, "iota_evm", "Iota")
     ZIRCUIT = ("zircuit", 48900, "zircuit", "Zircuit", None, None, "Zircuit")
+    CORE = ("core", 1116, "core", "Core", None, None, "Core")
 
     # extra properties
     id: int
@@ -141,6 +142,7 @@ class Dex(str, Enum):
     SCRIBE: "scribe"
     CIRCUIT: "circuit"
     GMEOW: "gmeow"
+    CORE: "core"
 
 
 class Protocol(str, Enum):
@@ -198,6 +200,8 @@ class Protocol(str, Enum):
     SCRIBE = ("scribe", None, None, None, "scribe", "Scribe")
     GMEOW = ("gmeow", None, None, None, "gmeow", "Gmeow")
     CIRCUIT = ("circuit", None, None, None, "circuit", "Circuit")
+    GLYPH = ("glyph", None, None, None, "glyph", "Glyph")
+    COREX = ("corex", None, None, None, "corex", "Corex")
 
     # extra properties
     api_url: str
