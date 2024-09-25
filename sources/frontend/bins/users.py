@@ -39,7 +39,9 @@ async def get_user_positions(user_address: str, chain: Chain) -> list[dict]:
         global_database_helper().convert_d128_to_decimal(x)
         for x in await local_database_helper(network=chain).get_items_from_database(
             collection_name="user_operations",
-            aggregate=query_user_positions(user_address=user_address),
+            aggregate=query_user_operations_current_info(
+                chain=chain, user_address=user_address
+            ),
         )
     ]
 
@@ -836,4 +838,242 @@ def query_user_positions_from_global_operations(user_address: str) -> list[dict]
             }
         },
     ]
+    return _query
+
+
+def query_user_operations_shares_without_values_fast(user_address: str) -> list[dict]:
+    """Query to be used in the user_operations collection to get the shares of a user without the values.
+        The returned values have to be converted to decimal by using the tokens decimals ( not returned in this query )
+
+    Args:
+        user_address (str): user address to query
+
+    Returns:
+        list[dict]: query
+    """
+    _query = [
+        {"$match": {"user_address": user_address}},
+        {"$sort": {"block": -1}},
+        {
+            "$group": {
+                "_id": {"user": "$user_address", "hype": "$hypervisor_address"},
+                "current_block": {"$last": "$block"},
+                "current_share_balance": {"$last": {"$toDecimal": "$shares.balance"}},
+                "tokens_deposited0": {"$sum": {"$toDecimal": "$tokens_flow.token0"}},
+                "tokens_deposited1": {"$sum": {"$toDecimal": "$tokens_flow.token0"}},
+            }
+        },
+    ]
+
+    return _query
+
+
+def query_user_operations_current_info(chain: Chain, user_address: str) -> list[dict]:
+    """Query to be used in the user_operations collection to get the detailed position of a user at the
+    latest block available in the database.
+    It uses latest hypervisor returns to get latest hype prices and underlying quantities.
+    It also aggregates all the user_opertions tokens flow to get the qtty of tokens deposited. Be aware that qtty deposited tokens are signed
+    -->  they are positive when the user withdraws more tokens than already deposited.
+
+
+    Args:
+        chain (Chain): chain to query ( used to add chain and chain id to the results )
+        user_address (str): user address to query
+
+    Returns:
+        list[dict]: query
+    """
+    _query = [
+        {"$match": {"user_address": user_address}},
+        {"$sort": {"block": -1}},
+        {
+            "$addFields": {
+                "tokens_flow.usd_token0": {
+                    "$sum": [
+                        {
+                            "$multiply": [
+                                {"$toDecimal": "$tokens_flow.token0"},
+                                "$prices.token0",
+                            ]
+                        }
+                    ]
+                },
+                "tokens_flow.usd_token1": {
+                    "$sum": [
+                        {
+                            "$multiply": [
+                                {"$toDecimal": "$tokens_flow.token1"},
+                                "$prices.token1",
+                            ]
+                        }
+                    ]
+                },
+            }
+        },
+        {
+            "$group": {
+                "_id": {"user": "$user_address", "hype": "$hypervisor_address"},
+                "end_block": {"$first": "$block"},
+                "ini_block": {"$last": "$block"},
+                "ini_balance": {"$push": "$shares.balance"},
+                "current_balance": {"$first": {"$toDecimal": "$shares.balance"}},
+                "cost_token0": {"$sum": {"$toDecimal": "$tokens_flow.token0"}},
+                "cost_token1": {"$sum": {"$toDecimal": "$tokens_flow.token1"}},
+                "cost_usd_token0": {"$sum": {"$toDecimal": "$tokens_flow.usd_token0"}},
+                "cost_usd_token1": {"$sum": {"$toDecimal": "$tokens_flow.usd_token1"}},
+            }
+        },
+        {
+            "$lookup": {
+                "from": "static",
+                "let": {"op_hype": "$_id.hype"},
+                "pipeline": [
+                    {"$match": {"$expr": {"$eq": ["$address", "$$op_hype"]}}},
+                    {
+                        "$project": {
+                            "_id": 0,
+                            "symbol": "$symbol",
+                            "decimals": "$decimals",
+                            "pool": "$pool",
+                        }
+                    },
+                ],
+                "as": "hypervisor_static",
+            }
+        },
+        {
+            "$unwind": {
+                "path": "$hypervisor_static",
+                "preserveNullAndEmptyArrays": False,
+            }
+        },
+        {
+            "$lookup": {
+                "from": "latest_hypervisor_returns",
+                "let": {
+                    "op_hype": "$_id.hype",
+                    "op_user": "$_id.user",
+                    "op_hype_decimals": "$hypervisor_static.decimals",
+                },
+                "pipeline": [
+                    {
+                        "$match": {
+                            "$expr": {"$and": [{"$eq": ["$address", "$$op_hype"]}]}
+                        }
+                    },
+                    {"$sort": {"timestmap.ini.block": -1}},
+                    {"$limit": 1},
+                    {
+                        "$project": {
+                            "_id": 0,
+                            "block": "$timeframe.end.block",
+                            "prices": "$status.end.prices",
+                            "underlying_qtty": "$status.end.underlying",
+                            "supply": "$status.end.supply",
+                        }
+                    },
+                ],
+                "as": "hype_returns",
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "user": "$_id.user",
+                "hypervisor": "$_id.hype",
+                "current_balance": {
+                    "$divide": [
+                        "$current_balance",
+                        {"$pow": [10, "$hypervisor_static.decimals"]},
+                    ]
+                },
+                "current_share": {
+                    "$divide": [
+                        {
+                            "$divide": [
+                                "$current_balance",
+                                {"$pow": [10, "$hypervisor_static.decimals"]},
+                            ]
+                        },
+                        {"$last": "$hype_returns.supply"},
+                    ]
+                },
+                "cost": {
+                    "token0": {
+                        "$divide": [
+                            "$cost_token0",
+                            {"$pow": [10, "$hypervisor_static.pool.token0.decimals"]},
+                        ]
+                    },
+                    "token1": {
+                        "$divide": [
+                            "$cost_token1",
+                            {"$pow": [10, "$hypervisor_static.pool.token1.decimals"]},
+                        ]
+                    },
+                    "usd": {
+                        "$sum": [
+                            {
+                                "$divide": [
+                                    "$cost_usd_token0",
+                                    {"$pow": [10, "$hypervisor_static.decimals"]},
+                                ]
+                            },
+                            {
+                                "$divide": [
+                                    "$cost_usd_token1",
+                                    {"$pow": [10, "$hypervisor_static.decimals"]},
+                                ]
+                            },
+                        ]
+                    },
+                },
+                "hype_returns": {"$first": "$hype_returns"},
+            }
+        },
+        {
+            "$project": {
+                "chain": chain.database_name,
+                "chain_id": {"$toInt":chain.id},
+                "user": 1,
+                "hypervisor": 1,
+                "balance": {
+                    "shares_qtty": "$current_balance",
+                    "shares_percent": "$current_share",
+                    "token0": {
+                        "$multiply": [
+                            "$hype_returns.underlying_qtty.qtty.token0",
+                            "$current_share",
+                        ]
+                    },
+                    "token1": {
+                        "$multiply": [
+                            "$hype_returns.underlying_qtty.qtty.token1",
+                            "$current_share",
+                        ]
+                    },
+                    "usd": {
+                        "$sum": [
+                            {
+                                "$multiply": [
+                                    "$hype_returns.underlying_qtty.qtty.token0",
+                                    "$current_share",
+                                    "$hype_returns.prices.token0",
+                                ]
+                            },
+                            {
+                                "$multiply": [
+                                    "$hype_returns.underlying_qtty.qtty.token0",
+                                    "$current_share",
+                                    "$hype_returns.prices.token1",
+                                ]
+                            },
+                        ]
+                    },
+                },
+                "deposited": "$cost",
+            }
+        },
+    ]
+
     return _query

@@ -422,7 +422,13 @@ class frontend_user_router_builder_main(router_builder_baseTemplate):
         address: str,
         chain: Chain | int | None = Query(None, enum=[*Chain, *[x.id for x in Chain]]),
     ):
-        """Returns all positions for a given user address"""
+        """Returns all positions known for a given user address at the latest block available.
+        * Balance **USD amount** is calculated using the last known token prices.
+        * Balance **shares_percent** is the percentage of share the user has versus the total shares of the hypervisor.
+        * Balance **token0 and token1** are calculated using the shares_percent and the last known total liquidity of the hypervisor.
+        * Deposited amounts will not be accounted for when being LP token transfers.
+        * Deposited **USD amount** is calculated using the closest prices to the timestamp of the deposit.
+        """
         if isinstance(chain, int):
             chain = int_to_chain(chain)
         address = filter_addresses(address)
@@ -430,12 +436,13 @@ class frontend_user_router_builder_main(router_builder_baseTemplate):
         if chain:
             return await get_user_positions(user_address=address, chain=chain)
         else:
-            return await asyncio.gather(
+            items = await asyncio.gather(
                 *[
                     get_user_positions(user_address=address, chain=cha)
                     for cha in list(Chain)
                 ]
             )
+            return [x for xs in items for x in xs]
 
 
 class frontend_externalApis_router_builder_main(router_builder_baseTemplate):
