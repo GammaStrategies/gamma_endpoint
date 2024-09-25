@@ -868,7 +868,9 @@ def query_user_operations_shares_without_values_fast(user_address: str) -> list[
     return _query
 
 
-def query_user_operations_current_info(chain: Chain, user_address: str) -> list[dict]:
+def query_user_operations_current_info(
+    chain: Chain, user_address: str, return_zero_balances: bool = False
+) -> list[dict]:
     """Query to be used in the user_operations collection to get the detailed position of a user at the
     latest block available in the database.
     It uses latest hypervisor returns to get latest hype prices and underlying quantities.
@@ -1034,7 +1036,7 @@ def query_user_operations_current_info(chain: Chain, user_address: str) -> list[
         {
             "$project": {
                 "chain": chain.database_name,
-                "chain_id": {"$toInt":chain.id},
+                "chain_id": {"$toInt": chain.id},
                 "user": 1,
                 "hypervisor": 1,
                 "balance": {
@@ -1075,5 +1077,12 @@ def query_user_operations_current_info(chain: Chain, user_address: str) -> list[
             }
         },
     ]
+
+    if not return_zero_balances:
+        _query.append(
+            {
+                "$match": {"balance.shares_qtty": {"$gt": 0}},
+            }
+        )
 
     return _query
