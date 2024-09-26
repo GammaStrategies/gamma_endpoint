@@ -202,6 +202,8 @@ class Protocol(str, Enum):
     CIRCUIT = ("circuit", None, None, None, "circuit", "Circuit")
     GLYPH = ("glyph", None, None, None, "glyph", "Glyph")
     COREX = ("corex", None, None, None, "corex", "Corex")
+    VELODROME = ("velodrome", None, None, None, "velodrome", "Velodrome")
+    AERODROME = ("aerodrome", None, None, None, "aerodrome", "Aerodrome")
 
     # extra properties
     api_url: str

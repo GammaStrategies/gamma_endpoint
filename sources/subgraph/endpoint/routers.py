@@ -1,5 +1,4 @@
 import asyncio
-from datetime import datetime
 from fastapi import APIRouter, Response, status
 from fastapi_cache.decorator import cache
 

@@ -211,6 +211,12 @@ GLYPH_CORE_HP_SUBGRAPH: url::https://thegraph.coredao.org/subgraphs/name/gamma-h
 COREX_CORE_GAMMA_SUBGRAPH: url::https://thegraph.coredao.org/subgraphs/name/gamma-corex-core
 COREX_CORE_HP_SUBGRAPH: url::https://thegraph.coredao.org/subgraphs/name/gamma-hp-corex-core
 
+VELODROME_OPTIMISM_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-velodrome-optimism/version/latest
+VELODROME_OPTIMISM_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-velodrome-optimism/version/latest
+
+AERODROME_BASE_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-aerodrome-base/version/latest
+AERODROME_BASE_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-aerodrome-base/version/latest
+
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {
   "ethereum":{},

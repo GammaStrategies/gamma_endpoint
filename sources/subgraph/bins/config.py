@@ -72,6 +72,8 @@ DEPLOYMENTS = [
     (Protocol.CIRCUIT, Chain.ZIRCUIT),
     (Protocol.GLYPH, Chain.CORE),
     (Protocol.COREX, Chain.CORE),
+    (Protocol.VELODROME, Chain.OPTIMISM),
+    (Protocol.AERODROME, Chain.BASE),
 ]
 
 # Protocol-Chains not supported by the subgraph but web3 api
