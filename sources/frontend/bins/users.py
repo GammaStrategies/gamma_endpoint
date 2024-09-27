@@ -1065,7 +1065,7 @@ def query_user_operations_current_info(
                             },
                             {
                                 "$multiply": [
-                                    "$hype_returns.underlying_qtty.qtty.token0",
+                                    "$hype_returns.underlying_qtty.qtty.token1",
                                     "$current_share",
                                     "$hype_returns.prices.token1",
                                 ]
