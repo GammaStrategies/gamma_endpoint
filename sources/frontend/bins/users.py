@@ -40,7 +40,7 @@ async def get_user_positions(user_address: str, chain: Chain) -> list[dict]:
         for x in await local_database_helper(network=chain).get_items_from_database(
             collection_name="user_operations",
             aggregate=query_user_operations_current_info(
-                chain=chain, user_address=user_address
+                chain=chain, shadowed_user_address=user_address
             ),
         )
     ]
@@ -869,7 +869,10 @@ def query_user_operations_shares_without_values_fast(user_address: str) -> list[
 
 
 def query_user_operations_current_info(
-    chain: Chain, user_address: str, return_zero_balances: bool = False
+    chain: Chain,
+    user_address: str | None = None,
+    shadowed_user_address: str | None = None,
+    return_zero_balances: bool = False,
 ) -> list[dict]:
     """Query to be used in the user_operations collection to get the detailed position of a user at the
     latest block available in the database.
@@ -880,13 +883,29 @@ def query_user_operations_current_info(
 
     Args:
         chain (Chain): chain to query ( used to add chain and chain id to the results )
-        user_address (str): user address to query
+        user_address (str): user address to query ( this has priority over shadowed_user_address )
+        shadowed_user_address (str): user address to query ( do not provide user address if you provide this )
+        return_zero_balances (bool, optional): if True, it will return all user balances, even if they are zero. Defaults to False.
 
     Returns:
         list[dict]: query
     """
+
+    _match = {}
+    _user = ""
+    if user_address:
+        _match = {"user_address": user_address}
+        _user = "user_address"
+    elif shadowed_user_address:
+        _match = {"shadowed_user_address": shadowed_user_address}
+        _user = "shadowed_user_address"
+    else:
+        raise ValueError(
+            "You have to provide either user_address or shadowed_user_address"
+        )
+
     _query = [
-        {"$match": {"user_address": user_address}},
+        {"$match": _match},
         {"$sort": {"block": -1}},
         {
             "$addFields": {
@@ -914,7 +933,7 @@ def query_user_operations_current_info(
         },
         {
             "$group": {
-                "_id": {"user": "$user_address", "hype": "$hypervisor_address"},
+                "_id": {"user": f"${_user}", "hype": "$hypervisor_address"},
                 "end_block": {"$first": "$block"},
                 "ini_block": {"$last": "$block"},
                 "ini_balance": {"$push": "$shares.balance"},
@@ -951,7 +970,7 @@ def query_user_operations_current_info(
         },
         {
             "$lookup": {
-                "from": "latest_hypervisor_returns",
+                "from": "hypervisor_returns_analytic_gaps",
                 "let": {
                     "op_hype": "$_id.hype",
                     "op_user": "$_id.user",
@@ -963,7 +982,7 @@ def query_user_operations_current_info(
                             "$expr": {"$and": [{"$eq": ["$address", "$$op_hype"]}]}
                         }
                     },
-                    {"$sort": {"timestmap.ini.block": -1}},
+                    {"$sort": {"timestmap.end.block": -1}},
                     {"$limit": 1},
                     {
                         "$project": {
@@ -1086,3 +1105,12 @@ def query_user_operations_current_info(
         )
 
     return _query
+
+
+def query_user_operations_current_info_pnl(
+    chain: Chain,
+    user_address: str | None = None,
+    shadowed_user_address: str | None = None,
+    return_zero_balances: bool = False,
+) -> list[dict]:
+    pass
