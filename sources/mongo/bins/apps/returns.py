@@ -63,7 +63,7 @@ async def build_hype_return_analysis_from_database(
             find={"address": hypervisor_address},
         ),
         local_database_helper(network=chain).get_items_from_database(
-            collection_name=("latest_hypervisor_returns"),
+            collection_name=("hypervisor_returns_analytic_gaps"),
             find=find,
         ),
     )
