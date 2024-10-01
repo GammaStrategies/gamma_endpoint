@@ -53,19 +53,25 @@ async def build_hype_return_analysis_from_database(
     yield_items = []
 
     # get yield items and static hype info
-    db_yield_items, hype_static, db_yield_items_latest = await asyncio.gather(
-        local_database_helper(network=chain).get_items_from_database(
-            collection_name=("hypervisor_returns"),
-            find=find,
-        ),
-        local_database_helper(network=chain).get_items_from_database(
-            collection_name="static",
-            find={"address": hypervisor_address},
-        ),
-        local_database_helper(network=chain).get_items_from_database(
-            collection_name=("hypervisor_returns_analytic_gaps"),
-            find=find,
-        ),
+    db_yield_items, hype_static, db_yield_items_latest, latest_hypervisor_returns = (
+        await asyncio.gather(
+            local_database_helper(network=chain).get_items_from_database(
+                collection_name=("hypervisor_returns"),
+                find=find,
+            ),
+            local_database_helper(network=chain).get_items_from_database(
+                collection_name="static",
+                find={"address": hypervisor_address},
+            ),
+            local_database_helper(network=chain).get_items_from_database(
+                collection_name=("hypervisor_returns_analytic_gaps"),
+                find=find,
+            ),
+            local_database_helper(network=chain).get_items_from_database(
+                collection_name=("latest_hypervisor_returns"),
+                find={"address": hypervisor_address},
+            ),
+        )
     )
 
     # check if we need to use latest collection
@@ -75,6 +81,9 @@ async def build_hype_return_analysis_from_database(
             f" Using latest hypervisor return data for {chain.database_name} {hypervisor_address}"
         )
         db_yield_items = db_yield_items_latest
+
+    if latest_hypervisor_returns:
+        db_yield_items += latest_hypervisor_returns
 
     # convert yield items to objects
     for item in db_yield_items:
