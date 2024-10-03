@@ -275,6 +275,7 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
         period: Period | int = Query(
             Period.BIWEEKLY, enum=[*Period, *[x.days for x in Period]]
         ),
+        # points_every: int = Query(None, include_in_schema=False),
     ):
         """Hypervisor returns data within the period, including token0 and token1 prices:
 
@@ -295,11 +296,15 @@ class frontend_analytics_router_builder_main(router_builder_baseTemplate):
             else period.days * 24 * 2 * 60 * 60
         )
 
+        # if not points_every:
+        # set points every hour for daily and every 12 hours for the rest
+        points_every = (60 * 60) if period == Period.DAILY else (60 * 60 * 12)
+
         return await build_hypervisor_returns_graph(
             chain=chain,
             hypervisor_address=hypervisor_address,
             ini_timestamp=ini_timestamp,
-            points_every=(60 * 60) if period == Period.DAILY else (60 * 60 * 12),
+            points_every=points_every,
         )
 
     # Hypervisor returns ( no cache for csv files )
