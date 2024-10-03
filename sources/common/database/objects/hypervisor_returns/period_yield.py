@@ -1494,7 +1494,10 @@ class period_yield_analyzer:
 
             # control points var
             filtered_data = list(filter(_should_include, self._graph_data))
-
+            # Ensure the last item is included if not already in filtered_data ( last item is the most recent )
+            if self._graph_data and (self._graph_data[-1] not in filtered_data):
+                filtered_data.append(self._graph_data[-1])
+                
             result = [
                 {
                     "chain": x["chain"],
