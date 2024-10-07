@@ -217,6 +217,9 @@ VELODROME_OPTIMISM_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506
 AERODROME_BASE_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-aerodrome-base/version/latest
 AERODROME_BASE_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-aerodrome-base/version/latest
 
+UNISWAP_GNOSIS_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-uniswap-gnosis/version/latest
+UNISWAP_GNOSIS_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-uniswap-gnosis/version/latest
+
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {
   "ethereum":{},
