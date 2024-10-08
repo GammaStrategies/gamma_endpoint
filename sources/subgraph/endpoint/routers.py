@@ -14,6 +14,7 @@ from endpoint.routers.template import (
     router_builder_baseTemplate,
     router_builder_generalTemplate,
 )
+from endpoint.utilities import add_deprecated_message
 from sources.common.general.enums import Period
 from sources.subgraph.bins.charts.daily import DailyChart
 from sources.subgraph.bins.common import (
@@ -232,6 +233,11 @@ class subgraph_router_builder(router_builder_generalTemplate):
     async def hypervisor_analytics_basic_daily(
         self, hypervisor_address: str, response: Response
     ):
+        ## DEPRECATED
+        message = "This endpoint is no longer valid."
+        response = add_deprecated_message(response, message=message)
+        return [message]
+
         return await analytics.get_hype_data(
             protocol=self.dex,
             chain=self.chain,
@@ -243,6 +249,11 @@ class subgraph_router_builder(router_builder_generalTemplate):
     async def hypervisor_analytics_basic_weekly(
         self, hypervisor_address: str, response: Response
     ):
+        ## DEPRECATED
+        message = "This endpoint is no longer valid."
+        response = add_deprecated_message(response, message=message)
+        return [message]
+
         return await analytics.get_hype_data(
             protocol=self.dex,
             chain=self.chain,
@@ -254,6 +265,11 @@ class subgraph_router_builder(router_builder_generalTemplate):
     async def hypervisor_analytics_basic_biweekly(
         self, hypervisor_address: str, response: Response
     ):
+        ## DEPRECATED
+        message = "This endpoint is no longer valid."
+        response = add_deprecated_message(response, message=message)
+        return [message]
+
         return await analytics.get_hype_data(
             protocol=self.dex,
             chain=self.chain,
@@ -265,6 +281,11 @@ class subgraph_router_builder(router_builder_generalTemplate):
     async def hypervisor_analytics_basic_monthly(
         self, hypervisor_address: str, response: Response
     ):
+        ## DEPRECATED
+        message = "This endpoint is no longer valid."
+        response = add_deprecated_message(response, message=message)
+        return [message]
+
         return await analytics.get_hype_data(
             protocol=self.dex,
             chain=self.chain,
@@ -276,6 +297,11 @@ class subgraph_router_builder(router_builder_generalTemplate):
     async def hypervisor_analytics_basic(
         self, hypervisor_address: str, response: Response, period: Period
     ):
+        ## DEPRECATED
+        message = "This endpoint is no longer valid."
+        response = add_deprecated_message(response, message=message)
+        return [message]
+
         return await analytics.get_hype_data(
             protocol=self.dex,
             chain=self.chain,
@@ -378,6 +404,11 @@ class subgraph_router_builder(router_builder_generalTemplate):
 
     @cache(expire=APY_CACHE_TIMEOUT)
     async def hypervisors_impermanentDivergence_daily(self, response: Response):
+        ## DEPRECATED
+        message = "This endpoint is no longer valid."
+        response = add_deprecated_message(response, message=message)
+        return [message]
+
         impermanent = hypervisor.ImpermanentDivergence(
             protocol=self.dex, chain=self.chain, days=1, response=response
         )
@@ -385,6 +416,11 @@ class subgraph_router_builder(router_builder_generalTemplate):
 
     @cache(expire=APY_CACHE_TIMEOUT)
     async def hypervisors_impermanentDivergence_weekly(self, response: Response):
+        ## DEPRECATED
+        message = "This endpoint is no longer valid."
+        response = add_deprecated_message(response, message=message)
+        return [message]
+
         impermanent = hypervisor.ImpermanentDivergence(
             protocol=self.dex, chain=self.chain, days=7, response=response
         )
@@ -392,6 +428,11 @@ class subgraph_router_builder(router_builder_generalTemplate):
 
     @cache(expire=APY_CACHE_TIMEOUT)
     async def hypervisors_impermanentDivergence_monthly(self, response: Response):
+        ## DEPRECATED
+        message = "This endpoint is no longer valid."
+        response = add_deprecated_message(response, message=message)
+        return [message]
+
         impermanent = hypervisor.ImpermanentDivergence(
             protocol=self.dex, chain=self.chain, days=30, response=response
         )
@@ -440,6 +481,11 @@ class subgraph_router_builder(router_builder_generalTemplate):
 
     @cache(expire=USER_CACHE_TIMEOUT)
     async def user_analytics(self, address: str, response: Response):
+        ## DEPRECATED
+        message = "This endpoint is no longer valid."
+        response = add_deprecated_message(response, message=message)
+        return [message]
+
         return await users.get_user_analytic_data(
             chain=self.chain, address=address.lower()
         )
