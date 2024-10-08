@@ -29,12 +29,7 @@ async def get_user_analytic_data(
     block_end: int = 0,
     response: Response | None = None,
 ):
-    # db_name = f"{chain.database_name}_gamma"
-    # db = database_local(mongo_url=MONGO_DB_URL, db_name=db_name)
 
-    # return await db.get_user_status(
-    #     address=address, block_ini=block_ini, block_end=block_end
-    # )
     return await get_user_analytic_data_mongo(
         chain=chain, address=address, block_ini=block_ini, block_end=block_end
     )

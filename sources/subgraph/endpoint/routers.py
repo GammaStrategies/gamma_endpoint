@@ -29,6 +29,7 @@ from sources.subgraph.bins.common import (
 )
 from sources.subgraph.bins.common.hypervisor import (
     hypervisor_basic_stats as basic_stats_output,
+    unified_hypervisors_data,
 )
 from sources.subgraph.bins.config import (
     DEFAULT_TIMEZONE,
@@ -574,6 +575,12 @@ class subgraph_router_builder_allDeployments(router_builder_baseTemplate):
             methods=["GET"],
         )
 
+        router.add_api_route(
+            path="/unifiedHypervisorsData",
+            endpoint=self.unifiedHypervisorsData,
+            methods=["GET"],
+        )
+
         return router
 
     @cache(expire=DASHBOARD_CACHE_TIMEOUT)
@@ -626,6 +633,11 @@ class subgraph_router_builder_allDeployments(router_builder_baseTemplate):
         result = Dashboard(period.lower())
 
         return await result.info("UTC")
+
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def unifiedHypervisorsData(self, response: Response):
+        # database call only
+        return await unified_hypervisors_data()
 
 
 class subgraph_router_builder_Charts(router_builder_baseTemplate):

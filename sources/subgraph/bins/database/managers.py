@@ -1423,6 +1423,10 @@ class db_allData_manager(db_collection_manager):
         except Exception:
             return {}
 
+    async def get_unified_hypervisors_data(self) -> list[dict]:
+        result = await self._get_data(query=self.query_unifiedHypervisorsData())
+        return result
+
     @staticmethod
     def query_all(chain: Chain, protocol: Protocol = "") -> list[dict]:
         """
@@ -1439,6 +1443,40 @@ class db_allData_manager(db_collection_manager):
 
         # return query
         return [{"$match": _match}, {"$unset": ["_id", "id"]}]
+
+    @staticmethod
+    def query_unifiedHypervisorsData() -> list[dict]:
+        _query = [
+            {
+                "$project": {
+                    "network": {"$first": {"$split": ["$id", "_"]}},
+                    "network_protocol": "$id",
+                    "lastUpdated": "$datetime",
+                    "data": {"$objectToArray": "$$ROOT"},
+                }
+            },
+            {"$unwind": {"path": "$data", "preserveNullAndEmptyArrays": False}},
+            {"$match": {"data.v.name": {"$exists": True}}},
+            {
+                "$project": {
+                    "protocol": {
+                        "$last": {
+                            "$split": [
+                                "$network_protocol",
+                                {"$concat": ["$network", "_"]},
+                            ]
+                        }
+                    },
+                    "name": "$data.v.name",
+                    "tvlUSD": "$data.v.tvlUSD",
+                    "totalSupply": "$data.v.totalSupply",
+                    "feeAPR": "$data.v.returns.daily.feeApr",
+                    "lastUpdated": "$lastUpdated",
+                }
+            },
+        ]
+
+        return _query
 
 
 class db_allRewards2_manager(db_collection_manager):

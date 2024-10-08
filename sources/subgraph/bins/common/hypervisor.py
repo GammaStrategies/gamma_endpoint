@@ -24,6 +24,7 @@ from sources.subgraph.bins.toplevel import TopLevelData
 
 logger = logging.getLogger(__name__)
 
+
 class HypeBasicStats(ExecutionOrderWrapper):
     async def _database(self):
         _mngr = db_allData_manager(mongo_url=MONGO_DB_URL)
@@ -36,6 +37,7 @@ class HypeBasicStats(ExecutionOrderWrapper):
     async def _subgraph(self):
         basic_stats = BasicStats(chain=self.chain, protocol=self.protocol)
         return await basic_stats.basic_stats()
+
 
 class AllData(ExecutionOrderWrapper):
     async def _database(self):
@@ -358,3 +360,13 @@ async def collected_fees(
         "endGrossFeesClaimedUSD": end_grossFeesClaimedUSD,
         "periodGrossFeesClaimedUSD": period_grossFeesClaimedUSD,
     }
+
+
+async def unified_hypervisors_data() -> list:
+    """Only database results
+
+    Returns:
+        list:
+    """
+    _mngr = db_allData_manager(mongo_url=MONGO_DB_URL)
+    result = await _mngr.get_unified_hypervisors_data()
