@@ -1521,10 +1521,11 @@ class db_allRewards2_manager(db_collection_manager):
 
         # add id and datetime to data
         data["datetime"] = datetime.now(timezone.utc)
+        # SET ID -> no history+unique
         # get timestamp without decimals
-        timestamp = int(datetime.timestamp(data["datetime"]))
+        # timestamp = int(datetime.timestamp(data["datetime"]))
         # set id
-        data["id"] = f"{timestamp}_{chain}_{protocol}"
+        data["id"] = f"{chain}_{protocol}"  # f"{timestamp}_{chain}_{protocol}"
         # identify data
         data["chain"] = chain
         data["protocol"] = protocol
