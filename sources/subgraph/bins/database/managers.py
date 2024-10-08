@@ -1424,8 +1424,12 @@ class db_allData_manager(db_collection_manager):
             return {}
 
     async def get_unified_hypervisors_data(self) -> list[dict]:
-        result = await self._get_data(query=self.query_unifiedHypervisorsData())
-        return result
+        try:
+            result = await self._get_data(query=self.query_unifiedHypervisorsData())
+            return result
+        except Exception as e:
+            logger.warning(f" No unified hypervisors data at db -> {e}")
+            return ["error getting data"]
 
     @staticmethod
     def query_all(chain: Chain, protocol: Protocol = "") -> list[dict]:
@@ -1459,6 +1463,7 @@ class db_allData_manager(db_collection_manager):
             {"$match": {"data.v.name": {"$exists": True}}},
             {
                 "$project": {
+                    "_id": 0,
                     "protocol": {
                         "$last": {
                             "$split": [

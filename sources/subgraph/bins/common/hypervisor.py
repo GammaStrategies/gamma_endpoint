@@ -369,4 +369,4 @@ async def unified_hypervisors_data() -> list:
         list:
     """
     _mngr = db_allData_manager(mongo_url=MONGO_DB_URL)
-    result = await _mngr.get_unified_hypervisors_data()
+    return await _mngr.get_unified_hypervisors_data()

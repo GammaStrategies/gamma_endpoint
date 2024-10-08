@@ -636,13 +636,14 @@ class subgraph_router_builder_allDeployments(router_builder_baseTemplate):
     ) -> agg_stats.AggregateStatsDeploymentInfoOutput:
         results = await asyncio.gather(
             *{
-                agg_stats.AggregateStats(
-                    deployment[0], deployment[1], response
-                ).run(RUN_FIRST)
+                agg_stats.AggregateStats(deployment[0], deployment[1], response).run(
+                    RUN_FIRST
+                )
                 for deployment in DEPLOYMENTS
-                if deployment not in [
+                if deployment
+                not in [
                     (Protocol.GLACIER, Chain.AVALANCHE),
-                    (Protocol.THENA, Chain.OPBNB)
+                    (Protocol.THENA, Chain.OPBNB),
                 ]
             },
             return_exceptions=True,
