@@ -220,6 +220,9 @@ AERODROME_BASE_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gam
 UNISWAP_GNOSIS_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-uniswap-gnosis/version/latest
 UNISWAP_GNOSIS_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-uniswap-gnosis/version/latest
 
+KODIAK_BERACHAIN_BARTIO_GAMMA_SUBGRAPH: goldsky::gamma-kodiak-bartio
+KODIAK_BERACHAIN_BARTIO_HP_SUBGRAPH: goldsky::gamma-hp-kodiak-bartio
+
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {
   "ethereum":{},

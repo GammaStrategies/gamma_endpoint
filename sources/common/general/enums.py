@@ -57,6 +57,15 @@ class Chain(str, Enum):
     IOTA = ("iota", 8822, "iota", "Iota", None, "iota_evm", "Iota")
     ZIRCUIT = ("zircuit", 48900, "zircuit", "Zircuit", None, None, "Zircuit")
     CORE = ("core", 1116, "core", "Core", None, None, "Core")
+    BARTIO = (
+        "berachain_bartio",
+        80084,
+        "berachain-bartio",
+        "Berachain bArtio",
+        None,
+        None,
+        "Berachain bArtio",
+    )
 
     # extra properties
     id: int
@@ -143,6 +152,7 @@ class Dex(str, Enum):
     CIRCUIT: "circuit"
     GMEOW: "gmeow"
     CORE: "core"
+    KODIAK: "kodiak"
 
 
 class Protocol(str, Enum):
@@ -204,6 +214,7 @@ class Protocol(str, Enum):
     COREX = ("corex", None, None, None, "corex", "Corex")
     VELODROME = ("velodrome", None, None, None, "velodrome", "Velodrome")
     AERODROME = ("aerodrome", None, None, None, "aerodrome", "Aerodrome")
+    KODIAK = ("kodiak", None, None, None, "kodiak", "Kodiak")
 
     # extra properties
     api_url: str
