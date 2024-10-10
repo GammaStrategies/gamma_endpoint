@@ -12,6 +12,7 @@ from sources.subgraph.bins.config import MONGO_DB_URL
 from sources.subgraph.bins.database.managers import (
     db_allData_manager,
     db_returns_manager,
+    db_unifiedData_manager,
 )
 from sources.subgraph.bins.enums import Chain, Protocol
 from sources.subgraph.bins.hype_fees.fees import fees_all
@@ -368,5 +369,5 @@ async def unified_hypervisors_data() -> list:
     Returns:
         list:
     """
-    _mngr = db_allData_manager(mongo_url=MONGO_DB_URL)
-    return await _mngr.get_unified_hypervisors_data()
+    _mngr = db_unifiedData_manager(mongo_url=MONGO_DB_URL)
+    return await _mngr.get_data()

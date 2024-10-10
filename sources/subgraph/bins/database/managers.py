@@ -2275,3 +2275,35 @@ class db_aggregateStats_manager(db_collection_manager):
             {"$sort": {"datetime": -1}},
             {"$unset": ["_id", "id", "chain", "protocol"]},
         ]
+
+
+class db_unifiedData_manager(db_collection_manager):
+    def __init__(self, mongo_url: str):
+        # Create a dictionary of collections
+        self.db_collections = {"unifiedData": {"id": True}}
+        # Set the database name
+        self.db_name = "gamma_db_v1"
+
+        super().__init__(
+            mongo_url=mongo_url,
+            db_name=self.db_name,
+            db_collections=self.db_collections,
+        )
+        self.db_collection_name = "unifiedData"
+
+    async def create_data(self, chain: Chain, protocol: Protocol) -> dict:
+        raise NotImplementedError(f" Create data has not been implemented yet ")
+
+    async def feed_db(self, chain: Chain, protocol: Protocol):
+        raise NotImplementedError(f" feed_db has not been implemented yet ")
+
+    async def get_data(self) -> dict:
+        try:
+            return await self.get_items_from_database(
+                collection_name=self.db_collection_name,
+                find={},
+                projection={"_id": 0, "id": 0},
+            )
+        except Exception as e:
+            logger.error(f" Error getting unified data from db -> {e}")
+            return []
