@@ -644,7 +644,7 @@ class subgraph_router_builder_allDeployments(router_builder_baseTemplate):
                 not in [
                     (Protocol.GLACIER, Chain.AVALANCHE),
                     (Protocol.THENA, Chain.OPBNB),
-                    (Protocol.Kodiak, Chain.BARTIO),
+                    (Protocol.KODIAK, Chain.BARTIO),
                 ]
             },
             return_exceptions=True,
