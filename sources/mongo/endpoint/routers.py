@@ -742,15 +742,24 @@ class MongoRouterBuilderPerps(router_builder_baseTemplate):
 
         return router
 
-    async def backtest(self):
+    async def backtest(
+        self,
+        start: str,
+        end: str,
+        strategy: str = "MACD",
+        token: str = "ETH",
+        timeframe: str = "8h",
+        lookback: int = 7,
+        leverage: int = 1,
+    ):
         results = await backtests(
-            strategy="MACD",
-            token="ETH",
-            timeframe="8h",
-            lookback=7,
-            leverage=1,
-            start=datetime.strptime("2024-01-01", "%Y-%m-%d"),
-            end=datetime.strptime("2024-06-15", "%Y-%m-%d"),
+            strategy=strategy,
+            token=token,
+            timeframe=timeframe,
+            lookback=lookback,
+            leverage=leverage,
+            start=datetime.strptime(start, "%Y-%m-%d"),
+            end=datetime.strptime(end, "%Y-%m-%d"),
         )
 
         return {"backtest": results}
