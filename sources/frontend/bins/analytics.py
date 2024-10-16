@@ -248,10 +248,10 @@ async def explain_hypervisor_returns(row1, row2) -> list[str]:
 
     ### anualized data
     result.append(
-        f"     the projected anual fee APR is {(_share_price_fees_move_percent/Decimal(str(_days)))*365:,.1%} [${(_share_price_fees_move/Decimal(str(_days)))*365:,.2f}]"
+        f"     the projected annual fee APR is {(_share_price_fees_move_percent/Decimal(str(_days)))*365:,.1%} [${(_share_price_fees_move/Decimal(str(_days)))*365:,.2f}]"
     )
     result.append(
-        f"     the projected anual reward APR is {(_share_price_rewards_move_percent/Decimal(str(_days)))*365:,.1%} [${(_share_price_rewards_move/Decimal(str(_days)))*365:,.2f}]"
+        f"     the projected annual reward APR is {(_share_price_rewards_move_percent/Decimal(str(_days)))*365:,.1%} [${(_share_price_rewards_move/Decimal(str(_days)))*365:,.2f}]"
     )
 
     #
