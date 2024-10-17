@@ -223,6 +223,12 @@ UNISWAP_GNOSIS_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gam
 KODIAK_BERACHAIN_BARTIO_GAMMA_SUBGRAPH: goldsky::gamma-kodiak-bartio
 KODIAK_BERACHAIN_BARTIO_HP_SUBGRAPH: goldsky::gamma-hp-kodiak-bartio
 
+SUSHI_OPTIMISM_GAMMA_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-sushi-optimism/version/latest
+SUSHI_OPTIMISM_HP_SUBGRAPH: url::https://api.studio.thegraph.com/query/73506/gamma-hp-sushi-optimism/version/latest
+
+UNISWAP_WORLDCHAIN_GAMMA_SUBGRAPH: goldsky::gamma-uniswap-worldchain
+UNISWAP_WORLDCHAIN_HP_SUBGRAPH: goldsky::gamma-hp-uniswap-worldchain
+
 # Masterchef addresses
 MASTERCHEF_ADDRESSES: {
   "ethereum":{},

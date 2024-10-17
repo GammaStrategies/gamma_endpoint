@@ -45,4 +45,5 @@ BLOCK_TIME_SECONDS = {
     Chain.ZIRCUIT: 2,
     Chain.CORE: 3,
     Chain.BARTIO: 2,
+    Chain.WORLDCHAIN: 2,
 }

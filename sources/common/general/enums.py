@@ -66,6 +66,7 @@ class Chain(str, Enum):
         None,
         "Berachain bArtio",
     )
+    WORLDCHAIN = ("worldchain", 480, "worldchain", "Worldchain", None, None, "Worldchain")
 
     # extra properties
     id: int
