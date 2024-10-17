@@ -21,48 +21,57 @@ async def get_positions_analysis(
             {"$eq": ["$address", hypervisor_address]},
         ]
     }
+    _project = {
+        "_id": 0,
+        "address": "$address",
+        "symbol": "$symbol",
+        # "name": "$name",
+        "timestamp": "$timestamp",
+        "block": "$block",
+        "currentTick": "$currentTick",
+        "baseUpper": "$baseUpper",
+        "baseLower": "$baseLower",
+        "baseLiquidity_0": "$basePosition.amount0",
+        "baseLiquidity_1": "$basePosition.amount1",
+        "limitUpper": "$limitUpper",
+        "limitLower": "$limitLower",
+        "limitLiquidity_0": "$limitPosition.amount0",
+        "limitLiquidity_1": "$limitPosition.amount1",
+        "token0_symbol": "$pool.token0.symbol",
+        "token1_symbol": "$pool.token1.symbol",
+        "token0_address": "$pool.token0.address",
+        "token1_address": "$pool.token1.address",
+        "token0_decimals": "$pool.token0.decimals",
+        "token1_decimals": "$pool.token1.decimals",
+    }
     if ini_timestamp:
         _expr["$and"].append({"$gte": ["$timestamp", ini_timestamp]})
     if end_timestamp:
         _expr["$and"].append({"$lte": ["$timestamp", end_timestamp]})
     _query = [
-        {
-            "$project": {
-                "_id": 0,
-                "address": "$address",
-                "symbol": "$symbol",
-                # "name": "$name",
-                "timestamp": "$timestamp",
-                "block": "$block",
-                "currentTick": "$currentTick",
-                "baseUpper": "$baseUpper",
-                "baseLower": "$baseLower",
-                "baseLiquidity_0": "$basePosition.amount0",
-                "baseLiquidity_1": "$basePosition.amount1",
-                "limitUpper": "$limitUpper",
-                "limitLower": "$limitLower",
-                "limitLiquidity_0": "$limitPosition.amount0",
-                "limitLiquidity_1": "$limitPosition.amount1",
-                "token0_symbol": "$pool.token0.symbol",
-                "token1_symbol": "$pool.token1.symbol",
-                "token0_address": "$pool.token0.address",
-                "token1_address": "$pool.token1.address",
-                "token0_decimals": "$pool.token0.decimals",
-                "token1_decimals": "$pool.token1.decimals",
-            }
-        },
+        {"$project": _project},
         {"$match": {"$expr": _expr}},
         {"$sort": {"timestamp": 1}},
     ]
 
     # execute query
-    _prices, _data = await asyncio.gather(
+    _prices, _data, _latest_data = await asyncio.gather(
         get_current_prices(network=chain),
         local_database_helper(network=chain).get_items_from_database(
             collection_name="status", aggregate=_query
         ),
+        local_database_helper(network=chain).get_items_from_database(
+            collection_name="latest_hypervisor_snapshots",
+            find={"address": hypervisor_address},
+            projection=_project,
+        ),
     )
     _prices = {itm["address"]: itm["price"] for itm in _prices}
+
+    # add latest data to the list if there is any
+    if _latest_data:
+        # only one item is expected to be present in the latest collection
+        _data.append(_latest_data[0])
 
     # build result
     result = []
