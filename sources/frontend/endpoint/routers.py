@@ -33,6 +33,7 @@ from sources.frontend.bins.revenue_stats import get_revenue_stats
 from sources.frontend.bins.users import get_user_positions
 
 from sources.mongo.bins.apps.returns import build_hype_return_analysis_from_database
+from sources.subgraph.bins.common.hypervisor import unified_hypervisors_data
 from sources.subgraph.bins.enums import Chain, Protocol
 
 
@@ -48,6 +49,10 @@ def build_routers() -> list:
     routes.append(frontend_analytics_router_builder_main(tags=["Analytics"], prefix=""))
 
     routes.append(frontend_user_router_builder_main(tags=["User"], prefix=""))
+
+    routes.append(
+        frontend_hypervisor_router_builder_main(tags=["Hypervisors"], prefix="")
+    )
 
     routes.append(
         frontend_externalApis_router_builder_main(tags=["External APIs"], prefix="")
@@ -448,6 +453,41 @@ class frontend_user_router_builder_main(router_builder_baseTemplate):
                 ]
             )
             return [x for xs in items for x in xs]
+
+
+class frontend_hypervisor_router_builder_main(router_builder_baseTemplate):
+    # ROUTEs BUILD FUNCTIONS
+    def router(self) -> APIRouter:
+        router = APIRouter(prefix=self.prefix)
+
+        router.add_api_route(
+            path="/hypervisors/allDataSummary",
+            endpoint=self.allDataSummary,
+            methods=["GET"],
+        )
+
+        return router
+
+    # ROUTE FUNCTIONS
+    @cache(expire=DB_CACHE_TIMEOUT)
+    async def allDataSummary(self, response: Response):
+        """Returns a summary of the status of all hypervisors across all chains.
+        This involves querying the allData endpoints for each protocol and chain to retrieve the hypervisors' feeAPR,
+        and querying the allRewards2 endpoints for each protocol and chain to obtain the hypervisors' rewards.
+        Additionally, it includes rewards from the following sources:
+        - Angle Merkl (excluding rewards from different campaign chains like uni)
+        - Camelot
+        - Hercules
+        - Lynex
+        - Ramses
+        - Synthswap
+        - Zyberswap
+        - Beamswap
+        - Gamma's MultiRewards
+        - Gamma's StakingRewards
+        """
+        # database call only
+        return await unified_hypervisors_data()
 
 
 class frontend_externalApis_router_builder_main(router_builder_baseTemplate):

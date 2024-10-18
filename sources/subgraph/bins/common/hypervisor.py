@@ -369,5 +369,4 @@ async def unified_hypervisors_data() -> list:
     Returns:
         list:
     """
-    _mngr = db_unifiedData_manager(mongo_url=MONGO_DB_URL)
-    return await _mngr.get_data()
+    return await db_unifiedData_manager(mongo_url=MONGO_DB_URL).get_data()
