@@ -2297,11 +2297,18 @@ class db_unifiedData_manager(db_collection_manager):
     async def feed_db(self, chain: Chain, protocol: Protocol):
         raise NotImplementedError(f" feed_db has not been implemented yet ")
 
-    async def get_data(self) -> dict:
+    async def get_data(self, chain: Chain|None=None, protocol: Protocol|None=None) -> dict:
+        
+        find = {}
+        if chain:
+            find["chain"] = chain.database_name
+        if protocol:
+            find["protocol"] = protocol.database_name
+        
         try:
             return await self.get_items_from_database(
                 collection_name=self.db_collection_name,
-                find={},
+                find=find,
                 projection={"_id": 0, "id": 0},
             )
         except Exception as e:

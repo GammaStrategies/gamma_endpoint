@@ -1,5 +1,5 @@
 import asyncio
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, Response, status, Query
 from fastapi_cache.decorator import cache
 
 from endpoint.config.cache import (
@@ -15,7 +15,7 @@ from endpoint.routers.template import (
     router_builder_generalTemplate,
 )
 from endpoint.utilities import add_deprecated_message
-from sources.common.general.enums import Period
+from sources.common.general.enums import Period, int_to_chain
 from sources.subgraph.bins.charts.daily import DailyChart
 from sources.subgraph.bins.common import (
     SubgraphStatusOutput,
@@ -683,9 +683,25 @@ class subgraph_router_builder_allDeployments(router_builder_baseTemplate):
         return await result.info("UTC")
 
     @cache(expire=DB_CACHE_TIMEOUT)
-    async def unifiedHypervisorsData(self, response: Response):
+    async def unifiedHypervisorsData(
+        self,
+        response: Response,
+        chain: Chain | int = Query(
+            None,
+            enum=[*Chain, *[x.id for x in Chain]],
+            description="Chain to filter by. When None, it will return all chains.",
+        ),
+        protocol: Protocol = Query(
+            None,
+            enum=[*Protocol],
+            description="Protocol to filter by. When None, it will return all protocols.",
+        ),
+    ):
+        # convert
+        if isinstance(chain, int):
+            chain = int_to_chain(chain)
         # database call only
-        return await unified_hypervisors_data()
+        return await unified_hypervisors_data(chain=chain, protocol=protocol)
 
 
 class subgraph_router_builder_Charts(router_builder_baseTemplate):

@@ -470,7 +470,20 @@ class frontend_hypervisor_router_builder_main(router_builder_baseTemplate):
 
     # ROUTE FUNCTIONS
     @cache(expire=DB_CACHE_TIMEOUT)
-    async def allDataSummary(self, response: Response):
+    async def allDataSummary(
+        self,
+        response: Response,
+        chain: Chain | int = Query(
+            None,
+            enum=[*Chain, *[x.id for x in Chain]],
+            description="Chain to filter by. When None, it will return all chains.",
+        ),
+        protocol: Protocol = Query(
+            None,
+            enum=[*Protocol],
+            description="Protocol to filter by. When None, it will return all protocols.",
+        ),
+    ):
         """Returns a summary of the status of all hypervisors across all chains.
         This involves querying the allData endpoints for each protocol and chain to retrieve the hypervisors' feeAPR,
         and querying the allRewards2 endpoints for each protocol and chain to obtain the hypervisors' rewards.
@@ -486,8 +499,11 @@ class frontend_hypervisor_router_builder_main(router_builder_baseTemplate):
         - Gamma's MultiRewards
         - Gamma's StakingRewards
         """
+        # convert
+        if isinstance(chain, int):
+            chain = int_to_chain(chain)
         # database call only
-        return await unified_hypervisors_data()
+        return await unified_hypervisors_data(chain=chain, protocol=protocol)
 
 
 class frontend_externalApis_router_builder_main(router_builder_baseTemplate):

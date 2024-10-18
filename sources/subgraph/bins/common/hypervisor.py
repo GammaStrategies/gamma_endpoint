@@ -363,10 +363,14 @@ async def collected_fees(
     }
 
 
-async def unified_hypervisors_data() -> list:
+async def unified_hypervisors_data(
+    chain: Chain | None = None, protocol: Protocol | None = None
+) -> list:
     """Only database results
 
     Returns:
         list:
     """
-    return await db_unifiedData_manager(mongo_url=MONGO_DB_URL).get_data()
+    return await db_unifiedData_manager(mongo_url=MONGO_DB_URL).get_data(
+        chain=chain, protocol=protocol
+    )
