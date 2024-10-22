@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import pandas as pd
 
 from sources.mongo.bins.helpers import perps_database_helper
@@ -18,11 +16,19 @@ async def backtests(token: str, timeframe: str, strategy: str, lookback: int, le
     df_data["cumulative_hold_return"] = df_data.hold_return.add(1).cumprod()
     df_data["cumulative_strategy_return"] = df_data.strategy_return.add(1).cumprod()
 
+    df_data = df_data.rename(
+        columns={
+            "hold_return": "holdReturn",
+            "strategy_return": "strategyReturn",
+            "cumulative_hold_return": "cumulativeHoldReturn",
+            "cumulative_strategy_return": "cumulativeStrategyReturn",
+        }
+    )
 
     return df_data[[
         "timestamp",
-        "hold_return",
-        "strategy_return",
-        "cumulative_hold_return",
-        "cumulative_strategy_return"
+        "holdReturn",
+        "strategyReturn",
+        "cumulativeHoldReturn",
+        "cumulativeStrategyReturn"
     ]].to_dict("records")
